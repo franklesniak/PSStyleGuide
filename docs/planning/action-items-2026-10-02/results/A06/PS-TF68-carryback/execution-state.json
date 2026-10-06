@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "local_product_validation_passed_commit_pending",
+  "status": "round1_reviews_and_CI_pending",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -85,14 +85,30 @@
     "deadline": "2026-10-13T20:12:24.969231+00:00",
     "accepted_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
   },
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
-  "pr": null,
-  "pending_native_operations": [],
-  "local_operation": "No test, container or Git write active. H94.1 qualification54controls, Node600assertions, Linux11hooks and Windows6groups rootverified.",
+  "rounds_used": 1,
+  "first_request_at": "2026-10-06T20:09:39.767792+00:00",
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "pr": 235,
+  "pending_native_operations": [
+    {
+      "kind": "Copilot_review_result",
+      "pr": 235,
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "request_event_id": 32633869034,
+      "requested_at": "2026-10-06T20:10:01Z",
+      "workflow_run_id": 37524396256
+    },
+    {
+      "kind": "Codex_review_result",
+      "pr": 235,
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "trigger_comment_id": 6024639747,
+      "requested_at": "2026-10-06T20:15:50Z"
+    }
+  ],
+  "local_operation": "No active local test/Git write; PR235 published; hosted CI may run.",
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Normal ten-path product commit; actual B/H endpoint/finalization checks and current two-root audit; final independent quality, PR and native reviews/CI.",
+  "next_action": "Capture complete review baselines, reconcile automatic activity, then one Balanced Copilot request and confirmed Codex trigger.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -101,7 +117,7 @@
     "No acceptance of S1/task/affected pair before legitimate service activation proof"
   ],
   "applied_at": "2026-10-06T18:45:48.069788+00:00",
-  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
   "postimages": [
     {
       "path": ".github/workflows/package.json",
@@ -287,6 +303,24 @@
       "session_id": 47986,
       "session_terminal_exit": 0,
       "verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json"
+    },
+    "committed_inputs": {
+      "status": "passed_root_verified",
+      "owner": "a06_conversion_cold_packet",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "execution_released": true,
+      "accepted_fixture": "C:/Users/flesniak/.codex/worktrees/ps-tf67-accepted-policy/PSStyleGuide",
+      "fixture_observed_head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "next_action": "Review frozen worker preparation, recheck current native main and fixture, then root-only normal detached advancement to B981 and five committed-input checks plus ordinary two-root audit.",
+      "manifest_sha256": "ae1594348470f04ae0c25b5eb69a95572b05c3f17c6b14d46a01b8614601fe1c",
+      "report_sha256": "aab085b224d5b6f66bfb5c12c57d2e8686378961abf0bb052dfddab3c92883a6",
+      "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\result.json",
+      "result_sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2",
+      "session_id": 90058,
+      "session_terminal_exit": 0
     }
   },
   "scratch_corrections": [
@@ -337,5 +371,252 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
+  },
+  "planning_checkpoint": "1649522474c8ec1e50295439fc86c8a309462a01",
+  "commit": {
+    "status": "committed",
+    "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "requested_at": "2026-10-06T19:48:28.580472+00:00",
+    "paths": [
+      ".github/workflows/package.json",
+      ".github/workflows/package-lock.json",
+      "docs/dependency-maintenance.md",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml"
+    ],
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\normal-carryback-commit.log",
+    "log_sha256": "3ca53969e7174156c399d74cdfcadcbe08adc115089185e41f877644a93c2816",
+    "observed_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "finished_at": "2026-10-06T19:48:35.353053+00:00"
+  },
+  "updated_at": "2026-10-06T20:16:37.774940+00:00",
+  "prior_committed_validation_attempts": [
+    {
+      "status": "failed",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation\\execution-run\\result.json",
+      "result_sha256": "da6a16b43cda304da752b3866c70638e59f8067aac484c680c8078b4bd9df7fd"
+    }
+  ],
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\result.json",
+    "result_sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2"
+  },
+  "final_validation": {
+    "status": "PASS_LOCAL_FINAL_CANDIDATE_VALIDATION",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\FINAL-VALIDATION.json",
+    "sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195"
+  },
+  "proposed_PR": {
+    "title": "Carry shared validation and review setup fixes back to PowerShell",
+    "body": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\pr-body-final.md",
+    "body_sha256": "de34018fd65817557066e075f8cc91354f8984a20801f8628f129e9adef3eb2a",
+    "status": "published_as_PR235"
+  },
+  "independent_local_quality": {
+    "status": "PASS_LOCAL_QUALITY_NO_MATERIAL_FINDINGS",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-local\\REPORT.md",
+    "report_sha256": "1feff5093cfaa69624457c471b70e01d8032529668149ef84e7349ed856a6a42",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-local\\evidence.json",
+    "evidence_sha256": "5a1f9fba11aec3095b83ece5d71464576925cb70ef3ae188cd18243e1d193d2f",
+    "root_verified_references": 30,
+    "root_verified_at": "2026-10-06T20:07:49.318904+00:00"
+  },
+  "topic_push": {
+    "status": "published",
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "branch": "codex/tf68-compareback",
+    "requested_at": "2026-10-06T20:07:50.059749+00:00",
+    "exit": 0,
+    "observed_remote": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\normal-topic-push.log",
+    "log_sha256": "c02eeb7f963dc072c20a1ff89bb2d293102709cbff915d78bcf1b5afac334204",
+    "published_at": "2026-10-06T20:07:53.376974+00:00"
+  },
+  "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/235",
+  "body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+  "PR_creation": {
+    "status": "confirmed",
+    "created_at": "2026-10-06T20:08:12Z",
+    "readback_at": "2026-10-06T20:08:42.838034+00:00",
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+    "reviewed_local_body_sha256": "de34018fd65817557066e075f8cc91354f8984a20801f8628f129e9adef3eb2a",
+    "body_transfer_difference": "Only LF to CRLF line endings; exact normalized text verified, no material scope/content change",
+    "attached": true
+  },
+  "review_rounds": [
+    {
+      "round": 1,
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+      "first_request_intent_at": "2026-10-06T20:09:39.767792+00:00",
+      "deadline": "2026-10-14T20:09:39.767792+00:00",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-baseline.json",
+      "baseline_sha256": "a0f9e24652501326de88eced015b1f571eab902ba032a625da88a01a6647c6aa",
+      "copilot": {
+        "status": "confirmed_pending_result",
+        "channel": "Balanced UI",
+        "selected_effort": "Balanced",
+        "observed_effort": null,
+        "channel_attempt": 1,
+        "request_event_id": 32633869034,
+        "request_issued_at": "2026-10-06T20:10:01Z",
+        "confirmed_by": "new_authenticated_request_event",
+        "workflow_run_id": 37524396256,
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-copilot-readback.json"
+      },
+      "codex": {
+        "status": "confirmed_pending_result",
+        "manual_trigger_issued": true,
+        "comment": "@codex review",
+        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-baseline.json",
+        "baseline_sha256": "33e470440675c714b809673961cf524e0b05d4674323785ab36752fe669689cd",
+        "request_intent_at": "2026-10-06T20:15:50.331128+00:00",
+        "channel_attempt": 1,
+        "trigger_comment_id": 6024639747,
+        "trigger_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#issuecomment-6024639747",
+        "requested_at": "2026-10-06T20:15:50Z",
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json"
+      },
+      "automatic_codex": {
+        "status": "authenticated_terminal",
+        "summary_comment_id": 6024517148,
+        "created_at": "2026-10-06T20:08:21Z",
+        "trigger": "PR opened",
+        "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "completed_at": "2026-10-06T20:11:41Z",
+        "summary_body_sha256": "b8763ecd9c761af41672f52d891d6bebf08a02c48c9e28acb38e73bfcc4ce899",
+        "findings_observed": 0,
+        "manual_attribution": "Excluded; PR-open trigger is distinct from the required manual request after Copilot confirmation"
+      },
+      "findings": []
+    }
+  ],
+  "latest_native_snapshot": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json",
+    "captured_at": "2026-10-06T20:15:59.632270+00:00",
+    "sha256": "c150d153cf7a05fc4b36080f31d1f219f552852385b9523fc6032d8364ddfb5c"
+  },
+  "CI_observation": {
+    "captured_at": "2026-10-06T20:15:59.632270+00:00",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json",
+    "workflows": [
+      {
+        "id": 37524396256,
+        "name": "Running Copilot Code Review",
+        "event": "dynamic",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37524154494,
+        "name": "Agent instruction validation",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37524154228,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37524154208,
+        "name": "Dev container boundary",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524154909,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524154355,
+        "name": "Copilot code review preparation",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524154327,
+        "name": "Markdown Lint",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524154479,
+        "name": "Build Style Guide Artifacts",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524110694,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37524110641,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37524110707,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524110671,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524110807,
+        "name": "Copilot code review preparation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524110612,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "failed_or_cancelled": [],
+    "retry_requested": false,
+    "merge_allowed": false
   }
 }

@@ -1,0 +1,140 @@
+{
+  "status": "PASS_LOCAL_FINAL_CANDIDATE_VALIDATION",
+  "verified_at": "2026-10-06T20:02:37.924426+00:00",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "source_paths": 78,
+  "candidate_dependencies": 1914,
+  "accepted_dependencies": 1910,
+  "Node_assertions": 600,
+  "Linux_hooks": 11,
+  "Windows_product_groups": 6,
+  "committed_endpoint_modes": 5,
+  "audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
+  },
+  "actual_finalization_UTC_date": "2026-10-06",
+  "owned_jobs_terminal_empty": true,
+  "input_guards_equal": true,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\normal-carryback-commit.log",
+      "sha256": "3ca53969e7174156c399d74cdfcadcbe08adc115089185e41f877644a93c2816"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\manifest.authorized.json",
+      "sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\ROOT-RELEASE.json",
+      "sha256": "68f50cf8975d9730c6e1fcb30ffc0579ff6aa47b53e5edf555c5d1eb4bbed39b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\result.json",
+      "sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\before.json",
+      "sha256": "0b945efff7d7b7556b4c20b1ddbc86234574c45b77ec924236ae5f3f2f71c499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\after.json",
+      "sha256": "0b945efff7d7b7556b4c20b1ddbc86234574c45b77ec924236ae5f3f2f71c499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\log.txt",
+      "sha256": "f4f41ae2204b2aceac164aeeeecae94d536bc770dea223ff40bf371f404f4499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\result.json",
+      "sha256": "b88c71dc57757b1f81da6f0c13aa4408287c82673c575f25e2836f485d1d6f66"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\native-result.json",
+      "sha256": "245f5c255d0fbb9a0b8f3a1b1650d5ea1295c73df3c062e4c9ba38f239f63d19"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\log.txt",
+      "sha256": "01663d0afddb58c9fe8ccb8df1d2ef60801cc33b33f5ca91bdcbb6941931c41c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\result.json",
+      "sha256": "6137a0fa61efd31ddd1113fe6549e8b2bf9a5eb1d2cac5be6f9ab1ab3926cf26"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\native-result.json",
+      "sha256": "d5ff0e100724be931983093e1f90242abf6cd17e25951a58a8a203b12fd1aa24"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\log.txt",
+      "sha256": "c021e4f5c70bb459aaba6277d2c4d7f8a624693457db3129378717db0a6d025e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\result.json",
+      "sha256": "736b36c2afb2cc6a477b17bdb2faaea9099343a63861ad205a5e35332ffb3dd2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\native-result.json",
+      "sha256": "9162d25cfbb869eab34174b74e1d3e05a3e44623ea48578bdce64d24459618cd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\log.txt",
+      "sha256": "e0a4baa5121a1e6e5ff5df68fcd0ee1e3c89efbffe20ab4f7df74524c1bcc8a6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\result.json",
+      "sha256": "5c621ed6a16b445e77660f7ebd0a2378d3086197b898bce34fbf5d5ed69089f8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\native-result.json",
+      "sha256": "61137ce8c07129602ec3f63efdae2a1f00303ae3bddc32b9509a2662716e8a21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\log.txt",
+      "sha256": "4f8ab99be939c71fbe229821ab019f69ebf9f93d7e29d285eba43f1a7f7c3a22"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\result.json",
+      "sha256": "46240f68720fa954873fd0f7c1f5db1a59b4cd0bc4c300f560722230735dc37e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\native-result.json",
+      "sha256": "6f982f020c97b94c52233bc968ddc00386a24d3952c55aed456be83f210cae34"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\log.txt",
+      "sha256": "c539e4cdc6d19c7929219e10dccc1243b27fb8214139a075ee286471161403cc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\result.json",
+      "sha256": "74b59e7be95dea29ca24f9fda63535bde91000113cecdd996fa24cd7d5248a1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\native-result.json",
+      "sha256": "a42ef7f83863c7ff04eac592dc3882da5bdc6ceefef171ebe16cfd6f19b02bbf"
+    }
+  ],
+  "retained_failures": "All original Linux/Windows/qualification/private-schema failures retain their original failed status; no passed group replay or product workaround. The first committed-validation guard failed before fixture mutation or product execution on dependencies versus actual dependency_files field. Corrected driver consumed original receipt and completed once.",
+  "limits": [
+    "Current local validation combines explicitly named evidence from retained runs",
+    "Original three adopted child causes remain unknown; Node assertions and independent owned terminal collection satisfy selected H94.1 contract",
+    "Current remote reviews, hosted CI, independent native premerge quality and legitimate dedicated service proof remain"
+  ]
+}

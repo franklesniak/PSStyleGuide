@@ -1,0 +1,16 @@
+{
+  "accepted": {
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "index_entries_sha256": "75f9d1df83f84e05deff97269129655e920cb6c753937e1b68740cc549a27454",
+    "refs_sha256": "9d7931ea36fcdcb186bf2c49baa700314cf4968506d32343920f655c004b9622",
+    "config_sha256": "46acdde17fb69c76d7f9d8c9312cb0aa2d7aecd6e24a9c67a9603745c7addf2b"
+  },
+  "candidate": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "index_entries_sha256": "3f88327bc2229cefc25e98962070c4697dfc6fa598322cc55bbe39ba75be8100",
+    "refs_sha256": "9d7931ea36fcdcb186bf2c49baa700314cf4968506d32343920f655c004b9622",
+    "config_sha256": "0198da33a47e643561932398603b3584cb7619d64c4549f1e15384648f04138f"
+  }
+}

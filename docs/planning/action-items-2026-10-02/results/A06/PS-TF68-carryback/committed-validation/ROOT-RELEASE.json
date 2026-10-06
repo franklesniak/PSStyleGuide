@@ -1,0 +1,12 @@
+{
+  "status": "ROOT_SOURCE_REVIEW_AND_PARSER_ONLY_PASS",
+  "prepared_manifest_sha256": "ae1594348470f04ae0c25b5eb69a95572b05c3f17c6b14d46a01b8614601fe1c",
+  "root_runner_sha256": "d97c40ee78b0e55c3e586979c6670438197ef6543061470823e1547551a5a2f2",
+  "manifest_sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16",
+  "transport_source_sha256": "ed960174b08b59be9424d43ce12b951fada9960d67bf8b494031495a37ac29b5",
+  "worker_Job_layouts_unchanged": true,
+  "run_stage_change": "Replace single wait with time/stream/output bounded monitoring, preserving ownership cleanup and primary failure",
+  "all_prepared_runtime_hashes_verified": true,
+  "execution_not_yet_started": true,
+  "factual_correction": "Use existing dependency_files field; preserve first failure and unchanged checkout/commands/guards."
+}

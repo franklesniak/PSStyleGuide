@@ -1,0 +1,489 @@
+{
+  "status": "PASS_LOCAL_QUALITY_NO_MATERIAL_FINDINGS",
+  "reviewer": "independent ps_carryback_final_quality",
+  "recorded_at_utc": "2026-10-06T20:05:53.8525805Z",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "branch": "codex/tf68-compareback",
+  "worktree_clean": true,
+  "actual_parent_matches_base": true,
+  "scope_count": 10,
+  "paths": [
+    {
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+      "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "accepted_TF_blob": "670083e767627cfed90a61f788021dba88de1091",
+      "accepted_TF_sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "exception_count": 6
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+      "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "accepted_TF_blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "accepted_TF_sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "exception_count": 2
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+      "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+      "accepted_TF_blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+      "accepted_TF_sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+      "exception_count": 1
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "accepted_TF_blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+      "accepted_TF_sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+      "exception_count": 1
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "accepted_TF_blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+      "accepted_TF_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+      "exception_count": 4
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+      "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "accepted_TF_blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "accepted_TF_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+      "exception_count": 1
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "accepted_TF_blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "accepted_TF_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "exception_count": 0
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "accepted_TF_blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "accepted_TF_sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "exception_count": 8
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+      "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "accepted_TF_blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "accepted_TF_sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "exception_count": 4
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "accepted_TF_blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "accepted_TF_sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "exception_count": 3
+    }
+  ],
+  "accepted_TF_commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "accepted_TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "source_count": 78,
+  "dependency_count": 1914,
+  "accepted_source_count": 77,
+  "accepted_dependency_count": 1910,
+  "accepted_katex": "0.16.27",
+  "candidate_katex": "0.18.2",
+  "material_findings": [],
+  "reused_source_review": "Exact-bound prior independent PREPARATION; no repeated broad unchanged-source review",
+  "reference_checks": {
+    "preparation_and_local": 48,
+    "final_validation": 25,
+    "expected_mutable_execution_state_changes": 1,
+    "unexpected_mismatches": 0,
+    "H94_1_prepared_inputs": 21
+  },
+  "validation": {
+    "node_pass": 600,
+    "guards_equal": true,
+    "Node_H94_1_controls": 54,
+    "Windows_product_groups": 6,
+    "Windows_receipt_negative_controls": 12,
+    "actual_finalization_UTC_date": "2026-10-06",
+    "node_cancelled": 0,
+    "current_audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "authoritySource": "local-origin-main",
+      "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+      "installedGraphRoots": [
+        ".",
+        ".github/workflows"
+      ],
+      "findings": []
+    },
+    "node_fail": 0,
+    "terminal_empty_jobs": 6,
+    "node_skipped": 0,
+    "Linux_strict_zero_waits": 67,
+    "node_todo": 0,
+    "Linux_hooks": 11,
+    "committed_modes": 5,
+    "single_uninterrupted_pass": false,
+    "Node_owned_terminal_observations": 82,
+    "Linux_skips": 0,
+    "Node_historical_unknown_causes": 3,
+    "normal_commit_hooks_passed": true
+  },
+  "runner_AST": {
+    "payload_executed": false,
+    "Job_equal": true,
+    "run_stage_only_change": "single wait replaced by bounded time/stream/output polling",
+    "worker_equal": true,
+    "checked_equal": true,
+    "BASIC_equal": true,
+    "EXT_equal": true,
+    "ACCOUNT_equal": true,
+    "IO_equal": true
+  },
+  "pr_title": "Carry shared validation and review setup fixes back to PowerShell",
+  "pr_body_sha256": "de34018fd65817557066e075f8cc91354f8984a20801f8628f129e9adef3eb2a",
+  "final_validation_sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195",
+  "committed_result_sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2",
+  "references": [
+    {
+      "sha256": "612a640ad7a012bdcb319310ef91a4e807ed00b5fcb83a421f66bcb2b3f35612",
+      "bytes": 8405,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\PREPARATION.md"
+    },
+    {
+      "sha256": "52c55476759293701917aee41c165917f55577a1fff1888879e29d06aa3339b7",
+      "bytes": 13994,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\evidence-preparation.json"
+    },
+    {
+      "sha256": "e113a061961c1be4df597a5b5d37e8cca205f0450137bf373ee1efb44b756ca0",
+      "bytes": 711,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\ROOT-PREPARATION-VERIFICATION.json"
+    },
+    {
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "bytes": 18558,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json"
+    },
+    {
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "bytes": 400393,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json"
+    },
+    {
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
+      "bytes": 3357,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json"
+    },
+    {
+      "sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195",
+      "bytes": 8497,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\FINAL-VALIDATION.json"
+    },
+    {
+      "sha256": "de34018fd65817557066e075f8cc91354f8984a20801f8628f129e9adef3eb2a",
+      "bytes": 4102,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\pr-body-final.md"
+    },
+    {
+      "sha256": "34679c2e49d09aca3453335603e0cac2ed2cfd52ac306480024031838cd5b26e",
+      "bytes": 15403,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\REPORT.md"
+    },
+    {
+      "sha256": "94dc15ffdcb29bd482e2e8de3c0f4f2ba90470fd8296f93ab1986b8986aa6070",
+      "bytes": 22460,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\evidence.json"
+    },
+    {
+      "sha256": "ec56dce1d90d17629e9440eaa4b0920b1f83e8c97e16d8db1e88390fdc98c408",
+      "bytes": 7768,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\node_stage.py"
+    },
+    {
+      "sha256": "a5e0a114933753a82de70a6d30ac4140f5d60ee821d6f96e637240f4d560d597",
+      "bytes": 13638,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\check_node_stage.py"
+    },
+    {
+      "sha256": "9908a985d8dd077bc4473ed5ae04a8eb7e9b0ee3a92f51cca6026c288d8117a6",
+      "bytes": 3612,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\manifest.prepared.json"
+    },
+    {
+      "sha256": "90e2be3b3ff39078890a0ff12a77d06f19184f1574f7b082d5e50d47748e0164",
+      "bytes": 7324,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\REUSE-BINDING.json"
+    },
+    {
+      "sha256": "83b10260595c089158f22470538172722b501fcb2f4dcd36114d258c4d919156",
+      "bytes": 1881,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-one\\STATUS.json"
+    },
+    {
+      "sha256": "4eef3cf9ef2f7b5e010385f3e6dfba0c2b9701dbe700835c53aee60273e271d6",
+      "bytes": 252,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-one\\stream.log"
+    },
+    {
+      "sha256": "059f6341cf2856cd88ba73dd26342a33a6de90e9481ab4dfb68546364bd547e7",
+      "bytes": 1908,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\STATUS.json"
+    },
+    {
+      "sha256": "40fe204b9ac52bb7b11abd9b4eb0044a14e3570664abd65817696be3eaee4352",
+      "bytes": 28450,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\output\\QUALIFICATION.json"
+    },
+    {
+      "sha256": "dfd051d69ad125801940b5004f40ce055bf1239340391f0eb33304f81cf94ecc",
+      "bytes": 138837,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\result.json"
+    },
+    {
+      "sha256": "ad39e4118754675075c14b90d9ee1b321ca9be91238dbdcf3080ab66a9070922",
+      "bytes": 122644,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node.log"
+    },
+    {
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe",
+      "bytes": 1883,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json"
+    },
+    {
+      "sha256": "979427dc7d769a8ddd0c624f839c8b7d57b10c58892b9ece1a9ca18f92125993",
+      "bytes": 4761,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json"
+    },
+    {
+      "sha256": "409d34c2bc5b39d9b7dca445b3fd5659f1a1f83cd2f73a50790c01c64bb1a01e",
+      "bytes": 3836,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\result.json"
+    },
+    {
+      "sha256": "776229cef1a1b168582970f623b415cbfc416237da4fbc3f0a0823fe690743c3",
+      "bytes": 8401,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\result.json"
+    },
+    {
+      "sha256": "faa0c2472fcc2f4e23725acf1fb7da6df509f620f41440e2aad516cd31518d15",
+      "bytes": 4232,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\execution-run\\result.json"
+    },
+    {
+      "sha256": "ed960174b08b59be9424d43ce12b951fada9960d67bf8b494031495a37ac29b5",
+      "bytes": 19387,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\runner.py"
+    },
+    {
+      "sha256": "da6a16b43cda304da752b3866c70638e59f8067aac484c680c8078b4bd9df7fd",
+      "bytes": 1448,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation\\execution-run\\result.json"
+    },
+    {
+      "sha256": "d97c40ee78b0e55c3e586979c6670438197ef6543061470823e1547551a5a2f2",
+      "bytes": 16343,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\runner.py"
+    },
+    {
+      "sha256": "f5f4f8eae8ae4719271a923e2068abbeec88d966cb7e9897d31f031086ba59fa",
+      "bytes": 18853,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\accepted-source-catalog.json"
+    },
+    {
+      "sha256": "da3f6f9308eb0a70c5682d2f48ed9c2371d10a19cff5bc71256251e0201c2e0e",
+      "bytes": 370942,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\accepted-dependency-catalog.json"
+    }
+  ],
+  "final_raw_references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\normal-carryback-commit.log",
+      "sha256": "3ca53969e7174156c399d74cdfcadcbe08adc115089185e41f877644a93c2816"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\manifest.authorized.json",
+      "sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\ROOT-RELEASE.json",
+      "sha256": "68f50cf8975d9730c6e1fcb30ffc0579ff6aa47b53e5edf555c5d1eb4bbed39b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\result.json",
+      "sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\before.json",
+      "sha256": "0b945efff7d7b7556b4c20b1ddbc86234574c45b77ec924236ae5f3f2f71c499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\after.json",
+      "sha256": "0b945efff7d7b7556b4c20b1ddbc86234574c45b77ec924236ae5f3f2f71c499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\log.txt",
+      "sha256": "f4f41ae2204b2aceac164aeeeecae94d536bc770dea223ff40bf371f404f4499"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\result.json",
+      "sha256": "b88c71dc57757b1f81da6f0c13aa4408287c82673c575f25e2836f485d1d6f66"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedMaintenance\\native-result.json",
+      "sha256": "245f5c255d0fbb9a0b8f3a1b1650d5ea1295c73df3c062e4c9ba38f239f63d19"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\log.txt",
+      "sha256": "01663d0afddb58c9fe8ccb8df1d2ef60801cc33b33f5ca91bdcbb6941931c41c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\result.json",
+      "sha256": "6137a0fa61efd31ddd1113fe6549e8b2bf9a5eb1d2cac5be6f9ab1ab3926cf26"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\AcceptedContent\\native-result.json",
+      "sha256": "d5ff0e100724be931983093e1f90242abf6cd17e25951a58a8a203b12fd1aa24"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\log.txt",
+      "sha256": "c021e4f5c70bb459aaba6277d2c4d7f8a624693457db3129378717db0a6d025e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\result.json",
+      "sha256": "736b36c2afb2cc6a477b17bdb2faaea9099343a63861ad205a5e35332ffb3dd2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\FinalizeMetadataNow\\native-result.json",
+      "sha256": "9162d25cfbb869eab34174b74e1d3e05a3e44623ea48578bdce64d24459618cd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\log.txt",
+      "sha256": "e0a4baa5121a1e6e5ff5df68fcd0ee1e3c89efbffe20ab4f7df74524c1bcc8a6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\result.json",
+      "sha256": "5c621ed6a16b445e77660f7ebd0a2378d3086197b898bce34fbf5d5ed69089f8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\MetadataClassificationOnly\\native-result.json",
+      "sha256": "61137ce8c07129602ec3f63efdae2a1f00303ae3bddc32b9509a2662716e8a21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\log.txt",
+      "sha256": "4f8ab99be939c71fbe229821ab019f69ebf9f93d7e29d285eba43f1a7f7c3a22"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\result.json",
+      "sha256": "46240f68720fa954873fd0f7c1f5db1a59b4cd0bc4c300f560722230735dc37e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\ProposedPolicy\\native-result.json",
+      "sha256": "6f982f020c97b94c52233bc968ddc00386a24d3952c55aed456be83f210cae34"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\log.txt",
+      "sha256": "c539e4cdc6d19c7929219e10dccc1243b27fb8214139a075ee286471161403cc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\result.json",
+      "sha256": "74b59e7be95dea29ca24f9fda63535bde91000113cecdd996fa24cd7d5248a1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\output\\CurrentAudit\\native-result.json",
+      "sha256": "a42ef7f83863c7ff04eac592dc3882da5bdc6ceefef171ebe16cfd6f19b02bbf"
+    }
+  ],
+  "local_raw_references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\STATUS.json",
+      "sha256": "059f6341cf2856cd88ba73dd26342a33a6de90e9481ab4dfb68546364bd547e7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\output\\QUALIFICATION.json",
+      "sha256": "40fe204b9ac52bb7b11abd9b4eb0044a14e3570664abd65817696be3eaee4352"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\release\\manifest.authorized.json",
+      "sha256": "b7fd46e36c19e26b4cc64bb4f397d4a382de50a8e3ca6183194730c9ef14196b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\manifest.prepared.json",
+      "sha256": "9908a985d8dd077bc4473ed5ae04a8eb7e9b0ee3a92f51cca6026c288d8117a6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\evidence.json",
+      "sha256": "7fdec65d846d17c75e30ae0cf97af2c0e71c80e13b589a98bfa615c01ee63833"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json",
+      "sha256": "979427dc7d769a8ddd0c624f839c8b7d57b10c58892b9ece1a9ca18f92125993"
+    }
+  ],
+  "retained_failures": [
+    "Original Linux packet",
+    "Historical cold comparison",
+    "Windows original wrapper",
+    "Windows continuation-one wrapper",
+    "Pure qualification-one absent cleanup field",
+    "Committed-validation first wrong prior receipt field"
+  ],
+  "remaining": [
+    "Current remote reviews and hosted CI",
+    "Independent final native premerge binding and normal landing",
+    "Legitimate dedicated Copilot service selection/guard/completion",
+    "Actual landed main/main reverse comparison and paired acceptance"
+  ],
+  "limits": [
+    "Local quality only; no merge/task/paired acceptance",
+    "No independent fresh native query in this review",
+    "Unknown historical adopted-child causes remain unknown",
+    "No single uninterrupted passing packet",
+    "No empirical all-PowerShell-7.x coverage"
+  ],
+  "operations": {
+    "git_writes": 0,
+    "product_payload_executions": 0,
+    "native_requests": 0,
+    "private_artifacts_written": 2,
+    "product_edits": 0,
+    "tests": 0,
+    "installs": 0,
+    "descendants": 0,
+    "process_inspections": 0,
+    "planning_state_counter_edits": 0
+  }
+}

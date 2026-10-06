@@ -1,0 +1,278 @@
+{
+  "state": "passed",
+  "started_utc": "2026-10-06T19:58:25.207708+00:00",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "stages": [
+    {
+      "name": "AcceptedMaintenance",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "504cd7672ac9604ace765a4f451346f801f09ddd"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-06T19:58:43.138620+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 97192,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 16,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 16,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T19:58:43.662766+00:00",
+      "log_sha256": "f4f41ae2204b2aceac164aeeeecae94d536bc770dea223ff40bf371f404f4499"
+    },
+    {
+      "name": "AcceptedContent",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-06T19:58:54.848914+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 103888,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 544,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 544,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T19:59:18.378605+00:00",
+      "log_sha256": "01663d0afddb58c9fe8ccb8df1d2ef60801cc33b33f5ca91bdcbb6941931c41c"
+    },
+    {
+      "name": "FinalizeMetadataNow",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-FinalizeMetadataNow"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-06T19:59:29.599325+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 39216,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 544,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 544,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T19:59:53.523268+00:00",
+      "log_sha256": "c021e4f5c70bb459aaba6277d2c4d7f8a624693457db3129378717db0a6d025e"
+    },
+    {
+      "name": "MetadataClassificationOnly",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-MetadataClassificationOnly"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-06T20:00:05.278737+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 1692,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 40,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 40,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T20:00:07.247546+00:00",
+      "log_sha256": "e0a4baa5121a1e6e5ff5df68fcd0ee1e3c89efbffe20ab4f7df74524c1bcc8a6"
+    },
+    {
+      "name": "ProposedPolicy",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-ProposedPolicy"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "started_utc": "2026-10-06T20:00:18.846670+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 103316,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 553,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 553,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T20:00:40.431171+00:00",
+      "log_sha256": "4f8ab99be939c71fbe229821ab019f69ebf9f93d7e29d285eba43f1a7f7c3a22"
+    },
+    {
+      "name": "CurrentAudit",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "started_utc": "2026-10-06T20:00:51.666104+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 66744,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 23,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 23,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-06T20:01:01.450370+00:00",
+      "log_sha256": "c539e4cdc6d19c7929219e10dccc1243b27fb8214139a075ee286471161403cc"
+    }
+  ],
+  "primary_failure": null,
+  "cleanup_failures": [],
+  "manifest_sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16",
+  "native_before": {
+    "observed_at": "2026-10-06T19:58:25.702693+00:00",
+    "native": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    }
+  },
+  "accepted_fixture_before": {
+    "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "index_entries_sha256": "ff2b1d145d3efc26b1d062b6026e5268cf23af5a7d6c738df0746538c5090153",
+    "refs_sha256": "9d7931ea36fcdcb186bf2c49baa700314cf4968506d32343920f655c004b9622",
+    "config_sha256": "46acdde17fb69c76d7f9d8c9312cb0aa2d7aecd6e24a9c67a9603745c7addf2b"
+  },
+  "fixture_switch_exit": 0,
+  "classification": {
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "policy": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "classification": "maintenance_required",
+    "maintenancePaths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json"
+    ]
+  },
+  "audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
+  },
+  "native_after": {
+    "observed_at": "2026-10-06T20:01:07.630896+00:00",
+    "native": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    }
+  },
+  "guards_equal": true,
+  "finished_utc": "2026-10-06T20:01:13.285597+00:00"
+}

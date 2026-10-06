@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "prepared": true,
+  "execution_authorized": true,
+  "authorizing_coordinator": "root",
+  "role": "committed-PS-B-H-endpoints-and-current-two-root-audit",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "accepted_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "finalization_utc_date": "2026-10-06",
+  "accepted_fixture": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+  "candidate_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "accepted_source_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\accepted-source-catalog.json",
+  "accepted_source_catalog_sha256": "f5f4f8eae8ae4719271a923e2068abbeec88d966cb7e9897d31f031086ba59fa",
+  "accepted_dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\accepted-dependency-catalog.json",
+  "accepted_dependency_catalog_sha256": "da3f6f9308eb0a70c5682d2f48ed9c2371d10a19cff5bc71256251e0201c2e0e",
+  "candidate_source_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+  "candidate_source_catalog_sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+  "candidate_dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+  "candidate_dependency_catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+  "accepted_prior_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\accepted-base-policy.json",
+  "accepted_prior_receipt_sha256": "787d58496e3259b6d83076916f17363a0bcf3ffe952fed54beebfae287d8fb27",
+  "fixture_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\fixture-readiness.json",
+  "fixture_readiness_sha256": "67c24219734731337e640ee51aa17c14c154f757d3cfe52283bd42fbaa742ab9",
+  "runtimes": {
+    "python": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+    },
+    "python_base": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+      "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+    },
+    "python_dll": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.dll",
+      "sha256": "9a0e3435aaa680d868150f87ab3e388ad2eebc22f87e036155c7b4eda8cd2120"
+    },
+    "pwsh": {
+      "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+    },
+    "node": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+    },
+    "git": {
+      "path": "C:\\Program Files\\Git\\cmd\\git.exe",
+      "sha256": "78211c7ed73988da93a6d8a33d47ec6187f464d7ea2a9a00c182bbd7a1ecf30f"
+    }
+  },
+  "npm_cli": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+  "limits": {
+    "overall_seconds": 3900,
+    "fixture_checkout_seconds": 60,
+    "per_command_seconds": 600,
+    "cleanup_reserve_seconds": 30,
+    "maximum_stream_bytes": 8388608,
+    "maximum_output_bytes": 67108864
+  },
+  "execution_transport": "root-owned qualified Windows job hosting; preserve before/after guards and no-live-residue; no new transport in this packet",
+  "audit_network": "ordinary current registry audit required; do not replace with cached result or offline filter",
+  "source_refs_and_index_mutations": "none by endpoint/audit commands; root may advance only the owned accepted fixture by normal detached checkout after complete clean/hash guard",
+  "accepted_source_count": 77,
+  "accepted_dependency_count": 1910,
+  "candidate_source_count": 78,
+  "candidate_dependency_count": 1914,
+  "prepared_files": {
+    "root-helper-template.py": "bf010a4b35dabe7eccc6131f57e5da4ed3b42b0e3b52fdc960d36afee41aaf7f",
+    "REPORT.md": "aab085b224d5b6f66bfb5c12c57d2e8686378961abf0bb052dfddab3c92883a6",
+    "fixture-readiness.json": "67c24219734731337e640ee51aa17c14c154f757d3cfe52283bd42fbaa742ab9",
+    "accepted-source-catalog.json": "f5f4f8eae8ae4719271a923e2068abbeec88d966cb7e9897d31f031086ba59fa",
+    "accepted-dependency-catalog.json": "da3f6f9308eb0a70c5682d2f48ed9c2371d10a19cff5bc71256251e0201c2e0e"
+  },
+  "root_reviewed_at": "2026-10-06T19:58:24.667578+00:00",
+  "root_runner_sha256": "d97c40ee78b0e55c3e586979c6670438197ef6543061470823e1547551a5a2f2",
+  "transport_scope": "Unchanged qualified worker/job/layout/cleanup; bounded wait monitoring added. Exact command plan, full guards, no new product tests."
+}
