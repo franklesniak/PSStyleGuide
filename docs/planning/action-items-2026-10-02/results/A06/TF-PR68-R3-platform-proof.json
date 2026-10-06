@@ -1,0 +1,197 @@
+{
+  "captured_at": "2026-10-06T04:11:59.498284+00:00",
+  "proofs": [
+    {
+      "run": 37412265819,
+      "attempt": 1,
+      "event": "pull_request",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "checkout_revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+      "native_commit": {
+        "sha": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+        "node_id": "C_kwDOSAZRhdoAKGZhMDljYWUyZWE1YjllZmVjNGIzMGFjNDcxYWZkMzViZGMwYjM2NWE",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+        "author": {
+          "name": "Frank Lesniak",
+          "email": "franklesniak@hotmail.com",
+          "date": "2026-10-06T04:08:16Z"
+        },
+        "committer": {
+          "name": "GitHub",
+          "email": "noreply@github.com",
+          "date": "2026-10-06T04:08:16Z"
+        },
+        "tree": {
+          "sha": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+          "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/0fe10c22e777dba76ce7511def2216bd2ec3b996"
+        },
+        "message": "Merge 7dd48f52c9e4c17268b4a571919622f4d701e5d0 into e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "parents": [
+          {
+            "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+            "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+          },
+          {
+            "sha": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+            "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        ],
+        "verification": {
+          "verified": true,
+          "reason": "valid",
+          "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxHQwCRC1aQ7uu5UhlAAA7gEQAKUSAg5kIH5t3az4Hi5KR3WM\nNVIQi0QqlsN5EABbHV9RvzCFljd6IiuWpAY8OY5fMCtzfsOdBjCIHzXLSPymsqgH\nR6WAxD+QrpMaK4mMvmvCVgPDSgQvInfNNYn2Oh+66jTyBUpFuH20P/u0P3vKVb3E\n2BbyzACZ353KZ5WW0do2v28SrFBTclkAbwsaCwxHp+qX4vJ7EuNoVVMYTup0+Raz\ntn9KkNe/DoGEsBBZJWu/ouHCIbtA0Tt2+HHYTkD2C8FiDLFAvFn/8OSD8ze703q4\nvMUxpa1Jk40lAoI3cBgBcQsiJ5gb5Jj+pBY3nzsZHhAVzmoK2pWpLgi5HRHaPFVv\n+2WCiSNY8q9eLL/O6QI5AiqE9ED6vp+FLuJgnWUraRYgTvr8xznwJ2A+brmN3m2j\ns+7JA5+5+qyyg5yJH/ZHBK3Jg2pRBEmRJfZGXPsruLRlMZFlG0wsKH+fPk1CWbeX\ntX/GjAS/ESQSXPL1071ciemz/SMZKqaaIvoA75Y42O5kPgYp/Y2i5GeMip2UTb6c\nMn8RJI6dNrcKmzFVWjEmgRdfzrbCoI92QAXuHgfkTEqZ1nIttRxglNRJHXuFCoSi\nloND4JkTJGQdAIKg+0im0Z6jgQycJGg28e+O2f+57BLb76/jNohLVlPUSQVhmemc\n2vjnM6j8Pz82a+aId7Ni\n=MrOb\n-----END PGP SIGNATURE-----\n",
+          "payload": "tree 0fe10c22e777dba76ce7511def2216bd2ec3b996\nparent e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\nparent 7dd48f52c9e4c17268b4a571919622f4d701e5d0\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791259696 -0500\ncommitter GitHub <noreply@github.com> 1791259696 -0500\n\nMerge 7dd48f52c9e4c17268b4a571919622f4d701e5d0 into e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\n",
+          "verified_at": "2026-10-06T04:08:17Z"
+        }
+      },
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112103100686,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:08:47.8511832Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:09:05.1456300Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112103100531,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:08:54.6598252Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:09:20.9940920Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112103100631,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:08:52.2278238Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:09:10.6303673Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        }
+      },
+      "artifact_id": 11389518342,
+      "all_jobs": "success",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265819\\attempt-1\\log.txt",
+      "log_sha256": "11c315732390b36b57d346fe388c807e376494d2fb737bdb8da2dd23acc4f39b"
+    },
+    {
+      "run": 37412263833,
+      "attempt": 1,
+      "event": "push",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "checkout_revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "native_commit": {
+        "sha": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "node_id": "C_kwDOSAZRhdoAKDdkZDQ4ZjUyYzllNGMxNzI2OGI0YTU3MTkxOTYyMmY0ZDcwMWU1ZDA",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "author": {
+          "name": "Frank Lesniak",
+          "email": "franklesniak@hotmail.com",
+          "date": "2026-10-06T04:03:04Z"
+        },
+        "committer": {
+          "name": "Frank Lesniak",
+          "email": "franklesniak@hotmail.com",
+          "date": "2026-10-06T04:03:04Z"
+        },
+        "tree": {
+          "sha": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+          "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/0fe10c22e777dba76ce7511def2216bd2ec3b996"
+        },
+        "message": "Treat fixture clock breakpoint paths as literal paths",
+        "parents": [
+          {
+            "sha": "f89d47d6780db47df29be4eb6d79cab35051f598",
+            "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/f89d47d6780db47df29be4eb6d79cab35051f598",
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/f89d47d6780db47df29be4eb6d79cab35051f598"
+          }
+        ],
+        "verification": {
+          "verified": false,
+          "reason": "unsigned",
+          "signature": null,
+          "payload": null,
+          "verified_at": null
+        }
+      },
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112103093811,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:08:52.3498288Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:09:14.7055609Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112103093978,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:08:55.6695950Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:09:23.7402107Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112103094006,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:08:52.3468793Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:09:11.0069485Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        }
+      },
+      "artifact_id": 11389523323,
+      "all_jobs": "success",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263833\\attempt-1\\log.txt",
+      "log_sha256": "ce1e3b609d2c98cce14d62b066adba4079af742d28a8ad1ebac80a476858804a"
+    }
+  ],
+  "limits": "Candidate platform and clean-commit artifact proof. Other CI/reviews, normal merge/landed and paired acceptance remain separate."
+}

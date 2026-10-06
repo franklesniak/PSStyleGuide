@@ -1,0 +1,557 @@
+{
+  "status": "PASS_FINAL_INPUT_BINDING",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-06T04:13:53.629855+00:00",
+  "reviewer": {
+    "agent": "/root/ps234_final_quality",
+    "role": "independent local final-quality reader; not remote review service",
+    "tests_run": false,
+    "descendants": false,
+    "mutations": "Only these two new report files."
+  },
+  "input": {
+    "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+    "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+    "parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "53b1005d6eabfa96df77ab9fe9fad0838339c0e36b90b96bef960edb416a54f8",
+    "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "complete_pr_paths": 16,
+    "all79_committed_and_current_source_hashes_match_reviewed_catalog": true,
+    "worktree_clean": true,
+    "native_pr_state": "open",
+    "native_pr_response_sha256": "e2c0a33a5c77c682e4ee4ef1ab71eade73d1dc6be9b5e356935a3577c4875692",
+    "native_commit_reads": [
+      {
+        "sha": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+        "parents": [
+          "f89d47d6780db47df29be4eb6d79cab35051f598"
+        ],
+        "response_sha256": "50a56316e29cf571ff51dc033a7cd55c952c8731e869843455ea1add8bc7f7a7"
+      },
+      {
+        "sha": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+        "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+        "parents": [
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+        ],
+        "response_sha256": "2707638abea3eb7e6acb33de65339e7e35a27da505e2216844f50bae3720bd82"
+      }
+    ]
+  },
+  "source_review_reuse": {
+    "REPORT.md": "b5a1f68e77c1080f0a0ce5d0bd07198dd704d42ea525cf433d0e8760768ade72",
+    "R1-focused-binding.md": "b60b247ef722050eacbe4c0770121d75dfe0c157e7613b914ecdabd4ed15ae62",
+    "R2-delta-review.md": "259a0b966068c2a5c7e4a12b85e95fa28f090d7611ea062201b71f1113142bfe",
+    "R2-final-binding.md": "92f042853acaf6ba39eea86d64215ee976379894953419542ee8d516f3cd50a2",
+    "R5-delta-review.md": "f1cc4236afb3803b55a4ede47751dbf36e6f3008d0639c8b22a95fae78028e39",
+    "R5-delta-review.json": "ff382a078147d54807ba44fd290d9ebf531e03f50f45b1dc51c434e5b128469b",
+    "R5-focused-binding.md": "c963f67e4c6370a039eafe0f6685ccf5ef2edd91da069007f0e8379da8ccb797",
+    "R5-focused-binding.json": "56988e31e77fdde4b70b33859b7f49b3f4b94adaeab8c06509c94219eeb4bf06"
+  },
+  "observations": {
+    "R5-QV1": "Remains resolved by actual corrected next-day author/prior-day capacity evidence on identical bytes; prior-day failed attempt retains exit1.",
+    "R5-QV2": "Remains resolved by actual changed-byte Linux matrix/persistent/transport and actual author/capacity evidence.",
+    "body": "Complete current body read; new repair, retained failed attempt, scoped evidence/limits and previous f89 attribution accurately distinguished.",
+    "paired": "Five-path common PS carryback remains required: SelfTest R1+R5 with sole T1/P1 fixture provenance exception, script-index metadata retaining finite language rows, workflow package pair with repository descriptors, dependency-maintenance explanation. Refresh against accepted TF/current PS inputs; not completed."
+  },
+  "local_validation": {
+    "session": 25941,
+    "result_sha256": "e41f14478e213967691e00007c4f0db11dc8038db9ba3ced78ed860f2da6728d",
+    "status_sha256": "cf4bb72a17a76d72f5511b8d179b6319fde30a142d6cfca21b67c0c51f49c6e0",
+    "all8_commands_exit_zero": true,
+    "node": {
+      "tests": 567,
+      "pass": 567,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "hooks": {
+      "passed": 11,
+      "skipped": 0
+    },
+    "guard": {
+      "full_host_before_after_equal": true,
+      "source_files": 79,
+      "dependency_files": 1914,
+      "index_refs_configuration_equal": true
+    },
+    "normal_commit": {
+      "status": "committed",
+      "expected_parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "expected_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "requested_at": "2026-10-06T04:03:03.961344+00:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-r5-commit.log",
+      "log_sha256": "1e3045c55448cb36774662cc878892d9c14df325d40889eb43aa1566839de02f",
+      "observed_head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "completed_at": "2026-10-06T04:03:06.720119+00:00"
+    },
+    "actual_endpoints": [
+      {
+        "mode": "AcceptedMaintenance",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "started_at": "2026-10-06T04:03:51.530681+00:00",
+        "finished_at": "2026-10-06T04:03:51.868678+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-AcceptedMaintenance-7dd48f5.log",
+        "log_sha256": "54556923c794a6fe0504b4489fc423366df4edf69169fd4c0e1039387d57c08b"
+      },
+      {
+        "mode": "AcceptedContent",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "started_at": "2026-10-06T04:03:53.748720+00:00",
+        "finished_at": "2026-10-06T04:04:19.508850+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-AcceptedContent-7dd48f5.log",
+        "log_sha256": "ccf407da37aef2375bcd0e984cd2f5b807ead2a8a1ba209498ba2673afe78c65"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "started_at": "2026-10-06T04:04:21.362931+00:00",
+        "finished_at": "2026-10-06T04:04:46.898946+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-FinalizeMetadataNow-7dd48f5.log",
+        "log_sha256": "df2ac4a9cb7e9fb0d31b1e8dc18829ce55ee7d5a7ab8f49cec98646bd2520f29"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-MetadataClassificationOnly"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "started_at": "2026-10-06T04:04:48.757229+00:00",
+        "finished_at": "2026-10-06T04:04:50.511184+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-MetadataClassificationOnly-7dd48f5.log",
+        "log_sha256": "4e98e4656c507b4ce87d6c236ee93fae80d679798a8229d101e819a705bda8b1"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-ProposedPolicy"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "started_at": "2026-10-06T04:04:52.397343+00:00",
+        "finished_at": "2026-10-06T04:05:17.727583+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-ProposedPolicy-7dd48f5.log",
+        "log_sha256": "77ef4bbf501e44976640323b4a6c78007bbf025f148a4d054e82292470324d2e"
+      }
+    ],
+    "current_audit": {
+      "exit": 0,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "mode": "ordinary local no-argument two-root audit",
+      "started_at": "2026-10-06T04:05:19.911722+00:00",
+      "finished_at": "2026-10-06T04:05:35.533720+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-current-audit-7dd48f5.log",
+      "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9"
+    },
+    "audit_observed_status": "CLEAN, no findings/accepted exceptions; local-origin-main authority freshness limit retained."
+  },
+  "hosted_current_input": [
+    {
+      "run": 37412265819,
+      "attempt": 1,
+      "event": "pull_request",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "checkout_revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a",
+      "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "parents": [
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+      ],
+      "jobs": [
+        {
+          "id": 112103100531,
+          "name": "generator_windows_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103100631,
+          "name": "generator_linux_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103100686,
+          "name": "generator_windows_51",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103359321,
+          "name": "verify",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103494473,
+          "name": "publish_committed_artifacts",
+          "conclusion": "success"
+        }
+      ],
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112103100686,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:08:47.8511832Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:09:05.1456300Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112103100531,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:08:54.6598252Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:09:20.9940920Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112103100631,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:08:52.2278238Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:09:10.6303673Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "fa09cae2ea5b9efec4b30ac471afd35bdc0b365a"
+          }
+        }
+      },
+      "artifact_id": 11389518342,
+      "raw_log_sha256": "11c315732390b36b57d346fe388c807e376494d2fb737bdb8da2dd23acc4f39b"
+    },
+    {
+      "run": 37412263833,
+      "attempt": 1,
+      "event": "push",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "checkout_revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "parents": [
+        "f89d47d6780db47df29be4eb6d79cab35051f598"
+      ],
+      "jobs": [
+        {
+          "id": 112103093811,
+          "name": "generator_windows_51",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103093978,
+          "name": "generator_windows_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103094006,
+          "name": "generator_linux_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103370131,
+          "name": "verify",
+          "conclusion": "success"
+        },
+        {
+          "id": 112103523438,
+          "name": "publish_committed_artifacts",
+          "conclusion": "success"
+        }
+      ],
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112103093811,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:08:52.3498288Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T04:09:14.7055609Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112103093978,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:08:55.6695950Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T04:09:23.7402107Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112103094006,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:08:52.3468793Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T04:09:11.0069485Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+          }
+        }
+      },
+      "artifact_id": 11389523323,
+      "raw_log_sha256": "ce1e3b609d2c98cce14d62b066adba4079af742d28a8ad1ebac80a476858804a"
+    }
+  ],
+  "native_runs_observation": [
+    {
+      "id": 37412403267,
+      "name": "Running Copilot Code Review",
+      "event": "dynamic",
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412265819,
+      "name": "Build Style Guide Artifacts",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412265677,
+      "name": "Copilot setup steps",
+      "event": "pull_request",
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412265660,
+      "name": "Dev container boundary",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412265656,
+      "name": "Agent instruction validation",
+      "event": "pull_request",
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412265813,
+      "name": "Agent instruction validation",
+      "event": "pull_request_target",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412266239,
+      "name": "Markdown Lint",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412263790,
+      "name": "Dev container boundary",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412263799,
+      "name": "Copilot setup steps",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412263931,
+      "name": "Agent instruction validation",
+      "event": "push",
+      "status": "in_progress",
+      "conclusion": null,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412263878,
+      "name": "Markdown Lint",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    },
+    {
+      "id": 37412263833,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0"
+    }
+  ],
+  "review_round": {
+    "round": 3,
+    "deadline": "2026-10-13T23:47:31Z",
+    "copilot_request_event": 32566648692,
+    "copilot_effort_selected": "Balanced",
+    "observed_terminal_effort": "not credited",
+    "copilot_run": 37412403267,
+    "codex_trigger_comment": 6009155889,
+    "remote_acceptance": "pending/uncredited; local review is not remote acceptance"
+  },
+  "uncredited_gates": [
+    "Remaining current-head ordinary behavior/setup and any other nonterminal CI; no pending result promoted to pass.",
+    "Round3 remote Copilot/Codex results, full finding inventory and required dispositions.",
+    "Immediate premerge current-input/native checks, normal reviewed landing and actual landed workflows.",
+    "Actual five-path paired PS carryback and raw accepted-input comparison; broader plan, filesystem, recovery and human gates."
+  ],
+  "evidence_hashes": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body-r5-final.md": "53b1005d6eabfa96df77ab9fe9fad0838339c0e36b90b96bef960edb416a54f8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r5-candidate-readiness.json": "f5ad6811220be5128885ab9add017e53380efc987735bd4a265426af0e1dbc61",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-r5.json": "f5b789f43e61e6d73dabf1b03d7c405311fc1f855104e54abaefa44ea55d3ca1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\result.json": "e41f14478e213967691e00007c4f0db11dc8038db9ba3ced78ed860f2da6728d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\status.json": "cf4bb72a17a76d72f5511b8d179b6319fde30a142d6cfca21b67c0c51f49c6e0",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\inputs\\source-before.json": "6dd47fc63bba4161af0a3fe83a8ae50b4b850e82adbe30f83fcd42aaaf7dae21",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\host-source-after.json": "6dd47fc63bba4161af0a3fe83a8ae50b4b850e82adbe30f83fcd42aaaf7dae21",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\tf-golden-outputs.json": "5d48dbb21969bf1317a56c77316a4e8303f184d045340db4e78c57112bbea417",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-r5-commit.log": "1e3045c55448cb36774662cc878892d9c14df325d40889eb43aa1566839de02f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-current-audit-7dd48f5.log": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\platform-proof.json": "c8080e2cfc685f633b9b227a54c8dc596f1a91a357c1e9a9c5366b3c89c95595",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round3-progress-1.json": "feaad863a7513b6e801bc10b7578581d19899d7c52c218c2df6e96d0957993b4",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-AcceptedMaintenance-7dd48f5.log": "54556923c794a6fe0504b4489fc423366df4edf69169fd4c0e1039387d57c08b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-AcceptedContent-7dd48f5.log": "ccf407da37aef2375bcd0e984cd2f5b807ead2a8a1ba209498ba2673afe78c65",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-FinalizeMetadataNow-7dd48f5.log": "df2ac4a9cb7e9fb0d31b1e8dc18829ce55ee7d5a7ab8f49cec98646bd2520f29",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-MetadataClassificationOnly-7dd48f5.log": "4e98e4656c507b4ce87d6c236ee93fae80d679798a8229d101e819a705bda8b1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-ProposedPolicy-7dd48f5.log": "77ef4bbf501e44976640323b4a6c78007bbf025f148a4d054e82292470324d2e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\staged-preflight.log": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\generator-linux-current-1.log": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\generator-linux-current-2.log": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\actual-tf-generator-1.log": "62992487b20ee41e1fcf002419615785991045fda4472bacdf8fd11db715e6e9",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\actual-tf-generator-2.log": "62992487b20ee41e1fcf002419615785991045fda4472bacdf8fd11db715e6e9",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\tf-semantic.log": "81ca4e911d0cb8784687f16af01ffad57b9cde869a2970d16af40dba96c1c8fe",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\full-node.log": "60901c6a30785cde1392e42bd3507d0cd4d30603ec20c7648c65c3bb0a8b6010",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r5\\output\\aggregate.log": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265819\\attempt-1\\run.json": "9285013e7c2ba0df9392619f27f8d4fcbbc07593c138deffa7d161c2218cd3fb",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265819\\attempt-1\\jobs.json": "e1045c45e27fecdfcc2f81619642021bc141eac8f57bb25e9ca3fd94b2534593",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265819\\attempt-1\\summary.json": "83f069711e308d522f636af7cf821b3ed704fe923ebec4484ced6d74139aaed1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265819\\attempt-1\\log.txt": "11c315732390b36b57d346fe388c807e376494d2fb737bdb8da2dd23acc4f39b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263833\\attempt-1\\run.json": "01892ff46d76fbda53fbb331dd1b15db9263fd1aa115da2a5a91efa07dd78c37",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263833\\attempt-1\\jobs.json": "fb4075ee7178c7636f07182442d26e29220049580531ea1750887de89cae2048",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263833\\attempt-1\\summary.json": "eb2e54f331cf126b7071da57b56c432000345242250445dd671375f237162688",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263833\\attempt-1\\log.txt": "ce1e3b609d2c98cce14d62b066adba4079af742d28a8ad1ebac80a476858804a"
+  },
+  "read_commands": [
+    "git --no-optional-locks --no-replace-objects show <H>:<all79catalogpaths>, show -s --format=%H %T %P HEAD, status --porcelain=v1, diff --name-only B H",
+    "gh api repos/franklesniak/TerraformStyleGuide/pulls/68; git/commits/<H and merge>; actions/runs?head_sha=<H>&per_page=30",
+    "Python byte/SHA256 reads and JSON comparisons of final result/status/command logs, actual endpoint logs, host guards and current hosted run/jobs/logs; no test execution."
+  ]
+}
