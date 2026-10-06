@@ -1,0 +1,228 @@
+{
+  "schema": 1,
+  "status": "PASS_LOCAL_FINAL_BINDING",
+  "reviewed_at_utc": "2026-10-06T17:43:17.9677812+00:00",
+  "reviewer": "/root/a06_conversion_quality",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body-C88-final.md",
+  "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+  "title": "Converge generator validation and make review setup reliable",
+  "parent_delta_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "whole_pr_paths": [
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-ExactGitPathSet.ps1",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-StyleGuideGenerator.ps1",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/package-lock.json",
+    ".github/workflows/package.json",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/workflow-policy-cases.json",
+    "docs/dependency-maintenance.md"
+  ],
+  "material_findings": [],
+  "resolved_preparation_finding": "Schema wording corrected: reused copies are previously validated; fresh conversion retains all schema checks.",
+  "worktree_clean": true,
+  "source_binding": {
+    "catalog_files": 80,
+    "committed_tree_entries": 80,
+    "catalog_paths_modes_blobs_match": true,
+    "working_file_sha256_mismatches": [],
+    "changed_source_hashes": {
+      ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+    },
+    "dependency_count": 1914,
+    "dependency_hash_size_mismatches": [],
+    "original_source_review_reused": true,
+    "prior_reports_immutable": true
+  },
+  "evidence_bindings": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\REPORT.md",
+      "sha256": "e38f69da4f4e3a3c271cdc00954fb02cbacb9139bed7993973748ab138f566ff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\evidence.json",
+      "sha256": "dfecce49d3b4830445ecdd7538faa8296ca078694461c3d872f7fabcdce07398"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-binding\\PREPARATION.md",
+      "sha256": "a5ebd6a89cc65f87619bb1ded39f5d2f6698b9fc79b02c31a1d61cb45f2807cc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\source-catalog.json",
+      "sha256": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-READINESS.json",
+      "sha256": "cc70a9ab7870c4c487004c2c1365cecfa4880a960160aefbab53103ace9a00b7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\manifest.authorized.json",
+      "sha256": "775e0aa4d786f27a1e46baf0945f3f435e4b1710684ed7121e4f86c33b7410e4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\COMMITTED-LOCAL-VALIDATION.json",
+      "sha256": "e5d220dd75ee5e515b14662b1fdd90a3e46f90844ac97d2a61d27f07d21fb005"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "c02b8b68f7cf900cbe1f621ab425a257dba42ce05b3faa8516498f59fb14db76"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+      "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\commit-conversion-C88-candidate.py",
+      "sha256": "a8c082d06fb1ac97ec2ffdf7a92505ea9a4a8871640284503a250195c7ea31c9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\validate-conversion-C88-endpoints.py",
+      "sha256": "d75be84be6010b3703c41af6fa20fd3d33a20e30dc1e2d25d8b5094727c01036"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body-C88-final.md",
+      "sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01"
+    }
+  ],
+  "direct_logs_inspected": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-conversion-C88-commit.log",
+      "sha256": "89a93cd16d1c0b27fd28fb312ae3329bd0d70f4ee999e8f8bbe33b5068660a9c",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-AcceptedMaintenance-89bf392.log",
+      "sha256": "77c3af6f7103a9ab11f70e46319c8a5982026fddf0051a368eff17b5b178df7b",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-AcceptedContent-89bf392.log",
+      "sha256": "a89c71f906fbc733423653afa0d9d483d4773e351c05045b27d93f2d583496ff",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-FinalizeMetadataNow-89bf392.log",
+      "sha256": "74ecea1d45443dd9ae4a54be91233703b1ea4ea8b0ad4187c6939a9bf4bcb47a",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-MetadataClassificationOnly-89bf392.log",
+      "sha256": "f8d6ba3f66c25b01774f470a4a90bcb51c0820cef6a1ce6234fec40457b25449",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-ProposedPolicy-89bf392.log",
+      "sha256": "4b754baf53ebe6812911afde2689c8e6deea06486450aa179f4aa2e6db9f8db6",
+      "exit": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-current-audit-89bf392.log",
+      "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+      "exit": 0
+    }
+  ],
+  "final_validation_artifacts_verified": 21,
+  "final_validation_artifact_mismatches": [],
+  "results": {
+    "staged_preflight_exit": 0,
+    "classifier_tests": 13,
+    "classifier_failures": 0,
+    "classifier_skips": 0,
+    "aggregate_hooks": 11,
+    "aggregate_skips": 0,
+    "aggregate_exit": 0,
+    "aggregate_seconds": 575.961905,
+    "normal_commit_exit": 0,
+    "endpoint_modes": [
+      "AcceptedMaintenance",
+      "AcceptedContent",
+      "FinalizeMetadataNow",
+      "MetadataClassificationOnly",
+      "ProposedPolicy"
+    ],
+    "endpoint_exits": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "audit_status": "CLEAN",
+    "audit_findings": 0,
+    "audit_accepted_packages": 0,
+    "audit_roots": [
+      ".",
+      ".github/workflows"
+    ],
+    "cleanup_receipts": 5,
+    "successful_adopted_exits": 81,
+    "signals": 0,
+    "cleanup_failures": 0,
+    "remaining_descendants": 0,
+    "container_absence": "verified by terminal/root evidence; no new native check by reviewer",
+    "old_cold_packet_status": "failed_unchanged"
+  },
+  "review_scope": "Independent C88.5 source review plus relevant callers, security, tests, final local committed/body binding and pair implications; not a new exhaustive review of all prior 19-path changes.",
+  "local_ready_to_publish": true,
+  "published_by_this_review": false,
+  "published_head_claim": false,
+  "remote_review_acceptance": false,
+  "hosted_ci_acceptance": false,
+  "merge_approval": false,
+  "paired_convergence": false,
+  "remaining_gates": [
+    "reconcile native publication preimage and accepted base",
+    "fresh current-input Copilot and Codex results",
+    "passing current-head hosted CI and service behavior",
+    "permitted normal landing and landed-workflow verification",
+    "accepted TF/current PS comparison and applicable carryback"
+  ],
+  "limits": [
+    "Current audit uses locally fetched origin/main and cannot discover external revocation or later ref changes",
+    "One cold timing pair is not a stable benchmark or hosted margin",
+    "Old cold packet failure retained despite new successful observation and final aggregate",
+    "Only Windows7.6.5 and Linux7.6.3 empirically cover converter",
+    "Earlier600-test and hosted platform results retain earlier input attribution"
+  ],
+  "counters": {
+    "round": 6,
+    "round_cap": 80,
+    "deadline_utc": "2026-10-13T23:47:31Z",
+    "transfers": {
+      "A06": 1,
+      "A03": 3,
+      "A21": 5,
+      "A07": 5
+    }
+  },
+  "reviewer_actions": {
+    "tests": 0,
+    "cleanup": 0,
+    "product_edits": 0,
+    "git_writes": 0,
+    "remote_operations": 0,
+    "planning_state_edits": 0
+  }
+}
