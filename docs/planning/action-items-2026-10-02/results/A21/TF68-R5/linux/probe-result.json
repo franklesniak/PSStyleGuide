@@ -1,0 +1,792 @@
+{
+  "powershell": "7.6.3",
+  "platform": "Unix 6.6.87.2",
+  "source_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+  "variants": "Exact helper body with only two registration expressions changed in memory; no source rewrite",
+  "api_overloads": [
+    "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock)",
+    "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock, System.Nullable`1[System.Int32])"
+  ],
+  "configured_temp_path": "/output/configured-temp[ab]/",
+  "configured_temp_native_exit": 0,
+  "rows": [
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracketa/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/bracketb/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/bracketa/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/bracketb/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracketa/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/bracketb/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/starXliteral/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/starXliteral/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/starXliteral/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/questionXliteral/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/questionXliteral/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "success": false,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "/output/questionXliteral/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Original"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "Escaped"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "plain",
+      "failure": null,
+      "success": true,
+      "checker": "/output/plain/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/plain/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "bracket[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/bracket[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/bracket[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "literal`tick[ab]",
+      "failure": null,
+      "success": true,
+      "checker": "/output/literal`tick[ab]/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/literal`tick[ab]/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "backtick`only",
+      "failure": null,
+      "success": true,
+      "checker": "/output/backtick`only/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/backtick`only/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "quote ' unicode-é",
+      "failure": null,
+      "success": true,
+      "checker": "/output/quote ' unicode-é/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/quote ' unicode-é/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "star*literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/star*literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/star*literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "initialization-and-local",
+      "variant": "LiteralApi"
+    },
+    {
+      "remaining_clock_variables": 0,
+      "path_kind": "question?literal",
+      "failure": null,
+      "success": true,
+      "checker": "/output/question?literal/checker.ps1",
+      "remaining_breakpoints": 0,
+      "registered": [
+        {
+          "Script": "/output/question?literal/checker.ps1",
+          "Line": 13
+        }
+      ],
+      "mode": "local-only",
+      "variant": "LiteralApi"
+    }
+  ]
+}

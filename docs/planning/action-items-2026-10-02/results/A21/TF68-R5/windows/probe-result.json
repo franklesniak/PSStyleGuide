@@ -1,0 +1,552 @@
+{
+  "powershell": "7.6.5",
+  "platform": "Microsoft Windows NT 10.0.26200.0",
+  "source_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+  "variants": "Exact helper body with only two registration expressions changed in memory; no source rewrite",
+  "api_overloads": [
+    "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock)",
+    "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock, System.Nullable`1[System.Int32])"
+  ],
+  "configured_temp_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\configured-temp[ab]\\",
+  "configured_temp_native_exit": 0,
+  "rows": [
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": false,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketa\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketb\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketa\\checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketb\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": false,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketa\\checker.ps1",
+          "Line": 13
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracketb\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": false,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": []
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": false,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": []
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Original",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "Escaped",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "plain",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\plain\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "bracket[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\bracket[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "literal`tick[ab]",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\literal`tick[ab]\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "backtick`only",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\backtick`only\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "initialization-and-local",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 6
+        },
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    },
+    {
+      "path_kind": "quote ' unicode-é",
+      "success": true,
+      "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+      "remaining_clock_variables": 0,
+      "failure": null,
+      "mode": "local-only",
+      "remaining_breakpoints": 0,
+      "variant": "LiteralApi",
+      "registered": [
+        {
+          "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows\\quote ' unicode-é\\checker.ps1",
+          "Line": 13
+        }
+      ]
+    }
+  ]
+}

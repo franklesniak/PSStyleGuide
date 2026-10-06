@@ -1,5 +1,5 @@
 {
-  "status": "round2_findings_under_decision",
+  "status": "R5_selected_repair_released",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -91,7 +91,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Publish R3/R4 canonical decisions, reply/resolve R4 once; finish separate R5 decision before any source repair. No outstanding reviewer request or ordinary CI. Preserve original clocks and transfers.",
+  "next_action": "Receive/verify R5 final single-file repair and focused evidence; independent delta quality then root sole final aggregate and normal current-input lifecycle. Do not reuse old-head review as new-head acceptance.",
   "checkout_exit": 0,
   "candidate_tree": "24ca66c74b176bb83037c453ee506aa3fee0cf5f",
   "implementation": {
@@ -422,7 +422,7 @@
       }
     ]
   },
-  "local_operations": "Existing owner worker prepares read-only R4/R5 proposals. No local validation aggregate or Git write is active. Read-only watcher6035 terminal exit1 remains history.",
+  "local_operations": "Existing PR-owning worker released for one SelfTest edit and focused validation; root owns aggregate/Git/native/counters. No aggregate active.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "passed",
@@ -492,7 +492,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r2-candidate-readiness.json",
     "sha256": "6837bc259be0a2ba39172a4256672c5f89baf9e06cb3a0936af94a31c89d0a80"
   },
-  "planning_checkpoint": "ed558e34f76b8857bff794cb588ac83cf1ff4746",
+  "planning_checkpoint": "ca5488aa5d48cc187d657a325d322843973300a4",
   "commit": {
     "status": "committed",
     "expected_parent": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
@@ -923,14 +923,24 @@
               "comment": 4190960527,
               "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
               "round": 2,
-              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
-              "body_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\n[TF68-R3 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A03/TF68-R3-windows-runner.md) selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+              "body_sha256": "849e3a4fe3c679f95e9795b6412d21f193adea603548e57fdd1151d9f09122e6",
               "requested_at": "2026-10-06T02:43:21.028610+00:00",
               "reply_exit": 0,
               "reply_id": 4191014123,
               "reply_created_at": "2026-10-06T02:43:45Z",
               "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191014123",
-              "resolved_at": "2026-10-06T02:43:24.993209+00:00"
+              "resolved_at": "2026-10-06T02:43:24.993209+00:00",
+              "editorial_update": {
+                "status": "verified",
+                "old_body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+                "old_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+                "new_body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\n[TF68-R3 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A03/TF68-R3-windows-runner.md) selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+                "reason": "Add canonical decision link or restore readable spacing; no disposition change.",
+                "requested_at": "2026-10-06T02:52:00.644350+00:00",
+                "exit": 0,
+                "native_updated_at": "2026-10-06T02:52:25Z"
+              }
             },
             "4190960581": {
               "status": "replied_resolved_verified",
@@ -938,14 +948,24 @@
               "comment": 4190960581,
               "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
               "round": 2,
-              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
-              "body_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\n[TF68-R3 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A03/TF68-R3-windows-runner.md) selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+              "body_sha256": "849e3a4fe3c679f95e9795b6412d21f193adea603548e57fdd1151d9f09122e6",
               "requested_at": "2026-10-06T02:47:07.466343+00:00",
               "reply_exit": 0,
               "reply_id": 4191034944,
               "reply_created_at": "2026-10-06T02:47:32Z",
               "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191034944",
-              "resolved_at": "2026-10-06T02:47:11.702388+00:00"
+              "resolved_at": "2026-10-06T02:47:11.702388+00:00",
+              "editorial_update": {
+                "status": "verified",
+                "old_body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+                "old_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+                "new_body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\n[TF68-R3 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A03/TF68-R3-windows-runner.md) selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+                "reason": "Add canonical decision link or restore readable spacing; no disposition change.",
+                "requested_at": "2026-10-06T02:52:02.888052+00:00",
+                "exit": 0,
+                "native_updated_at": "2026-10-06T02:52:27Z"
+              }
             }
           }
         },
@@ -958,26 +978,63 @@
           "threads": [
             "PRRT_kwDOSAZRhc6pTBjD"
           ],
-          "status": "refuted_selected_A96_pending_native_reply_resolution",
+          "status": "refuted_replied_resolved_no_product_change",
           "finding": "Full fixture-clock helper text embedded in child command; assess native length and quoting/debugging risk before choosing action.",
           "source_change": false,
           "decision": "docs/planning/action-items-2026-10-02/results/A21/TF68-R4/DECISION.md",
           "evidence_sha256": "0365eeeae9460f1669b1a3cf63fa785d4a2c1c28f31eeb12c5665afdedc690d2",
-          "selected": "A96 retain current child transport; bounded present non-defect"
+          "selected": "A96 retain current child transport; bounded present non-defect",
+          "native_dispositions": {
+            "4190960625": {
+              "status": "replied_resolved_verified",
+              "thread": "PRRT_kwDOSAZRhc6pTBjD",
+              "comment": 4190960625,
+              "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+              "round": 2,
+              "body": "[TF68-R4 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A21/TF68-R4/DECISION.md): retain the current transport; no present length or quoting defect reproduced.\nExact unchanged helper/caller probes on Windows 7.6.5 and Linux 7.6.3 measured 7,404 command characters and 7,163 argument bytes, respectively, below the applicable 32,767-character and 131,072-byte limits. Four child controls passed per platform; literal values and the original parameter error survived unchanged.\nThese probes use a synthetic checker; full fixture coverage comes from the separate successful current-head runs. Future growth requires reassessment. The independently reproduced bracket-path issue is tracked separately as TF68-R5.",
+              "body_sha256": "fb838aa6973f5bd95b0b40c1a0c43f432fa5b27f759b45e4e287f00edbe3aadd",
+              "requested_at": "2026-10-06T02:51:23.108600+00:00",
+              "reply_exit": 0,
+              "reply_id": 4191062408,
+              "reply_created_at": "2026-10-06T02:51:47Z",
+              "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191062408",
+              "resolved_at": "2026-10-06T02:51:27.005553+00:00",
+              "editorial_update": {
+                "status": "verified",
+                "old_body": "[TF68-R4 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A21/TF68-R4/DECISION.md): retain the current transport; no present length or quoting defect reproduced.\nExact unchanged helper/caller probes on Windows7.6.5 and Linux7.6.3 measured7404 command characters and7163 argument bytes, respectively, below the applicable32767-character and131072-byte limits. Four child controls passed per platform; literal values and the original parameter error survived unchanged.\nThese probes use a synthetic checker; full fixture coverage comes from the separate successful current-head runs. Future growth requires reassessment. The independently reproduced bracket-path issue is tracked separately as TF68-R5.",
+                "old_sha256": "092580ee43bd2cdf54cb32711f00c0d828b9bfb59be8320e995fc94adee142c8",
+                "new_body": "[TF68-R4 decision](https://github.com/franklesniak/PSStyleGuide/blob/ca5488aa5d48cc187d657a325d322843973300a4/docs/planning/action-items-2026-10-02/results/A21/TF68-R4/DECISION.md): retain the current transport; no present length or quoting defect reproduced.\nExact unchanged helper/caller probes on Windows 7.6.5 and Linux 7.6.3 measured 7,404 command characters and 7,163 argument bytes, respectively, below the applicable 32,767-character and 131,072-byte limits. Four child controls passed per platform; literal values and the original parameter error survived unchanged.\nThese probes use a synthetic checker; full fixture coverage comes from the separate successful current-head runs. Future growth requires reassessment. The independently reproduced bracket-path issue is tracked separately as TF68-R5.",
+                "reason": "Add canonical decision link or restore readable spacing; no disposition change.",
+                "requested_at": "2026-10-06T02:52:05.114937+00:00",
+                "exit": 0,
+                "native_updated_at": "2026-10-06T02:52:29Z"
+              }
+            }
+          }
         },
         {
           "id": "TF68-R5",
           "owner": "A21",
           "source": "Bounded private R4 validation; separate direct invocation reproduction",
-          "status": "writer_validating_supported_path_contract_and_preparing_full_proposal_no_product_edits",
+          "status": "selected_B97.5_single_file_implementation_released",
           "finding": "Fixture clock fails to fire when checker path contains literal square brackets; direct in-process helper reproduces without child command serialization. Assess wildcard-aware breakpoint matching and supported contract before selecting repair.",
           "comments": [],
-          "threads": []
+          "threads": [],
+          "source_change": true,
+          "decision": "docs/planning/action-items-2026-10-02/results/A21/TF68-R5/DECISION.md",
+          "selected": "B97.5 escape literal checker path once at both existing breakpoint registrations; bounded existing regression with decoy",
+          "released_at": "2026-10-06T02:59:37.877868+00:00",
+          "allowed_paths": [
+            ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+          ],
+          "source_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+          "evidence_sha256": "b2f89538852c7f6070c67fc4e09ab47a86a52383bcdd0268b441ace4f1cac9e9",
+          "remaining": "Actual edited-source focus, independent quality, root final aggregate, metadata/commit/current review/hosted/normal TF acceptance and actual opposite repair."
         }
       ],
       "request_set_terminal": true,
       "clean": false,
-      "status": "terminal_findings_under_disposition",
+      "status": "terminal_review_comments_disposed_separate_R5_under_decision",
       "body_inventory": {
         "declared_findings": 3,
         "distinct_findings": 2,
@@ -987,7 +1044,7 @@
       }
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-11.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-12.json",
   "hosted_platform_progress": {
     "status": "passed",
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
@@ -2852,13 +2909,14 @@
     }
   ],
   "live_remote_observation": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-11.json",
-    "captured_at": "2026-10-06T02:47:23.694206+00:00",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-12.json",
+    "captured_at": "2026-10-06T02:52:44.429293+00:00",
     "pending_run_ids": [],
     "ordinary_successful": 11,
-    "attempts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\round2-progress-11-attempts.json"
+    "attempts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\round2-progress-11-attempts.json",
+    "unresolved_review_threads": []
   },
-  "updated_at": "2026-10-06T02:50:22.477762+00:00",
+  "updated_at": "2026-10-06T02:59:37.878058+00:00",
   "next_poll_not_before": "2026-10-06T02:38:06.379957+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
