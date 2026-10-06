@@ -109,3 +109,11 @@ On2026-10-03 at17:16:32Z, a [read-only foundation refresh](current-foundation-re
 Read [the current task](../../tasks/A06.md) and [design and validation scope](design.md). Next: Retain retirements; validate current generator.
 
 Reopen trigger: a real automatic-publication or archive-promotion consumer. PS PR221, TF PR63 and the closures of PS147, PS156, PS151, PS209 and PS181 stand; restore nothing and reopen nothing without that trigger.
+
+## 2026-10-06 measured conversion repair selected
+
+Root selected [C88.5](TF68-round6-timeout-remedy/repair-proposal/REPORT.md) after displaying all15 options, the unique weighted rubric, verified scores and controlled instructions. The final proposal/evidence bytes are retained unchanged. Root checked3 raw Git source blobs, all80 current source files,16 artifact hashes,15 totals and the corrected1.636770039s schema sum.
+
+Release scope is only the current TF validator and SelfTest: an explicit Markdown-only stateless compiled conversion path, unchanged generic callers and a finite special-name full-root legacy path. Keep all strict JSON/schema/fresh-parser/reuse/deep-copy rules and the PowerShell7 floor. First implement and run bounded equivalence, negative and parser/analyzer checks; then prepare the actual cold-process comparison packet. No cold comparison, full suite, dependency change, Git/native operation or merge is released here. Startup benefit and hosted completion remain unproved. Root owns subsequent gates.
+
+TF68 remains open oned9eea2 with cancelled dynamic CI; round6, deadline2026-10-13T23:47:31Z and transfers1/3/5/5of12 are unchanged. No new human input is needed for this local repair.
