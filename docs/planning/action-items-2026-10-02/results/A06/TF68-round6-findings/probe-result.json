@@ -1,0 +1,83 @@
+{
+  "R17": {
+    "instrumented_output_equal": true,
+    "output_characters": 221502,
+    "visits": 64,
+    "source_function_sha256": "1dc630bf66b1d5426e2fc34ae6242b248a2d38b06f51d1d35b97c7e48dede89b",
+    "unique_references": 63,
+    "duplicates": [
+      {
+        "clean_lines": 17,
+        "body_lines": 23,
+        "heading": "## Executive Summary: Terraform Philosophy"
+      }
+    ]
+  },
+  "R18": [
+    {
+      "failure": null,
+      "before_count": 3,
+      "current_count": 3,
+      "case": "same",
+      "key_visits": 6
+    },
+    {
+      "failure": "git-state: a child changed a path outside the four permitted generated artifacts",
+      "before_count": 3,
+      "current_count": 3,
+      "case": "changed",
+      "key_visits": 3
+    },
+    {
+      "failure": "git-state: a child changed a path outside the four permitted generated artifacts",
+      "before_count": 3,
+      "current_count": 4,
+      "case": "added",
+      "key_visits": 7
+    },
+    {
+      "failure": "git-state: a child changed a path outside the four permitted generated artifacts",
+      "before_count": 3,
+      "current_count": 2,
+      "case": "removed",
+      "key_visits": 3
+    },
+    {
+      "failure": "git-state: a child changed a path outside the four permitted generated artifacts",
+      "before_count": 3,
+      "current_count": 4,
+      "case": "case-distinct",
+      "key_visits": 4
+    },
+    {
+      "failure": null,
+      "before_count": 3,
+      "current_count": 3,
+      "case": "allowed-artifact",
+      "key_visits": 6
+    }
+  ],
+  "native_exit": 0,
+  "source_equal": true,
+  "R16": [
+    {
+      "emitted_count": 0,
+      "variant": "actual",
+      "emitted_hex": [],
+      "failure": "git-paths: empty or duplicate record",
+      "input_hex": "610000"
+    },
+    {
+      "emitted_count": 1,
+      "variant": "suggested-single-pass",
+      "emitted_hex": [
+        "61"
+      ],
+      "failure": "git-paths: empty or duplicate record",
+      "input_hex": "610000"
+    }
+  ],
+  "state": "passed",
+  "scope": "Extracted exact functions only; R16 prospective private mutant, R17 visit marker, R18 fixture stubs/count marker; no real gate/generator entry point, files, Git or child execution.",
+  "pwsh": "7.6.5"
+}

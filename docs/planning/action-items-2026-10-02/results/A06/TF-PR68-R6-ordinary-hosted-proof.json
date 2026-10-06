@@ -1,0 +1,91 @@
+{
+  "captured_at": "2026-10-06T11:57:31.852995+00:00",
+  "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1201.json",
+  "snapshot_sha256": "8142a0a798a6cadece720a4ad3574a7cfb146d3d80c2ca63918497f31d937ec9",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "ordinary_status": "all13passed",
+  "runs": [
+    37456293111,
+    37456293100,
+    37456293051,
+    37456293027,
+    37456293024,
+    37456293018,
+    37456288501,
+    37456283827,
+    37456283698,
+    37456283753,
+    37456283891,
+    37456283745,
+    37456283825
+  ],
+  "behavior": [
+    {
+      "run": 37456293018,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293018\\attempt-1\\log.txt",
+      "sha256": "7af4f33d848659592235561bc42c8c0d8818bb035481435f96a6a0eade9c21b0",
+      "counts": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "expected_separate_admission_job": "skipped on non-main event; pull_request_target authority run success"
+    },
+    {
+      "run": 37456283825,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283825\\attempt-1\\log.txt",
+      "sha256": "11217c779fce055713152a1cc299edd9bc67c78ddfca975b51a870456ce52d74",
+      "counts": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "expected_separate_admission_job": "skipped on non-main event; pull_request_target authority run success"
+    }
+  ],
+  "setups": [
+    {
+      "run": 37456293051,
+      "passed_hooks": 11,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\log.txt",
+      "sha256": "4e234b691dc8a8ebebe5ee17f9d44e4c3d5960b7c76245fdc2f9b8d648e662b1",
+      "final_immutable_guard": "success",
+      "aggregate_started": "2026-10-06T11:25:53Z",
+      "aggregate_finished": "2026-10-06T11:50:46Z",
+      "aggregate_seconds": 1493.0
+    },
+    {
+      "run": 37456283745,
+      "passed_hooks": 11,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\log.txt",
+      "sha256": "6792cd846cdf6a9c297f4e93db98351054d237d65a013689000abac441549974",
+      "final_immutable_guard": "success",
+      "aggregate_started": "2026-10-06T11:25:45Z",
+      "aggregate_finished": "2026-10-06T11:52:42Z",
+      "aggregate_seconds": 1617.0
+    }
+  ],
+  "platform_proof": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\platform-proof.json",
+    "sha256": "a0fca2c670444418aef6a77759977aede8dda9ef89424e010ac5f7746e9bae43",
+    "assertions_per_pass": 156,
+    "passes_per_platform": 2,
+    "platforms": 3
+  },
+  "dynamic": {
+    "run": 37456500523,
+    "job": 112245306404,
+    "conclusion": "cancelled",
+    "cause": "20-minute job maximum during instruction hook",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1"
+  },
+  "limit": "All ordinary workflows passed; cancelled dynamic setup still blocks merge. No retry, merge or product mutation."
+}

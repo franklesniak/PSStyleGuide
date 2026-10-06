@@ -1,0 +1,24 @@
+{
+  "status": "root_verified_selected_no_change",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "verified_at": "2026-10-06T11:59:52.613070+00:00",
+  "source_artifact_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-findings",
+  "source_report_sha256": "f40a3283b8ef5c82a6e800340a85fde86e1d6737cfc4fc403b3e75076e0974b0",
+  "source_evidence_sha256": "b80ae079cd344c013185324157313f28b6ea5ae7e05e28c716d37f9a0538511b",
+  "verified_artifacts": 8,
+  "verified_references": 6,
+  "verified_score_rows": 20,
+  "raw_published_source_files_verified": 2,
+  "selected": {
+    "TF68-R16": "A100",
+    "TF68-R17": "A95.5",
+    "TF68-R18": "A96"
+  },
+  "displayed_before_disposition": true,
+  "product_changes": false,
+  "scope_limit": "Private extracted functions and source inspection, not a new full-suite or platform run.",
+  "canonical_adjustments": "Markdown-only: format HashSet<T> link label as inline code; remove extra final blank line. Worker source evidence remains frozen.",
+  "canonical_report_sha256": "93469f4745c241ef7b8a590daf49d338af9019373b08d92665330a8228d017dd"
+}

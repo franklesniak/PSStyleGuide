@@ -1,0 +1,176 @@
+{
+  "captured_at": "2026-10-06T11:52:22.762361+00:00",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "ps": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "comments": [
+    {
+      "id": 4194835328,
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "line": 213,
+      "body": "ConvertFrom-NulPathRecordStream scans the byte array twice: once to validate empty records and again to emit records. This is redundant work and increases complexity. Consider merging validation and emission into a single pass (validate `intIndex == intStart` before allocating/emitting each record).",
+      "commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "original_commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835328",
+      "pull_request_review_id": 5427825804
+    },
+    {
+      "id": 4194835388,
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "line": 1308,
+      "body": "When the executive summary top section is indexed into `$hashtableSections` under `$SummaryAnchor`, the same object is also present in `$listTopSections`. The later loop concatenates both collections, so that section can be processed twice. Consider deduplicating the sections before computing `CleanBody` (e.g., track a `[System.Collections.Generic.HashSet[object]]` of seen references) to avoid repeated work and reduce confusion.",
+      "commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "original_commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835388",
+      "pull_request_review_id": 5427825804
+    },
+    {
+      "id": 4194835424,
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "line": 1320,
+      "body": "When the executive summary top section is indexed into `$hashtableSections` under `$SummaryAnchor`, the same object is also present in `$listTopSections`. The later loop concatenates both collections, so that section can be processed twice. Consider deduplicating the sections before computing `CleanBody` (e.g., track a `[System.Collections.Generic.HashSet[object]]` of seen references) to avoid repeated work and reduce confusion.",
+      "commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "original_commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835424",
+      "pull_request_review_id": 5427825804
+    },
+    {
+      "id": 4194835467,
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "line": 577,
+      "body": "This union-by-concatenation can include duplicate paths (a path present in both dictionaries is checked twice). Consider iterating a de-duplicated set of keys (e.g., build a hash set from both key collections) so the integrity check is strictly one comparison per path.",
+      "commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "original_commit_id": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835467",
+      "pull_request_review_id": 5427825804
+    }
+  ],
+  "sources": [
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "bytes": 36081,
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+      "bytes": 91158,
+      "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "bytes": 152868,
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+      "bytes": 73953,
+      "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "bytes": 31949,
+      "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "bytes": 95329,
+      "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "bytes": 152868,
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+      "bytes": 73953,
+      "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "bytes": 36090,
+      "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+      "bytes": 90995,
+      "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+      "bytes": 148759,
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+      "bytes": 135295,
+      "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+    }
+  ],
+  "state": {
+    "status": "round6_reviews_pending",
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "deadline": "2026-10-13T23:47:31+00:00",
+    "transfers": {
+      "A06": {
+        "used": 1,
+        "cap": 12
+      },
+      "A03": {
+        "used": 3,
+        "cap": 12
+      },
+      "A21": {
+        "used": 5,
+        "cap": 12
+      },
+      "A07": {
+        "used": 5,
+        "cap": 12
+      }
+    }
+  },
+  "inputs": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1148.json": "fcab604ab69fe0960dd25f0ef31e04be41f0843ba6e3d5dda2b0db210b9f83e0",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\execution-state.json": "f19c4fd2464f0967dafe713e684ecb92bfd2b5ca29e1ac93cb0e13edabdbb022",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md": "b52e3529c2bf916574b8c3cd69460e9efd8705223ac0b7089dae739da9468f9d"
+  }
+}

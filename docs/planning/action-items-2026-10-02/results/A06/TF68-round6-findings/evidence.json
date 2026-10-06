@@ -1,0 +1,665 @@
+{
+  "captured_at": "2026-10-06T11:56:31.822268+00:00",
+  "state": "read_only_proposal_no_product_edits",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "source_after_equal": true,
+  "worktree_and_index_diff_empty": true,
+  "findings": [
+    {
+      "id": "R16",
+      "title": "Keep structural validation before record emission",
+      "comments": [
+        4194835328
+      ],
+      "weights": [
+        40,
+        25,
+        15,
+        15,
+        5
+      ],
+      "criteria": [
+        "Failure atomicity",
+        "Raw output/caller fidelity",
+        "Cross-runtime reliability",
+        "Clarity and practical utility",
+        "Maintenance cost"
+      ],
+      "options": [
+        [
+          "A",
+          "Keep the two scans; explain why validation precedes output.",
+          [
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "Preserves the exact observed no-output refusal and simple allocation behavior."
+        ],
+        [
+          "B",
+          "Merge validation with immediate per-record emission, as suggested.",
+          [
+            0,
+            8,
+            10,
+            8,
+            9
+          ],
+          "Ineligible: a late empty record exposes an earlier record before throwing."
+        ],
+        [
+          "C",
+          "Scan once into a private list of byte-array records; emit only after full validation.",
+          [
+            10,
+            10,
+            9,
+            7,
+            6
+          ],
+          "Viable, but retains all allocated records and adds collection machinery; no material benefit shown."
+        ],
+        [
+          "D",
+          "Scan once into a list of delimiter spans; validate fully, then copy and emit those spans.",
+          [
+            10,
+            10,
+            9,
+            8,
+            7
+          ],
+          "Viable two-phase design; replaces a simple byte scan with retained delimiter metadata."
+        ],
+        [
+          "E",
+          "Use a compiled/native delimiter helper with an all-or-nothing result.",
+          [
+            10,
+            9,
+            5,
+            4,
+            2
+          ],
+          "Adds runtime/type-loading and deployment obligations for no measured bottleneck."
+        ],
+        [
+          "F",
+          "Change callers/contracts to allow partial records, or drop late-empty validation.",
+          [
+            0,
+            2,
+            6,
+            2,
+            5
+          ],
+          "Ineligible: weakens the retained refusal contract. Caller array capture does not justify changing function output."
+        ]
+      ],
+      "validation": "The observation of two scans is correct. The claim that the first scan is redundant is false under the retained output contract. Lines 188\u2013203 reject missing terminal NUL and any empty record before lines 205\u2013213 allocate and emit records. Both scans are linear in byte length; this is not a quadratic algorithm. The actual callers at lines 790\u2013792 pass the complete conversion result to the strict decoded allowlist checker. The private function also has a directly tested success-stream contract.\n\nThe exact current file SHA256 `8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120` equals the file tested for canonical TF68-R8. Its saved final contract proof rejects a missing final NUL and an empty record after a valid prefix with zero emitted objects. A new minimal discriminator executes the actual extracted function and the comment's suggested private single-pass construction on bytes `61 00 00`: actual emits zero; suggested emits byte[] `61` before the same error. This is a concrete regression, not a claim that existing callers accepted malicious data. Allocation/copy failures can still propagate after earlier emissions; the retained guarantee discussed here is structural NUL validation, not universal transactional output.\n\nThe precise two-scan suggestion has no earlier dedicated decision. Reuse R8's exact-byte output-contract evidence and A06-D3's strict raw-path admission requirements. Do not reopen the OutputType choice.",
+      "stakeholders": "Security reviewers and wrapper consumers need complete structural refusal before visible records. Test maintainers need real stream behavior. Windows 5.1/7 and Linux users need the same byte-array object boundaries. Contributors need a small readable parser; CI owners need measured, useful performance changes.",
+      "rubric": "Failure atomicity (40%) means zero success objects for every structurally malformed NUL stream. Raw output/caller fidelity (25%) preserves byte values, per-record byte[] objects, empty results, diagnostics, and downstream allowlist behavior. Cross-runtime reliability (15%) favors the already supported APIs and avoids new compiler/runtime machinery. Clarity and practical utility (15%) asks whether a reader can see the validation boundary and whether added machinery buys a demonstrated benefit. Maintenance cost (5%) covers implementation and meaningful verification scope. B and F fail the first hard constraint regardless of total.",
+      "selection": "Select A. Keep the function and its callers unchanged. Explain that the first scan validates the complete structure before output starts. Link the exact-byte contract proof and the single-pass negative control in the review disposition. Do not add a timing test or a new framework. No product path or metadata edit is proposed.",
+      "scored_options": [
+        {
+          "option": "A",
+          "description": "Keep the two scans; explain why validation precedes output.",
+          "scores": [
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "total": 100.0,
+          "reason": "Preserves the exact observed no-output refusal and simple allocation behavior."
+        },
+        {
+          "option": "B",
+          "description": "Merge validation with immediate per-record emission, as suggested.",
+          "scores": [
+            0,
+            8,
+            10,
+            8,
+            9
+          ],
+          "total": 51.5,
+          "reason": "Ineligible: a late empty record exposes an earlier record before throwing."
+        },
+        {
+          "option": "C",
+          "description": "Scan once into a private list of byte-array records; emit only after full validation.",
+          "scores": [
+            10,
+            10,
+            9,
+            7,
+            6
+          ],
+          "total": 92.0,
+          "reason": "Viable, but retains all allocated records and adds collection machinery; no material benefit shown."
+        },
+        {
+          "option": "D",
+          "description": "Scan once into a list of delimiter spans; validate fully, then copy and emit those spans.",
+          "scores": [
+            10,
+            10,
+            9,
+            8,
+            7
+          ],
+          "total": 94.0,
+          "reason": "Viable two-phase design; replaces a simple byte scan with retained delimiter metadata."
+        },
+        {
+          "option": "E",
+          "description": "Use a compiled/native delimiter helper with an all-or-nothing result.",
+          "scores": [
+            10,
+            9,
+            5,
+            4,
+            2
+          ],
+          "total": 77.0,
+          "reason": "Adds runtime/type-loading and deployment obligations for no measured bottleneck."
+        },
+        {
+          "option": "F",
+          "description": "Change callers/contracts to allow partial records, or drop late-empty validation.",
+          "scores": [
+            0,
+            2,
+            6,
+            2,
+            5
+          ],
+          "total": 19.5,
+          "reason": "Ineligible: weakens the retained refusal contract. Caller array capture does not justify changing function output."
+        }
+      ]
+    },
+    {
+      "id": "R17",
+      "title": "Retain the bounded duplicate summary cleanup",
+      "comments": [
+        4194835388,
+        4194835424
+      ],
+      "weights": [
+        40,
+        20,
+        15,
+        15,
+        10
+      ],
+      "criteria": [
+        "Composition correctness",
+        "Supported-runtime fidelity",
+        "Demonstrated benefit",
+        "Reader and ownership clarity",
+        "Maintenance scope"
+      ],
+      "options": [
+        [
+          "A",
+          "Keep the current loop and record the exact bounded duplicate work.",
+          [
+            10,
+            10,
+            8,
+            9,
+            10
+          ],
+          "No output defect or material runtime impact demonstrated; both collection roles remain explicit."
+        ],
+        [
+          "B",
+          "Skip a section whose newly created object already has CleanBody.",
+          [
+            10,
+            10,
+            9,
+            8,
+            8
+          ],
+          "Feasible narrow optimization; turns an output property into a processing-state guard."
+        ],
+        [
+          "C",
+          "Build a HashSet of section objects, with explicit reference identity, then clean each once.",
+          [
+            10,
+            8,
+            9,
+            7,
+            6
+          ],
+          "Feasible only after verifying identity semantics and all supported runtimes; adds a set for one overlapping object."
+        ],
+        [
+          "D",
+          "Build one unique all-sections list during parsing and clean that list.",
+          [
+            10,
+            9,
+            9,
+            7,
+            6
+          ],
+          "Larger parser/collection data-flow change; can also clean previously overwritten sections unnecessarily."
+        ],
+        [
+          "E",
+          "Make the two cleanup loops disjoint by excluding the shared summary reference from one.",
+          [
+            10,
+            10,
+            9,
+            7,
+            7
+          ],
+          "Avoids a set, but embeds the summary-index relationship in a second location."
+        ],
+        [
+          "F",
+          "Clean lazily at each emission site or recompute on demand.",
+          [
+            8,
+            9,
+            6,
+            5,
+            4
+          ],
+          "Moves work and state into multiple output paths and may repeat cleanup for repeated markers."
+        ],
+        [
+          "G",
+          "Start another timing/profile campaign before deciding.",
+          [
+            10,
+            10,
+            6,
+            8,
+            5
+          ],
+          "Can measure wall time, but present one-section evidence does not justify more runs now."
+        ]
+      ],
+      "validation": "Both comments have identical bodies and form one finding. They are factually correct: the top executive-summary hashtable is stored in the top-section list and under the summary anchor. The cleanup loop visits it twice. Each visit reads the same completed Body and deterministically assigns equivalent CleanBody strings. No emitted section is duplicated by this loop itself; emission is controlled later.\n\nThe bounded actual-function probe runs `New-FullPayload` with current TF guide/rationale text and records reference identity at the existing cleanup statement. It sees 64 visits to 63 unique section objects. The only overlap is `## Executive Summary: Terraform Philosophy`, with 23 body lines and 17 cleaned lines. Removing only the observation marker produces identical full output (221,502 characters). These counts are not a wall-clock speedup claim. In this parser, fresh section objects are created for headings; the special summary top object is the single possible top/leaf-index overlap. Repeated cleanup therefore remains linear in input size, although a larger summary can increase its constant cost.\n\nThis is distinct from canonical PS234-R5, which proved quadratic repeated full-output-prefix scans under repeated summary boundaries and selected a cursor. That proven fix remains intact. R17 does not reproduce that old growth mechanism, and the current instruction-validation service bottleneck has not been attributed to this generator loop.",
+      "stakeholders": "TF and PS document readers need exact ordering, markers, summary placement, and output bytes. Maintainers need understandable section ownership. Cross-platform contributors need compatible hashtable and identity behavior. CI operators need changes with a useful measured effect; reviewers need truthful operation-count claims.",
+      "rubric": "Composition correctness (40%) preserves aliases, marker semantics, heading collisions, order and all four goldens. Supported-runtime fidelity (20%) preserves PowerShell 5.1/7 and Linux behavior without new reference-comparer assumptions. Demonstrated benefit (15%) distinguishes eliminating one known repeated cleanup from fixing proven superlinear work or a measured bottleneck. Reader and ownership clarity (15%) favors direct collection roles over hidden processed-state or more emission paths. Maintenance scope (10%) covers extra state, coupled implementations and verification burden. Scores credit viable optimizations; they do not claim they are incorrect.",
+      "selection": "Select A. Keep the generator unchanged. Acknowledge the one repeated cleanup and its measured size. State that it is deterministic and does not duplicate output. Retain the existing cursor fix. Reconsider a narrow cleanup guard only if supported inputs or profiling show a material cost. Do not claim a runtime improvement or add an unneeded set now.",
+      "scored_options": [
+        {
+          "option": "A",
+          "description": "Keep the current loop and record the exact bounded duplicate work.",
+          "scores": [
+            10,
+            10,
+            8,
+            9,
+            10
+          ],
+          "total": 95.5,
+          "reason": "No output defect or material runtime impact demonstrated; both collection roles remain explicit."
+        },
+        {
+          "option": "B",
+          "description": "Skip a section whose newly created object already has CleanBody.",
+          "scores": [
+            10,
+            10,
+            9,
+            8,
+            8
+          ],
+          "total": 93.5,
+          "reason": "Feasible narrow optimization; turns an output property into a processing-state guard."
+        },
+        {
+          "option": "C",
+          "description": "Build a HashSet of section objects, with explicit reference identity, then clean each once.",
+          "scores": [
+            10,
+            8,
+            9,
+            7,
+            6
+          ],
+          "total": 86.0,
+          "reason": "Feasible only after verifying identity semantics and all supported runtimes; adds a set for one overlapping object."
+        },
+        {
+          "option": "D",
+          "description": "Build one unique all-sections list during parsing and clean that list.",
+          "scores": [
+            10,
+            9,
+            9,
+            7,
+            6
+          ],
+          "total": 88.0,
+          "reason": "Larger parser/collection data-flow change; can also clean previously overwritten sections unnecessarily."
+        },
+        {
+          "option": "E",
+          "description": "Make the two cleanup loops disjoint by excluding the shared summary reference from one.",
+          "scores": [
+            10,
+            10,
+            9,
+            7,
+            7
+          ],
+          "total": 91.0,
+          "reason": "Avoids a set, but embeds the summary-index relationship in a second location."
+        },
+        {
+          "option": "F",
+          "description": "Clean lazily at each emission site or recompute on demand.",
+          "scores": [
+            8,
+            9,
+            6,
+            5,
+            4
+          ],
+          "total": 70.5,
+          "reason": "Moves work and state into multiple output paths and may repeat cleanup for repeated markers."
+        },
+        {
+          "option": "G",
+          "description": "Start another timing/profile campaign before deciding.",
+          "scores": [
+            10,
+            10,
+            6,
+            8,
+            5
+          ],
+          "total": 86.0,
+          "reason": "Can measure wall time, but present one-section evidence does not justify more runs now."
+        }
+      ]
+    },
+    {
+      "id": "R18",
+      "title": "Retain the complete before/after key checks",
+      "comments": [
+        4194835467
+      ],
+      "weights": [
+        42,
+        23,
+        20,
+        10,
+        5
+      ],
+      "criteria": [
+        "Integrity coverage",
+        "Ordinal and exception fidelity",
+        "Demonstrated practical value",
+        "Audit clarity",
+        "Maintenance cost"
+      ],
+      "options": [
+        [
+          "A",
+          "Keep concatenated keys and the existing complete comparison.",
+          [
+            10,
+            10,
+            8,
+            10,
+            10
+          ],
+          "Checks shared paths twice; preserves simple complete coverage with no new set state."
+        ],
+        [
+          "B",
+          "Build a HashSet[string] using StringComparer.Ordinal and compare its union once.",
+          [
+            10,
+            10,
+            9,
+            8,
+            7
+          ],
+          "Viable constant-factor reduction, with another allocation and no measured runtime need."
+        ],
+        [
+          "C",
+          "Check all old keys, then only new keys absent from the old dictionary.",
+          [
+            10,
+            10,
+            9,
+            7,
+            7
+          ],
+          "Avoids a set, but splits one integrity predicate into multiple paths."
+        ],
+        [
+          "D",
+          "Merge the two ordinally sorted key enumerators.",
+          [
+            10,
+            9,
+            9,
+            5,
+            3
+          ],
+          "Can preserve order and linear traversal; adds iterator state and edge cases."
+        ],
+        [
+          "E",
+          "Use a generic sort/unique pipeline without an explicit ordinal equivalence contract.",
+          [
+            6,
+            4,
+            7,
+            6,
+            6
+          ],
+          "Ineligible as stated: case-sensitive path identity must not be collapsed or culture-dependent."
+        ],
+        [
+          "F",
+          "Check only current keys, only old keys, or counts/digest aggregates.",
+          [
+            2,
+            5,
+            5,
+            6,
+            7
+          ],
+          "Ineligible: can lose added/deleted-path coverage or the exact per-path artifact exception."
+        ],
+        [
+          "G",
+          "Add a profile/benchmark before any decision.",
+          [
+            10,
+            10,
+            6,
+            8,
+            5
+          ],
+          "Potential future measurement; current duplicate checks alone do not warrant another run."
+        ]
+      ],
+      "validation": "The common keys are indeed visited twice. The repeated operation is in-memory dictionary membership/value comparison, not another filesystem walk or SHA-256 calculation: `Get-WorktreeFileDigestMap` has already produced the two maps. Both are ordinal `SortedDictionary[string,string]` instances. The loop must cover additions and deletions and must skip only the four exact allowed artifacts when that switch is set. Current complexity is proportional to the combined key visits with sorted-dictionary lookups; a set can reduce constant work but does not repair a demonstrated coverage defect.\n\nA bounded probe executes the exact integrity function with fixed read-only control-surface/map stubs and a visit counter. Three identical keys cause six visits and pass. Changed, added, removed, and case-distinct added keys all fail with the fixed integrity diagnostic. The permitted artifact change passes only with the existing switch. The probe does not execute filesystem snapshotting, a semantic child, or the real wrapper. It validates this comparison loop; existing actual wrapper and platform evidence remains separate.\n\nNo exact previous decision for this key-union suggestion was found. A06-D3's complete integrity envelope and ordinal path requirements remain applicable. This is not the measured parser interpretation bottleneck and is not a remedy for the current cancelled service setup.",
+      "stakeholders": "Security reviewers and recovery users need detection of every unauthorized added, deleted or changed path. Authors need correct four-artifact regeneration. Linux/case-sensitive users need ordinal identity. Maintainers need an auditable complete predicate; CI owners need useful improvements rather than speculative speed claims.",
+      "rubric": "Integrity coverage (42%) requires additions, deletions, changed digests, and exact four-artifact exception behavior. Ordinal and exception fidelity (23%) preserves case-distinct paths, fixed diagnostics and visible failures. Demonstrated practical value (20%) weighs actual benefits without equating fewer lookups with measured end-to-end time. Audit clarity (10%) favors a single complete comparison over implicit comparer choices or multiple partial passes. Maintenance cost (5%) covers added memory/state and cross-repository validation. E and F are ineligible in their stated forms; an explicit ordinal set is separately evaluated as B.",
+      "selection": "Select A. Keep the comparison unchanged. Acknowledge the repeated common-key lookup. Explain that file hashing is not repeated by this loop. Preserve all integrity cases and the exact artifact allowance. Revisit an ordinal set only if profiling shows a material cost. Do not weaken the key census or claim this resolves the service timeout.",
+      "scored_options": [
+        {
+          "option": "A",
+          "description": "Keep concatenated keys and the existing complete comparison.",
+          "scores": [
+            10,
+            10,
+            8,
+            10,
+            10
+          ],
+          "total": 96.0,
+          "reason": "Checks shared paths twice; preserves simple complete coverage with no new set state."
+        },
+        {
+          "option": "B",
+          "description": "Build a HashSet[string] using StringComparer.Ordinal and compare its union once.",
+          "scores": [
+            10,
+            10,
+            9,
+            8,
+            7
+          ],
+          "total": 94.5,
+          "reason": "Viable constant-factor reduction, with another allocation and no measured runtime need."
+        },
+        {
+          "option": "C",
+          "description": "Check all old keys, then only new keys absent from the old dictionary.",
+          "scores": [
+            10,
+            10,
+            9,
+            7,
+            7
+          ],
+          "total": 93.5,
+          "reason": "Avoids a set, but splits one integrity predicate into multiple paths."
+        },
+        {
+          "option": "D",
+          "description": "Merge the two ordinally sorted key enumerators.",
+          "scores": [
+            10,
+            9,
+            9,
+            5,
+            3
+          ],
+          "total": 87.2,
+          "reason": "Can preserve order and linear traversal; adds iterator state and edge cases."
+        },
+        {
+          "option": "E",
+          "description": "Use a generic sort/unique pipeline without an explicit ordinal equivalence contract.",
+          "scores": [
+            6,
+            4,
+            7,
+            6,
+            6
+          ],
+          "total": 57.4,
+          "reason": "Ineligible as stated: case-sensitive path identity must not be collapsed or culture-dependent."
+        },
+        {
+          "option": "F",
+          "description": "Check only current keys, only old keys, or counts/digest aggregates.",
+          "scores": [
+            2,
+            5,
+            5,
+            6,
+            7
+          ],
+          "total": 39.4,
+          "reason": "Ineligible: can lose added/deleted-path coverage or the exact per-path artifact exception."
+        },
+        {
+          "option": "G",
+          "description": "Add a profile/benchmark before any decision.",
+          "scores": [
+            10,
+            10,
+            6,
+            8,
+            5
+          ],
+          "total": 87.5,
+          "reason": "Potential future measurement; current duplicate checks alone do not warrant another run."
+        }
+      ]
+    }
+  ],
+  "source_evidence": {
+    "path": "source-evidence.json",
+    "sha256": "292064bdc7bb07f6e1be181aae12e985389143546aa830438a9eb35b1a3223fc"
+  },
+  "validation": {
+    "command": [
+      "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-findings\\probe.ps1",
+      "-Directory",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-findings",
+      "-RepositoryRoot",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+    ],
+    "native_exit": 0,
+    "result": "probe-result.json",
+    "runtime_sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+    "scope": "Extracted exact functions only; R16 prospective private mutant, R17 visit marker, R18 fixture stubs/count marker; no real gate/generator entry point, files, Git or child execution.",
+    "no_product_entrypoint_execution": true
+  },
+  "references": {
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R8-output-type.md": "cf739d8b36f6d7a0e76bec03f29f79b51de51637fb0d5532fe08fddbc0eb7298",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round1\\R5-summary-scans.md": "f81786c9c68f4a2a83c811bb41c46a1adced6b9b0f7ed77da68adbb2aaccb13d",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round1\\R6-measurement-reporting.md": "799fba20e00254a54fc3f99d69d78e1b29788408cf312276baee088878eee329",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\design.md": "6b5d43d8a1eafe2b6a4f07593d82012f5aa62a8432d275fa1a0a653eb7ba8d51",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-result.json": "5bd9d84f50eb288fa1c91c1c4a690572b8dd6c3f6faf07625f846649a6fd7ff1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-probe.ps1": "a5c3f182f53221c94b5d31fa40bb3493e3d091d7c571447a3da5ac3e52e0279c"
+  },
+  "artifacts": {
+    "build-report.py": {
+      "sha256": "a9a089f1f1860312d45a57acbcf68e601fb6dd273b73a0594ece9a6bd9b370c3",
+      "bytes": 20637
+    },
+    "collect.py": {
+      "sha256": "3eeeffac4ffc96a2ba26dc8d305f02263f75e28fae97e2f03876c050415374a3",
+      "bytes": 2658
+    },
+    "Generate-StyleGuideArtifacts.ps1": {
+      "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "bytes": 91158
+    },
+    "probe-result.json": {
+      "sha256": "d98a5cdd3f75c5fc4e0e77dadd7c4c00b9296eeb7aeac13c6d2bd341cb1e057c",
+      "bytes": 2300
+    },
+    "probe.ps1": {
+      "sha256": "b8cb63bf54802e5bcc33723f9ecc36876463045c2a46bf058cb4e07001cb7353",
+      "bytes": 6780
+    },
+    "REPORT.md": {
+      "sha256": "f40a3283b8ef5c82a6e800340a85fde86e1d6737cfc4fc403b3e75076e0974b0",
+      "bytes": 17792
+    },
+    "source-evidence.json": {
+      "sha256": "292064bdc7bb07f6e1be181aae12e985389143546aa830438a9eb35b1a3223fc",
+      "bytes": 8376
+    },
+    "Test-StyleGuideArtifacts.ps1": {
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+      "bytes": 36081
+    }
+  },
+  "one_next_action": "Root display/select and post dispositions; retain cancelled setup merge block."
+}

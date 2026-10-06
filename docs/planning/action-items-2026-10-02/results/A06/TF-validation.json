@@ -1,5 +1,5 @@
 {
-  "status": "round6_reviews_pending",
+  "status": "round6_findings_and_setup_timeout_under_decision",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -94,7 +94,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Collect the existing Copilot result and five live CI runs; no duplicate trigger. Finish bounded read-only A14 impact assessment. Fresh final native quality and all CI success are required before normal merge; no cancellation waiver.",
+  "next_action": "Publish bounded R16/R17/R18 no-change decisions and post one disposition per thread. Finish separate targeted runtime-remedy proposal; no merge while dynamic CI cancelled.",
   "checkout_exit": 0,
   "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
   "implementation": {
@@ -196,7 +196,7 @@
     ],
     "historical_full_node_scope": "600 tests at parent only; current candidate selected13 tests and complete11 hooks."
   },
-  "local_operations": "No local tests, Git writes or workers active. Existing Copilot round6 and five CI runs remain pending at latest native snapshot; no source or transfer.",
+  "local_operations": "No local tests or Git writes active. R16-R18 worker stopped. a14_tf68_runtime_impact prepares read-only timeout remedy. All remote review/CI operations terminal; no relaunch.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "current_input_native_binding_pending",
@@ -467,7 +467,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-READINESS.json",
     "sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1"
   },
-  "planning_checkpoint": "ab673c9bbb96b8d27aecc4ab44e0291836dccee2",
+  "planning_checkpoint": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
   "commit": {
     "status": "committed",
     "expected_parent": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
@@ -2667,11 +2667,11 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-new-head-baseline.json",
       "baseline_sha256": "72f4e51d2756a510afd03d31d2fa0fbcc202f31c996a7e4834143da2e8335533",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_with_findings",
         "requested_at": "2026-10-06T11:27:02.132224+00:00",
         "effort_selected": null,
         "effort_preferred": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "channel": "GitHub CLI @copilot fallback",
         "fallback_reason": "Previously authenticated Edge browser3 is unavailable. Available browser inventory contains only IAB and MCP Apps. IAB opened the exact PR and displays Sign in and Sign in to comment, with no authenticated request control. Supported UI cannot submit Balanced. AGENTS.md prescribes CLI @copilot fallback; no browser authentication or effort inferred.",
@@ -2682,8 +2682,13 @@
         },
         "request_event_id": 32593286249,
         "native_requested_at": "2026-10-06T11:27:04Z",
-        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-copilot.json",
-        "workflow_run": 37456500523
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1154.json",
+        "workflow_run": 37456500523,
+        "review_id": 5427825804,
+        "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#pullrequestreview-5427825804",
+        "completed_at": "2026-10-06T11:45:24Z",
+        "result_body_sha256": "82d6f4dbccaa7797bc3ad3453387d82953cc53f0fef6399a5bf2da3aca6c9510",
+        "attribution": "Authenticated bot, exact head, new baseline-excluded review after sole accepted request; requested reviewers empty; service run terminal cancelled. Lite observed in review overview, not inferred from transport."
       },
       "codex": {
         "status": "completed_clean",
@@ -2708,12 +2713,65 @@
         "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1135.json",
         "attribution": "Authenticated bot/app; excluded from complete pretrigger baseline; sole recorded manual trigger; later exact current commit prefix and completed manual summary; no new inline findings."
       },
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
-      "findings": []
+      "findings": [
+        {
+          "finding": "TF68-R16",
+          "comment": 4194835328,
+          "thread": "PRRT_kwDOSAZRhc6pchUt",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835328",
+          "status": "no_change_selected_pending_native_disposition",
+          "resolved": false,
+          "body_sha256": "3b39d6ecaa1d7b5cf17ce4bad40530017576a4bb244f20e19790234946e31f34",
+          "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
+          "decision_id": "TF68-R16",
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+        },
+        {
+          "finding": "TF68-R17",
+          "comment": 4194835388,
+          "thread": "PRRT_kwDOSAZRhc6pchVa",
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835388",
+          "status": "no_change_selected_pending_native_disposition",
+          "resolved": false,
+          "body_sha256": "3ec6eb391ce0abbd1579a6c8a804a0a4eb60b5e186bc9271dec62b6079f5ea87",
+          "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
+          "decision_id": "TF68-R17",
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+        },
+        {
+          "finding": "TF68-R17",
+          "comment": 4194835424,
+          "thread": "PRRT_kwDOSAZRhc6pchV0",
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835424",
+          "status": "no_change_selected_pending_native_disposition",
+          "resolved": false,
+          "body_sha256": "3ec6eb391ce0abbd1579a6c8a804a0a4eb60b5e186bc9271dec62b6079f5ea87",
+          "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
+          "decision_id": "TF68-R17",
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+        },
+        {
+          "finding": "TF68-R18",
+          "comment": 4194835467,
+          "thread": "PRRT_kwDOSAZRhc6pchWS",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835467",
+          "status": "no_change_selected_pending_native_disposition",
+          "resolved": false,
+          "body_sha256": "3854c20901a70e1b7590310526dc29a79288dd0e88ba4838a1388827f9dcff97",
+          "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
+          "decision_id": "TF68-R18",
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+        }
+      ]
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1140.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1201.json",
   "hosted_platform_progress": {
     "status": "passed",
     "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
@@ -6577,7 +6635,7 @@
       }
     }
   ],
-  "updated_at": "2026-10-06T11:40:29.800519+00:00",
+  "updated_at": "2026-10-06T11:59:52.868062+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
     "status": "All older round2/round3 acceptance and merge helpers are stale; do not execute. New input3b/round4 and strict owner no-failing-CI rule must be bound before any future acceptance.",
@@ -6594,7 +6652,7 @@
       "accept-landed-tf68-r2.py": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
     }
   },
-  "last_goal_turn_classification": "Progress: current remote Codex clean result authenticated and canonical A14 candidate impact integrated after raw source/region/guard verification. Five specific CI runs and Copilot remain authoritatively live at11:40:07Z; no merge or relaunch.",
+  "last_goal_turn_classification": "Progress: new exact-head Copilot Lite review reconciled terminal with four comments/three findings; actual20-minute CI cancellation established. Both ordinary setup workflows passed. Bounded finding proposals active.",
   "partial_hosted_r2": {
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
     "push_behavior": {
@@ -6682,8 +6740,8 @@
     "minimum_interval_seconds": 3600,
     "last_relaunch_at": null,
     "restriction": "No merge while CI is failing. No automatic retry schedule. Reconcile all native operations before a permitted relaunch. A new-input review cannot silently waive a cancelled/failed current workflow; acceptance of historical TF67/PS224 is not a blanket exemption.",
-    "next_permitted_unchanged_relaunch_at": "2026-10-06T08:31:29Z",
-    "next_time_basis": "Conservative one-hour spacing from accepted initial round5 request07:31:29Z; no relaunch scheduled or released."
+    "next_permitted_unchanged_relaunch_at": "2026-10-06T12:27:04Z",
+    "next_time_basis": "Conservative hour after accepted round6 request11:27:04Z. No relaunch scheduled or released; current failed CI remains a merge blocker."
   },
   "partial_hosted_r4": {
     "pr_setup": {
@@ -8996,13 +9054,37 @@
     }
   },
   "planning_publication": {
-    "head": "ab673c9bbb96b8d27aecc4ab44e0291836dccee2",
-    "published_at": "2026-10-06T11:15:27.076611+00:00",
-    "owned_files": 63,
+    "head": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
+    "published_at": "2026-10-06T11:41:29.263669+00:00",
+    "owned_files": 11,
     "unrelated_preserved": 2693,
-    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-repaired-evidence-planning-publication.json",
-    "immutable_binding": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\PUBLICATION-BINDING-REPAIRED.json",
-    "binding_sha256": "f140973f2587301562960949347db42d184196f7fc88cf029ce36127ee1226d6"
+    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-round6-evidence-planning-publication.json",
+    "normalizations": [
+      {
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.json",
+        "source_sha256": "df50e5df89992ca1a27cf1afbee43143032ca2e7d0a8abb5bc46767e13ae9307",
+        "published_sha256": "5e121e0c92f65bba9d4871d8d64846eca0f1e2b1259227390b10d41126384f11",
+        "relationship": "Git CRLF-to-LF normalization only"
+      },
+      {
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.md",
+        "source_sha256": "b512849a07437e1a2f68467ad9a6e773ecdf6580a0cf41b4391189482a31d6b5",
+        "published_sha256": "d7259b6a2e3b95b70b1612475be0613b29db28d9a29e3431880060d51de526b7",
+        "relationship": "Git CRLF-to-LF normalization only"
+      },
+      {
+        "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/REPORT.md",
+        "source_sha256": "2c1a398f8905ef31d5a64285b86d2f50d6d152a625cfe94cf8222f1d410d04c4",
+        "published_sha256": "0c8f23a80aaf58a991b84011209b4af035b5c24ba54e028a39f42a2056b6ac4f",
+        "relationship": "Git CRLF-to-LF normalization only"
+      },
+      {
+        "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/evidence.json",
+        "source_sha256": "97320a39978f58ab14d80bf7082220a32b02d61c70fc16fb19bf952ab3b04c97",
+        "published_sha256": "e33a8b158e54a39251c27cc535484f40a6d257868d0ef8855359994e26e2fb4c",
+        "relationship": "Git CRLF-to-LF normalization only"
+      }
+    ]
   },
   "last_read_only_native_observation": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-runtime-C-prevalidation-native.json",
@@ -9224,27 +9306,29 @@
       "owned_files": 38,
       "unrelated_preserved": 2693,
       "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-evidence-planning-publication.json"
+    },
+    {
+      "head": "ab673c9bbb96b8d27aecc4ab44e0291836dccee2",
+      "published_at": "2026-10-06T11:15:27.076611+00:00",
+      "owned_files": 63,
+      "unrelated_preserved": 2693,
+      "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-repaired-evidence-planning-publication.json",
+      "immutable_binding": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\PUBLICATION-BINDING-REPAIRED.json",
+      "binding_sha256": "f140973f2587301562960949347db42d184196f7fc88cf029ce36127ee1226d6"
     }
   ],
   "live_remote_observation": {
-    "captured_at": "2026-10-06T11:40:07.045156+00:00",
-    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1140.json",
-    "sha256": "3b58c6b20bf97251c4bcba0f849a769c3dba650bbcf831191f844a73cf2ea9e0",
+    "captured_at": "2026-10-06T11:57:31.852995+00:00",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1201.json",
+    "sha256": "8142a0a798a6cadece720a4ad3574a7cfb146d3d80c2ca63918497f31d937ec9",
     "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
     "runs": [
       {
         "id": 37456500523,
         "name": "Running Copilot Code Review",
         "event": "dynamic",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37456293051,
-        "name": "Copilot setup steps",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "cancelled"
       },
       {
         "id": 37456293111,
@@ -9261,6 +9345,13 @@
         "conclusion": "success"
       },
       {
+        "id": 37456293051,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
         "id": 37456293027,
         "name": "Markdown Lint",
         "event": "pull_request",
@@ -9268,15 +9359,15 @@
         "conclusion": "success"
       },
       {
-        "id": 37456293018,
-        "name": "Agent instruction validation",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
         "id": 37456293024,
         "name": "Copilot code review preparation",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37456293018,
+        "name": "Agent instruction validation",
         "event": "pull_request",
         "status": "completed",
         "conclusion": "success"
@@ -9287,20 +9378,6 @@
         "event": "pull_request_target",
         "status": "completed",
         "conclusion": "success"
-      },
-      {
-        "id": 37456283825,
-        "name": "Agent instruction validation",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37456283745,
-        "name": "Copilot setup steps",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
       },
       {
         "id": 37456283827,
@@ -9329,20 +9406,47 @@
         "event": "push",
         "status": "completed",
         "conclusion": "success"
+      },
+      {
+        "id": 37456283745,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37456283825,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
       }
     ]
   },
   "round6_setup_activation": {
-    "status": "unverified_service_still_uses_coding_aggregate",
+    "status": "failed_service_setup_timeout",
     "run": 37456500523,
     "job": 112245306404,
     "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-copilot-jobs-first.json",
     "sha256": "946eb7c70f967ac28cfe6c752957f11fe4d464864fe1aaffff4208bb835b91e3",
     "observed_step": "Run complete repository validation",
     "started_at": "2026-10-06T11:27:20Z",
-    "limitation": "Current service still includes full coding aggregate. No dedicated setup selection or successful completion is inferred."
+    "limitation": "Current service still includes full coding aggregate. No dedicated setup selection or successful completion is inferred.",
+    "current_job_observation": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\jobs.json",
+      "sha256": "97fb103c9f8dcda593480d47c27d9d7e843aaf5d6829da1986414def63c626e0",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "job_started_at": "2026-10-06T11:27:20Z",
+      "job_completed_at": "2026-10-06T11:47:37Z"
+    },
+    "conclusion": "cancelled",
+    "completed_at": "2026-10-06T11:47:37Z",
+    "terminal_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1",
+    "reason": "Job exceeded external 20-minute service limit while complete repository validation was running. Ten earlier hooks passed; instruction-contract hook unfinished. No billing/outage cause established.",
+    "merge_blocked": true
   },
-  "next_poll_not_before": "2026-10-06T11:45:00+00:00",
+  "next_poll_not_before": "2026-10-06T12:00:00+00:00",
   "A14_current_candidate_impact": {
     "status": "root_verified_conditional_no_trigger_candidate_only",
     "worker": "a14_tf68_runtime_impact",
@@ -9358,5 +9462,126 @@
     "evidence": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\TF68-runtime-impact\\evidence.json",
     "evidence_sha256": "97320a39978f58ab14d80bf7082220a32b02d61c70fc16fb19bf952ab3b04c97",
     "root_verification": "Read complete report; verified78 raw object modes/blobs/hashes,19path scope,20 region hashes,10 raw comparisons,10 immutable historical/evidence input hashes and both existing platform logs. Mutable STATUS capture remains historical; subsequent root status updates do not change product assumptions. No new test or acceptance."
+  },
+  "obsolete_merge_helpers": {
+    "paths": [
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\merge-reviewed-tf68.py",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\merge-reviewed-tf68-r2.py",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\merge-reviewed-tf68-r3.py"
+    ],
+    "restriction": "Historical input-specific helpers; obsolete. Any cancelled-CI allowance is superseded by owner2026-10-06 no-failing-CI direction. Prepare a current no-waiver helper only after actual acceptance gates pass."
+  },
+  "hosted_round6_ci": {
+    "captured_at": "2026-10-06T11:57:31.852995+00:00",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1201.json",
+    "snapshot_sha256": "8142a0a798a6cadece720a4ad3574a7cfb146d3d80c2ca63918497f31d937ec9",
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+    "ordinary_status": "all13passed",
+    "runs": [
+      37456293111,
+      37456293100,
+      37456293051,
+      37456293027,
+      37456293024,
+      37456293018,
+      37456288501,
+      37456283827,
+      37456283698,
+      37456283753,
+      37456283891,
+      37456283745,
+      37456283825
+    ],
+    "behavior": [
+      {
+        "run": 37456293018,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293018\\attempt-1\\log.txt",
+        "sha256": "7af4f33d848659592235561bc42c8c0d8818bb035481435f96a6a0eade9c21b0",
+        "counts": {
+          "tests": 600,
+          "pass": 600,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "expected_separate_admission_job": "skipped on non-main event; pull_request_target authority run success"
+      },
+      {
+        "run": 37456283825,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283825\\attempt-1\\log.txt",
+        "sha256": "11217c779fce055713152a1cc299edd9bc67c78ddfca975b51a870456ce52d74",
+        "counts": {
+          "tests": 600,
+          "pass": 600,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "expected_separate_admission_job": "skipped on non-main event; pull_request_target authority run success"
+      }
+    ],
+    "setups": [
+      {
+        "run": 37456293051,
+        "passed_hooks": 11,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\log.txt",
+        "sha256": "4e234b691dc8a8ebebe5ee17f9d44e4c3d5960b7c76245fdc2f9b8d648e662b1",
+        "final_immutable_guard": "success",
+        "aggregate_started": "2026-10-06T11:25:53Z",
+        "aggregate_finished": "2026-10-06T11:50:46Z",
+        "aggregate_seconds": 1493.0
+      },
+      {
+        "run": 37456283745,
+        "passed_hooks": 11,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\log.txt",
+        "sha256": "6792cd846cdf6a9c297f4e93db98351054d237d65a013689000abac441549974",
+        "final_immutable_guard": "success",
+        "aggregate_started": "2026-10-06T11:25:45Z",
+        "aggregate_finished": "2026-10-06T11:52:42Z",
+        "aggregate_seconds": 1617.0
+      }
+    ],
+    "platform_proof": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\platform-proof.json",
+      "sha256": "a0fca2c670444418aef6a77759977aede8dda9ef89424e010ac5f7746e9bae43",
+      "assertions_per_pass": 156,
+      "passes_per_platform": 2,
+      "platforms": 3
+    },
+    "dynamic": {
+      "run": 37456500523,
+      "job": 112245306404,
+      "conclusion": "cancelled",
+      "cause": "20-minute job maximum during instruction hook",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1"
+    },
+    "limit": "All ordinary workflows passed; cancelled dynamic setup still blocks merge. No retry, merge or product mutation."
+  },
+  "round6_findings_decision": {
+    "status": "root_verified_selected_no_change",
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+    "verified_at": "2026-10-06T11:59:52.613070+00:00",
+    "source_artifact_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-findings",
+    "source_report_sha256": "f40a3283b8ef5c82a6e800340a85fde86e1d6737cfc4fc403b3e75076e0974b0",
+    "source_evidence_sha256": "b80ae079cd344c013185324157313f28b6ea5ae7e05e28c716d37f9a0538511b",
+    "verified_artifacts": 8,
+    "verified_references": 6,
+    "verified_score_rows": 20,
+    "raw_published_source_files_verified": 2,
+    "selected": {
+      "TF68-R16": "A100",
+      "TF68-R17": "A95.5",
+      "TF68-R18": "A96"
+    },
+    "displayed_before_disposition": true,
+    "product_changes": false,
+    "scope_limit": "Private extracted functions and source inspection, not a new full-suite or platform run."
   }
 }
