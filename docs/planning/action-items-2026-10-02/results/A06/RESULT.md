@@ -117,3 +117,15 @@ Root selected [C88.5](TF68-round6-timeout-remedy/repair-proposal/REPORT.md) afte
 Release scope is only the current TF validator and SelfTest: an explicit Markdown-only stateless compiled conversion path, unchanged generic callers and a finite special-name full-root legacy path. Keep all strict JSON/schema/fresh-parser/reuse/deep-copy rules and the PowerShell7 floor. First implement and run bounded equivalence, negative and parser/analyzer checks; then prepare the actual cold-process comparison packet. No cold comparison, full suite, dependency change, Git/native operation or merge is released here. Startup benefit and hosted completion remain unproved. Root owns subsequent gates.
 
 TF68 remains open oned9eea2 with cancelled dynamic CI; round6, deadline2026-10-13T23:47:31Z and transfers1/3/5/5of12 are unchanged. No new human input is needed for this local repair.
+
+## 2026-10-06 C88.5 focused validation verified
+
+The [two-file implementation and focused result](TF68-round6-timeout-remedy/implementation/REPORT.md) passes Windows7.6.5 and Linux7.6.3 controls, including frozen baseline equivalence,7 meaningful mutants, initialization refusal, actual reuse and final parser/PSSA. Root bound52 artifacts and all80 current source files; candidate treee71b812 was independently reconstructed without Git writes. Cold caller/full suite/new-input reviews and hosted CI remain pending.
+
+Original worker model capacity failed after Linux analysis completed. Root reconciled all saved operations, confirmed both containers absent and no task-owned local process, revoked its scope, and assigned only cold-packet preparation to a bounded replacement. Product remains frozen/uncommitted at e2a7767f/dd2aaf7f, on HEADed9. Original counters/deadline/merge hold unchanged.
+
+## 2026-10-06 cold timing verified; cleanup investigation open
+
+The [one cold comparison](TF68-round6-timeout-remedy/implementation/cold-comparison/REPORT.md) completed both actual commands correctly:11.407920466s original,8.074512943s changed, including0.3080119s first compilation. Outputs,59 parser calls,51 conversions and8 reuse hits match. Root verified25 artifacts and complete80-source/1,914-dependency guards. Both selected child groups were empty.
+
+The overall packet failed because parent cleanup found two adopted descendants, which it removed. Saved records lack state/command, so their cause remains unproved. Container absence and unchanged host state are verified. Root assigned read-only investigation/proposal only; no repeated pair, full suite, product/native write or merge is released. Historical failed status and valid partial evidence remain distinct. Existing counters/deadline unchanged.

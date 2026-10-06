@@ -1,5 +1,5 @@
 {
-  "status": "round6_measured_conversion_implementation_active",
+  "status": "round6_conversion_cold_pair_cleanup_investigation",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -94,7 +94,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Read a06 C88.5 diff and bounded focused results; inspect concrete cold-comparison packet before any launch.",
+  "next_action": "Review frozen cold-comparison preparation and its parser-only checks; release one bounded actual-caller pair only after guards pass. Preserve completed focused evidence.",
   "checkout_exit": 0,
   "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
   "implementation": {
@@ -196,7 +196,7 @@
     ],
     "historical_full_node_scope": "600 tests at parent only; current candidate selected13 tests and complete11 hooks."
   },
-  "local_operations": "a06 is sole writer for two TF validator/test files and bounded focused controls. No root test, Git/native or remote operation active. Cold actual comparison/full suite remain unreleased.",
+  "local_operations": "No task test/container/Git/native operation remains after capacity-failure recovery. Replacement worker prepares cold comparison only, with a separately released syntax/hash check. Product frozen; full suite/cold execution/native actions unreleased.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "current_input_native_binding_pending",
@@ -467,7 +467,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-READINESS.json",
     "sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1"
   },
-  "planning_checkpoint": "6139ecf9b7d1027eccb75387bc3df79cfb3f31a9",
+  "planning_checkpoint": "505bdb35478dc9c4d74260ef3c4aeacddd965588",
   "commit": {
     "status": "committed",
     "expected_parent": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
@@ -6705,8 +6705,8 @@
   },
   "last_goal_turn_classification": {
     "classification": "progress",
-    "at": "2026-10-06T12:45:13.555386+00:00",
-    "evidence": "Measured conversion repair C88.5 selected after complete displayed process; exact bounded implementation handoff prepared."
+    "at": "2026-10-06T16:29:43.518563+00:00",
+    "evidence": "Two-file C88.5 implemented; final Windows/Linux focused checks verified against52 artifacts/80files, missing Linux analyzer resolved. Capacity-failed worker reconciled and bounded preparation reassigned."
   },
   "partial_hosted_r2": {
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
@@ -9109,37 +9109,12 @@
     }
   },
   "planning_publication": {
-    "head": "6139ecf9b7d1027eccb75387bc3df79cfb3f31a9",
-    "parent": "513b57b9fb5797fb0d18d7a04b3f936f73c6fe38",
-    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-context-result-planning-publication.json",
-    "files": 26,
+    "head": "505bdb35478dc9c4d74260ef3c4aeacddd965588",
+    "parent": "6139ecf9b7d1027eccb75387bc3df79cfb3f31a9",
+    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-conversion-repair-proposal-planning-publication.json",
+    "files": 5,
     "preserved_other_files": 2693,
-    "normalizations": [
-      {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/author-catalog.json",
-        "source_sha256": "f53359bb5bb5c0627c347c7e28c6536e4f425561eb1c25604d7a5bb1617a141e",
-        "published_blob_sha256": "2fd385a57301ccb7a7b108edaf95925faff9b05cd2f1a82b43cf3256a23be95b",
-        "reason": "Git CRLF-to-LF normalization only"
-      },
-      {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/preparation-checks.json",
-        "source_sha256": "f8ba20f69089033c18225f13a4e16ce7bb0a776b33263ae7d10fa14720bdc116",
-        "published_blob_sha256": "f6b8d060b15dbf3cf0ee94df0ae5e33a3d2bf5249b14c7f3aa0ce3f707f90a32",
-        "reason": "Git CRLF-to-LF normalization only"
-      },
-      {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/prepared-parser.json",
-        "source_sha256": "f591ce361df45a5ed72022fc6ba17cad302f150d3876da3f3b97087368901db4",
-        "published_blob_sha256": "ba42c95182b65b883902d6af631e17e0f1da77c13ed14ae26ea718ff01857a93",
-        "reason": "Git CRLF-to-LF normalization only"
-      },
-      {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/profile-catalog.json",
-        "source_sha256": "e59e54f1b02c7d88d8cf91065559a2aac7f6a5671ec6eb8308758a4b6f9920a9",
-        "published_blob_sha256": "febc9c80d55b4149563c8511b358397227d5b77394f1558f496aa93b9fe6b06e",
-        "reason": "Git CRLF-to-LF normalization only"
-      }
-    ]
+    "normalizations": []
   },
   "last_read_only_native_observation": {
     "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-dispositions.json",
@@ -9444,6 +9419,39 @@
           "reason": "Git CRLF-to-LF normalization only"
         }
       ]
+    },
+    {
+      "head": "6139ecf9b7d1027eccb75387bc3df79cfb3f31a9",
+      "parent": "513b57b9fb5797fb0d18d7a04b3f936f73c6fe38",
+      "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-context-result-planning-publication.json",
+      "files": 26,
+      "preserved_other_files": 2693,
+      "normalizations": [
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/author-catalog.json",
+          "source_sha256": "f53359bb5bb5c0627c347c7e28c6536e4f425561eb1c25604d7a5bb1617a141e",
+          "published_blob_sha256": "2fd385a57301ccb7a7b108edaf95925faff9b05cd2f1a82b43cf3256a23be95b",
+          "reason": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/preparation-checks.json",
+          "source_sha256": "f8ba20f69089033c18225f13a4e16ce7bb0a776b33263ae7d10fa14720bdc116",
+          "published_blob_sha256": "f6b8d060b15dbf3cf0ee94df0ae5e33a3d2bf5249b14c7f3aa0ce3f707f90a32",
+          "reason": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/prepared-parser.json",
+          "source_sha256": "f591ce361df45a5ed72022fc6ba17cad302f150d3876da3f3b97087368901db4",
+          "published_blob_sha256": "ba42c95182b65b883902d6af631e17e0f1da77c13ed14ae26ea718ff01857a93",
+          "reason": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-timeout-remedy/diagnostic/profile-catalog.json",
+          "source_sha256": "e59e54f1b02c7d88d8cf91065559a2aac7f6a5671ec6eb8308758a4b6f9920a9",
+          "published_blob_sha256": "febc9c80d55b4149563c8511b358397227d5b77394f1558f496aa93b9fe6b06e",
+          "reason": "Git CRLF-to-LF normalization only"
+        }
+      ]
     }
   ],
   "live_remote_observation": {
@@ -9733,7 +9741,7 @@
     "preparation_owner": "/root/a06_tf_generator_owner",
     "preparation_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic",
     "execution_released": true,
-    "product_edits_released": true,
+    "product_edits_released": false,
     "provider_question_prepared": true,
     "provider_message_sent": false,
     "owner_input_needed_for_local_diagnostic": false,
@@ -9745,7 +9753,7 @@
       "pairs": 1,
       "automatic_repeat": false
     },
-    "next_action": "Read a06 C88.5 diff and bounded focused results; inspect concrete cold-comparison packet before any launch.",
+    "next_action": "Read-only cleanup investigation and proposal. No repeat, full suite, product/native mutation released.",
     "source_report_sha256": "0d39f48d7dca7dcfff5c1cf2de84a96c65461819dac9732464e78df1081019a9",
     "canonical_adjustment": "Table cell whitespace only for required Markdown lint; frozen worker report retained.",
     "authorized_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\manifest.authorized.json",
@@ -9766,9 +9774,9 @@
     "actual_conversion_seconds": 5.305516866,
     "control_seconds": 12.986890148999997,
     "timed_seconds": 12.849493307000003,
-    "next_step": "Existing a06 owner prepares the measured conversion repair proposal only; no tests or edits released.",
+    "next_step": "Read-only cleanup investigation and proposal. No repeat, full suite, product/native mutation released.",
     "repair": {
-      "status": "implementation_and_focused_validation_released",
+      "status": "focused_passed_cold_pair_functional_pass_cleanup_failed",
       "selected": "C",
       "score": 88.5,
       "selected_at": "2026-10-06T12:45:13.555386+00:00",
@@ -9784,18 +9792,138 @@
         "timing_sum": 1.636770039
       },
       "options_rubric_scores_choice_displayed_before_implementation": true,
-      "owner": "/root/a06_tf_generator_owner",
+      "owner": "root; bounded cold packet /root/a06_conversion_cold_packet",
       "scope": [
         ".github/workflows/Test-AgentInstructions.ps1",
         ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
       ],
       "validation_release": "Bounded focused equivalence, negative controls and parser/analyzer checks only; no full suite. Prepare the actual cold-comparison packet for root review before execution.",
-      "cold_comparison_released": false,
+      "cold_comparison_released": true,
       "full_suite_released": false,
       "native_operations_released": false,
       "limits": "No deps/runtime floor/schema/fresh parser/cache/clock changes. No Git/native actions. Stop on material incompatibility or broader scope.",
       "released_at": "2026-10-06T12:45:59.651151+00:00",
-      "implementation_artifacts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation"
+      "implementation_artifacts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation",
+      "progress": {
+        "observed_at": "2026-10-06T16:29:43.518563+00:00",
+        "stage": "focused_complete_root_verified",
+        "windows_final": true,
+        "linux_behavior": true,
+        "linux_analysis": true,
+        "root_artifact_hashes": 52,
+        "cold_comparison_released": false,
+        "worker_progress": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\progress.json"
+      },
+      "candidate_source_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\source-catalog.json",
+      "candidate_source_catalog_sha256": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+      "candidate_files": [
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "mode": "100644",
+          "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+          "bytes": 285263,
+          "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+          "bytes": 510470,
+          "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+        }
+      ],
+      "focused_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\ROOT-FOCUSED-VERIFICATION.json",
+      "focused_verification_sha256": "0d38b68e5ead4c6ab05ab01f9d34e26731ed8ab9dc20ad9ad87739d8b7d58d12",
+      "focused_report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\REPORT.md",
+      "candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "worker_recovery": {
+        "at": "2026-10-06T16:29:43.518563+00:00",
+        "previous_worker": "/root/a06_tf_generator_owner",
+        "authoritative_status": "errored: Selected model is at capacity. Please try a different model.",
+        "old_scope_revoked": true,
+        "task_owned_processes_after_reconciliation": 0,
+        "task_containers_after_reconciliation": 0,
+        "replacement": "/root/a06_conversion_cold_packet",
+        "requested_model": "gpt-6.1-sol",
+        "requested_reasoning": "high",
+        "scope": "prepare cold packet only; no product edits or launch",
+        "preparation_only_parser_check_released": true,
+        "cold_execution_released": false
+      },
+      "cold_comparison": {
+        "status": "failed_parent_adopted_cleanup_pair_only_passed",
+        "released_at": "2026-10-06T16:38:52.461955+00:00",
+        "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison",
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\manifest.authorized.json",
+        "manifest_sha256": "785471e3a5f528f57247194ddf27ea5f4291a5b49f0119a702f152e97ad5d92e",
+        "preparation_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\ROOT-PREPARATION-VERIFICATION.json",
+        "preparation_verification_sha256": "82b3e373d0e71e8f4773234b8a1bf5db56f8ab1eba9acb9de659e5257715d7ce",
+        "run_id": "tf68-ed9-cold-original-changed-one",
+        "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one",
+        "automatic_repeat": false,
+        "native_operations_released": false,
+        "full_suite_released": false,
+        "session_id": 60818,
+        "observed_at": "2026-10-06T16:39:30.012505+00:00",
+        "terminal_exit": 1,
+        "execution_complete": true,
+        "source_after_equal": true,
+        "container_absent": true,
+        "finished_at": "2026-10-06T16:40:24.721111+00:00",
+        "pair_result": {
+          "state": "passed",
+          "role": "cold-original-changed-case-comparison-not-acceptance",
+          "case": {
+            "Role": "cold reconstructed first current-date actual author case",
+            "Baseline": "65bb1cadfc31d32f0b9f4afc0c94c14aaeabee3f",
+            "Candidate": "2d62832374cd562b61e4fd958b0b71d2b70447dc",
+            "Clock": "2026-10-06T16:39:42.1553826+00:00",
+            "ExpectedDate": "2026-10-06",
+            "ExpectedExit": 0,
+            "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=65bb1cadfc31d32f0b9f4afc0c94c14aaeabee3f H=2d62832374cd562b61e4fd958b0b71d2b70447dc",
+            "PriorEphemeralIdentityReplayed": false
+          },
+          "counts": {
+            "control": {
+              "generic": 4,
+              "native": 59,
+              "native-attempt": 59,
+              "structural": 51,
+              "legacy-structural": 51,
+              "reuse": 8
+            },
+            "profile": {
+              "generic": 4,
+              "native": 59,
+              "native-attempt": 59,
+              "structural": 51,
+              "compile": 1,
+              "reuse": 8
+            }
+          },
+          "equal_argv_cwd_clock_outputs": true,
+          "cold_original_seconds": 11.407920466,
+          "cold_changed_seconds": 8.074512943000002,
+          "changed_faster": true,
+          "native_count_unchanged": true,
+          "changed_native_initializations": 1,
+          "selected_children": 2,
+          "helper_compile_seconds": 0.3080119,
+          "first_structural_call_seconds": 0.3428981,
+          "native_exits_equal": true,
+          "schema_and_snapshot_checks_unchanged": true,
+          "limits": [
+            "One ordered cold pair, not stable benchmark or hosted20m acceptance.",
+            "Counters are symmetric except changed-only compilation count; all marker removal must recover exact source.",
+            "Generic decoder count is recorded separately; no preprocessing warm-up in either child."
+          ]
+        },
+        "reason": "Two adopted parent descendants found before cleanup; process state/command not retained. Both removed. Do not infer live vs zombie or source without further evidence.",
+        "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\ROOT-RESULT-VERIFICATION.json",
+        "root_verification_sha256": "e30f7f2c776b8cace81d509b353d59e48ce2766f6a1e30650e5b8da127922480",
+        "report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\REPORT.md",
+        "cleanup_investigation_owner": "/root/a06_conversion_cold_packet"
+      }
     }
   },
   "prepared_round6_body_update": {

@@ -1,0 +1,281 @@
+{
+  "status": "PASS_FOCUSED_FINAL_CANDIDATE_NOT_FULL_ACCEPTANCE",
+  "verified_at": "2026-10-06T16:27:59.979884+00:00",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "changed_files": {
+    ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+  },
+  "source_catalog_files": 80,
+  "legacy_recursive_converter_byte_equal": true,
+  "windows": [
+    {
+      "run": "windows-final-focus",
+      "pid": 42088,
+      "exit": 0,
+      "result": {
+        "state": "passed",
+        "source_hashes": [
+          "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+          "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+        ],
+        "pwsh": "7.6.5",
+        "started_utc": "2026-10-06T12:57:24.3843472+00:00",
+        "checks": [
+          {
+            "state": "passed",
+            "seconds": 0.4837265,
+            "name": "Assert-ParserJsonConversionSelfTest"
+          },
+          {
+            "state": "passed",
+            "seconds": 5.3552403,
+            "name": "Assert-MarkdownParseReuseSelfTest"
+          }
+        ],
+        "source_after_equal": true,
+        "finished_utc": "2026-10-06T12:57:30.3725039+00:00"
+      },
+      "guard_source_hashes": {
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+      }
+    },
+    {
+      "run": "windows-controls4",
+      "pid": 80696,
+      "exit": 0,
+      "result": {
+        "state": "passed",
+        "pwsh": "7.6.5",
+        "checks": [
+          "actual package success/refusal, Node identity and TOML typed caller; no native initialization",
+          "frozen prechange decoder versus changed opt-in: full persistent corpus including exact UTF-8 boundary",
+          "one lazy implementation Type, same exact Type on subsequent calls",
+          "normal opt-in bypasses original recursion; special-name and generic calls execute it",
+          "unexpected native failure remains failure; no broad fallback",
+          "killed mutant: native always legacy",
+          "killed mutant: native duplicate allowed",
+          "killed mutant: empty name not rejected",
+          "killed mutant: nonfinite accepted",
+          "killed mutant: single array collapsed",
+          "killed mutant: PSTypeName made ordinary",
+          "killed mutant: timestamp coerced"
+        ],
+        "native_implementation": "4b776964f9ccf922b1224e436a9ab8d0c422a3553c4843a21552812a876734bc"
+      },
+      "guard_source_hashes": {
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+      }
+    },
+    {
+      "run": "windows-initialization1",
+      "pid": 64176,
+      "exit": 0,
+      "result": {
+        "state": "passed",
+        "pwsh": "7.6.5",
+        "checks": [
+          "actual Add-Type failure propagated, no successful output or Type",
+          "same-name wrong-source Type rejected; default generic path still succeeds"
+        ]
+      },
+      "guard_source_hashes": {
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+      }
+    },
+    {
+      "run": "windows-final-quality",
+      "pid": 59816,
+      "exit": 0,
+      "result": {
+        "analyzer": "1.24.0",
+        "rows": [
+          {
+            "diagnostics": [],
+            "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+            "parser_errors": [],
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1"
+          },
+          {
+            "diagnostics": [],
+            "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+            "parser_errors": [],
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1"
+          }
+        ],
+        "pwsh": "7.6.5"
+      },
+      "guard_source_hashes": {
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+      }
+    }
+  ],
+  "linux": [
+    {
+      "run": "tf68-ed9-native-converter-focus-one",
+      "overall": "failed",
+      "results": {
+        "focus": {
+          "state": "passed",
+          "source_hashes": [
+            "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+            "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+          ],
+          "pwsh": "7.6.3",
+          "started_utc": "2026-10-06T13:00:50.0075467+00:00",
+          "checks": [
+            {
+              "name": "Assert-ParserJsonConversionSelfTest",
+              "seconds": 0.6985397,
+              "state": "passed"
+            },
+            {
+              "name": "Assert-MarkdownParseReuseSelfTest",
+              "seconds": 2.2536135,
+              "state": "passed"
+            }
+          ],
+          "source_after_equal": true,
+          "finished_utc": "2026-10-06T13:00:53.1777060+00:00"
+        },
+        "controls": {
+          "state": "passed",
+          "pwsh": "7.6.3",
+          "checks": [
+            "actual package success/refusal, Node identity and TOML typed caller; no native initialization",
+            "frozen prechange decoder versus changed opt-in: full persistent corpus including exact UTF-8 boundary",
+            "one lazy implementation Type, same exact Type on subsequent calls",
+            "normal opt-in bypasses original recursion; special-name and generic calls execute it",
+            "unexpected native failure remains failure; no broad fallback",
+            "killed mutant: native always legacy",
+            "killed mutant: native duplicate allowed",
+            "killed mutant: empty name not rejected",
+            "killed mutant: nonfinite accepted",
+            "killed mutant: single array collapsed",
+            "killed mutant: PSTypeName made ordinary",
+            "killed mutant: timestamp coerced"
+          ],
+          "native_implementation": "4b776964f9ccf922b1224e436a9ab8d0c422a3553c4843a21552812a876734bc"
+        },
+        "initialization-controls": {
+          "state": "passed",
+          "pwsh": "7.6.3",
+          "checks": [
+            "actual Add-Type failure propagated, no successful output or Type",
+            "same-name wrong-source Type rejected; default generic path still succeeds"
+          ]
+        }
+      },
+      "source_files": 80,
+      "dependencies": 1914,
+      "container": "tf68-converter-focus-tf68-ed9-native-converter-focus-one",
+      "container_absent": true,
+      "owned_groups_empty": true
+    },
+    {
+      "run": "tf68-ed9-converter-quality-only",
+      "overall": "passed",
+      "results": {
+        "quality": {
+          "rows": [
+            {
+              "diagnostics": [],
+              "path": "/work/structural-focus-r8wz6uzr/repository/.github/workflows/Test-AgentInstructions.ps1",
+              "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+              "parser_errors": []
+            },
+            {
+              "diagnostics": [],
+              "path": "/work/structural-focus-r8wz6uzr/repository/.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+              "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+              "parser_errors": []
+            }
+          ],
+          "loaded_identity": {
+            "module_path": "/work/structural-focus-r8wz6uzr/tools/PSScriptAnalyzer/1.24.0/PSScriptAnalyzer.psm1",
+            "version": "1.24.0",
+            "assembly": "/work/structural-focus-r8wz6uzr/tools/PSScriptAnalyzer/1.24.0/PSv7/Microsoft.Windows.PowerShell.ScriptAnalyzer.dll",
+            "assembly_sha256": "a816f622b3bc1b3000afd51be8c40358050a544675181c55d0e14fdfd1ce470c",
+            "pwsh_assembly_sha256": "0b07ddeb9d942ca4896fae858ab13fcc747b7c57164a0a4ebe68d11db706612b",
+            "manifest": "/work/structural-focus-r8wz6uzr/tools/PSScriptAnalyzer/1.24.0/PSScriptAnalyzer.psd1",
+            "pwsh_assembly": "/opt/microsoft/powershell/7/System.Management.Automation.dll"
+          },
+          "analyzer": "1.24.0",
+          "pwsh": "7.6.3"
+        }
+      },
+      "source_files": 80,
+      "dependencies": 1914,
+      "container": "tf68-converter-quality-tf68-ed9-converter-quality-only",
+      "container_absent": true,
+      "owned_groups_empty": true
+    }
+  ],
+  "artifacts": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\source-catalog.json": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-focus\\native.json": "5e1bd55ce023349c1e8e3ddf33a7d60764d5a4e363d53e704dc5913da1d9965a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-focus\\result.json": "3e404241291430fa55d8316e8aed603b53fe57fb56b1a11b5b913983d1a1c6af",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-focus\\before.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-focus\\after.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-controls4\\native.json": "4d2dfc5bde2aa1d88d87216fe2da1bc063deaf9b52a7cd58de6b48d51b6f8733",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-controls4\\result.json": "926cf1fa4c50132eac1de69fdae284b5c61a39fadcd101a53f3b3247a29cad30",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-controls4\\before.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-controls4\\after.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-initialization1\\native.json": "87d6c56dffc41d3b2e627d329716ab593e9edb30b931d8eb9465a741966686cd",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-initialization1\\result.json": "751b41700b20a303d44394182190ad65504065b32216f9149aa077449b024355",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-initialization1\\before.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-initialization1\\after.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-quality\\native.json": "da0266380f961206c7cf4cae03e307a295059f119dc1f7c9eb8f8bd86b50ff64",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-quality\\result.json": "29f01fcd359986b236160e280b01512448b6b2844d24e54e57df253f410dd3cf",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-quality\\before.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\windows-final-quality\\after.json": "318a6441a80fcf587450003167dee9c8e20347b11214883ffe8c5d96e0da397b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\manifest.json": "4187a9b26d4b611bed00750af64def7178920d8c8db2a299446945368cdab2bd",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\status.json": "afaa5e7a08bdf3dcd6333b9fb53f6c7e9a14bc7e3b0fba3f5a15be6f4fcde71d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\result.json": "4aa549f5c9b4e0735ad17672da832ed7d0ac5a5d3f572109c55e461d66972ec2",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\controls.ps1": "b105310bda583403dbfa116f3127359a6e2388d284f11d845fc754606cb02a65",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\focus.ps1": "e1f773a0bd570eda9241618e49feb97ed5e99fd6bf26ccffa2a0772193c179d3",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\initialization-controls.ps1": "bc4c2ebe159776ff64d79d97d01ab1832cc13b34a74256a7bbf1856584a7e474",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\inside.py": "e380a2c939ed40823ca492c8a9a582a4fa0748b5ead06b732133181714915e1d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\launch.py": "3d44a29d5f74675b17cf6b5ededb85f7030cae3a886bfe0ca800f41293bdd560",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\load-functions.ps1": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\original-Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\owned-group.py": "90a2d269eeefa64e09485d98129505c54fd5740b28f02d9e2b4aa6fa9f0e34d1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\inputs\\quality.ps1": "265ce786b1789b7199224572ef9c7fc06090c8ddd6a16ada7203d39b1ddb0439",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\source-catalog.json": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\before.json": "92ba0447b8d25cc2e33a5db2d0cb390450e23bfa70219bd04770aa3c1cd41440",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\after.json": "92ba0447b8d25cc2e33a5db2d0cb390450e23bfa70219bd04770aa3c1cd41440",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\focus.json": "4fbc8035198d58a183c64c00f640b57a32e6dde48a9fdf0e66cee3d652859d3d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\controls.json": "f015dfadc62becf8c4b237b16b07c90e35609d12b8b4bc5404dee08cbf6152c1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\initialization-controls.json": "c90b4c0bc43c5a1151b255545855d4f8aa303596e31d0a74c7cc4bb075801e13",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\runs\\tf68-ed9-native-converter-focus-one\\output\\quality.log": "d2b25cd0a2304998b7b5afaa908c728269cc032750e642a1f75aeeb72f102d50",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\manifest.json": "c034167f041a9741443722047f94885e8cbc5a07116c3bc7ebb52fbc45d688ce",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\status.json": "706049a00ec9a1412e6cdfed8a017c36aa33d1ad370e9a5663480d18bc84204f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\output\\result.json": "b14b9961698b49a9125dede0101fd81674405b967f7066bb47efa7dc7581c5ca",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\analyzer.tar": "c7a69a6f7d8eb881657822c6566b0f8eb1ab2b5d1d1e6109e5d37d6ac684e32e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\inside.py": "b865632680c4ca9caaf552a3bb6786432c98391881bc446cddcfc76c710d77e6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\launch.py": "fa7a6f717eef174b38e15b485f60cf6a599f19403d7cd9d94fd16f6e1d2ee800",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\module-catalog.json": "e95d801761d1318dd084b2b96bf57428193ef0507d2e8cf80836a1f78017bce0",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\owned-group.py": "90a2d269eeefa64e09485d98129505c54fd5740b28f02d9e2b4aa6fa9f0e34d1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\inputs\\quality.ps1": "edfbe92c9c0c52d3eafe34822670822c50120f62b291bc907d3431225107dc41",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\source-catalog.json": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\output\\before.json": "01398ec3234cf05594b87dcc5c97f29c9e7d4c781418cee3cd96ca33f051764b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\output\\after.json": "01398ec3234cf05594b87dcc5c97f29c9e7d4c781418cee3cd96ca33f051764b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\runs\\tf68-ed9-converter-quality-only\\output\\quality.json": "0674649055a99f340fc7ecdbef86f1d0cc5e1c095601d15770d0b65fcb5fbce6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\module-catalog.json": "e95d801761d1318dd084b2b96bf57428193ef0507d2e8cf80836a1f78017bce0"
+  },
+  "limitations": [
+    "No cold actual-caller comparison, full SelfTest/aggregate, current-head remote reviews or hosted CI for these uncommitted bytes.",
+    "Initial Linux focused packet remains failed due absent analysis tool; its behavior passed and missing analysis passed separately.",
+    "Windows7.6.5 and Linux7.6.3 are tested; earlier PowerShell7 compatibility is source review, not empirical coverage.",
+    "No claim of hostile in-process code or filesystem concurrency resistance."
+  ],
+  "next_action": "Inspect and authorize one bounded cold actual-caller comparison packet; no merge while current CI cancelled."
+}
