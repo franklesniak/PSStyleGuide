@@ -1,0 +1,16 @@
+{
+  "status": "ROOT_VERIFIED_PRIVATE_PROFILE_PREPARATION_NATIVE_HELD",
+  "verified_at": "2026-10-06T20:58:15.132535+00:00",
+  "evidence_sha256": "dc8a7202d18847afe77115f3d3b57d784461818fcf333e031356a297078589b0",
+  "profile_sha256": "010703251518231a71603d42caa2807f5b6a1f3410912bc9a187a139d9afe811",
+  "controls_sha256": "efc16a54a410a500d88ffbd3e7cc2583337046423ce0626652ac669253563898",
+  "result_sha256": "440492f9c3e8faf579029be5b3874f78496943bb52a64e61116682deec77698e",
+  "payloads_verified": 5,
+  "reused_references_verified": 13,
+  "pure_controls_passed": 47,
+  "root_source_inspection": "Read complete finite module, controls, README and REPORT; actual current tree contains78tracked paths, same count as source catalog; future binding must use complete real candidate.",
+  "native_binding": null,
+  "candidate_assembled": false,
+  "product_acceptance": false,
+  "test_replays": 0
+}

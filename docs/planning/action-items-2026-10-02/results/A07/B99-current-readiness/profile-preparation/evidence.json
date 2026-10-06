@@ -1,0 +1,152 @@
+{
+  "state": "prepared_pure_qualified_native_integration_held",
+  "prepared_at": "2026-10-06T20:56:25.342892+00:00",
+  "selected_decision": "D98",
+  "execution_authorized": false,
+  "native_binding": null,
+  "candidate_config_assembled": false,
+  "qualification": {
+    "command": [
+      "C:/Users/flesniak/AppData/Local/Programs/Python/Python313/python.exe",
+      "-I",
+      "-S",
+      "-B",
+      "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/controls.py"
+    ],
+    "scope": "pure in-memory/file-fixture controls only; no subprocess/native/product execution",
+    "controls": 47,
+    "result_sha256": "440492f9c3e8faf579029be5b3874f78496943bb52a64e61116682deec77698e"
+  },
+  "payloads": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/profile.py",
+      "sha256": "010703251518231a71603d42caa2807f5b6a1f3410912bc9a187a139d9afe811",
+      "bytes": 6726
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/controls.py",
+      "sha256": "efc16a54a410a500d88ffbd3e7cc2583337046423ce0626652ac669253563898",
+      "bytes": 9787
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/README.md",
+      "sha256": "56b0bf385894d63630e625b8dca504674fd9c0debc6c65e2dc1846ecd739f506",
+      "bytes": 4030
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/REPORT.md",
+      "sha256": "19c4d3ac6a89fc2101bbbdfdb0d5680d6db68674b065ea8061c12d6e6d0e35c3",
+      "bytes": 4014
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/result.json",
+      "sha256": "440492f9c3e8faf579029be5b3874f78496943bb52a64e61116682deec77698e",
+      "bytes": 9524
+    }
+  ],
+  "immutable_reuse": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/REPORT.md",
+      "sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+      "bytes": 16432
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/evidence.json",
+      "sha256": "e54784630256118eb598028ec5bb5ca48aa5daf57912336c2c61a071dba3e97d",
+      "bytes": 21248
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/ROOT-VERIFICATION.json",
+      "sha256": "c3d66c74ee62e59d677cc05aa8a8093bd5f956bfa79c01fa7945296cdfbe66df",
+      "bytes": 389
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/hook-block.proposed.yaml",
+      "sha256": "b682208d3aa19ff2f4d700f75953ea1bdb2e1cf6ff2ac02910bcd2450ee2c248",
+      "bytes": 441
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/windows/results.json",
+      "sha256": "72b2d621c091f79805229d229642200e658be3e183e65e8c5a4b4f44b00d7c1f",
+      "bytes": 137113
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/linux/cases/results.json",
+      "sha256": "93bab638182fbb986cc87e897bd7dde22c6b9846f26123b38b3d2fb4e0a12e77",
+      "bytes": 95818
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/authority-boundary.json",
+      "sha256": "2ebd39ee0325781ffe2488c4b39fc4dea5bb4ac0418e4805ae2375dbd607a574",
+      "bytes": 16336
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/inside.py",
+      "sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643",
+      "bytes": 18205
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/launch.py",
+      "sha256": "eb901f4dc633a53e766f1f6d0b851817ae6e9089378414493dd144396320df75",
+      "bytes": 12395
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/manifest.authorized.json",
+      "sha256": "d8bec40be133de42ce5c9242968750463b7c6f6496ee5724e1a7925e44a08d11",
+      "bytes": 4660
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe",
+      "bytes": 1883
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/runs/ps-carryback-20261006-aggregate-one/output/aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "bytes": 880
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/runs/ps-carryback-20261006-aggregate-one/output/result.json",
+      "sha256": "416624a76e18d349e329288af3728a1f228e60ff10be07f4966e349d5662ce7d",
+      "bytes": 215007
+    }
+  ],
+  "PS_raw_read_only_before": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "status": "",
+    "config_index_row": "100644 f0fcbb13bfdb25d7549cae7aea216ae9b81ee564 0\t.pre-commit-config.yaml",
+    "config_worktree_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+  },
+  "PS_raw_read_only_after": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "status": "",
+    "config_index_row": "100644 f0fcbb13bfdb25d7549cae7aea216ae9b81ee564 0\t.pre-commit-config.yaml",
+    "config_worktree_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+  },
+  "committed_config": {
+    "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "mode": "100644",
+    "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+    "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+    "has_B99": false
+  },
+  "future_integration_requirements": [
+    "genuine PS235 acceptance and actual current B/H/tree",
+    "qualified assembled exact finite config; unchanged eleven bodies/pins; selected B99 only; no bypass selectors/stages/types/excludes",
+    "complete frozen source-catalog names and immutable source/config/index/dependency guards",
+    "full argv/environment/direct-exit/raw-output/NUL-inventory receipts at the same phase boundary",
+    "preserve primary failure and exact ownership/cleanup/outer bounds; separate intentional rejection evidence"
+  ],
+  "preserved": {
+    "old_readiness_and_root_verification": true,
+    "old_runners_receipts_failures": true,
+    "products_Git_native_planning_state_counters": true,
+    "transfers": [
+      2,
+      4,
+      6,
+      6
+    ],
+    "descendants": 0
+  }
+}

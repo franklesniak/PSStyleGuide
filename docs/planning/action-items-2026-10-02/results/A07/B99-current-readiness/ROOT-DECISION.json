@@ -1,0 +1,29 @@
+{
+  "status": "D98_SELECTED_PRIVATE_PREPARATION_RELEASED_PRODUCT_HELD",
+  "selected_at": "2026-10-06T20:51:21.296718+00:00",
+  "report_sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+  "evidence_sha256": "e54784630256118eb598028ec5bb5ca48aa5daf57912336c2c61a071dba3e97d",
+  "root_verification": {
+    "status": "ROOT_READ_ONLY_READINESS_VERIFIED_SELECTION_PENDING",
+    "verified_at": "2026-10-06T20:38:08.908904+00:00",
+    "references": 24,
+    "raw_rows": 12,
+    "scores": 11,
+    "report_sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+    "evidence_sha256": "e54784630256118eb598028ec5bb5ca48aa5daf57912336c2c61a071dba3e97d",
+    "implementation_released": false
+  },
+  "displayed_before_selection": "Validated applicability conflict, eleven options, unique detailed32/24/21/13/7/3rubric, all ratings and scores, controlled actions",
+  "selected_option": "D",
+  "score": 98,
+  "private_profile_preparation_released": true,
+  "product_implementation_released": false,
+  "product_release_condition": "Genuine PS235 acceptance and fresh accepted-main input bind; retain held A07 tree",
+  "old_results": "unchanged",
+  "counters": "A06/A03/A21/A07=2/4/6/6of12 unchanged",
+  "canonical_report_format": {
+    "original_sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+    "formatted_sha256": "cb06a41a47a606b706812380922f9548d577dd9079b96bebe0566d89ac2fcf5b",
+    "change": "Escape two literal regex pipes inside Markdown table; LF presentation. Same displayed regex/decision. Original private report/evidence preserved."
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "status": "ROOT_READ_ONLY_READINESS_VERIFIED_SELECTION_PENDING",
+  "verified_at": "2026-10-06T20:38:08.908904+00:00",
+  "references": 24,
+  "raw_rows": 12,
+  "scores": 11,
+  "report_sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+  "evidence_sha256": "e54784630256118eb598028ec5bb5ca48aa5daf57912336c2c61a071dba3e97d",
+  "implementation_released": false
+}

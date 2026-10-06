@@ -1,0 +1,307 @@
+{
+  "state": "passed_pure_fixture_controls_only",
+  "finished_at": "2026-10-06T20:54:59.853351+00:00",
+  "python": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\Users\\flesniak\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "control_count": 47,
+  "controls": [
+    {
+      "name": "positive synthetic composite, never product acceptance",
+      "expected": "fixture-only judgment",
+      "state": "passed_pure_control"
+    },
+    {
+      "name": "native entry stays held",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "held: no independently qualified actual candidate binding"
+    },
+    {
+      "name": "unknown hook name",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "unknown, missing or reordered hook identity"
+    },
+    {
+      "name": "wrong known name/order",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "unknown, missing or reordered hook identity"
+    },
+    {
+      "name": "duplicate hook row",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "duplicate native hook row"
+    },
+    {
+      "name": "missing hook row",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact twelve native rows required"
+    },
+    {
+      "name": "extra hook row",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact twelve native rows required"
+    },
+    {
+      "name": "malformed hook row",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "malformed or unknown native row"
+    },
+    {
+      "name": "old hook skipped",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "existing applicable hook must pass"
+    },
+    {
+      "name": "old hook failed",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "existing applicable hook must pass"
+    },
+    {
+      "name": "B99 falsely Passed",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "B99 must be native no-files skip"
+    },
+    {
+      "name": "B99 wrong skip reason",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "malformed or unknown native row"
+    },
+    {
+      "name": "B99 skipped without reason",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "B99 must be native no-files skip"
+    },
+    {
+      "name": "native nonzero",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "native aggregate exit"
+    },
+    {
+      "name": "native signaled",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "native aggregate exit"
+    },
+    {
+      "name": "Boolean exit is not a receipt",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "native aggregate exit"
+    },
+    {
+      "name": "hook selection suppressed by argv",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "ordinary full aggregate argv required"
+    },
+    {
+      "name": "SKIP present even empty",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "suppression environment"
+    },
+    {
+      "name": "suppression environment alias",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "suppression environment"
+    },
+    {
+      "name": "unknown environment drift",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "environment drift or suppression"
+    },
+    {
+      "name": "source after drift",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "source/config/index/dependency drift"
+    },
+    {
+      "name": "config after drift",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "source/config/index/dependency drift"
+    },
+    {
+      "name": "index after drift",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "source/config/index/dependency drift"
+    },
+    {
+      "name": "dependencies after drift",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "source/config/index/dependency drift"
+    },
+    {
+      "name": "before guard missing",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "source/config/index/dependency drift"
+    },
+    {
+      "name": "config bytes not known",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "unknown configuration bytes"
+    },
+    {
+      "name": "stderr diagnostic prevents acceptance",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "unexpected native stderr"
+    },
+    {
+      "name": "unknown extra output",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact twelve native rows required"
+    },
+    {
+      "name": "ANSI-hidden native output",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "ambiguous output controls"
+    },
+    {
+      "name": "output decoding failure",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "output encoding"
+    },
+    {
+      "name": "inventory missing receipt",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "complete inventory command receipt required"
+    },
+    {
+      "name": "inventory filtered pathspec",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "unfiltered tracked inventory required"
+    },
+    {
+      "name": "inventory read nonzero",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "inventory read failure"
+    },
+    {
+      "name": "inventory read diagnostic",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "inventory read failure"
+    },
+    {
+      "name": "inventory incomplete",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "inventory incomplete or unknown source path"
+    },
+    {
+      "name": "inventory unknown path",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "inventory incomplete or unknown source path"
+    },
+    {
+      "name": "inventory truncated without NUL",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "bounded complete NUL inventory required"
+    },
+    {
+      "name": "inventory duplicate path",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "empty or duplicate inventory path"
+    },
+    {
+      "name": "inventory unknown encoding",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "inventory encoding"
+    },
+    {
+      "name": "complete inventory has match MODULE.PYC",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "tracked compiled/cache filename matched"
+    },
+    {
+      "name": "complete inventory has match module.pyo",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "tracked compiled/cache filename matched"
+    },
+    {
+      "name": "complete inventory has match module.pyd",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "tracked compiled/cache filename matched"
+    },
+    {
+      "name": "complete inventory has match pkg/__PyCaChE__/data.txt",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "tracked compiled/cache filename matched"
+    },
+    {
+      "name": "wrong hook ID binding",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact twelve unique hook IDs/names required"
+    },
+    {
+      "name": "duplicate ID binding",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact twelve unique hook IDs/names required"
+    },
+    {
+      "name": "bare caller applicability Boolean",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "exact qualified binding required"
+    },
+    {
+      "name": "claimed skip count cannot authorize",
+      "expected": "reject",
+      "state": "passed_pure_control",
+      "reason": "complete exact aggregate receipt required"
+    }
+  ],
+  "native_integration": "held; NATIVE_BINDING=None",
+  "no_product_test_or_native_execution": true,
+  "inputs": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\runs\\ps-carryback-20261006-aggregate-one\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\linux\\cases\\results.json",
+      "sha256": "93bab638182fbb986cc87e897bd7dde22c6b9846f26123b38b3d2fb4e0a12e77"
+    }
+  ],
+  "payloads": {
+    "profile.py": "010703251518231a71603d42caa2807f5b6a1f3410912bc9a187a139d9afe811",
+    "controls.py": "efc16a54a410a500d88ffbd3e7cc2583337046423ce0626652ac669253563898"
+  },
+  "limits": "Synthetic receipt uses saved native row text with synthetic guards/config/inventory; no assembled B99 configuration or native twelve-hook acceptance."
+}

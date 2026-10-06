@@ -1,0 +1,561 @@
+{
+  "state": "read_only_readiness_and_same_B99_applicability_proposal_no_release",
+  "captured_at_utc": "2026-10-06T20:27:01.056300+00:00",
+  "PS_candidate_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "PS_native_base_provided_by_root": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "TF_native_main_provided_by_root": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "sources": [
+    {
+      "label": "PS_candidate",
+      "root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "four_paths": [
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+          "bytes": 5398,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+          "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+          "bytes": 289,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+          "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+          "bytes": 510470,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+          "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+          "bytes": 285244,
+          "B99_implemented_literal": false
+        }
+      ],
+      "compiled_filename_matches": []
+    },
+    {
+      "label": "TF_accepted",
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "four_paths": [
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+          "bytes": 5405,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+          "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+          "bytes": 289,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+          "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+          "bytes": 510470,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+          "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+          "bytes": 285263,
+          "B99_implemented_literal": false
+        }
+      ],
+      "compiled_filename_matches": []
+    },
+    {
+      "label": "held_A07",
+      "root": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-tooling\\PSStyleGuide",
+      "revision": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+      "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+      "four_paths": [
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0688b48f0065acf8a57181c0eb13816d6f363796",
+          "sha256": "a3c8998aabe4f78f1b29267ece80c727fa10f01bbce3d63cdb3d4f471c40180e",
+          "bytes": 5373,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+          "sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad",
+          "bytes": 250,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+          "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5",
+          "bytes": 378451,
+          "B99_implemented_literal": false
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+          "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba",
+          "bytes": 19602,
+          "B99_implemented_literal": false
+        }
+      ],
+      "compiled_filename_matches": []
+    }
+  ],
+  "held_preservation": {
+    "head": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "named_staged_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "index_path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide4\\index",
+    "index_sha256_before": "f2cf51afbe28157071d806a4d9c307355e122b2df24e6f3d9eab143cf445cd14",
+    "index_sha256_after": "f2cf51afbe28157071d806a4d9c307355e122b2df24e6f3d9eab143cf445cd14",
+    "four_index_rows_equal_named_tree": true,
+    "four_index_rows": [
+      {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+        "stage": "0"
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+        "stage": "0"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "blob": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+        "stage": "0"
+      },
+      {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "0688b48f0065acf8a57181c0eb13816d6f363796",
+        "stage": "0"
+      }
+    ],
+    "index_sha256_after_output": "f2cf51afbe28157071d806a4d9c307355e122b2df24e6f3d9eab143cf445cd14"
+  },
+  "verified_references": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "173be61a6cd32e30c1af098a1d6e4f7169933261a3c1ab13f73cf792cd313799"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A07.md",
+      "sha256": "63cb7d51f26adc12072ed82d63b3bc82c0b722a2d1a8dd817fc4afbc65538af9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\research-hook-applicability.md",
+      "sha256": "7bc9167bd59641e32d5f52b3f02834204ab51e49157f5898efde2b3f4a5cec2c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\foundation-dependency-decision.md",
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\postlanding-sequence\\REPORT.md",
+      "sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\root-decision.json",
+      "sha256": "ca8b95eae308778501a049b1399658af9dad89ac03bc0e72359cd3309298863a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\HANDOFF.md",
+      "sha256": "4421cdd23b7a4657134796fe31b9f8d8858e3ac30b61ff191ccf16edfba5e667"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\ADDENDUM-authority-boundary.md",
+      "sha256": "850f55429cd403333d0e2f64ce6c30a5013a51ff88b0ecb09d0f0680afeb5b91"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\compact-cases.md",
+      "sha256": "7095f2fbc4bb36ec7f023258c8c9abdba79609bf77abbcdc683b8a0bf5c01d9a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\compact-cases.json",
+      "sha256": "19a6a5075b377466e9d8b7b682657e21a76f6322b57c1d1f1faaca3e1c67f599"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\authority-boundary.json",
+      "sha256": "2ebd39ee0325781ffe2488c4b39fc4dea5bb4ac0418e4805ae2375dbd607a574"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\hook-block.proposed.yaml",
+      "sha256": "b682208d3aa19ff2f4d700f75953ea1bdb2e1cf6ff2ac02910bcd2450ee2c248"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\ignore-lines.proposed.txt",
+      "sha256": "b6908aa83aef57866e683fdf92a2e5b4786aecb4e0df9ea08405755a91827d3c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\windows\\results.json",
+      "sha256": "72b2d621c091f79805229d229642200e658be3e183e65e8c5a4b4f44b00d7c1f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\linux\\cases\\results.json",
+      "sha256": "93bab638182fbb986cc87e897bd7dde22c6b9846f26123b38b3d2fb4e0a12e77"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\inside.py",
+      "sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\launch.py",
+      "sha256": "eb901f4dc633a53e766f1f6d0b851817ae6e9089378414493dd144396320df75"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\manifest.authorized.json",
+      "sha256": "d8bec40be133de42ce5c9242968750463b7c6f6496ee5724e1a7925e44a08d11"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe"
+    }
+  ],
+  "reused_native_controls": [
+    {
+      "platform": "Windows",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\windows\\results.json",
+      "sha256": "72b2d621c091f79805229d229642200e658be3e183e65e8c5a4b4f44b00d7c1f",
+      "cases": 29,
+      "rejections": 18,
+      "no_match_skips": 11,
+      "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+      "pre_commit": "pre-commit 4.6.2",
+      "git": "git version 2.55.0.windows.5",
+      "scope_limit": "Filename-guard-only staged probes; no product aggregate, native commit, hook install or package-byte attestation.",
+      "rerun": false
+    },
+    {
+      "platform": "Linux",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\linux\\cases\\results.json",
+      "sha256": "93bab638182fbb986cc87e897bd7dde22c6b9846f26123b38b3d2fb4e0a12e77",
+      "cases": 29,
+      "rejections": 18,
+      "no_match_skips": 11,
+      "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+      "pre_commit": "pre-commit 4.6.2",
+      "git": "git version 2.55.0",
+      "scope_limit": "Filename-guard-only staged probes; no product aggregate, native commit, hook install or package-byte attestation.",
+      "rerun": false
+    }
+  ],
+  "current_caller_observations": [
+    {
+      "PS_path": ".github/workflows/copilot-setup-steps.yml",
+      "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "bytes": 51809,
+      "pre_commit_invocation_lines": [
+        981
+      ],
+      "zero_skip_or_count_literals": []
+    },
+    {
+      "PS_path": ".github/workflows/copilot-code-review.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995,
+      "pre_commit_invocation_lines": [],
+      "zero_skip_or_count_literals": []
+    },
+    {
+      "PS_path": ".github/workflows/agent-instructions.yml",
+      "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "bytes": 12865,
+      "pre_commit_invocation_lines": [],
+      "zero_skip_or_count_literals": []
+    },
+    {
+      "PS_path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "bytes": 6095,
+      "pre_commit_invocation_lines": [],
+      "zero_skip_or_count_literals": []
+    }
+  ],
+  "zero_skip_conflict": {
+    "product_hosted_exit_semantics": "native pre-commit exit; no hook-count/zero-skip rule found in exact bound callers",
+    "private_profile": "11 Passed and 0 Skipped at inside.py137-138; manifest and launch hard-code11",
+    "remaining_conflict": "Future12-hook B99 clean tree necessarily reports one no-match skip; unchanged private11/0 cannot validate it",
+    "proposed_resolution": "D98: exact12 identified rows; existing11 pass; only compiled hook no-files skip with exact config and independently empty matched tracked inventory; reject suppression/errors/unknown rows"
+  },
+  "rubric": {
+    "weights": [
+      32,
+      24,
+      21,
+      13,
+      7,
+      3
+    ],
+    "criteria": [
+      "admission_and_applicable_check_integrity",
+      "truthful_evidence",
+      "contributor_usability",
+      "current_caller_closure",
+      "bounded_maintenance",
+      "operating_cost"
+    ],
+    "scale": "0-5",
+    "scores": [
+      {
+        "option": "A",
+        "scores": [
+          1,
+          1,
+          1,
+          2,
+          5,
+          5
+        ],
+        "numerator": 153,
+        "total": 30.6
+      },
+      {
+        "option": "B",
+        "scores": [
+          3,
+          2,
+          5,
+          2,
+          5,
+          5
+        ],
+        "numerator": 325,
+        "total": 65.0
+      },
+      {
+        "option": "C",
+        "scores": [
+          1,
+          2,
+          5,
+          1,
+          5,
+          5
+        ],
+        "numerator": 248,
+        "total": 49.6
+      },
+      {
+        "option": "D",
+        "scores": [
+          5,
+          5,
+          5,
+          5,
+          4,
+          4
+        ],
+        "numerator": 490,
+        "total": 98.0
+      },
+      {
+        "option": "E",
+        "scores": [
+          5,
+          5,
+          4,
+          4,
+          2,
+          3
+        ],
+        "numerator": 439,
+        "total": 87.8
+      },
+      {
+        "option": "F",
+        "scores": [
+          5,
+          5,
+          4,
+          3,
+          1,
+          2
+        ],
+        "numerator": 416,
+        "total": 83.2
+      },
+      {
+        "option": "G",
+        "scores": [
+          4,
+          5,
+          3,
+          4,
+          3,
+          2
+        ],
+        "numerator": 390,
+        "total": 78.0
+      },
+      {
+        "option": "H",
+        "scores": [
+          2,
+          2,
+          0,
+          2,
+          5,
+          5
+        ],
+        "numerator": 188,
+        "total": 37.6
+      },
+      {
+        "option": "I",
+        "scores": [
+          3,
+          5,
+          2,
+          2,
+          5,
+          5
+        ],
+        "numerator": 334,
+        "total": 66.8
+      },
+      {
+        "option": "J",
+        "scores": [
+          1,
+          2,
+          4,
+          1,
+          5,
+          5
+        ],
+        "numerator": 227,
+        "total": 45.4
+      },
+      {
+        "option": "K",
+        "scores": [
+          1,
+          1,
+          4,
+          1,
+          5,
+          5
+        ],
+        "numerator": 203,
+        "total": 40.6
+      }
+    ],
+    "proposed_choice": "D98",
+    "root_selection_before_implementation": true
+  },
+  "sequence": {
+    "PS235_genuine_acceptance_required_before_next_overlapping_writer": true,
+    "TF_S1_dedicated_proof_prerequisite_to_B99_PS_write": false,
+    "PS_first_then_normal_TF_transfer_after_PS_B99_acceptance": true,
+    "S1_task_paired_acceptance_remains_open": true,
+    "A16_foundation_gate_remains": true
+  },
+  "transfers_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "actions_not_performed": [
+    "product or held source edits",
+    "Git/native/planning/state/counter writes",
+    "test/control/suite/install execution",
+    "process control",
+    "review/CI polling",
+    "descendants"
+  ],
+  "scope_limit": "Current-input inspection only; no future finite contract/profile/aggregate or acceptance result is claimed.",
+  "report_sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+  "primary_references": [
+    {
+      "url": "https://pre-commit.com/#fail",
+      "verified": "official current filename fail language, default applicability and always_run option"
+    },
+    {
+      "url": "https://github.com/pre-commit/pre-commit/blob/v4.6.2/pre_commit/languages/fail.py",
+      "verified": "pinned native fail run_hook unconditionally returns1; no new test executed"
+    }
+  ],
+  "current_product_root_refs_after": [
+    {
+      "root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "named_revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "named_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb"
+    },
+    {
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "named_revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "named_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2"
+    },
+    {
+      "root": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-tooling\\PSStyleGuide",
+      "named_revision": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+      "named_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6"
+    }
+  ],
+  "frozen_at_utc": "2026-10-06T20:29:51.653190+00:00"
+}

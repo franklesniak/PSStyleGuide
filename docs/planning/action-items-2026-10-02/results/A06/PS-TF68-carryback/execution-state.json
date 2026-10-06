@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_Copilot_Lite_finding_CI_cancelled_no_merge",
+  "status": "round1_findings_resolved_CI_cancelled_no_merge",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -361,7 +361,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "dee4582870574a67cadfd3f2a44a69b9ffbbd072",
+  "planning_checkpoint": "301e139d0170a323b88e2bdadfc750fa5ea6cd06",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -386,7 +386,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-06T20:46:59.338902+00:00",
+  "updated_at": "2026-10-06T20:58:15.132535+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -435,7 +435,7 @@
     "published_at": "2026-10-06T20:07:53.376974+00:00"
   },
   "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/235",
-  "body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+  "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
   "PR_creation": {
     "status": "confirmed",
     "created_at": "2026-10-06T20:08:12Z",
@@ -481,7 +481,8 @@
         "submitted_at": "2026-10-06T20:28:56Z",
         "review_body_sha256": "7fdb3abb4d4e840a54aa3465744e5fc461f2912c250202d755a2335eb2987180",
         "workflow_conclusion": "cancelled",
-        "workflow_terminal_at": "2026-10-06T20:31:36Z"
+        "workflow_terminal_at": "2026-10-06T20:31:36Z",
+        "finding_disposition": "one_native_finding_refuted_and_resolved_no_material_finding_remaining"
       },
       "codex": {
         "status": "clean",
@@ -526,14 +527,22 @@
           "comment_id": 4200122706,
           "review_id": 5434209468,
           "thread_id": "PRRT_kwDOQkjdhM6ppYLF",
-          "status": "refuted_A97.8_reply_pending",
+          "status": "refuted_resolved",
           "path": ".github/workflows/copilot-code-review.yml",
           "line": 886,
           "exact_guard_controls": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PR235-round1-R1\\linux-guard-validation\\result.json",
           "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PR235-round1-R1\\ROOT-DECISION.json",
-          "score": 97.8
+          "score": 97.8,
+          "reply_id": 4200287320,
+          "resolution": "authenticated_native_readback",
+          "native_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R1-native-disposition.json"
         }
-      ]
+      ],
+      "nonmaterial_body_update": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R1-body-update.json",
+        "new_body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+        "review_request_body_hash_preserved": true
+      }
     }
   ],
   "latest_native_snapshot": {
@@ -665,9 +674,13 @@
   },
   "B99_read_only_preparation": {
     "worker": "a06_conversion_cold_packet",
-    "status": "root_verified_proposal_selection_pending",
+    "status": "D98_private_profile_prepared_47pure_controls_native_integration_held",
     "directory": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006",
-    "product_execution_released": false
+    "product_execution_released": false,
+    "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\ROOT-DECISION.json",
+    "profile_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\evidence.json",
+    "profile_sha256": "010703251518231a71603d42caa2807f5b6a1f3410912bc9a187a139d9afe811",
+    "pure_controls": 47
   },
   "native_gates_baseline": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-native-gates-baseline.json",
@@ -688,5 +701,26 @@
     "next_conservative_attempt_not_before": "2026-10-06T21:10:11Z",
     "retry_requested": false,
     "rule": "At most one relaunch per hour per PR. Conservatively count the original20:10:11 launch for the first interval; no scheduled automation. Reconcile native run/head/body/review surfaces before a single supported rerun."
-  }
+  },
+  "body_updates": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R1-body-update.json",
+      "status": "confirmed_nonmaterial_body_update",
+      "old_body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+      "new_body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+      "material_change": false
+    }
+  ],
+  "independent_current_quality": {
+    "status": "PRODUCT_QUALITY_PASS_NO_MATERIAL_FINDINGS_CI_HOLD",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\REPORT.md",
+    "report_sha256": "8b2bb9c6dd6576292b4dda2f2b07f273d63916722f2505cd61a2ba57f272b0f3",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\evidence.json",
+    "evidence_sha256": "a168c19b9b61c08166dacf6eb023599ea9a21cf15a5640ff75c5544570f2138f",
+    "root_verified_references": 69,
+    "root_verified_at": "2026-10-06T20:55:38.218083+00:00",
+    "CI_hold": true
+  },
+  "quality_reader_note": "First private reader compared material_findings array to zero; stopped before writes. Corrected to exact empty array, with no repeated product/native operation.",
+  "planning_format_note": "Canonical B99 table literal pipes escaped; STATUS accidental CR translation corrected before publication. Original private report and evidence preserved. No product change."
 }
