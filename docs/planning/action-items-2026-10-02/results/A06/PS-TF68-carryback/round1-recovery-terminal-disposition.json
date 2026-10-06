@@ -1,0 +1,122 @@
+{
+  "status": "CANCELLED_CI_HOLD_CHANNEL_ATTEMPTS_EXHAUSTED",
+  "captured_at": "2026-10-06T22:32:12.402231+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+  "request_event_id": 32641329434,
+  "review_id": 5435249947,
+  "observed_effort": "Lite",
+  "review_findings": [
+    4201048162,
+    4201048196
+  ],
+  "workflow_run_id": 37538942393,
+  "attempt": 1,
+  "workflow_conclusion": "cancelled",
+  "terminal_at": "2026-10-06T22:31:33Z",
+  "job_id": 112526912328,
+  "job_started_at": "2026-10-06T22:11:14Z",
+  "job_completed_at": "2026-10-06T22:31:32Z",
+  "phases": [
+    {
+      "name": "Run complete repository validation",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 77,
+      "started_at": "2026-10-06T22:12:12Z",
+      "completed_at": "2026-10-06T22:29:13Z"
+    },
+    {
+      "name": "Verify final immutable setup inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 82,
+      "started_at": "2026-10-06T22:29:14Z",
+      "completed_at": "2026-10-06T22:29:14Z"
+    },
+    {
+      "name": "Processing Request (Linux)",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "number": 94,
+      "started_at": "2026-10-06T22:29:19Z",
+      "completed_at": "2026-10-06T22:31:29Z"
+    }
+  ],
+  "successful_hook_lines": [
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:38.3987016Z check json...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:39.4465526Z check yaml...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:41.0089118Z fix end of files.........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:42.6956416Z trim trailing whitespace.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:43.9315777Z yamllint.................................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:45.2091651Z Lint GitHub Actions workflow files.......................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:46.5568525Z Validate Dependabot Config (v2)..........................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:47.8386144Z Validate GitHub Workflows................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:47.8751076Z staged Markdown..........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:48.7065342Z workflow policy contract.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:29:13.2833517Z agent instruction contract and mutation tests............................Passed"
+  ],
+  "annotations": [
+    {
+      "message": "The job has exceeded the maximum execution time of 20m0s",
+      "annotation_level": "failure"
+    },
+    {
+      "message": "The operation was canceled.",
+      "annotation_level": "failure"
+    }
+  ],
+  "ordinary_successful_runs": [
+    37529312195,
+    37524154208,
+    37524154909,
+    37524154355,
+    37524154327,
+    37524154479,
+    37524154494,
+    37524154228,
+    37524110707,
+    37524110671,
+    37524110807,
+    37524110612,
+    37524110641,
+    37524110694
+  ],
+  "snapshots": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+      "sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e"
+    }
+  ],
+  "log_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\run.json",
+      "sha256": "83146fa7668c3a61154550637fa5ff29cd6dc141c69cfb381eee6f4893a284a9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\jobs.json",
+      "sha256": "c37fba3c1f5ac223560928fe0dbcf2cb62566f78ed00451dccecf9f506942070"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\annotations.json",
+      "sha256": "7b0ff72ba440713c61a69d21521394d1d5bfc6b2f90cd5bc6feb635c94e52eb3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\log.txt",
+      "sha256": "0ec386b09791e8ff9447bd002e0383720e1239f1eef73358ea1ed5886e9f9756"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\summary.json",
+      "sha256": "bf332ad0f4af9df091ed8e96d50de3949a3b14d7ce1cfb7931eb05db9baa0afa"
+    }
+  ],
+  "channel_attempts_used": 3,
+  "channel_attempt_limit": 3,
+  "round": 1,
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "retry_released": false,
+  "merge_released": false,
+  "dedicated_service_selection_proved": false,
+  "interpretation": "Full coding setup passed all eleven hooks and final guard but consumed1021seconds. Review processing then exceeded the authenticated20-minute job limit. No billing or outage cause is established. The Lite review is distinct from cancelled CI. No fourth attempt is authorized by the existing limit."
+}

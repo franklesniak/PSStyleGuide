@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_Copilot_recovery3_pending_no_merge",
+  "status": "round1_R2_R3_no_change_selected_CI_hold_diagnostic_preparation",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,21 +89,10 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [
-    {
-      "kind": "Copilot CI recovery",
-      "status": "accepted_current_head_result_pending",
-      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
-      "round": 1,
-      "channel_attempt": 3,
-      "request_event_id": 32641329434,
-      "run_id": 37538942393,
-      "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three.json"
-    }
-  ],
+  "pending_native_operations": [],
   "local_operation": "No active local test/Git write; PR235 published; hosted CI may run.",
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "After22:10:39.477709Z reconcile current native inputs and reviewer/run baselines, then at most one supported Balanced Copilot re-request for cancelled-service recovery. Same round/deadline; no merge with failed/cancelled CI. Independent B99 local-source-boundary proposal is being checked before any release.",
+  "next_action": "Publish selected no-change decisions; reply/resolve the two current review threads once. Prepare and review the exact bounded current-author diagnostic before execution. Keep provider inquiry unsent, no fourth CI request, no merge; B99 remains frozen.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -372,7 +361,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "f3ac450bd5344f9f2fecf609ba83ef88cf33f00e",
+  "planning_checkpoint": "eaf97c98d445a44c2f6eb7681dd033142babb3db",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -397,7 +386,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-06T22:20:10.994682+00:00",
+  "updated_at": "2026-10-06T22:43:30.921889+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -517,16 +506,19 @@
               "ordinal": 3,
               "channel": "GitHub Reviewers Re-request Copilot review",
               "intent_at": "2026-10-06T22:10:54.067571+00:00",
-              "outcome": "accepted_current_head_result_pending",
+              "outcome": "terminal_cancelled_two_findings_channel_limit_exhausted",
               "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three.json",
               "request_event_id": 32641329434,
               "run_id": 37538942393,
-              "confirmed_at": "2026-10-06T22:10:58Z"
+              "confirmed_at": "2026-10-06T22:10:58Z",
+              "review_id": 5435249947,
+              "terminal_at": "2026-10-06T22:31:33Z",
+              "workflow_conclusion": "cancelled"
             }
           ],
           "next_attempt_ordinal": null,
           "latest_request": {
-            "status": "accepted_current_head_result_pending",
+            "status": "terminal_cancelled_two_findings_channel_limit_exhausted",
             "intent_at": "2026-10-06T22:10:54.067571+00:00",
             "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
             "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -545,12 +537,12 @@
             "old_review": 5434209468,
             "codex_clean_result_reused": 6024708462,
             "ui_request_issued": true,
-            "observed_result_effort": null,
+            "observed_result_effort": "Lite",
             "next_attempt_not_before": "2026-10-06T23:10:58+00:00",
             "counter_limit_not_extended": true,
             "ambiguity_rule": "After clicking once, reconcile full authenticated native surfaces. Never repeat an ambiguous UI action.",
-            "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-progress-2215.json",
-            "native_readback_sha256": "fb44474e0d18dcaf38a3869a13f3ef1738745be5868a11723ac8f4580eda24c5",
+            "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+            "native_readback_sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e",
             "confirmed_request_events": [
               {
                 "id": 32641329434,
@@ -563,25 +555,193 @@
               {
                 "id": 37538942393,
                 "created_at": "2026-10-06T22:11:08Z",
-                "status": "in_progress",
-                "conclusion": null,
+                "status": "completed",
+                "conclusion": "cancelled",
                 "run_attempt": 1
               }
             ],
             "accepted": true,
             "recorded_at": "2026-10-06T22:13:36.982738+00:00",
-            "confirmed_at": "2026-10-06T22:10:58Z"
+            "confirmed_at": "2026-10-06T22:10:58Z",
+            "review_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-review-result.json",
+            "review_id": 5435249947,
+            "workflow_terminal_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json",
+            "workflow_terminal_result_sha256": "a0cf4f33772433ab4d923eabae47ff6c28d2fc2b5b5ff9630e24aa776f563000"
           },
           "latest_setup_observation": {
             "observed_at": "2026-10-06T22:18:57Z",
             "workflow_run_id": 37538942393,
             "job_id": 112526912328,
             "job_started_at": "2026-10-06T22:11:14Z",
-            "active_step": "Run complete repository validation",
+            "active_step": null,
             "step_started_at": "2026-10-06T22:12:12Z",
-            "job_status": "in_progress",
+            "job_status": "completed",
             "source": "authenticated GitHub Actions jobs API",
-            "dedicated_service_selection_proved": false
+            "dedicated_service_selection_proved": false,
+            "workflow_conclusion": "cancelled",
+            "terminal_at": "2026-10-06T22:31:33Z",
+            "terminal_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json"
+          },
+          "latest_review": {
+            "status": "authenticated_review_two_findings_workflow_cancelled",
+            "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+            "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+            "review_id": 5435249947,
+            "author_id": 175728472,
+            "submitted_at": "2026-10-06T22:29:47Z",
+            "observed_effort": "Lite",
+            "review_body_sha256": "60569c764d727e0530789701451bf02d1f572659f9847230c915678d714c0dbe",
+            "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 2 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (2)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call\u2026](#discussion_r4201048162) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This npm-environment sanitization block appears multiple times in the workflow (e.g., in the\u2026](#discussion_r4201048196) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This immutable-input guard hard-codes files that the workflow itself classifies as absent for\u2026](#discussion_r4200122706)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+            "source_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-observation-2230.json",
+            "source_snapshot_sha256": "b286eb0353102e38482cb9fbb938dd8964f1230da3de11aebeda3a96a8cc76db",
+            "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-baseline.json",
+            "baseline_sha256": "a66eab4562f3777f03100538d504dee65041ef72be18483b95853ee1bbbac42d",
+            "request_event_id": 32641329434,
+            "workflow_run_id": 37538942393,
+            "channel_attempt": 3,
+            "findings": [
+              {
+                "id": 4201048162,
+                "path": ".github/workflows/Test-AgentInstructions.ps1",
+                "line": 426,
+                "body": "The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call when `-UseNativeStructuralConversion` is set. Since the template is constant, consider caching (at script scope) the computed identity, resolved `[type]`, and any reflected members used for verification/invocation so hot-path Markdown parsing avoids repeated hashing/reflection overhead while preserving the same correctness checks.",
+                "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201048162",
+                "created_at": "2026-10-06T22:29:47Z",
+                "thread_id": "PRRT_kwDOQkjdhM6prmeI"
+              },
+              {
+                "id": 4201048196,
+                "path": ".github/workflows/copilot-code-review.yml",
+                "line": 600,
+                "body": "This npm-environment sanitization block appears multiple times in the workflow (e.g., in the verification, install, and dependency-tree steps). Duplicating this logic increases the chance of future drift (one step updated while others aren\u2019t). Consider moving the sanitization into a single repo-owned helper script (bash) that each step calls, or using a single step that exports the sanitized env values and a reusable command wrapper, so policy changes stay consistent across all npm invocations.",
+                "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201048196",
+                "created_at": "2026-10-06T22:29:47Z",
+                "thread_id": "PRRT_kwDOQkjdhM6prmei"
+              }
+            ],
+            "attribution": "Authenticated author ID, baseline exclusion, same exact head and post-request timestamp; observed effort from completed review overview."
+          },
+          "terminal_disposition": {
+            "status": "CANCELLED_CI_HOLD_CHANNEL_ATTEMPTS_EXHAUSTED",
+            "captured_at": "2026-10-06T22:32:12.402231+00:00",
+            "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+            "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+            "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+            "request_event_id": 32641329434,
+            "review_id": 5435249947,
+            "observed_effort": "Lite",
+            "review_findings": [
+              4201048162,
+              4201048196
+            ],
+            "workflow_run_id": 37538942393,
+            "attempt": 1,
+            "workflow_conclusion": "cancelled",
+            "terminal_at": "2026-10-06T22:31:33Z",
+            "job_id": 112526912328,
+            "job_started_at": "2026-10-06T22:11:14Z",
+            "job_completed_at": "2026-10-06T22:31:32Z",
+            "phases": [
+              {
+                "name": "Run complete repository validation",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 77,
+                "started_at": "2026-10-06T22:12:12Z",
+                "completed_at": "2026-10-06T22:29:13Z"
+              },
+              {
+                "name": "Verify final immutable setup inputs",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 82,
+                "started_at": "2026-10-06T22:29:14Z",
+                "completed_at": "2026-10-06T22:29:14Z"
+              },
+              {
+                "name": "Processing Request (Linux)",
+                "status": "completed",
+                "conclusion": "cancelled",
+                "number": 94,
+                "started_at": "2026-10-06T22:29:19Z",
+                "completed_at": "2026-10-06T22:31:29Z"
+              }
+            ],
+            "successful_hook_lines": [
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:38.3987016Z check json...............................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:39.4465526Z check yaml...............................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:41.0089118Z fix end of files.........................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:42.6956416Z trim trailing whitespace.................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:43.9315777Z yamllint.................................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:45.2091651Z Lint GitHub Actions workflow files.......................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:46.5568525Z Validate Dependabot Config (v2)..........................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:47.8386144Z Validate GitHub Workflows................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:47.8751076Z staged Markdown..........................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:12:48.7065342Z workflow policy contract.................................................Passed",
+              "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T22:29:13.2833517Z agent instruction contract and mutation tests............................Passed"
+            ],
+            "annotations": [
+              {
+                "message": "The job has exceeded the maximum execution time of 20m0s",
+                "annotation_level": "failure"
+              },
+              {
+                "message": "The operation was canceled.",
+                "annotation_level": "failure"
+              }
+            ],
+            "ordinary_successful_runs": [
+              37529312195,
+              37524154208,
+              37524154909,
+              37524154355,
+              37524154327,
+              37524154479,
+              37524154494,
+              37524154228,
+              37524110707,
+              37524110671,
+              37524110807,
+              37524110612,
+              37524110641,
+              37524110694
+            ],
+            "snapshots": [
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+                "sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e"
+              }
+            ],
+            "log_evidence": [
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\run.json",
+                "sha256": "83146fa7668c3a61154550637fa5ff29cd6dc141c69cfb381eee6f4893a284a9"
+              },
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\jobs.json",
+                "sha256": "c37fba3c1f5ac223560928fe0dbcf2cb62566f78ed00451dccecf9f506942070"
+              },
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\annotations.json",
+                "sha256": "7b0ff72ba440713c61a69d21521394d1d5bfc6b2f90cd5bc6feb635c94e52eb3"
+              },
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\log.txt",
+                "sha256": "0ec386b09791e8ff9447bd002e0383720e1239f1eef73358ea1ed5886e9f9756"
+              },
+              {
+                "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\summary.json",
+                "sha256": "bf332ad0f4af9df091ed8e96d50de3949a3b14d7ce1cfb7931eb05db9baa0afa"
+              }
+            ],
+            "channel_attempts_used": 3,
+            "channel_attempt_limit": 3,
+            "round": 1,
+            "deadline": "2026-10-14T20:09:39.767792+00:00",
+            "retry_released": false,
+            "merge_released": false,
+            "dedicated_service_selection_proved": false,
+            "interpretation": "Full coding setup passed all eleven hooks and final guard but consumed1021seconds. Review processing then exceeded the authenticated20-minute job limit. No billing or outage cause is established. The Lite review is distinct from cancelled CI. No fourth attempt is authorized by the existing limit."
           }
         }
       },
@@ -637,6 +797,32 @@
           "reply_id": 4200287320,
           "resolution": "authenticated_native_readback",
           "native_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R1-native-disposition.json"
+        },
+        {
+          "id": "PS235-R2",
+          "comment_id": 4201048162,
+          "review_id": 5435249947,
+          "thread_id": "PRRT_kwDOQkjdhM6prmeI",
+          "status": "no_change_merits_selected_reply_and_resolution_pending",
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "line": 426,
+          "worker": "a06_conversion_cold_packet",
+          "proposal_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings",
+          "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\ROOT-DECISION.json",
+          "score": 92.7
+        },
+        {
+          "id": "PS235-R3",
+          "comment_id": 4201048196,
+          "review_id": 5435249947,
+          "thread_id": "PRRT_kwDOQkjdhM6prmei",
+          "status": "no_change_merits_selected_reply_and_resolution_pending",
+          "path": ".github/workflows/copilot-code-review.yml",
+          "line": 600,
+          "worker": "a06_conversion_cold_packet",
+          "proposal_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings",
+          "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\ROOT-DECISION.json",
+          "score": 96.1
         }
       ],
       "nonmaterial_body_update": {
@@ -647,9 +833,9 @@
     }
   ],
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-progress-2215.json",
-    "captured_at": "2026-10-06T22:13:36.830730+00:00",
-    "sha256": "fb44474e0d18dcaf38a3869a13f3ef1738745be5868a11723ac8f4580eda24c5"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+    "captured_at": "2026-10-06T22:32:12.402231+00:00",
+    "sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e"
   },
   "CI_observation": {
     "captured_at": "2026-10-06T20:59:01.329921+00:00",
@@ -816,10 +1002,10 @@
     "retry_requested": true,
     "rule": "At most one relaunch per hour per PR. Conservatively count the original20:10:11 launch for the first interval; no scheduled automation. Reconcile native run/head/body/review surfaces before a single supported rerun.",
     "last_request_attempt_at": "2026-10-06T22:10:54.067571+00:00",
-    "pending_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three.json",
+    "pending_receipt": null,
     "accepted": true,
     "observed_attempt": 1,
-    "status": "accepted_current_head_result_pending",
+    "status": "terminal_cancelled_channel_limit_exhausted",
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three.json",
     "supported_next_channel": {
       "channel": "GitHub Reviewers Re-request Copilot review with Balanced",
@@ -830,7 +1016,9 @@
       "issued": true,
       "why": "Recover terminal cancelled service after workflow rerun endpoint refusal; not to change Lite alone",
       "primary_docs": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/use-copilot-agents/copilot-code-review#request-a-re-review"
-    }
+    },
+    "next_automatic_attempt": null,
+    "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json"
   },
   "body_updates": [
     {
@@ -886,6 +1074,24 @@
       "index_raw_sha256": "20abf18aaf81715036f13a3660ec6ba23c9079cff9a479328e1555bc67b6b020",
       "candidate_executed": false,
       "not_final_acceptance": true
+    }
+  },
+  "CI_recovery_proposal": {
+    "status": "P95_selected_preparation_complete_diagnostic_driver_preparation_active",
+    "worker": "ps_carryback_final_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion",
+    "scope": "Validate current cancellation and exhausted recovery, compare supported options and prepare exact next action without CI, product, settings or external-message mutation.",
+    "implementation_or_retry_released": false,
+    "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\ROOT-DECISION.json",
+    "diagnostic_writer": "a06_conversion_cold_packet",
+    "diagnostic_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic",
+    "tests_released": false,
+    "external_message_authorized": false,
+    "owner_question": {
+      "status": "awaiting_explicit_external_message_authorization",
+      "question": "May root send the prepared GitHub Support inquiry about PS235 setup selection and20-minute timeout?",
+      "draft": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\UNSENT-PROVIDER-INQUIRY.md",
+      "dependent_action": "External support message only; diagnostic preparation and no-change review disposition continue."
     }
   }
 }

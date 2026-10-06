@@ -1,5 +1,5 @@
 {
-  "status": "accepted_current_head_result_pending",
+  "status": "terminal_cancelled_two_findings_channel_limit_exhausted",
   "intent_at": "2026-10-06T22:10:54.067571+00:00",
   "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
   "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -18,12 +18,12 @@
   "old_review": 5434209468,
   "codex_clean_result_reused": 6024708462,
   "ui_request_issued": true,
-  "observed_result_effort": null,
+  "observed_result_effort": "Lite",
   "next_attempt_not_before": "2026-10-06T23:10:58+00:00",
   "counter_limit_not_extended": true,
   "ambiguity_rule": "After clicking once, reconcile full authenticated native surfaces. Never repeat an ambiguous UI action.",
-  "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-progress-2215.json",
-  "native_readback_sha256": "fb44474e0d18dcaf38a3869a13f3ef1738745be5868a11723ac8f4580eda24c5",
+  "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+  "native_readback_sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e",
   "confirmed_request_events": [
     {
       "id": 32641329434,
@@ -36,12 +36,16 @@
     {
       "id": 37538942393,
       "created_at": "2026-10-06T22:11:08Z",
-      "status": "in_progress",
-      "conclusion": null,
+      "status": "completed",
+      "conclusion": "cancelled",
       "run_attempt": 1
     }
   ],
   "accepted": true,
   "recorded_at": "2026-10-06T22:13:36.982738+00:00",
-  "confirmed_at": "2026-10-06T22:10:58Z"
+  "confirmed_at": "2026-10-06T22:10:58Z",
+  "review_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-review-result.json",
+  "review_id": 5435249947,
+  "workflow_terminal_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json",
+  "workflow_terminal_result_sha256": "a0cf4f33772433ab4d923eabae47ff6c28d2fc2b5b5ff9630e24aa776f563000"
 }

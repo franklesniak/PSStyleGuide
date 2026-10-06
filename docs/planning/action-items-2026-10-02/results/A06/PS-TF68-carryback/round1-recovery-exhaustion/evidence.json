@@ -1,0 +1,506 @@
+{
+  "status": "PROPOSAL_COMPLETE_NO_ACTION_RELEASED",
+  "captured_at": "2026-10-06T22:39:21.394533+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+  "selected": "P95.0",
+  "weights": [
+    31,
+    23,
+    19,
+    17,
+    7,
+    3
+  ],
+  "scores": [
+    {
+      "id": "A",
+      "option": "Retain hold and wait without further preparation",
+      "scores": [
+        10,
+        10,
+        3,
+        4,
+        1,
+        10
+      ],
+      "total": 70.2,
+      "boundary": "Eligible; preserves gates but leaves the unknowns unresolved."
+    },
+    {
+      "id": "B",
+      "option": "Make a fourth unchanged UI request at the next hourly boundary",
+      "scores": [
+        7,
+        10,
+        5,
+        2,
+        3,
+        8
+      ],
+      "total": 62.1,
+      "boundary": "Unavailable under the present same-input cap; variance is not a remedy."
+    },
+    {
+      "id": "C",
+      "option": "Retry the rejected Actions rerun endpoint again",
+      "scores": [
+        5,
+        10,
+        2,
+        1,
+        1,
+        8
+      ],
+      "total": 47.1,
+      "boundary": "Unavailable under cap and contradicted by authenticated 403; no new transport evidence."
+    },
+    {
+      "id": "D",
+      "option": "Land PS235 now, then prove dedicated activation",
+      "scores": [
+        0,
+        2,
+        4,
+        2,
+        5,
+        9
+      ],
+      "total": 21.8,
+      "boundary": "Ineligible while current CI is cancelled; B93.5 is conditional on green gates."
+    },
+    {
+      "id": "E",
+      "option": "Create a separately reviewed minimal dedicated-setup bootstrap",
+      "scores": [
+        9,
+        9,
+        4,
+        4,
+        4,
+        3
+      ],
+      "total": 66.7,
+      "boundary": "Conditional genuine dependency repair; at least seven coupled paths previously identified; its own old setup can time out."
+    },
+    {
+      "id": "F",
+      "option": "Change timeout YAML, filename, trigger or dispatch in hope of activation",
+      "scores": [
+        6,
+        8,
+        3,
+        1,
+        2,
+        5
+      ],
+      "total": 47.3,
+      "boundary": "Unsupported as a current remedy; both job declarations already say 59 minutes."
+    },
+    {
+      "id": "G",
+      "option": "Prepare the precise provider inquiry and preserve the hold",
+      "scores": [
+        10,
+        10,
+        8,
+        9,
+        5,
+        10
+      ],
+      "total": 91.0,
+      "boundary": "Preparation eligible now; sending needs explicit external-message authority."
+    },
+    {
+      "id": "H",
+      "option": "Run one current-source author-case timing pair after a scoped release",
+      "scores": [
+        9,
+        10,
+        8,
+        8,
+        6,
+        7
+      ],
+      "total": 86.0,
+      "boundary": "Conditional, not run here; must follow R2 disposition to avoid duplicate measurements."
+    },
+    {
+      "id": "I",
+      "option": "Repeat the full SelfTest/aggregate profile now",
+      "scores": [
+        8,
+        10,
+        3,
+        4,
+        3,
+        2
+      ],
+      "total": 63.0,
+      "boundary": "Low information value; repeats known outer hotspot and does not measure provider selection."
+    },
+    {
+      "id": "J",
+      "option": "Implement speculative caching, converter or parallel fixture changes now",
+      "scores": [
+        5,
+        5,
+        4,
+        2,
+        5,
+        3
+      ],
+      "total": 42.4,
+      "boundary": "Unproved semantics and payoff; existing native conversion/reuse already applied; R2 belongs to its owner."
+    },
+    {
+      "id": "K",
+      "option": "Qualify a supported larger hosted runner",
+      "scores": [
+        8,
+        8,
+        5,
+        5,
+        5,
+        2
+      ],
+      "total": 65.3,
+      "boundary": "Conditional on supported account/configuration, actual cost authority and selection; no purchased capacity here."
+    },
+    {
+      "id": "L",
+      "option": "Qualify ARC Ubuntu x64 infrastructure",
+      "scores": [
+        7,
+        6,
+        2,
+        4,
+        4,
+        1
+      ],
+      "total": 49.2,
+      "boundary": "Conditional security/network/platform work; disproportionate before selection is understood."
+    },
+    {
+      "id": "M",
+      "option": "Use dependency caches, snapshot or prebuilt tools to shorten setup",
+      "scores": [
+        7,
+        7,
+        5,
+        4,
+        4,
+        3
+      ],
+      "total": 57.8,
+      "boundary": "Conditional provenance and invalidation design; preparation outside aggregate is only about one minute here."
+    },
+    {
+      "id": "N",
+      "option": "Continue genuine R2/R3 merits and any selected necessary repair",
+      "scores": [
+        10,
+        10,
+        8,
+        9,
+        7,
+        8
+      ],
+      "total": 91.8,
+      "boundary": "Already scoped to separate author; real changed input gets normal new-input review, no manufactured cap reset."
+    },
+    {
+      "id": "O",
+      "option": "Disable review capabilities, remove checks, waive failure, or change main directly",
+      "scores": [
+        0,
+        0,
+        2,
+        0,
+        3,
+        7
+      ],
+      "total": 8.0,
+      "boundary": "Ineligible; removes actual gates or bypasses normal admission."
+    },
+    {
+      "id": "P",
+      "option": "Prepare G and the exact H fallback; retain hold; use N without duplicate work",
+      "scores": [
+        10,
+        10,
+        9,
+        10,
+        6,
+        9
+      ],
+      "total": 95.0,
+      "boundary": "Selected preparation and coordination; no execution, retry or message released by the score."
+    },
+    {
+      "id": "Q",
+      "option": "Defer PS235 and continue an independent on-plan outcome",
+      "scores": [
+        10,
+        10,
+        6,
+        5,
+        4,
+        8
+      ],
+      "total": 79.1,
+      "boundary": "Eligible only under its actual dependencies and ownership; does not clear this PR or B99 integration hold."
+    },
+    {
+      "id": "R",
+      "option": "Close or abandon PS235 now",
+      "scores": [
+        9,
+        10,
+        2,
+        5,
+        0,
+        9
+      ],
+      "total": 65.9,
+      "boundary": "No evidence requires abandoning valid work; destructive scheduling choice is not selected."
+    }
+  ],
+  "channel_attempts": 3,
+  "channel_limit": 3,
+  "owner_quote_source": "Direct wording relayed by root in this task; compatible with the finite policy cap; not an inferred unlimited extension.",
+  "round": 1,
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "native_operations_pending_in_bound_state": [],
+  "ordinary_runs_verified": [
+    37529312195,
+    37524154208,
+    37524154909,
+    37524154355,
+    37524154327,
+    37524154479,
+    37524154494,
+    37524154228,
+    37524110707,
+    37524110671,
+    37524110807,
+    37524110612,
+    37524110641,
+    37524110694
+  ],
+  "verified_disposition_reference_hashes": true,
+  "phases": [
+    {
+      "name": "Run complete repository validation",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 77,
+      "started_at": "2026-10-06T22:12:12Z",
+      "completed_at": "2026-10-06T22:29:13Z"
+    },
+    {
+      "name": "Verify final immutable setup inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 82,
+      "started_at": "2026-10-06T22:29:14Z",
+      "completed_at": "2026-10-06T22:29:14Z"
+    },
+    {
+      "name": "Processing Request (Linux)",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "number": 94,
+      "started_at": "2026-10-06T22:29:19Z",
+      "completed_at": "2026-10-06T22:31:29Z"
+    }
+  ],
+  "source_postimages_verified": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/copilot-code-review.yml"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\run.json",
+      "sha256": "83146fa7668c3a61154550637fa5ff29cd6dc141c69cfb381eee6f4893a284a9",
+      "bytes": 14948
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\jobs.json",
+      "sha256": "c37fba3c1f5ac223560928fe0dbcf2cb62566f78ed00451dccecf9f506942070",
+      "bytes": 29649
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\annotations.json",
+      "sha256": "7b0ff72ba440713c61a69d21521394d1d5bfc6b2f90cd5bc6feb635c94e52eb3",
+      "bytes": 975
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\log.txt",
+      "sha256": "0ec386b09791e8ff9447bd002e0383720e1239f1eef73358ea1ed5886e9f9756",
+      "bytes": 509998
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37538942393\\attempt-1\\summary.json",
+      "sha256": "bf332ad0f4af9df091ed8e96d50de3949a3b14d7ce1cfb7931eb05db9baa0afa",
+      "bytes": 12169
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-terminal.json",
+      "sha256": "650d8caf51a4ac14ab36f0083a88bfe2a98644c1ca6563f48a7e7604d7c5940e",
+      "bytes": 702694
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json",
+      "sha256": "a0cf4f33772433ab4d923eabae47ff6c28d2fc2b5b5ff9630e24aa776f563000",
+      "bytes": 6053
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three.json",
+      "sha256": "8a7fc219108130a867aef2aa76b42e9df5c4a2cc539a95df90e18398406b6907",
+      "bytes": 2493
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-review-result.json",
+      "sha256": "b19703df190fae671abde131f63bc30b844510533d10b0ae00442fd1cd47ad5d",
+      "bytes": 5841
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-CI-retry-one.json",
+      "sha256": "bc585a2f6c1611155ea9f7b1ac5a8c051c130ad5ac4b8d5e797fabba495fe50a",
+      "bytes": 31986
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\execution-state.json",
+      "sha256": "70935ded82edc877a7f9b5ecd447558923932e1f578547a5eaabe61b3bdab009",
+      "bytes": 61325
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\FINAL-VALIDATION.json",
+      "sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195",
+      "bytes": 8497
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\REPORT.md",
+      "sha256": "8b2bb9c6dd6576292b4dda2f2b07f273d63916722f2505cd61a2ba57f272b0f3",
+      "bytes": 5099
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "7aa2b5356500333c7f7e6edc8894f3563a054391869ab908c9c263fc5e2ed2a4",
+      "bytes": 10965
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4",
+      "bytes": 10209
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\owner-ci-audit-2026-10-06\\REPORT.md",
+      "sha256": "430b83a7ef20fa3527cff204edbf0ff110ce052efa94f88e8624af5772988d48",
+      "bytes": 9237
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1.md",
+      "sha256": "534a17a5cd0358f88cf78338a3593727d1b12a17561252a8fd017456538d6921",
+      "bytes": 17111
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def",
+      "bytes": 16997
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\REPORT.md",
+      "sha256": "4157c2c8833e6e1e4b719312281f17e34805b227a1db907981d8e3b2ff52bbbd",
+      "bytes": 20304
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\timing.json",
+      "sha256": "31a457a740ae2624f8e78f0ffde42f12c6774a070e15c3c50024a3de8e0e289c",
+      "bytes": 379681
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\REPORT.md",
+      "sha256": "62b53b47d31a0faeff85cfb58d8b83bd80ab0da47c031076c3612adc49651494",
+      "bytes": 5649
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\REPORT.md",
+      "sha256": "b784e9254b382e661e539d3fd81062ea6b2392adb38293e6f40c4377f4ff07d2",
+      "bytes": 2886
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\postlanding-sequence\\REPORT.md",
+      "sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2",
+      "bytes": 8654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\copilot-code-review.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\copilot-setup-steps.yml",
+      "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "bytes": 51809
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244
+    }
+  ],
+  "primary_sources": [
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-code-review",
+      "relevant_lines": "117-133,155-157,182-188",
+      "finding": "Supported re-review and dedicated-file precedence; no dedicated lookup revision specified in inspected section."
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment",
+      "relevant_lines": "60-70,102-115",
+      "finding": "Coding setup default-branch activation and customizable timeout up to59; not evidence of dynamic code-review budget control."
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners",
+      "relevant_lines": "36-48,58-100",
+      "finding": "Ubuntu x64, ARC and paid larger-runner configuration; this account capability and activation unproved."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\REPORT.md",
+      "sha256": "08d47709347089791dd70c9ebf6355a96db4b5192a24fdd57b62585e09aa01de"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\UNSENT-PROVIDER-INQUIRY.md",
+      "sha256": "5c9f2405e4eca44af6b38987d637cfd3243366ba35943a52cfbcd13e9f9ac17a"
+    }
+  ],
+  "limits": [
+    "No candidate/test/native execution or external message",
+    "No fourth request, cap extension or new round released",
+    "R2/R3 merits delegated elsewhere and not decided here",
+    "Conditional experiment specified only; no product source changed",
+    "Saved native snapshot only; root must refresh before action",
+    "No merge readiness or paired/service acceptance"
+  ]
+}

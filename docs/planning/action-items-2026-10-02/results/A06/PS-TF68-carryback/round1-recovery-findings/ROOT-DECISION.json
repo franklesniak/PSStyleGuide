@@ -1,0 +1,66 @@
+{
+  "status": "SELECTED_AFTER_ROOT_DISPLAY",
+  "selected_at_utc": "2026-10-06T22:43:30.921889+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "choices": {
+    "R2": {
+      "option": "A",
+      "score": 92.7,
+      "disposition": "retain_per_call_metadata_verification_no_material_repair"
+    },
+    "R3": {
+      "option": "A",
+      "score": 96.1,
+      "disposition": "retain_inline_per_process_sanitation_no_material_repair"
+    }
+  },
+  "root_read_full_proposals": true,
+  "reference_hashes_verified": 25,
+  "weighted_totals_verified": 26,
+  "raw_current_source_rows_verified": 5,
+  "source_worktree_clean": true,
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\evidence.json",
+      "sha256": "24e7b42b4f694d266c5dee50a3da5374945f653c15f56d407042e4452cc7cd25"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R2-converter-metadata-cache.md",
+      "sha256": "8dad90140bdb010bd19c2c65a8e75a2199aa805cf00674c4dc4189683831226f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R3-npm-environment-duplication.md",
+      "sha256": "c89f83e0a44fce755c87188e74114f98c5d5db86ffa1ffec533b65b3e5b2c1a0"
+    }
+  ],
+  "product_changes_released": false,
+  "candidate_tests_released": false,
+  "additional_review_or_CI_request_released": false,
+  "external_message_authorized": false,
+  "round": 1,
+  "deadline": "2026-10-14T20:09:39.767792Z",
+  "transfers": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "publication_format_derivatives": [
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R2-converter-metadata-cache.md",
+      "source_sha256": "8dad90140bdb010bd19c2c65a8e75a2199aa805cf00674c4dc4189683831226f",
+      "published_copy": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\round1-recovery-findings\\R2-converter-metadata-cache.md",
+      "published_sha256": "ec4d1e70725f99eeb85b91d8246785b5b77c2789b16ade2dd2d105c55681b73a",
+      "change": "Table cell padding only; all cell text and non-table lines preserved."
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R3-npm-environment-duplication.md",
+      "source_sha256": "c89f83e0a44fce755c87188e74114f98c5d5db86ffa1ffec533b65b3e5b2c1a0",
+      "published_copy": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\round1-recovery-findings\\R3-npm-environment-duplication.md",
+      "published_sha256": "5958a262bbcfe68585a4a3956743f428a22b3e12baea783564d018728075a8eb",
+      "change": "Table cell padding only; all cell text and non-table lines preserved."
+    }
+  ]
+}

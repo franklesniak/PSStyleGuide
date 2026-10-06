@@ -1,0 +1,39 @@
+{
+  "status": "authenticated_review_two_findings_workflow_separately_pending",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "review_id": 5435249947,
+  "author_id": 175728472,
+  "submitted_at": "2026-10-06T22:29:47Z",
+  "observed_effort": "Lite",
+  "review_body_sha256": "60569c764d727e0530789701451bf02d1f572659f9847230c915678d714c0dbe",
+  "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 2 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (2)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call\u2026](#discussion_r4201048162) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This npm-environment sanitization block appears multiple times in the workflow (e.g., in the\u2026](#discussion_r4201048196) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This immutable-input guard hard-codes files that the workflow itself classifies as absent for\u2026](#discussion_r4200122706)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+  "source_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-observation-2230.json",
+  "source_snapshot_sha256": "b286eb0353102e38482cb9fbb938dd8964f1230da3de11aebeda3a96a8cc76db",
+  "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-baseline.json",
+  "baseline_sha256": "a66eab4562f3777f03100538d504dee65041ef72be18483b95853ee1bbbac42d",
+  "request_event_id": 32641329434,
+  "workflow_run_id": 37538942393,
+  "channel_attempt": 3,
+  "findings": [
+    {
+      "id": 4201048162,
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "line": 426,
+      "body": "The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call when `-UseNativeStructuralConversion` is set. Since the template is constant, consider caching (at script scope) the computed identity, resolved `[type]`, and any reflected members used for verification/invocation so hot-path Markdown parsing avoids repeated hashing/reflection overhead while preserving the same correctness checks.",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201048162",
+      "created_at": "2026-10-06T22:29:47Z",
+      "thread_id": "PRRT_kwDOQkjdhM6prmeI"
+    },
+    {
+      "id": 4201048196,
+      "path": ".github/workflows/copilot-code-review.yml",
+      "line": 600,
+      "body": "This npm-environment sanitization block appears multiple times in the workflow (e.g., in the verification, install, and dependency-tree steps). Duplicating this logic increases the chance of future drift (one step updated while others aren\u2019t). Consider moving the sanitization into a single repo-owned helper script (bash) that each step calls, or using a single step that exports the sanitized env values and a reusable command wrapper, so policy changes stay consistent across all npm invocations.",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201048196",
+      "created_at": "2026-10-06T22:29:47Z",
+      "thread_id": "PRRT_kwDOQkjdhM6prmei"
+    }
+  ],
+  "attribution": "Authenticated author ID, baseline exclusion, same exact head and post-request timestamp; observed effort from completed review overview."
+}

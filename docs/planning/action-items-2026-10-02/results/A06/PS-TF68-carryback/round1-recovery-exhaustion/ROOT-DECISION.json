@@ -1,0 +1,50 @@
+{
+  "status": "SELECTED_AFTER_ROOT_DISPLAY",
+  "selected_at_utc": "2026-10-06T22:43:30.921889+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "choices": {
+    "CI": {
+      "option": "P",
+      "score": 95.0,
+      "disposition": "retain_CI_hold_prepare_provider_inquiry_and_conditional_current_author_timing_pair"
+    }
+  },
+  "root_read_full_proposals": true,
+  "reference_hashes_verified": 29,
+  "weighted_totals_verified": 18,
+  "raw_current_source_rows_verified": 5,
+  "source_worktree_clean": true,
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\evidence.json",
+      "sha256": "ae60a8c9ca5370d43ec4fe489973b3ecff2861804fecf713a19a4a150be2953c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\REPORT.md",
+      "sha256": "08d47709347089791dd70c9ebf6355a96db4b5192a24fdd57b62585e09aa01de"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\UNSENT-PROVIDER-INQUIRY.md",
+      "sha256": "5c9f2405e4eca44af6b38987d637cfd3243366ba35943a52cfbcd13e9f9ac17a"
+    }
+  ],
+  "product_changes_released": false,
+  "candidate_tests_released": false,
+  "additional_review_or_CI_request_released": false,
+  "external_message_authorized": false,
+  "round": 1,
+  "deadline": "2026-10-14T20:09:39.767792Z",
+  "transfers": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "next_authorized_preparation": {
+    "worker": "a06_conversion_cold_packet",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic",
+    "scope": "Prepare exact current-source control/timing pair for remaining author-case cost, per H boundaries after R2/R3 no-change selection. Root must review before execution. No R2 metadata microbenchmark or fullSelfTest."
+  }
+}
