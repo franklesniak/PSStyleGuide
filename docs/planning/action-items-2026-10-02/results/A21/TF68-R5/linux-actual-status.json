@@ -1,0 +1,31 @@
+{
+  "state": "passed",
+  "started_at": "2026-10-06T03:14:50.394215+00:00",
+  "manifest_sha256": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "psstyleguide-tf68-r5-focused-20261006-v1",
+    "--label",
+    "psstyleguide.focused-manifest=62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside-focused.py"
+  ],
+  "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "selftest_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+  "container_exit": 0,
+  "host_source_equal": true,
+  "finished_at": "2026-10-06T03:29:20.210225+00:00"
+}

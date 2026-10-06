@@ -1,0 +1,8 @@
+Private fixture anchor: 2026-10-05T03:03:18.5149442+00:00
+Exception: 
+Line |
+ 283 |              throw "Author finalization caller failed (Now=$Now Later= …
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Author finalization caller failed (Now=True Later=False Accept=True exit=1): Agent-instruction contract failed:
+- .github/workflows/scripts-README.md Last Updated is later than trusted UTC.
+- docs/dependency-maintenance.md Last Updated is later than trusted UTC.

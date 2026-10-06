@@ -1,0 +1,1585 @@
+{
+  "finding": "TF68-R5",
+  "decision": "Root selected and released B 97.5 after full ordered display; canonical results/A21/TF68-R5/DECISION.md",
+  "captured_at_utc": "2026-10-06T03:42:53.843774+00:00",
+  "status": "Focused repair complete; frozen for root aggregate and native acceptance",
+  "preimage": {
+    "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "entry": "100644 blob a976b7f224b4e9df0064493e3ec2c5514e9b8046\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "bytes": 241436,
+    "index_sha256": "de2ee5e5f4152ca882bee83ac05c1d02e53479345311ad172c84b3899a9741bc",
+    "refs_sha256": "6ab2eae0d00cdd01b2b8f686c0b786665ffe37458075b1919d6fcbead9c955ee"
+  },
+  "postimage": {
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "mode": "100644",
+    "blob": "d0a6b62013d1772388aa7d20773d2db592bf91dc",
+    "sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "bytes": 242137
+  },
+  "scope": [
+    "One escaped breakpoint-only path shared by both existing registrations",
+    "Original literal source read and checker execution unchanged",
+    "Persistent bracket probe and matching decoy, exact newly registered count/target assertion",
+    "Existing anchor, receipt, primary-error and cleanup controls retained"
+  ],
+  "metadata": "Current UTC Oct6 already recorded. New helper version 1.0 has no accepted-B predecessor; author fixture 1.1 is the current PR update over accepted-B 1.0. No work-in-progress version increment.",
+  "native_results": {
+    "windows": [
+      {
+        "name": "matrix",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-matrix.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OriginalSource",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1",
+          "-CheckerTemplate",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\checker-template.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+        "started": "2026-10-06T03:03:50.249058+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:03:54.932912+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "persistent",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\persistent-controls.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OriginalSource",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\persistent"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+        "started": "2026-10-06T03:03:54.936656+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:03:56.879339+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "transport",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\transport.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\transport"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+        "started": "2026-10-06T03:03:56.881259+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:04:06.754548+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "quality",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1",
+          "-RepositoryRootPath",
+          "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+          "-AnalyzeOnly"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+        "started": "2026-10-06T03:04:06.756215+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:05:08.772538+00:00",
+        "log_sha256": "ed997a533ee24203963bf0bf3b58a649c703c7e77a059576297cce7d2f7d5ff6"
+      }
+    ],
+    "linux": [
+      {
+        "name": "matrix",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "/input/actual-matrix.ps1",
+          "-Source",
+          "/input/source-final.ps1",
+          "-OriginalSource",
+          "/input/source-SelfTest.ps1",
+          "-CheckerTemplate",
+          "/input/checker-template.ps1",
+          "-OutputDirectory",
+          "/output/matrix"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+        "started": "2026-10-06T03:14:43.822416+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:14:49.186251+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "persistent",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "/input/persistent-controls.ps1",
+          "-Source",
+          "/input/source-final.ps1",
+          "-OriginalSource",
+          "/input/source-SelfTest.ps1",
+          "-OutputDirectory",
+          "/output/persistent"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+        "started": "2026-10-06T03:14:49.200095+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:14:50.889540+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "transport",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "/input/transport.ps1",
+          "-Source",
+          "/input/source-final.ps1",
+          "-OutputDirectory",
+          "/output/transport"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+        "started": "2026-10-06T03:14:50.925342+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:14:55.483843+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ]
+  },
+  "matrices": {
+    "windows": {
+      "counts": {
+        "Original": {
+          "cases": 10,
+          "passed": 6
+        },
+        "Actual": {
+          "cases": 10,
+          "passed": 10
+        }
+      },
+      "data": {
+        "powershell": "7.6.5",
+        "platform": "Microsoft Windows NT 10.0.26200.0",
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "variants": "Exact original and actual changed helper bodies; no variant substitution",
+        "api_overloads": [
+          "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock)",
+          "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock, System.Nullable`1[System.Int32])"
+        ],
+        "configured_temp_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\configured-temp[ab]\\",
+        "configured_temp_native_exit": 0,
+        "rows": [
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": false,
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketa\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketb\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketa\\checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketb\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": false,
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketa\\checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracketb\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": false,
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": false,
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          },
+          {
+            "variant": "Original",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          }
+        ]
+      }
+    },
+    "linux": {
+      "counts": {
+        "Original": {
+          "cases": 14,
+          "passed": 6
+        },
+        "Actual": {
+          "cases": 14,
+          "passed": 14
+        }
+      },
+      "data": {
+        "powershell": "7.6.3",
+        "platform": "Unix 6.6.87.2",
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "variants": "Exact original and actual changed helper bodies; no variant substitution",
+        "api_overloads": [
+          "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock)",
+          "System.Management.Automation.LineBreakpoint SetLineBreakpoint(System.String, Int32, Int32, System.Management.Automation.ScriptBlock, System.Nullable`1[System.Int32])"
+        ],
+        "configured_temp_path": "/output/matrix/configured-temp[ab]/",
+        "configured_temp_native_exit": 0,
+        "rows": [
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracketa/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/bracketb/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/bracketa/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/bracketb/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracketa/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/bracketb/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Original",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/starXliteral/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/starXliteral/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/starXliteral/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/questionXliteral/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/questionXliteral/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": "Fixture clock control failed: Initialization clock did not fire with a successful readback. Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              },
+              {
+                "Script": "/output/matrix/questionXliteral/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": false,
+            "variant": "Original",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": "Fixture clock control failed: Local clock did not fire with a successful readback.",
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          }
+        ]
+      }
+    }
+  },
+  "persistent": {
+    "windows": {
+      "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "original_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "powershell": "7.6.5",
+      "block_start_line": 1029,
+      "rows": [
+        {
+          "expected_outcome": "rejected",
+          "variant": "Original",
+          "remaining_clock_variables": 0,
+          "failure": "The fixture clock registered breakpoints outside the exact probe path.\nFixture clock control failed: Local clock did not fire with a successful readback.",
+          "remaining_breakpoints": 0
+        },
+        {
+          "expected_outcome": "passed",
+          "variant": "Actual",
+          "remaining_clock_variables": 0,
+          "failure": null,
+          "remaining_breakpoints": 0
+        }
+      ],
+      "scope": "Exact changed persistent block, including original helper negative, difference 0/1, missing/duplicate/inactive anchor, primary error and uninstrumented post-cleanup controls"
+    },
+    "linux": {
+      "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "original_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "powershell": "7.6.3",
+      "block_start_line": 1029,
+      "rows": [
+        {
+          "remaining_breakpoints": 0,
+          "failure": "The fixture clock registered breakpoints outside the exact probe path.\nFixture clock control failed: Local clock did not fire with a successful readback.",
+          "remaining_clock_variables": 0,
+          "variant": "Original",
+          "expected_outcome": "rejected"
+        },
+        {
+          "remaining_breakpoints": 0,
+          "failure": null,
+          "remaining_clock_variables": 0,
+          "variant": "Actual",
+          "expected_outcome": "passed"
+        }
+      ],
+      "scope": "Exact changed persistent block, including original helper negative, difference 0/1, missing/duplicate/inactive anchor, primary error and uninstrumented post-cleanup controls"
+    }
+  },
+  "transport": {
+    "windows": {
+      "platform": "Microsoft Windows NT 10.0.26200.0",
+      "powershell": "7.6.5",
+      "host": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "helperCharacters": 6676,
+      "helperUtf8Bytes": 6676,
+      "sourceSha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "callerStartLine": 1280,
+      "callerEndLine": 1301,
+      "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+      "cases": [
+        {
+          "name": "no-args-local",
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "",
+            "PublishedBaselineRevision": "",
+            "FinalizeMetadataNow": false,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7332,
+            "CommandPayloadCharacters": 7176,
+            "CommandPayloadUtf8Bytes": 7177,
+            "ArgvUtf8BytesWithNuls": 7324.0
+          },
+          "native_exit": 0
+        },
+        {
+          "name": "current-finalization",
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "FinalizeMetadataNow": true,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7466,
+            "CommandPayloadCharacters": 7310,
+            "CommandPayloadUtf8Bytes": 7311,
+            "ArgvUtf8BytesWithNuls": 7458.0
+          },
+          "native_exit": 0
+        },
+        {
+          "name": "proposed-combined-modes",
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "FinalizeMetadataNow": true,
+            "ProposedPolicy": true,
+            "SelfTest": true,
+            "MetadataClassificationOnly": true,
+            "CommandLineCharacters": 7520,
+            "CommandPayloadCharacters": 7364,
+            "CommandPayloadUtf8Bytes": 7365,
+            "ArgvUtf8BytesWithNuls": 7512.0
+          },
+          "native_exit": 0
+        },
+        {
+          "name": "literal-roundtrip",
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-\u00e9",
+            "PublishedBaselineRevision": "\"quoted\" trailing\\",
+            "FinalizeMetadataNow": false,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7450,
+            "CommandPayloadCharacters": 7292,
+            "CommandPayloadUtf8Bytes": 7294,
+            "ArgvUtf8BytesWithNuls": 7441.0
+          },
+          "native_exit": 0
+        },
+        {
+          "name": "early-parameter-refusal",
+          "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again.",
+          "native_exit": 1
+        }
+      ]
+    },
+    "linux": {
+      "platform": "Unix 6.6.87.2",
+      "powershell": "7.6.3",
+      "host": "/opt/microsoft/powershell/7/pwsh",
+      "helperCharacters": 6676,
+      "helperUtf8Bytes": 6676,
+      "sourceSha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "callerStartLine": 1280,
+      "callerEndLine": 1301,
+      "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+      "cases": [
+        {
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "",
+            "PublishedBaselineRevision": "",
+            "FinalizeMetadataNow": false,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7174,
+            "CommandPayloadCharacters": 7083,
+            "CommandPayloadUtf8Bytes": 7084,
+            "ArgvUtf8BytesWithNuls": 7166.0
+          },
+          "native_exit": 0,
+          "name": "no-args-local"
+        },
+        {
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "FinalizeMetadataNow": true,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7308,
+            "CommandPayloadCharacters": 7217,
+            "CommandPayloadUtf8Bytes": 7218,
+            "ArgvUtf8BytesWithNuls": 7300.0
+          },
+          "native_exit": 0,
+          "name": "current-finalization"
+        },
+        {
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+            "FinalizeMetadataNow": true,
+            "ProposedPolicy": true,
+            "SelfTest": true,
+            "MetadataClassificationOnly": true,
+            "CommandLineCharacters": 7362,
+            "CommandPayloadCharacters": 7271,
+            "CommandPayloadUtf8Bytes": 7272,
+            "ArgvUtf8BytesWithNuls": 7354.0
+          },
+          "native_exit": 0,
+          "name": "proposed-combined-modes"
+        },
+        {
+          "result": {
+            "Captured": "2000-01-02",
+            "Local": "2000-01-02",
+            "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-\u00e9",
+            "PublishedBaselineRevision": "\"quoted\" trailing\\",
+            "FinalizeMetadataNow": false,
+            "ProposedPolicy": false,
+            "SelfTest": false,
+            "MetadataClassificationOnly": false,
+            "CommandLineCharacters": 7292,
+            "CommandPayloadCharacters": 7199,
+            "CommandPayloadUtf8Bytes": 7201,
+            "ArgvUtf8BytesWithNuls": 7283.0
+          },
+          "native_exit": 0,
+          "name": "literal-roundtrip"
+        },
+        {
+          "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again.",
+          "native_exit": 1,
+          "name": "early-parameter-refusal"
+        }
+      ]
+    }
+  },
+  "actual_windows_focus": {
+    "status": "passed",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus-next-day.ps1",
+      "-RepositoryRootPath",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+    ],
+    "started": "2026-10-06T03:10:17.244614+00:00",
+    "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "driver_sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+    "native_exit": 0,
+    "finished": "2026-10-06T03:41:35.914760+00:00",
+    "source_after_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "log_sha256": "e63c9b352e7fd2189b73457f7bd733f05cb2ecee3ef1d20bf3817ac25edc1761",
+    "source_unchanged": true
+  },
+  "actual_linux_focus": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\result.json",
+    "sha256": "5c50258d2202513758b7b0d40043e2ae23f40838ff693d904b7d6af5d5ffa9b0",
+    "result": {
+      "state": "passed",
+      "started_at": "2026-10-06T03:14:53.333228+00:00",
+      "scope": "Focused clock fixtures only; no aggregate or product acceptance.",
+      "versions": {
+        "node": "v24.18.1",
+        "npm": "11.16.0",
+        "pwsh": "7.6.3"
+      },
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/actual-focus-next-day.ps1",
+        "-RepositoryRootPath",
+        "/work/focused-repository"
+      ],
+      "private_candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+      "pid": 76,
+      "exit": 0,
+      "log_sha256": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e",
+      "source_equal": true,
+      "finished_at": "2026-10-06T03:29:01.645849+00:00"
+    },
+    "host_status": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\status.json",
+      "sha256": "c0a22ff765822fb0cfa86d6a880b9297a98479c53806bce12e5d67ebe8ca914d",
+      "result": {
+        "state": "passed",
+        "started_at": "2026-10-06T03:14:50.394215+00:00",
+        "manifest_sha256": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+        "command": [
+          "docker",
+          "run",
+          "--rm",
+          "--pull",
+          "never",
+          "--name",
+          "psstyleguide-tf68-r5-focused-20261006-v1",
+          "--label",
+          "psstyleguide.focused-manifest=62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+          "--network",
+          "none",
+          "--mount",
+          "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs,target=/input,readonly",
+          "--mount",
+          "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output,target=/output",
+          "--entrypoint",
+          "python",
+          "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+          "/input/inside-focused.py"
+        ],
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "selftest_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "container_exit": 0,
+        "host_source_equal": true,
+        "finished_at": "2026-10-06T03:29:20.210225+00:00"
+      }
+    },
+    "manifest": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs\\focused-manifest.json",
+      "sha256": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+      "driver_sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+      "selftest_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e"
+    },
+    "log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\focused.log",
+      "sha256": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e"
+    }
+  },
+  "transport_limits": {
+    "windows_limit_including_nul": 32767,
+    "windows_max_command_characters": 7520,
+    "linux_max_payload_utf8_bytes": 7272,
+    "linux": {
+      "pagesize": 4096,
+      "arg_max": 2097152,
+      "stack": [
+        8388608,
+        -1
+      ],
+      "environment_bytes": 811
+    }
+  },
+  "guards": {
+    "selftest_frozen": true,
+    "head_unchanged": true,
+    "index_unchanged": true,
+    "refs_unchanged": true,
+    "installed_dependency_catalog_files_unchanged": 1914,
+    "other_tracked_files_raw_equal": 78
+  },
+  "scope_limits": [
+    "No Windows 5.1 execution or policy bypass",
+    "Linux */? matrix uses mounted scratch filesystem; no hosted/native-ext4 acceptance claim",
+    "Synthetic matrix checks helper path semantics; actual author/capacity checks qualify installed source separately",
+    "No final aggregate, index/commit/publication or native acceptance by worker",
+    "Eventual common PS A21 carryback includes R1 and R5 while preserving historical T1/P1 fixture-path exception"
+  ],
+  "artifacts": {
+    "source-final.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "source-SelfTest.ps1": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "actual-focus.ps1": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+    "actual-focus-next-day.ps1": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+    "actual-matrix.ps1": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+    "persistent-controls.ps1": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+    "transport.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+    "linux-bounded.py": "498efcc422724ec2d8cc9c72cba99c3588c014a4e746974619fb5fb8b680ccb0",
+    "run-bounded.py": "68c69fba8303ec801e113442e233b4421dd9cf863f4789eb7ccf00fe852490df",
+    "run-windows-focus.py": "cc6d2adc631523738326e6f1074d43261510071e8302414d0518d7eb20680146",
+    "run-windows-next-day.py": "cb661670d84480a7c7ac43cc7f5878b05039035ff2f5db225d80ccb315972d4e",
+    "prepare-next-day.py": "7896f00af132d33dc4deeca8f8763e7b840a5821004c911e84eec1752321a4ad",
+    "prepare-implementation.py": "f6314a50da1b69cb163d568310e129b1f6fcc3dc359f72245a61a0345719d6ae",
+    "finalize-implementation.py": "d6a8521edc29c39546bb38d798e30c53925373fa780ccd4ee242a56bf3ad3b30",
+    "windows-actual-focus.log": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+    "windows-actual-focus.json": "9c84bb2054024d42fc82634aa29e5eede36ec2c7bd0aa2005ed0ca3553812bc6",
+    "windows-next-day-focus.log": "e63c9b352e7fd2189b73457f7bd733f05cb2ecee3ef1d20bf3817ac25edc1761",
+    "windows-next-day-focus.json": "274c8d3e6afcecfe9ff4ffc02990b7ef53eccfa333ee2d1c98dd105b50604c47",
+    "DECISION.md": "13c8b2da6db00be1f6b2a2d9dc0dd48c66585a49a0978a15c271a6c75917f954",
+    "evidence.json": "b2f89538852c7f6070c67fc4e09ab47a86a52383bcdd0268b441ace4f1cac9e9",
+    "actual-windows/native-results.json": "3abbdb3dcc5108aa0a5e3e1ed77eb20b1aac23120bbb538aaf7e671cefb7f806",
+    "actual-windows/matrix.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-windows/persistent.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-windows/transport.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-windows/matrix/probe-result.json": "fd9f8eea46db393d864cdbe5c5cdd029a97e399de68950afe5d6d673574bdfa8",
+    "actual-windows/persistent/persistent-result.json": "75c174d18d47629f5ee8b72d421d1bd764ea158f2e00ba8fd81111d2a40af835",
+    "actual-windows/transport/probe-result.json": "884b1127b5995d82118c3a968e6e202dc24e1c273f970c26daab2ee8831abc37",
+    "actual-linux/native-results.json": "32e4dd3b4decd271ede1e90934dc9aa8a27cccf3875ba598e8215be71300d5de",
+    "actual-linux/matrix.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-linux/persistent.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-linux/transport.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "actual-linux/matrix/probe-result.json": "7b8d1a49b8dce23607379123193ba84f649223e7e62d594cd5dcd52520324649",
+    "actual-linux/persistent/persistent-result.json": "55fe3e33fe8cf70a2dd7ac7bf3fa00d68eb7c2fa770f1ce4cb29383aaf61b9ca",
+    "actual-linux/transport/probe-result.json": "ee810ef2896b5f2d27bbbc3d1823ae6580caf821e82164eee1d9c61620a03181",
+    "actual-windows/quality.log": "ed997a533ee24203963bf0bf3b58a649c703c7e77a059576297cce7d2f7d5ff6",
+    "actual-linux/limits.json": "0b4c3c65bfd7309b6ec24e4ff985c19d8bf896fd4b34406a9b9c725f4c9296cb",
+    "actual-linux/container-result.json": "c15b85b5b0899c590d94c2200dd2285f8a87a0325b1438fc6e985aa77251cddb",
+    "launch-linux-bounded.py": "4c1adec560876ae0d11f04326c296335edd9c0cb69ced1c28f89e07b5f6b4508"
+  },
+  "retained_failed_prior_day_driver": {
+    "receipt": {
+      "status": "failed",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1",
+        "-RepositoryRootPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+      ],
+      "started": "2026-10-06T03:03:17.787583+00:00",
+      "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "driver_sha256": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+      "native_exit": 1,
+      "finished": "2026-10-06T03:06:49.395752+00:00",
+      "source_after_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "log_sha256": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+      "source_unchanged": true
+    },
+    "attribution": "Reused R1 scratch anchor Oct5 conflicts with genuine committed Oct6 document metadata; exact checker correctly rejects later-than-trusted dates. Root and independent reviewer confirmed driver context mismatch, not product failure.",
+    "correction": "Root authorized one checked in-memory next-day author anchor; capacity stays prior-day. Product bytes unchanged."
+  },
+  "linux_bounded_container": {
+    "state": "passed",
+    "started": "2026-10-06T03:14:39.662142+00:00",
+    "command": [
+      "docker",
+      "run",
+      "--rm",
+      "--pull",
+      "never",
+      "--network",
+      "none",
+      "--name",
+      "tf68-r5-bounded-20261006",
+      "--mount",
+      "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5,target=/input,readonly",
+      "--mount",
+      "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux,target=/output",
+      "--entrypoint",
+      "python",
+      "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "/input/linux-bounded.py"
+    ],
+    "inputs": {
+      "source-final.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "actual-matrix.ps1": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+      "persistent-controls.ps1": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+      "transport.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+      "linux-bounded.py": "498efcc422724ec2d8cc9c72cba99c3588c014a4e746974619fb5fb8b680ccb0"
+    },
+    "native_exit": 0,
+    "finished": "2026-10-06T03:14:56.059106+00:00",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input_guard": true
+  }
+}

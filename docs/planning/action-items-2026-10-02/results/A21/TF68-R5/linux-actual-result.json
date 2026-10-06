@@ -1,0 +1,26 @@
+{
+  "state": "passed",
+  "started_at": "2026-10-06T03:14:53.333228+00:00",
+  "scope": "Focused clock fixtures only; no aggregate or product acceptance.",
+  "versions": {
+    "node": "v24.18.1",
+    "npm": "11.16.0",
+    "pwsh": "7.6.3"
+  },
+  "command": [
+    "pwsh",
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "/input/actual-focus-next-day.ps1",
+    "-RepositoryRootPath",
+    "/work/focused-repository"
+  ],
+  "private_candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+  "pid": 76,
+  "exit": 0,
+  "log_sha256": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e",
+  "source_equal": true,
+  "finished_at": "2026-10-06T03:29:01.645849+00:00"
+}

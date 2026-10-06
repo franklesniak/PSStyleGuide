@@ -1,0 +1,21 @@
+{
+  "status": "failed",
+  "command": [
+    "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1",
+    "-RepositoryRootPath",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+  ],
+  "started": "2026-10-06T03:03:17.787583+00:00",
+  "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+  "driver_sha256": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+  "native_exit": 1,
+  "finished": "2026-10-06T03:06:49.395752+00:00",
+  "source_after_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+  "log_sha256": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+  "source_unchanged": true
+}

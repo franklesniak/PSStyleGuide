@@ -1,0 +1,4 @@
+Private fixture anchor: 2026-10-07T03:14:58.1747092+00:00
+Actual author-finalization fixture passed with next-day fixture anchor and real current-day host.
+Actual capacity fixture passed with prior-day expected date.
+Focused fixture clock cleanup passed.

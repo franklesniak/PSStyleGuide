@@ -1,0 +1,219 @@
+{
+  "status": "SOURCE_AND_BOUNDED_WINDOWS_PASS_VALIDATION_PENDING",
+  "findings": [],
+  "validation_observations": [
+    {
+      "id": "R5-QV1",
+      "status": "unresolved_actual_author_capacity_focus",
+      "kind": "evidence/setup limitation, not demonstrated product defect",
+      "native_exit": 1,
+      "started": "2026-10-06T03:03:17.787583+00:00",
+      "finished": "2026-10-06T03:06:49.395752+00:00",
+      "reason": "Prior-day driver pins Oct5 while current committed f89 includes legitimate Oct6 scripts-README and dependency-maintenance dates; accepted validator refuses future metadata.",
+      "log_sha256": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+      "source_unchanged": true,
+      "required": "Root-selected focused proof appropriate to current committed metadata; retain failure, do not claim author/capacity pass."
+    },
+    {
+      "id": "R5-QV2",
+      "status": "pending_actual_linux_changed_bytes",
+      "kind": "missing evidence",
+      "reason": "Docker startup failed before new-byte Linux tests. Proposal Linux probes are historical, not changed-source validation."
+    }
+  ],
+  "reviewed_at_utc": "2026-10-06T03:09:38.970555+00:00",
+  "reviewer": {
+    "agent": "/root/ps234_final_quality",
+    "role": "independent local read-only delta reviewer",
+    "no_tests_or_descendants": true,
+    "no_product_git_dependency_native_planning_writes": true
+  },
+  "input": {
+    "parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
+    "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "raw_blob": "d0a6b62 prefix observed from Git diff",
+    "delta": {
+      "added": 11,
+      "deleted": 3
+    },
+    "other_78_source_files_match_previously_reviewed_catalog": true,
+    "production_validator_unchanged": true,
+    "dependencies_and_runtime_no_delta": true
+  },
+  "source_review": {
+    "literal_path": "Original CheckerPath remains the source/execution identity; WildcardPattern.Escape value is used only for both Script arguments.",
+    "clock_properties": "Both complete anchors, line derivation, action bodies, receipt checks, LocalOnly/RequireLocal, cleanup and primary-error logic are unchanged.",
+    "regression": "Literal clock-probe[fixture].ps1 plus clock-probef.ps1 decoy; exactly two new IDs on exact target checked before execution; both changed/unchanged local branches retained.",
+    "cleanup": "Existing private parent-directory cleanup uses LiteralPath; receipt and breakpoint postconditions retained.",
+    "metadata": "Function already carries Oct6 version1.0.20261006.0; no new date required by this same-day repair.",
+    "paired": "Common A21 carryback required with R1; no Terraform-only algorithm exception. Preserve exact T1/P1 provenance exception."
+  },
+  "windows_completed": {
+    "powershell": "7.6.5",
+    "native_commands": [
+      {
+        "name": "matrix",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-matrix.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OriginalSource",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1",
+          "-CheckerTemplate",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\checker-template.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+        "started": "2026-10-06T03:03:50.249058+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:03:54.932912+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "persistent",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\persistent-controls.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OriginalSource",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\persistent"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+        "started": "2026-10-06T03:03:54.936656+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:03:56.879339+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "transport",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\transport.ps1",
+          "-Source",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\transport"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+        "started": "2026-10-06T03:03:56.881259+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:04:06.754548+00:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "quality",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1",
+          "-RepositoryRootPath",
+          "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+          "-AnalyzeOnly"
+        ],
+        "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "driver_sha256": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+        "started": "2026-10-06T03:04:06.756215+00:00",
+        "native_exit": 0,
+        "finished": "2026-10-06T03:05:08.772538+00:00",
+        "log_sha256": "ed997a533ee24203963bf0bf3b58a649c703c7e77a059576297cce7d2f7d5ff6"
+      }
+    ],
+    "matrix": {
+      "original_pass": 6,
+      "original_expected_fail": 4,
+      "actual_pass": 10,
+      "actual_total": 10,
+      "actual_exact_target_and_count_all_verified": true,
+      "all_rows_zero_remaining_breakpoints_and_clock_variables": true
+    },
+    "persistent": {
+      "original": "rejected exact-path decoy control",
+      "actual": "passed full exact persistent block",
+      "covers": [
+        "two local-difference branches",
+        "missing anchor",
+        "duplicate anchor",
+        "inactive anchor",
+        "primary error",
+        "uninstrumented invocation after cleanup",
+        "zero residual breakpoint/receipt state"
+      ]
+    },
+    "transport": {
+      "helper_characters": 6676,
+      "max_full_command_characters": 7520,
+      "four_successful_roundtrips": true,
+      "original_native_early_refusal_exit": 1,
+      "limits": "Exact new helper/caller bodies with synthetic checker; not full actual validator coverage."
+    },
+    "parser_errors": 0,
+    "analyzer_warnings_errors": 0
+  },
+  "evidence_hashes": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-matrix.ps1": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\persistent-controls.ps1": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\transport.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\native-results.json": "3abbdb3dcc5108aa0a5e3e1ed77eb20b1aac23120bbb538aaf7e671cefb7f806",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\probe-result.json": "fd9f8eea46db393d864cdbe5c5cdd029a97e399de68950afe5d6d673574bdfa8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\persistent\\persistent-result.json": "75c174d18d47629f5ee8b72d421d1bd764ea158f2e00ba8fd81111d2a40af835",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\transport\\probe-result.json": "884b1127b5995d82118c3a968e6e202dc24e1c273f970c26daab2ee8831abc37",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\quality.log": "ed997a533ee24203963bf0bf3b58a649c703c7e77a059576297cce7d2f7d5ff6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-actual-focus.json": "9c84bb2054024d42fc82634aa29e5eede36ec2c7bd0aa2005ed0ca3553812bc6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-actual-focus.log": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A21\\TF68-R5\\DECISION.md": "ea9d455204b5838b3209b7a2630638e2e6a3a5e108d92960a60e3324e99c413e"
+  },
+  "reused_quality": {
+    "R2-delta-review.md": "259a0b966068c2a5c7e4a12b85e95fa28f090d7611ea062201b71f1113142bfe",
+    "R2-delta-review.json": "e99276f9aa062983a935b663361d0bebfacaf469a4b13e57a04e614ea1aa4ba6",
+    "R2-final-binding.md": "92f042853acaf6ba39eea86d64215ee976379894953419542ee8d516f3cd50a2",
+    "R2-final-binding.json": "189c5b9e8e5d4c6b2cf9c0853df23a9b8b79a25d977037278432bd5a77819344",
+    "R1-focused-binding.md": "b60b247ef722050eacbe4c0770121d75dfe0c157e7613b914ecdabd4ed15ae62",
+    "R1-focused-binding.json": "35e5e9c22fcb0256780f13993eaffa00a45c50103701cfd3e5826b9d84b57f21"
+  },
+  "pending_gates": [
+    "Disposition and terminal relevant actual author/capacity focus over final source; R5-QV1.",
+    "Actual-new-byte Linux literal matrix including star/question decoys, persistent control, transport and selected actual fixtures; R5-QV2.",
+    "Stable implementation packet and complete source/dependency/Git guards.",
+    "Root final aggregate and actual accepted-B/new-H metadata endpoints.",
+    "Final commit/tree/body/native binding, refreshed remote reviews/current-head CI and premerge/landed acceptance.",
+    "Paired PS common R1+R5 helper/regression and R2 dependency repair; broader plan/recovery/human obligations remain."
+  ],
+  "sources": [
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-psbreakpoint?view=powershell-7.5",
+    "https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.wildcardpattern.escape?view=powershellsdk-7.4.0"
+  ],
+  "commands_inspected": [
+    "Replacement-disabled and optional-lock-disabled git diff HEAD -- SelfTest, status porcelain and rev-parse HEAD.",
+    "Python standard-library source/artifact SHA256 and JSON outcome/target identity checks.",
+    "Read complete changed helper/persistent block and all three bounded Windows driver implementations; read actual-focus driver and terminal failure log.",
+    "Read canonical R5 decision and current STATUS; read official cmdlet/escaping contracts."
+  ]
+}

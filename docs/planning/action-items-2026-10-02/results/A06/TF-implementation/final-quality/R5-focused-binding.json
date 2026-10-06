@@ -1,0 +1,302 @@
+{
+  "status": "FOCUSED_READY_FOR_FINAL_AGGREGATE",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-06T03:46:51.102883+00:00",
+  "reviewer": {
+    "agent": "/root/ps234_final_quality",
+    "role": "independent local read-only evidence binding",
+    "tests_executed": false,
+    "descendants": false,
+    "product_git_dependency_native_planning_writes": false
+  },
+  "inputs": {
+    "parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "staged_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+    "postimage": {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "d0a6b62013d1772388aa7d20773d2db592bf91dc",
+      "sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "bytes": 242137
+    },
+    "only_staged_path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "unstaged_delta": false,
+    "root_readiness_sha256": "f5ad6811220be5128885ab9add017e53380efc987735bd4a265426af0e1dbc61",
+    "writer_report_sha256": "82c107176536205632589e759b713d803ab80fdb2172ce7197a76b05900d3e67",
+    "writer_evidence_sha256": "a495a1099d747e964e0678acc1cf19dc0a2bfca85d81956bde90cc1544cc341e",
+    "reused_delta_review_sha256": "f1cc4236afb3803b55a4ede47751dbf36e6f3008d0639c8b22a95fae78028e39",
+    "reused_delta_evidence_sha256": "ff382a078147d54807ba44fd290d9ebf531e03f50f45b1dc51c434e5b128469b"
+  },
+  "resolved_observations": [
+    {
+      "id": "R5-QV1",
+      "status": "resolved_by_corrected_focused_evidence",
+      "basis": "Same product bytes. Exact checked private author anchor moved to next day; all derived fixture dates remain coherent with current committed metadata while retaining host/fixture mismatch. Actual Windows and Linux author, prior-day capacity and cleanup pass.",
+      "failed_attempt_retained": {
+        "native_exit": 1,
+        "log_sha256": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+        "receipt_sha256": "9c84bb2054024d42fc82634aa29e5eede36ec2c7bd0aa2005ed0ca3553812bc6",
+        "no_relabeling": true
+      }
+    },
+    {
+      "id": "R5-QV2",
+      "status": "resolved_by_actual_changed_byte_linux_execution",
+      "basis": "Actual source hash bound; 14/14 corrected matrix, eight original expected failures, exact targets/counts, no residual state, persistent old-helper rejection and new-helper success, transport controls and actual author/capacity pass."
+    }
+  ],
+  "focused_validation": {
+    "windows_actual": {
+      "status": "passed",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus-next-day.ps1",
+        "-RepositoryRootPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+      ],
+      "started": "2026-10-06T03:10:17.244614+00:00",
+      "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "driver_sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+      "native_exit": 0,
+      "finished": "2026-10-06T03:41:35.914760+00:00",
+      "source_after_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+      "log_sha256": "e63c9b352e7fd2189b73457f7bd733f05cb2ecee3ef1d20bf3817ac25edc1761",
+      "source_unchanged": true
+    },
+    "linux_actual": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\result.json",
+      "sha256": "5c50258d2202513758b7b0d40043e2ae23f40838ff693d904b7d6af5d5ffa9b0",
+      "result": {
+        "state": "passed",
+        "started_at": "2026-10-06T03:14:53.333228+00:00",
+        "scope": "Focused clock fixtures only; no aggregate or product acceptance.",
+        "versions": {
+          "node": "v24.18.1",
+          "npm": "11.16.0",
+          "pwsh": "7.6.3"
+        },
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "/input/actual-focus-next-day.ps1",
+          "-RepositoryRootPath",
+          "/work/focused-repository"
+        ],
+        "private_candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+        "pid": 76,
+        "exit": 0,
+        "log_sha256": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e",
+        "source_equal": true,
+        "finished_at": "2026-10-06T03:29:01.645849+00:00"
+      },
+      "host_status": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\status.json",
+        "sha256": "c0a22ff765822fb0cfa86d6a880b9297a98479c53806bce12e5d67ebe8ca914d",
+        "result": {
+          "state": "passed",
+          "started_at": "2026-10-06T03:14:50.394215+00:00",
+          "manifest_sha256": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+          "command": [
+            "docker",
+            "run",
+            "--rm",
+            "--pull",
+            "never",
+            "--name",
+            "psstyleguide-tf68-r5-focused-20261006-v1",
+            "--label",
+            "psstyleguide.focused-manifest=62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+            "--network",
+            "none",
+            "--mount",
+            "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs,target=/input,readonly",
+            "--mount",
+            "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output,target=/output",
+            "--entrypoint",
+            "python",
+            "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+            "/input/inside-focused.py"
+          ],
+          "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+          "selftest_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+          "container_exit": 0,
+          "host_source_equal": true,
+          "finished_at": "2026-10-06T03:29:20.210225+00:00"
+        }
+      },
+      "manifest": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs\\focused-manifest.json",
+        "sha256": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+        "driver_sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+        "selftest_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e"
+      },
+      "log": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\focused.log",
+        "sha256": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e"
+      }
+    },
+    "linux_bounded": {
+      "state": "passed",
+      "started": "2026-10-06T03:14:39.662142+00:00",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--network",
+        "none",
+        "--name",
+        "tf68-r5-bounded-20261006",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5,target=/input,readonly",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux,target=/output",
+        "--entrypoint",
+        "python",
+        "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "/input/linux-bounded.py"
+      ],
+      "inputs": {
+        "source-final.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+        "actual-matrix.ps1": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+        "persistent-controls.ps1": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+        "transport.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+        "linux-bounded.py": "498efcc422724ec2d8cc9c72cba99c3588c014a4e746974619fb5fb8b680ccb0"
+      },
+      "native_exit": 0,
+      "finished": "2026-10-06T03:14:56.059106+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input_guard": true
+    },
+    "matrix_counts": {
+      "windows": {
+        "Original": {
+          "cases": 10,
+          "passed": 6
+        },
+        "Actual": {
+          "cases": 10,
+          "passed": 10
+        }
+      },
+      "linux": {
+        "Original": {
+          "cases": 14,
+          "passed": 6
+        },
+        "Actual": {
+          "cases": 14,
+          "passed": 14
+        }
+      }
+    },
+    "all_actual_matrix_targets_counts_and_zero_cleanup_independently_checked": true,
+    "persistent_old_helper_rejected_both_platforms": true,
+    "persistent_actual_pass_both_platforms": true,
+    "transport": {
+      "windows_max_full_command_characters": 7520,
+      "linux_max_payload_utf8_bytes": 7272,
+      "four_positive_native_zero_and_intended_refusal_one_each": true
+    },
+    "driver_sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+    "driver_scope": "One checked private author timestamp expression changed in memory to next day; real checker bytes/source identity, all real consumers, prior-day capacity and cleanup unchanged.",
+    "parser_analyzer": "Windows parser0/analyzer0; Linux parsing exercised by drivers"
+  },
+  "guards": {
+    "all_38_packet_artifact_hashes_match": true,
+    "all_79_current_source_hashes_match_root_catalog": true,
+    "all_1914_current_dependency_hashes_match_unchanged_R2_catalog": true,
+    "root_linux_host_before_after_equal": true,
+    "linux_private_source_dependencies_head_index_refs_config_status_before_after_equal": true,
+    "worker_pre_stage_head_index_refs_guard_passed": true,
+    "current_index_change": "Root-authorized sole SelfTest staging after worker guard; not a worker no-change assertion."
+  },
+  "carryback": {
+    "prospective_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json",
+      ".github/workflows/scripts-README.md",
+      "docs/dependency-maintenance.md"
+    ],
+    "historical_prospective_receipt_sha256": "3b15be16c32f20b6f0b7adf7bea8903fb86e9d81add8939a97279345db04ab1f",
+    "updated_boundary": "Same five paths. SelfTest now must include both R1 and R5 common helper/regression; exact sole T1/P1 provenance path exception retained. R2 package/lock/doc and scripts-README metadata/finite language differences retained. Historical prospective SelfTest hash must be refreshed against final accepted TF input.",
+    "no_transfer_or_acceptance_claim": true
+  },
+  "evidence_hashes": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-SelfTest.ps1": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus.ps1": "07c5a4b82894d007ef526cddf3600a55c74b1bbe7056a7b22ea6004fd9c5f97a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus-next-day.ps1": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-matrix.ps1": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\persistent-controls.ps1": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\transport.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\linux-bounded.py": "498efcc422724ec2d8cc9c72cba99c3588c014a4e746974619fb5fb8b680ccb0",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\run-bounded.py": "68c69fba8303ec801e113442e233b4421dd9cf863f4789eb7ccf00fe852490df",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\run-windows-focus.py": "cc6d2adc631523738326e6f1074d43261510071e8302414d0518d7eb20680146",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\run-windows-next-day.py": "cb661670d84480a7c7ac43cc7f5878b05039035ff2f5db225d80ccb315972d4e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\prepare-next-day.py": "7896f00af132d33dc4deeca8f8763e7b840a5821004c911e84eec1752321a4ad",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\prepare-implementation.py": "f6314a50da1b69cb163d568310e129b1f6fcc3dc359f72245a61a0345719d6ae",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\finalize-implementation.py": "d6a8521edc29c39546bb38d798e30c53925373fa780ccd4ee242a56bf3ad3b30",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-actual-focus.log": "5e25a9f15730564211fcefac1f6c3616d5e637ed30966f047d09f1750902debe",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-actual-focus.json": "9c84bb2054024d42fc82634aa29e5eede36ec2c7bd0aa2005ed0ca3553812bc6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-next-day-focus.log": "e63c9b352e7fd2189b73457f7bd733f05cb2ecee3ef1d20bf3817ac25edc1761",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\windows-next-day-focus.json": "274c8d3e6afcecfe9ff4ffc02990b7ef53eccfa333ee2d1c98dd105b50604c47",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\DECISION.md": "13c8b2da6db00be1f6b2a2d9dc0dd48c66585a49a0978a15c271a6c75917f954",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\evidence.json": "b2f89538852c7f6070c67fc4e09ab47a86a52383bcdd0268b441ace4f1cac9e9",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\native-results.json": "3abbdb3dcc5108aa0a5e3e1ed77eb20b1aac23120bbb538aaf7e671cefb7f806",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\persistent.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\transport.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\probe-result.json": "fd9f8eea46db393d864cdbe5c5cdd029a97e399de68950afe5d6d673574bdfa8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\persistent\\persistent-result.json": "75c174d18d47629f5ee8b72d421d1bd764ea158f2e00ba8fd81111d2a40af835",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\transport\\probe-result.json": "884b1127b5995d82118c3a968e6e202dc24e1c273f970c26daab2ee8831abc37",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\native-results.json": "32e4dd3b4decd271ede1e90934dc9aa8a27cccf3875ba598e8215be71300d5de",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\matrix.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\persistent.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\transport.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\matrix\\probe-result.json": "7b8d1a49b8dce23607379123193ba84f649223e7e62d594cd5dcd52520324649",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\persistent\\persistent-result.json": "55fe3e33fe8cf70a2dd7ac7bf3fa00d68eb7c2fa770f1ce4cb29383aaf61b9ca",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\transport\\probe-result.json": "ee810ef2896b5f2d27bbbc3d1823ae6580caf821e82164eee1d9c61620a03181",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\quality.log": "ed997a533ee24203963bf0bf3b58a649c703c7e77a059576297cce7d2f7d5ff6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\limits.json": "0b4c3c65bfd7309b6ec24e4ff985c19d8bf896fd4b34406a9b9c725f4c9296cb",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-linux\\container-result.json": "c15b85b5b0899c590d94c2200dd2285f8a87a0325b1438fc6e985aa77251cddb",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\launch-linux-bounded.py": "4c1adec560876ae0d11f04326c296335edd9c0cb69ced1c28f89e07b5f6b4508",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r5-candidate-readiness.json": "f5ad6811220be5128885ab9add017e53380efc987735bd4a265426af0e1dbc61",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs\\focused-manifest.json": "62a7c728b6bd7770a46e5833e838793c9b54488f7b786ec0413c7f8e30ce4a36",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\inputs\\host-source-before.json": "f517c047e920d89ee225c3b89fe521214e95c70c022e9b31d79624e1b5703125",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\host-source-after.json": "f517c047e920d89ee225c3b89fe521214e95c70c022e9b31d79624e1b5703125",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\source-before.json": "ad80e6eb3a5c83d00f1182a7e8ddbcbf7888b7d2b187d70012c7ff4c9fa20ad8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\source-after.json": "ad80e6eb3a5c83d00f1182a7e8ddbcbf7888b7d2b187d70012c7ff4c9fa20ad8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\result.json": "5c50258d2202513758b7b0d40043e2ae23f40838ff693d904b7d6af5d5ffa9b0",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\status.json": "c0a22ff765822fb0cfa86d6a880b9297a98479c53806bce12e5d67ebe8ca914d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-focused\\output\\focused.log": "8ca3cd415babfa3c84833dcef3607a7185a542ecbdf2a1fa4616e0fe730aa79e"
+  },
+  "uncredited_gates": [
+    "Root aggregate25941 on manifestf5b789f43e61e6d73dabf1b03d7c405311fc1f855104e54abaefa44ea55d3ca1 is running; not polled and no outcome credited.",
+    "Actual accepted-B/new-H metadata checks and current ordinary audit.",
+    "New commit/tree/body/native/hosted/remote review binding and normal acceptance; previous f89 results remain prior-input history.",
+    "Immediate premerge and actual landed-workflow checks; paired PS carryback and final raw comparisons.",
+    "Other A03/A06/A21/R5/B1/recovery/human obligations remain separate."
+  ],
+  "limits": [
+    "No new local Windows PowerShell5.1 claim.",
+    "Linux wildcard matrix uses mounted scratch filesystem, not hosted ext4 acceptance.",
+    "Synthetic path probes and actual installed-checker author/capacity proof have separate roles."
+  ],
+  "commands_inspected": [
+    "Read exact old/new scratch driver diff and complete terminal focus receipts/logs.",
+    "Python SHA256 validation of all38 artifact files, all79 source files and1914 dependency files; JSON equality of full Linux before/after guards.",
+    "Replacement-disabled/no-optional-locks git rev-parse HEAD, diff --cached --name-only, diff --name-only and ls-tree staged-tree -- SelfTest.",
+    "Read root readiness and historical five-path prospective carryback; no aggregate polling."
+  ]
+}
