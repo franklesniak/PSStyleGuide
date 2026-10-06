@@ -1,0 +1,19 @@
+{
+  "released_at": "2026-10-06T08:54:33.433463+00:00",
+  "state": "released_not_launched",
+  "decision": "B94.2",
+  "role": "runtime-attribution-pair-non-acceptance",
+  "run_id": "tf68-h5ec-20261006-pair-one",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\pair\\manifest.authorized.json",
+  "manifest_sha256": "112b8f14bfde0a8f6c8e158ae9c19776ced0265e37ea943be8dbc178cea948ca",
+  "prepared_sha256": "e8f656f7c9164ecd323e769538ce34f7eb82edfcf37505a4fc0540d626dda466",
+  "maximum_runs": 1,
+  "container_timeout_seconds": 300,
+  "parent_timeout_seconds": 270,
+  "selected_child_timeout_seconds": 90,
+  "maximum_selected_children": 2,
+  "ordinary_bootstrap_separate": true,
+  "root_review": "Reviewed full preparation, profile insertion/exact reconstruction, first-case extraction/transport/driver and changes from qualified guarded runners. Verified all16preparation artifacts,12manifest input hashes and exact original-prefix/finally checks. All original/profile raw streams retained. Source and complete Git/dependency identities guarded. No product change, whole-suite repeat, CI retry or merge is released.",
+  "on_failure": "Retain native failure and both guards; no automatic retry or guard bypass.",
+  "next_action": "Execute selected pair once and attribute measured internal cost; prepare a specific correctness-preserving repair proposal before product changes."
+}

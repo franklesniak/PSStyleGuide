@@ -1,0 +1,36 @@
+{
+  "selected_at": "2026-10-06T08:38:41.222582+00:00",
+  "finding": "Measured instruction-validation runtime",
+  "selected": "B",
+  "score": 94.2,
+  "report_sha256": "5a169d34421dc85cf9014020749919a2a52e562d51bdb6b5573ae4894781b2fd",
+  "evidence_sha256": "9d6f4c8307670830b0394d233d818e3830ad62e516480c6327cdfeea77fb5025",
+  "verified": "Root read full report and corrected proposal; verified30artifact hashes,17score totals and independently reconstructed all505timing labels from2428events. All12incomplete intervals are explicit expected-negative controls; both complete identity guards match.",
+  "displayed_process": "Validation,17options,distinct6criterion rubric,fullscoretable,selected short procedure displayed before execution.",
+  "next_step": "Prepare and review exact one-case original/timed diagnostic pair, maximum300seconds and90seconds per selected child; no full suite repeat.",
+  "execution_released": false,
+  "product_repair_selected": false,
+  "owner_input_needed": false,
+  "deadline": "2026-10-13T23:47:31+00:00",
+  "rounds_used": 5,
+  "transfers": {
+    "A06": {
+      "used": 1,
+      "cap": 12
+    },
+    "A03": {
+      "used": 3,
+      "cap": 12
+    },
+    "A21": {
+      "used": 5,
+      "cap": 12
+    },
+    "A07": {
+      "used": 5,
+      "cap": 12
+    }
+  },
+  "canonical_report_sha256": "ee3f027337e3754a2d6da97f3e8cd7e82b73d6884fcc97c99b30c2d3309f6fb8",
+  "report_sha256_scope": "Original frozen worker report; canonical copy has recorded Markdown-only formatting changes."
+}

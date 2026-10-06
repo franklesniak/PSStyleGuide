@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "8f5ab6e16eeeefaad91a7a5657506d21091ffcbcb4657b5fbe840b68a58c0fd7",
+  "started_at": "2026-10-06T08:12:41.182895+00:00",
+  "run_id": "tf68-h5ec-20261006-one",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "runtime-diagnostic-non-acceptance",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "tf68-runtime-diagnostic-tf68-h5ec-20261006-one",
+    "--label",
+    "psstyleguide.validation-manifest=8f5ab6e16eeeefaad91a7a5657506d21091ffcbcb4657b5fbe840b68a58c0fd7",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T08:26:10.721195+00:00"
+}

@@ -1,0 +1,46 @@
+{
+  "released_at": "2026-10-06T09:18:31.994119+00:00",
+  "state": "bounded_implementation_and_focused_validation_released",
+  "selected": "C refined",
+  "score": 89.85,
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "source_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "design_sha256": "dfcaad5a5041bf07f539efa5f728ace046a6eedd842fee3aa46e037ac7a02c7a",
+  "design_evidence_sha256": "8f83bd82806434b549ecc000bc1a86565fb83fdb2798850271c3db53e18a61c9",
+  "writer": "a06_tf_generator_owner",
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "allowed_paths": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "preimages": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681"
+    }
+  ],
+  "root_review": "Read complete concrete design; audited seven output arrays and nested table shape plus actual intent/endpoint/delegation callers. Verified all design artifact/source hashes, score arithmetic and clean H5ec/tree441d. Options/rubric/scores/selection and refined changed score displayed before release.",
+  "clarifications": [
+    "Snapshot limit is eight; small empty slots can number twice the governed-document census, already bounded by existing input inventory. Do not claim eight slots total or exact CLR-memory cap.",
+    "Main cleanup must include current/prior slots if construction throws before the document record is appended; finally cleanup must preserve original error.",
+    "Bounded representative comparison is prepared for root review before launching; do not replay old diagnostic launches."
+  ],
+  "tests_released": "Source parser/analyzer and focused new reuse/metadata/classification behavior regressions in bounded processes; no full aggregate or full author suite. Preserve failed attempts.",
+  "measurement_next": "Prepare original/changed same-case manifest; unchanged native parser count, reduced structural interpretations, exact output/clocks/source/dependency/Git guards required. Root reviews launch.",
+  "forbidden": [
+    "Git stage/commit/push",
+    "Remote review request or CI retry",
+    "Merge",
+    "PS carryback or protected guides",
+    "Dependency install",
+    "Workflow or clock changes",
+    "Global cache or removed checks"
+  ],
+  "ci_rule": "Current cancellation blocks merge. No existing approval waives failed CI.",
+  "pending_native_operations": [],
+  "owner_input_needed": false
+}

@@ -1,0 +1,69 @@
+{
+  "state": "design_only_no_product_write_or_test",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "finding": "existing TF68 runtime finding",
+  "selected_option": "C refinement",
+  "previous_total": 91.15,
+  "refined_scores": [
+    9.5,
+    9.5,
+    8,
+    9,
+    9,
+    6
+  ],
+  "weights": [
+    30,
+    25,
+    20,
+    15,
+    7,
+    3
+  ],
+  "refined_total": 89.85,
+  "alternative_B_total": 84.9,
+  "maximum_snapshots": 8,
+  "per_snapshot_utf16_code_units": 524288,
+  "per_snapshot_records": 2048,
+  "per_snapshot_array_elements": 8192,
+  "parser_process_count": "unchanged",
+  "reduction_target": "structural JSON decoding/schema/materialization only",
+  "scope": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "source": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "IMPLEMENTATION-DESIGN.md",
+      "sha256": "dfcaad5a5041bf07f539efa5f728ace046a6eedd842fee3aa46e037ac7a02c7a",
+      "bytes": 19004
+    },
+    {
+      "path": "REPORT.md",
+      "sha256": "671384f7872f0010ad404bf347a658f49e661c522729d02cb1ac6a52e03d549d",
+      "bytes": 15781
+    },
+    {
+      "path": "EVIDENCE.json",
+      "sha256": "9b6d4f94720dd4f6689e54e160008c33bdaacd835cf812cca70eac3c5e0a286a",
+      "bytes": 9725
+    },
+    {
+      "path": "timing.json",
+      "sha256": "a8435cb1577f34d04ce01d795e0894c2c3675bb53677eeabfe592518189ad401",
+      "bytes": 9121
+    }
+  ],
+  "implementation_authorized": false
+}

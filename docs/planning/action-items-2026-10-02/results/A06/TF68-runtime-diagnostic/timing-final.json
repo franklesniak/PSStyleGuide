@@ -1,0 +1,4070 @@
+{
+  "non_acceptance": true,
+  "inclusive_overlap_warning": "Nested rows overlap. Do not add totals across different labels.",
+  "event_count": 2428,
+  "rows": [
+    {
+      "label": "Test-AgentInstructions.ps1:9193:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 608.331662584,
+      "mean_seconds": 608.331662584,
+      "max_seconds": 608.331662584,
+      "min_seconds": 608.331662584
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3324:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 563.753555261,
+      "mean_seconds": 563.753555261,
+      "max_seconds": 563.753555261,
+      "min_seconds": 563.753555261
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1309:AssignmentStatementAst",
+      "count": 41,
+      "inclusive_total_seconds": 478.279645115,
+      "mean_seconds": 11.665357197926829,
+      "max_seconds": 12.73387082,
+      "min_seconds": 11.111636498
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1316:PipelineAst",
+      "count": 12,
+      "inclusive_total_seconds": 26.830574103,
+      "mean_seconds": 2.23588117525,
+      "max_seconds": 11.513783987,
+      "min_seconds": 0.348448757
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10897:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 26.341450725,
+      "mean_seconds": 26.341450725,
+      "max_seconds": 26.341450725,
+      "min_seconds": 26.341450725
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1855:AssignmentStatementAst",
+      "count": 2,
+      "inclusive_total_seconds": 24.299904123,
+      "mean_seconds": 12.1499520615,
+      "max_seconds": 12.718936211,
+      "min_seconds": 11.580967912
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1580:PipelineAst",
+      "count": 2,
+      "inclusive_total_seconds": 23.812485070999998,
+      "mean_seconds": 11.906242535499999,
+      "max_seconds": 12.278132502,
+      "min_seconds": 11.534352569
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1675:PipelineAst",
+      "count": 2,
+      "inclusive_total_seconds": 23.264907739999998,
+      "mean_seconds": 11.632453869999999,
+      "max_seconds": 11.665456668,
+      "min_seconds": 11.599451072
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1574:PipelineAst",
+      "count": 2,
+      "inclusive_total_seconds": 22.97975023,
+      "mean_seconds": 11.489875115,
+      "max_seconds": 11.600327688,
+      "min_seconds": 11.379422542
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1554:PipelineAst",
+      "count": 2,
+      "inclusive_total_seconds": 22.902987987,
+      "mean_seconds": 11.4514939935,
+      "max_seconds": 11.483412945,
+      "min_seconds": 11.419575042
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1575:PipelineAst",
+      "count": 2,
+      "inclusive_total_seconds": 22.61543114,
+      "mean_seconds": 11.30771557,
+      "max_seconds": 11.499994737,
+      "min_seconds": 11.115436403
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11593:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 20.511839434,
+      "mean_seconds": 20.511839434,
+      "max_seconds": 20.511839434,
+      "min_seconds": 20.511839434
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9664:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 17.214568351,
+      "mean_seconds": 17.214568351,
+      "max_seconds": 17.214568351,
+      "min_seconds": 17.214568351
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10584:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.949509468,
+      "mean_seconds": 12.949509468,
+      "max_seconds": 12.949509468,
+      "min_seconds": 12.949509468
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1685:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.736961278,
+      "mean_seconds": 12.736961278,
+      "max_seconds": 12.736961278,
+      "min_seconds": 12.736961278
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1822:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.638428335,
+      "mean_seconds": 12.638428335,
+      "max_seconds": 12.638428335,
+      "min_seconds": 12.638428335
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1781:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.53859421,
+      "mean_seconds": 12.53859421,
+      "max_seconds": 12.53859421,
+      "min_seconds": 12.53859421
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1794:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.532873765,
+      "mean_seconds": 12.532873765,
+      "max_seconds": 12.532873765,
+      "min_seconds": 12.532873765
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1839:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 12.423935216,
+      "mean_seconds": 12.423935216,
+      "max_seconds": 12.423935216,
+      "min_seconds": 12.423935216
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1550:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.972372511,
+      "mean_seconds": 11.972372511,
+      "max_seconds": 11.972372511,
+      "min_seconds": 11.972372511
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3317:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.895983939,
+      "mean_seconds": 11.895983939,
+      "max_seconds": 11.895983939,
+      "min_seconds": 11.895983939
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1586:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.792826379,
+      "mean_seconds": 11.792826379,
+      "max_seconds": 11.792826379,
+      "min_seconds": 11.792826379
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1775:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.739484446,
+      "mean_seconds": 11.739484446,
+      "max_seconds": 11.739484446,
+      "min_seconds": 11.739484446
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1652:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.732569074,
+      "mean_seconds": 11.732569074,
+      "max_seconds": 11.732569074,
+      "min_seconds": 11.732569074
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1875:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.701901941,
+      "mean_seconds": 11.701901941,
+      "max_seconds": 11.701901941,
+      "min_seconds": 11.701901941
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1647:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.621295227,
+      "mean_seconds": 11.621295227,
+      "max_seconds": 11.621295227,
+      "min_seconds": 11.621295227
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1633:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.603611961,
+      "mean_seconds": 11.603611961,
+      "max_seconds": 11.603611961,
+      "min_seconds": 11.603611961
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1808:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.598867783,
+      "mean_seconds": 11.598867783,
+      "max_seconds": 11.598867783,
+      "min_seconds": 11.598867783
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1522:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.598796518,
+      "mean_seconds": 11.598796518,
+      "max_seconds": 11.598796518,
+      "min_seconds": 11.598796518
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3323:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.578979783,
+      "mean_seconds": 11.578979783,
+      "max_seconds": 11.578979783,
+      "min_seconds": 11.578979783
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1599:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.555773455,
+      "mean_seconds": 11.555773455,
+      "max_seconds": 11.555773455,
+      "min_seconds": 11.555773455
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1658:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.530127428,
+      "mean_seconds": 11.530127428,
+      "max_seconds": 11.530127428,
+      "min_seconds": 11.530127428
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1838:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.515021331,
+      "mean_seconds": 11.515021331,
+      "max_seconds": 11.515021331,
+      "min_seconds": 11.515021331
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1800:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.504187161,
+      "mean_seconds": 11.504187161,
+      "max_seconds": 11.504187161,
+      "min_seconds": 11.504187161
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1549:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.502416625,
+      "mean_seconds": 11.502416625,
+      "max_seconds": 11.502416625,
+      "min_seconds": 11.502416625
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1661:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.471487198,
+      "mean_seconds": 11.471487198,
+      "max_seconds": 11.471487198,
+      "min_seconds": 11.471487198
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1620:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.461793848,
+      "mean_seconds": 11.461793848,
+      "max_seconds": 11.461793848,
+      "min_seconds": 11.461793848
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1538:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.460426056,
+      "mean_seconds": 11.460426056,
+      "max_seconds": 11.460426056,
+      "min_seconds": 11.460426056
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1847:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.440275964,
+      "mean_seconds": 11.440275964,
+      "max_seconds": 11.440275964,
+      "min_seconds": 11.440275964
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1523:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.419953234,
+      "mean_seconds": 11.419953234,
+      "max_seconds": 11.419953234,
+      "min_seconds": 11.419953234
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1693:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.354648602,
+      "mean_seconds": 11.354648602,
+      "max_seconds": 11.354648602,
+      "min_seconds": 11.354648602
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1595:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.336798256,
+      "mean_seconds": 11.336798256,
+      "max_seconds": 11.336798256,
+      "min_seconds": 11.336798256
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1823:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.277225537,
+      "mean_seconds": 11.277225537,
+      "max_seconds": 11.277225537,
+      "min_seconds": 11.277225537
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1811:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.27419819,
+      "mean_seconds": 11.27419819,
+      "max_seconds": 11.27419819,
+      "min_seconds": 11.27419819
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1625:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 11.234232206,
+      "mean_seconds": 11.234232206,
+      "max_seconds": 11.234232206,
+      "min_seconds": 11.234232206
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3320:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 7.339349973,
+      "mean_seconds": 7.339349973,
+      "max_seconds": 7.339349973,
+      "min_seconds": 7.339349973
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3313:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 7.125772853,
+      "mean_seconds": 7.125772853,
+      "max_seconds": 7.125772853,
+      "min_seconds": 7.125772853
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11027:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 6.601856261,
+      "mean_seconds": 6.601856261,
+      "max_seconds": 6.601856261,
+      "min_seconds": 6.601856261
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9445:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 5.817872267,
+      "mean_seconds": 5.817872267,
+      "max_seconds": 5.817872267,
+      "min_seconds": 5.817872267
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1185:AssignmentStatementAst",
+      "count": 321,
+      "inclusive_total_seconds": 5.773991224,
+      "mean_seconds": 0.017987511601246106,
+      "max_seconds": 0.024767103,
+      "min_seconds": 0.000235691
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1179:AssignmentStatementAst",
+      "count": 321,
+      "inclusive_total_seconds": 5.767062712,
+      "mean_seconds": 0.017965927451713395,
+      "max_seconds": 0.037831319,
+      "min_seconds": 0.00128108
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10438:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 4.457543561,
+      "mean_seconds": 4.457543561,
+      "max_seconds": 4.457543561,
+      "min_seconds": 4.457543561
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1452:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.805126261,
+      "mean_seconds": 3.805126261,
+      "max_seconds": 3.805126261,
+      "min_seconds": 3.805126261
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1448:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.748590349,
+      "mean_seconds": 3.748590349,
+      "max_seconds": 3.748590349,
+      "min_seconds": 3.748590349
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11155:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.694310422,
+      "mean_seconds": 3.694310422,
+      "max_seconds": 3.694310422,
+      "min_seconds": 3.694310422
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1480:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.665288882,
+      "mean_seconds": 3.665288882,
+      "max_seconds": 3.665288882,
+      "min_seconds": 3.665288882
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10381:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.663188817,
+      "mean_seconds": 3.663188817,
+      "max_seconds": 3.663188817,
+      "min_seconds": 3.663188817
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1470:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.584698484,
+      "mean_seconds": 3.584698484,
+      "max_seconds": 3.584698484,
+      "min_seconds": 3.584698484
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10947:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.567668669,
+      "mean_seconds": 3.567668669,
+      "max_seconds": 3.567668669,
+      "min_seconds": 3.567668669
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3321:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 3.444807944,
+      "mean_seconds": 3.444807944,
+      "max_seconds": 3.444807944,
+      "min_seconds": 3.444807944
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10820:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 2.961609046,
+      "mean_seconds": 2.961609046,
+      "max_seconds": 2.961609046,
+      "min_seconds": 2.961609046
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9022:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 2.588293146,
+      "mean_seconds": 2.588293146,
+      "max_seconds": 2.588293146,
+      "min_seconds": 2.588293146
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10849:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 2.231101318,
+      "mean_seconds": 2.231101318,
+      "max_seconds": 2.231101318,
+      "min_seconds": 2.231101318
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11163:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.831745749,
+      "mean_seconds": 1.831745749,
+      "max_seconds": 1.831745749,
+      "min_seconds": 1.831745749
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:796:PipelineAst",
+      "count": 3,
+      "inclusive_total_seconds": 1.600452914,
+      "mean_seconds": 0.5334843046666666,
+      "max_seconds": 0.544124642,
+      "min_seconds": 0.51570085
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11641:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.573472981,
+      "mean_seconds": 1.573472981,
+      "max_seconds": 1.573472981,
+      "min_seconds": 1.573472981
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:797:PipelineAst",
+      "count": 3,
+      "inclusive_total_seconds": 1.5290465659999999,
+      "mean_seconds": 0.5096821886666667,
+      "max_seconds": 0.512847285,
+      "min_seconds": 0.507692339
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11011:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.492132955,
+      "mean_seconds": 1.492132955,
+      "max_seconds": 1.492132955,
+      "min_seconds": 1.492132955
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11346:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.461259306,
+      "mean_seconds": 1.461259306,
+      "max_seconds": 1.461259306,
+      "min_seconds": 1.461259306
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1866:AssignmentStatementAst",
+      "count": 3,
+      "inclusive_total_seconds": 1.164017883,
+      "mean_seconds": 0.388005961,
+      "max_seconds": 0.417161352,
+      "min_seconds": 0.373088349
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9058:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.086016292,
+      "mean_seconds": 1.086016292,
+      "max_seconds": 1.086016292,
+      "min_seconds": 1.086016292
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9954:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 1.078246479,
+      "mean_seconds": 1.078246479,
+      "max_seconds": 1.078246479,
+      "min_seconds": 1.078246479
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11288:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.951108608,
+      "mean_seconds": 0.951108608,
+      "max_seconds": 0.951108608,
+      "min_seconds": 0.951108608
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11435:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.751488262,
+      "mean_seconds": 0.751488262,
+      "max_seconds": 0.751488262,
+      "min_seconds": 0.751488262
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3319:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.676615779,
+      "mean_seconds": 0.676615779,
+      "max_seconds": 0.676615779,
+      "min_seconds": 0.676615779
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9551:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.663252168,
+      "mean_seconds": 0.663252168,
+      "max_seconds": 0.663252168,
+      "min_seconds": 0.663252168
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:740:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.64182852,
+      "mean_seconds": 0.64182852,
+      "max_seconds": 0.64182852,
+      "min_seconds": 0.64182852
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:811:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.604134795,
+      "mean_seconds": 0.604134795,
+      "max_seconds": 0.604134795,
+      "min_seconds": 0.604134795
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8488:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.584412501,
+      "mean_seconds": 0.584412501,
+      "max_seconds": 0.584412501,
+      "min_seconds": 0.584412501
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:733:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.562292187,
+      "mean_seconds": 0.562292187,
+      "max_seconds": 0.562292187,
+      "min_seconds": 0.562292187
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3316:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.506012973,
+      "mean_seconds": 0.506012973,
+      "max_seconds": 0.506012973,
+      "min_seconds": 0.506012973
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:816:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.504472606,
+      "mean_seconds": 0.504472606,
+      "max_seconds": 0.504472606,
+      "min_seconds": 0.504472606
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:831:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.496254428,
+      "mean_seconds": 0.496254428,
+      "max_seconds": 0.496254428,
+      "min_seconds": 0.496254428
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:825:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.493761768,
+      "mean_seconds": 0.493761768,
+      "max_seconds": 0.493761768,
+      "min_seconds": 0.493761768
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:828:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.492707345,
+      "mean_seconds": 0.492707345,
+      "max_seconds": 0.492707345,
+      "min_seconds": 0.492707345
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:804:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.484845312,
+      "mean_seconds": 0.484845312,
+      "max_seconds": 0.484845312,
+      "min_seconds": 0.484845312
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:819:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.483110666,
+      "mean_seconds": 0.483110666,
+      "max_seconds": 0.483110666,
+      "min_seconds": 0.483110666
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:750:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.47812922,
+      "mean_seconds": 0.47812922,
+      "max_seconds": 0.47812922,
+      "min_seconds": 0.47812922
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:745:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.477806469,
+      "mean_seconds": 0.477806469,
+      "max_seconds": 0.477806469,
+      "min_seconds": 0.477806469
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:751:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.474362288,
+      "mean_seconds": 0.474362288,
+      "max_seconds": 0.474362288,
+      "min_seconds": 0.474362288
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:834:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.470836682,
+      "mean_seconds": 0.470836682,
+      "max_seconds": 0.470836682,
+      "min_seconds": 0.470836682
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10146:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.464573878,
+      "mean_seconds": 0.464573878,
+      "max_seconds": 0.464573878,
+      "min_seconds": 0.464573878
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10110:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.454077248,
+      "mean_seconds": 0.454077248,
+      "max_seconds": 0.454077248,
+      "min_seconds": 0.454077248
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10052:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.453832751,
+      "mean_seconds": 0.453832751,
+      "max_seconds": 0.453832751,
+      "min_seconds": 0.453832751
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10088:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.453670359,
+      "mean_seconds": 0.453670359,
+      "max_seconds": 0.453670359,
+      "min_seconds": 0.453670359
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10101:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.451321929,
+      "mean_seconds": 0.451321929,
+      "max_seconds": 0.451321929,
+      "min_seconds": 0.451321929
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10132:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.451162378,
+      "mean_seconds": 0.451162378,
+      "max_seconds": 0.451162378,
+      "min_seconds": 0.451162378
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10004:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.444927998,
+      "mean_seconds": 0.444927998,
+      "max_seconds": 0.444927998,
+      "min_seconds": 0.444927998
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10080:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.44260794,
+      "mean_seconds": 0.44260794,
+      "max_seconds": 0.44260794,
+      "min_seconds": 0.44260794
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10040:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.44191417,
+      "mean_seconds": 0.44191417,
+      "max_seconds": 0.44191417,
+      "min_seconds": 0.44191417
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10065:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.441109719,
+      "mean_seconds": 0.441109719,
+      "max_seconds": 0.441109719,
+      "min_seconds": 0.441109719
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10122:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.439355735,
+      "mean_seconds": 0.439355735,
+      "max_seconds": 0.439355735,
+      "min_seconds": 0.439355735
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10015:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.437829381,
+      "mean_seconds": 0.437829381,
+      "max_seconds": 0.437829381,
+      "min_seconds": 0.437829381
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10059:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.43711484,
+      "mean_seconds": 0.43711484,
+      "max_seconds": 0.43711484,
+      "min_seconds": 0.43711484
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9984:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.434920908,
+      "mean_seconds": 0.434920908,
+      "max_seconds": 0.434920908,
+      "min_seconds": 0.434920908
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10034:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.429327795,
+      "mean_seconds": 0.429327795,
+      "max_seconds": 0.429327795,
+      "min_seconds": 0.429327795
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10072:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.419172106,
+      "mean_seconds": 0.419172106,
+      "max_seconds": 0.419172106,
+      "min_seconds": 0.419172106
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11564:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.412599493,
+      "mean_seconds": 0.412599493,
+      "max_seconds": 0.412599493,
+      "min_seconds": 0.412599493
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11580:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.404656498,
+      "mean_seconds": 0.404656498,
+      "max_seconds": 0.404656498,
+      "min_seconds": 0.404656498
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11200:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.396520498,
+      "mean_seconds": 0.396520498,
+      "max_seconds": 0.396520498,
+      "min_seconds": 0.396520498
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11341:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.391203908,
+      "mean_seconds": 0.391203908,
+      "max_seconds": 0.391203908,
+      "min_seconds": 0.391203908
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8946:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.389191672,
+      "mean_seconds": 0.389191672,
+      "max_seconds": 0.389191672,
+      "min_seconds": 0.389191672
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11496:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.388631994,
+      "mean_seconds": 0.388631994,
+      "max_seconds": 0.388631994,
+      "min_seconds": 0.388631994
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11068:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.38483759,
+      "mean_seconds": 0.38483759,
+      "max_seconds": 0.38483759,
+      "min_seconds": 0.38483759
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11631:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.384398491,
+      "mean_seconds": 0.384398491,
+      "max_seconds": 0.384398491,
+      "min_seconds": 0.384398491
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3318:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.383474882,
+      "mean_seconds": 0.383474882,
+      "max_seconds": 0.383474882,
+      "min_seconds": 0.383474882
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11685:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.380591178,
+      "mean_seconds": 0.380591178,
+      "max_seconds": 0.380591178,
+      "min_seconds": 0.380591178
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11466:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.379577115,
+      "mean_seconds": 0.379577115,
+      "max_seconds": 0.379577115,
+      "min_seconds": 0.379577115
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10549:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.378735386,
+      "mean_seconds": 0.378735386,
+      "max_seconds": 0.378735386,
+      "min_seconds": 0.378735386
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11578:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.378097287,
+      "mean_seconds": 0.378097287,
+      "max_seconds": 0.378097287,
+      "min_seconds": 0.378097287
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11520:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.377359396,
+      "mean_seconds": 0.377359396,
+      "max_seconds": 0.377359396,
+      "min_seconds": 0.377359396
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10719:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.376192876,
+      "mean_seconds": 0.376192876,
+      "max_seconds": 0.376192876,
+      "min_seconds": 0.376192876
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8524:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.375791567,
+      "mean_seconds": 0.375791567,
+      "max_seconds": 0.375791567,
+      "min_seconds": 0.375791567
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11409:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.375026086,
+      "mean_seconds": 0.375026086,
+      "max_seconds": 0.375026086,
+      "min_seconds": 0.375026086
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10536:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.373756444,
+      "mean_seconds": 0.373756444,
+      "max_seconds": 0.373756444,
+      "min_seconds": 0.373756444
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10989:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.373288815,
+      "mean_seconds": 0.373288815,
+      "max_seconds": 0.373288815,
+      "min_seconds": 0.373288815
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10993:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.373152629,
+      "mean_seconds": 0.373152629,
+      "max_seconds": 0.373152629,
+      "min_seconds": 0.373152629
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11223:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.372436926,
+      "mean_seconds": 0.372436926,
+      "max_seconds": 0.372436926,
+      "min_seconds": 0.372436926
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10670:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.371101457,
+      "mean_seconds": 0.371101457,
+      "max_seconds": 0.371101457,
+      "min_seconds": 0.371101457
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11403:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.371088358,
+      "mean_seconds": 0.371088358,
+      "max_seconds": 0.371088358,
+      "min_seconds": 0.371088358
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11421:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.371043983,
+      "mean_seconds": 0.371043983,
+      "max_seconds": 0.371043983,
+      "min_seconds": 0.371043983
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11085:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.370109818,
+      "mean_seconds": 0.370109818,
+      "max_seconds": 0.370109818,
+      "min_seconds": 0.370109818
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11549:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.369905067,
+      "mean_seconds": 0.369905067,
+      "max_seconds": 0.369905067,
+      "min_seconds": 0.369905067
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11415:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.369846178,
+      "mean_seconds": 0.369846178,
+      "max_seconds": 0.369846178,
+      "min_seconds": 0.369846178
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11678:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.369181716,
+      "mean_seconds": 0.369181716,
+      "max_seconds": 0.369181716,
+      "min_seconds": 0.369181716
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11562:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.368569258,
+      "mean_seconds": 0.368569258,
+      "max_seconds": 0.368569258,
+      "min_seconds": 0.368569258
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10030:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.36849513,
+      "mean_seconds": 0.36849513,
+      "max_seconds": 0.36849513,
+      "min_seconds": 0.36849513
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11211:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.368399904,
+      "mean_seconds": 0.368399904,
+      "max_seconds": 0.368399904,
+      "min_seconds": 0.368399904
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11235:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.367891035,
+      "mean_seconds": 0.367891035,
+      "max_seconds": 0.367891035,
+      "min_seconds": 0.367891035
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10726:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.367493201,
+      "mean_seconds": 0.367493201,
+      "max_seconds": 0.367493201,
+      "min_seconds": 0.367493201
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11689:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.366759224,
+      "mean_seconds": 0.366759224,
+      "max_seconds": 0.366759224,
+      "min_seconds": 0.366759224
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11637:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.366631495,
+      "mean_seconds": 0.366631495,
+      "max_seconds": 0.366631495,
+      "min_seconds": 0.366631495
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10700:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.365712915,
+      "mean_seconds": 0.365712915,
+      "max_seconds": 0.365712915,
+      "min_seconds": 0.365712915
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10690:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.365276073,
+      "mean_seconds": 0.365276073,
+      "max_seconds": 0.365276073,
+      "min_seconds": 0.365276073
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11109:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.365250032,
+      "mean_seconds": 0.365250032,
+      "max_seconds": 0.365250032,
+      "min_seconds": 0.365250032
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11393:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.365074692,
+      "mean_seconds": 0.365074692,
+      "max_seconds": 0.365074692,
+      "min_seconds": 0.365074692
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11674:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.364778597,
+      "mean_seconds": 0.364778597,
+      "max_seconds": 0.364778597,
+      "min_seconds": 0.364778597
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11384:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.364362823,
+      "mean_seconds": 0.364362823,
+      "max_seconds": 0.364362823,
+      "min_seconds": 0.364362823
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10317:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.364106478,
+      "mean_seconds": 0.364106478,
+      "max_seconds": 0.364106478,
+      "min_seconds": 0.364106478
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11531:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.363325938,
+      "mean_seconds": 0.363325938,
+      "max_seconds": 0.363325938,
+      "min_seconds": 0.363325938
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11000:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.363050834,
+      "mean_seconds": 0.363050834,
+      "max_seconds": 0.363050834,
+      "min_seconds": 0.363050834
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11092:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.361893547,
+      "mean_seconds": 0.361893547,
+      "max_seconds": 0.361893547,
+      "min_seconds": 0.361893547
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11670:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.361778078,
+      "mean_seconds": 0.361778078,
+      "max_seconds": 0.361778078,
+      "min_seconds": 0.361778078
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11506:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.361428444,
+      "mean_seconds": 0.361428444,
+      "max_seconds": 0.361428444,
+      "min_seconds": 0.361428444
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11489:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.361378805,
+      "mean_seconds": 0.361378805,
+      "max_seconds": 0.361378805,
+      "min_seconds": 0.361378805
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10660:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.36134992,
+      "mean_seconds": 0.36134992,
+      "max_seconds": 0.36134992,
+      "min_seconds": 0.36134992
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10781:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.360423705,
+      "mean_seconds": 0.360423705,
+      "max_seconds": 0.360423705,
+      "min_seconds": 0.360423705
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11078:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.35960673,
+      "mean_seconds": 0.35960673,
+      "max_seconds": 0.35960673,
+      "min_seconds": 0.35960673
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11058:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.359467276,
+      "mean_seconds": 0.359467276,
+      "max_seconds": 0.359467276,
+      "min_seconds": 0.359467276
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11540:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.359100757,
+      "mean_seconds": 0.359100757,
+      "max_seconds": 0.359100757,
+      "min_seconds": 0.359100757
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10306:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.358742179,
+      "mean_seconds": 0.358742179,
+      "max_seconds": 0.358742179,
+      "min_seconds": 0.358742179
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11007:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.357229275,
+      "mean_seconds": 0.357229275,
+      "max_seconds": 0.357229275,
+      "min_seconds": 0.357229275
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11193:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.355687615,
+      "mean_seconds": 0.355687615,
+      "max_seconds": 0.355687615,
+      "min_seconds": 0.355687615
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10679:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.354818634,
+      "mean_seconds": 0.354818634,
+      "max_seconds": 0.354818634,
+      "min_seconds": 0.354818634
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10324:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.353991684,
+      "mean_seconds": 0.353991684,
+      "max_seconds": 0.353991684,
+      "min_seconds": 0.353991684
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10785:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.352958123,
+      "mean_seconds": 0.352958123,
+      "max_seconds": 0.352958123,
+      "min_seconds": 0.352958123
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11666:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.352595658,
+      "mean_seconds": 0.352595658,
+      "max_seconds": 0.352595658,
+      "min_seconds": 0.352595658
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9978:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.351245336,
+      "mean_seconds": 0.351245336,
+      "max_seconds": 0.351245336,
+      "min_seconds": 0.351245336
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10710:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.345763984,
+      "mean_seconds": 0.345763984,
+      "max_seconds": 0.345763984,
+      "min_seconds": 0.345763984
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11339:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.342861878,
+      "mean_seconds": 0.342861878,
+      "max_seconds": 0.342861878,
+      "min_seconds": 0.342861878
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10296:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.334914424,
+      "mean_seconds": 0.334914424,
+      "max_seconds": 0.334914424,
+      "min_seconds": 0.334914424
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9123:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.291157874,
+      "mean_seconds": 0.291157874,
+      "max_seconds": 0.291157874,
+      "min_seconds": 0.291157874
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8302:TryStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.28872639,
+      "mean_seconds": 0.28872639,
+      "max_seconds": 0.28872639,
+      "min_seconds": 0.28872639
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9555:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.262129623,
+      "mean_seconds": 0.262129623,
+      "max_seconds": 0.262129623,
+      "min_seconds": 0.262129623
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8679:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.253059613,
+      "mean_seconds": 0.253059613,
+      "max_seconds": 0.253059613,
+      "min_seconds": 0.253059613
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9553:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.250981507,
+      "mean_seconds": 0.250981507,
+      "max_seconds": 0.250981507,
+      "min_seconds": 0.250981507
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3322:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.219877545,
+      "mean_seconds": 0.219877545,
+      "max_seconds": 0.219877545,
+      "min_seconds": 0.219877545
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9108:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.20751983,
+      "mean_seconds": 0.20751983,
+      "max_seconds": 0.20751983,
+      "min_seconds": 0.20751983
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9090:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.205928125,
+      "mean_seconds": 0.205928125,
+      "max_seconds": 0.205928125,
+      "min_seconds": 0.205928125
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10221:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.205298606,
+      "mean_seconds": 0.205298606,
+      "max_seconds": 0.205298606,
+      "min_seconds": 0.205298606
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9498:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.199778294,
+      "mean_seconds": 0.199778294,
+      "max_seconds": 0.199778294,
+      "min_seconds": 0.199778294
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9432:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.185486641,
+      "mean_seconds": 0.185486641,
+      "max_seconds": 0.185486641,
+      "min_seconds": 0.185486641
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8617:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.172379126,
+      "mean_seconds": 0.172379126,
+      "max_seconds": 0.172379126,
+      "min_seconds": 0.172379126
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9526:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.138080551,
+      "mean_seconds": 0.138080551,
+      "max_seconds": 0.138080551,
+      "min_seconds": 0.138080551
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8365:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.124645108,
+      "mean_seconds": 0.124645108,
+      "max_seconds": 0.124645108,
+      "min_seconds": 0.124645108
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3622:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.098340735,
+      "mean_seconds": 0.098340735,
+      "max_seconds": 0.098340735,
+      "min_seconds": 0.098340735
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10748:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.097265894,
+      "mean_seconds": 0.097265894,
+      "max_seconds": 0.097265894,
+      "min_seconds": 0.097265894
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3573:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.094230798,
+      "mean_seconds": 0.094230798,
+      "max_seconds": 0.094230798,
+      "min_seconds": 0.094230798
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8984:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.08668082,
+      "mean_seconds": 0.08668082,
+      "max_seconds": 0.08668082,
+      "min_seconds": 0.08668082
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9001:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.085827862,
+      "mean_seconds": 0.085827862,
+      "max_seconds": 0.085827862,
+      "min_seconds": 0.085827862
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9070:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.08558081,
+      "mean_seconds": 0.08558081,
+      "max_seconds": 0.08558081,
+      "min_seconds": 0.08558081
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3746:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.077557129,
+      "mean_seconds": 0.077557129,
+      "max_seconds": 0.077557129,
+      "min_seconds": 0.077557129
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8631:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.074464089,
+      "mean_seconds": 0.074464089,
+      "max_seconds": 0.074464089,
+      "min_seconds": 0.074464089
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3676:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.074033703,
+      "mean_seconds": 0.074033703,
+      "max_seconds": 0.074033703,
+      "min_seconds": 0.074033703
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8796:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.073438522,
+      "mean_seconds": 0.073438522,
+      "max_seconds": 0.073438522,
+      "min_seconds": 0.073438522
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3702:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.072604179,
+      "mean_seconds": 0.072604179,
+      "max_seconds": 0.072604179,
+      "min_seconds": 0.072604179
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3690:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.07258861,
+      "mean_seconds": 0.07258861,
+      "max_seconds": 0.07258861,
+      "min_seconds": 0.07258861
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3751:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.072409212,
+      "mean_seconds": 0.072409212,
+      "max_seconds": 0.072409212,
+      "min_seconds": 0.072409212
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3589:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.072260975,
+      "mean_seconds": 0.072260975,
+      "max_seconds": 0.072260975,
+      "min_seconds": 0.072260975
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3612:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.071948527,
+      "mean_seconds": 0.071948527,
+      "max_seconds": 0.071948527,
+      "min_seconds": 0.071948527
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3635:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.070893482,
+      "mean_seconds": 0.070893482,
+      "max_seconds": 0.070893482,
+      "min_seconds": 0.070893482
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3741:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.069618796,
+      "mean_seconds": 0.069618796,
+      "max_seconds": 0.069618796,
+      "min_seconds": 0.069618796
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3645:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.069355601,
+      "mean_seconds": 0.069355601,
+      "max_seconds": 0.069355601,
+      "min_seconds": 0.069355601
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3731:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.06928572,
+      "mean_seconds": 0.06928572,
+      "max_seconds": 0.06928572,
+      "min_seconds": 0.06928572
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3724:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.069059373,
+      "mean_seconds": 0.069059373,
+      "max_seconds": 0.069059373,
+      "min_seconds": 0.069059373
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3562:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.068870171,
+      "mean_seconds": 0.068870171,
+      "max_seconds": 0.068870171,
+      "min_seconds": 0.068870171
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8964:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.068452953,
+      "mean_seconds": 0.068452953,
+      "max_seconds": 0.068452953,
+      "min_seconds": 0.068452953
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10183:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.068432392,
+      "mean_seconds": 0.068432392,
+      "max_seconds": 0.068432392,
+      "min_seconds": 0.068432392
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10212:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.068387239,
+      "mean_seconds": 0.068387239,
+      "max_seconds": 0.068387239,
+      "min_seconds": 0.068387239
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3601:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.067991429,
+      "mean_seconds": 0.067991429,
+      "max_seconds": 0.067991429,
+      "min_seconds": 0.067991429
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10205:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.067472623,
+      "mean_seconds": 0.067472623,
+      "max_seconds": 0.067472623,
+      "min_seconds": 0.067472623
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10193:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.066971198,
+      "mean_seconds": 0.066971198,
+      "max_seconds": 0.066971198,
+      "min_seconds": 0.066971198
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8748:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.064481664,
+      "mean_seconds": 0.064481664,
+      "max_seconds": 0.064481664,
+      "min_seconds": 0.064481664
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3315:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.061395895,
+      "mean_seconds": 0.061395895,
+      "max_seconds": 0.061395895,
+      "min_seconds": 0.061395895
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8456:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.045788526,
+      "mean_seconds": 0.045788526,
+      "max_seconds": 0.045788526,
+      "min_seconds": 0.045788526
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8554:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.039524101,
+      "mean_seconds": 0.039524101,
+      "max_seconds": 0.039524101,
+      "min_seconds": 0.039524101
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8764:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.038851039,
+      "mean_seconds": 0.038851039,
+      "max_seconds": 0.038851039,
+      "min_seconds": 0.038851039
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8480:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.038726022,
+      "mean_seconds": 0.038726022,
+      "max_seconds": 0.038726022,
+      "min_seconds": 0.038726022
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3664:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.03854356,
+      "mean_seconds": 0.03854356,
+      "max_seconds": 0.03854356,
+      "min_seconds": 0.03854356
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8587:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.036800919,
+      "mean_seconds": 0.036800919,
+      "max_seconds": 0.036800919,
+      "min_seconds": 0.036800919
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8695:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.035312018,
+      "mean_seconds": 0.035312018,
+      "max_seconds": 0.035312018,
+      "min_seconds": 0.035312018
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10558:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.035236501,
+      "mean_seconds": 0.035236501,
+      "max_seconds": 0.035236501,
+      "min_seconds": 0.035236501
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8978:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.035108187,
+      "mean_seconds": 0.035108187,
+      "max_seconds": 0.035108187,
+      "min_seconds": 0.035108187
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10463:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034973774,
+      "mean_seconds": 0.034973774,
+      "max_seconds": 0.034973774,
+      "min_seconds": 0.034973774
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10501:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034973671,
+      "mean_seconds": 0.034973671,
+      "max_seconds": 0.034973671,
+      "min_seconds": 0.034973671
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9031:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034922319,
+      "mean_seconds": 0.034922319,
+      "max_seconds": 0.034922319,
+      "min_seconds": 0.034922319
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8958:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034797693,
+      "mean_seconds": 0.034797693,
+      "max_seconds": 0.034797693,
+      "min_seconds": 0.034797693
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8723:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034653925,
+      "mean_seconds": 0.034653925,
+      "max_seconds": 0.034653925,
+      "min_seconds": 0.034653925
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8707:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034623998,
+      "mean_seconds": 0.034623998,
+      "max_seconds": 0.034623998,
+      "min_seconds": 0.034623998
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3654:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.034028458,
+      "mean_seconds": 0.034028458,
+      "max_seconds": 0.034028458,
+      "min_seconds": 0.034028458
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10486:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.033613026,
+      "mean_seconds": 0.033613026,
+      "max_seconds": 0.033613026,
+      "min_seconds": 0.033613026
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10524:TryStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.031772108,
+      "mean_seconds": 0.031772108,
+      "max_seconds": 0.031772108,
+      "min_seconds": 0.031772108
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10511:TryStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.031655034,
+      "mean_seconds": 0.031655034,
+      "max_seconds": 0.031655034,
+      "min_seconds": 0.031655034
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10764:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.031482303,
+      "mean_seconds": 0.031482303,
+      "max_seconds": 0.031482303,
+      "min_seconds": 0.031482303
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8335:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.025615891,
+      "mean_seconds": 0.025615891,
+      "max_seconds": 0.025615891,
+      "min_seconds": 0.025615891
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9618:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.019047898,
+      "mean_seconds": 0.019047898,
+      "max_seconds": 0.019047898,
+      "min_seconds": 0.019047898
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:1390:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.018907697,
+      "mean_seconds": 0.018907697,
+      "max_seconds": 0.018907697,
+      "min_seconds": 0.018907697
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11391:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.017542953,
+      "mean_seconds": 0.017542953,
+      "max_seconds": 0.017542953,
+      "min_seconds": 0.017542953
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11473:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.01750545,
+      "mean_seconds": 0.01750545,
+      "max_seconds": 0.01750545,
+      "min_seconds": 0.01750545
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11428:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.017291178,
+      "mean_seconds": 0.017291178,
+      "max_seconds": 0.017291178,
+      "min_seconds": 0.017291178
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11483:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.016340169,
+      "mean_seconds": 0.016340169,
+      "max_seconds": 0.016340169,
+      "min_seconds": 0.016340169
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11501:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.016075244,
+      "mean_seconds": 0.016075244,
+      "max_seconds": 0.016075244,
+      "min_seconds": 0.016075244
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3415:TryStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.015223237,
+      "mean_seconds": 0.015223237,
+      "max_seconds": 0.015223237,
+      "min_seconds": 0.015223237
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3328:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.011793492,
+      "mean_seconds": 0.011793492,
+      "max_seconds": 0.011793492,
+      "min_seconds": 0.011793492
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11475:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.006368956,
+      "mean_seconds": 0.006368956,
+      "max_seconds": 0.006368956,
+      "min_seconds": 0.006368956
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10789:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.003274005,
+      "mean_seconds": 0.003274005,
+      "max_seconds": 0.003274005,
+      "min_seconds": 0.003274005
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:2084:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00273518,
+      "mean_seconds": 0.00273518,
+      "max_seconds": 0.00273518,
+      "min_seconds": 0.00273518
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9574:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.002289744,
+      "mean_seconds": 0.002289744,
+      "max_seconds": 0.002289744,
+      "min_seconds": 0.002289744
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8806:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.002160309,
+      "mean_seconds": 0.002160309,
+      "max_seconds": 0.002160309,
+      "min_seconds": 0.002160309
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9597:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.002090965,
+      "mean_seconds": 0.002090965,
+      "max_seconds": 0.002090965,
+      "min_seconds": 0.002090965
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3757:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.002009911,
+      "mean_seconds": 0.002009911,
+      "max_seconds": 0.002009911,
+      "min_seconds": 0.002009911
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9075:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00198201,
+      "mean_seconds": 0.00198201,
+      "max_seconds": 0.00198201,
+      "min_seconds": 0.00198201
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10231:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001955994,
+      "mean_seconds": 0.001955994,
+      "max_seconds": 0.001955994,
+      "min_seconds": 0.001955994
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8288:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001911962,
+      "mean_seconds": 0.001911962,
+      "max_seconds": 0.001911962,
+      "min_seconds": 0.001911962
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9248:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001777816,
+      "mean_seconds": 0.001777816,
+      "max_seconds": 0.001777816,
+      "min_seconds": 0.001777816
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11101:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001623309,
+      "mean_seconds": 0.001623309,
+      "max_seconds": 0.001623309,
+      "min_seconds": 0.001623309
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10472:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001610048,
+      "mean_seconds": 0.001610048,
+      "max_seconds": 0.001610048,
+      "min_seconds": 0.001610048
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9155:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001596879,
+      "mean_seconds": 0.001596879,
+      "max_seconds": 0.001596879,
+      "min_seconds": 0.001596879
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10025:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001585023,
+      "mean_seconds": 0.001585023,
+      "max_seconds": 0.001585023,
+      "min_seconds": 0.001585023
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9323:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001582374,
+      "mean_seconds": 0.001582374,
+      "max_seconds": 0.001582374,
+      "min_seconds": 0.001582374
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9067:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001500032,
+      "mean_seconds": 0.001500032,
+      "max_seconds": 0.001500032,
+      "min_seconds": 0.001500032
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3355:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001414039,
+      "mean_seconds": 0.001414039,
+      "max_seconds": 0.001414039,
+      "min_seconds": 0.001414039
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9387:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001407174,
+      "mean_seconds": 0.001407174,
+      "max_seconds": 0.001407174,
+      "min_seconds": 0.001407174
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11636:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001288913,
+      "mean_seconds": 0.001288913,
+      "max_seconds": 0.001288913,
+      "min_seconds": 0.001288913
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9557:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001284921,
+      "mean_seconds": 0.001284921,
+      "max_seconds": 0.001284921,
+      "min_seconds": 0.001284921
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9080:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001228772,
+      "mean_seconds": 0.001228772,
+      "max_seconds": 0.001228772,
+      "min_seconds": 0.001228772
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9578:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001133002,
+      "mean_seconds": 0.001133002,
+      "max_seconds": 0.001133002,
+      "min_seconds": 0.001133002
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10560:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001073851,
+      "mean_seconds": 0.001073851,
+      "max_seconds": 0.001073851,
+      "min_seconds": 0.001073851
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9004:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.001070482,
+      "mean_seconds": 0.001070482,
+      "max_seconds": 0.001070482,
+      "min_seconds": 0.001070482
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10649:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000998952,
+      "mean_seconds": 0.000998952,
+      "max_seconds": 0.000998952,
+      "min_seconds": 0.000998952
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9925:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000945198,
+      "mean_seconds": 0.000945198,
+      "max_seconds": 0.000945198,
+      "min_seconds": 0.000945198
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10545:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000910138,
+      "mean_seconds": 0.000910138,
+      "max_seconds": 0.000910138,
+      "min_seconds": 0.000910138
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8715:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00088006,
+      "mean_seconds": 0.00088006,
+      "max_seconds": 0.00088006,
+      "min_seconds": 0.00088006
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8327:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000874399,
+      "mean_seconds": 0.000874399,
+      "max_seconds": 0.000874399,
+      "min_seconds": 0.000874399
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9573:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00083369,
+      "mean_seconds": 0.00083369,
+      "max_seconds": 0.00083369,
+      "min_seconds": 0.00083369
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10048:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000796816,
+      "mean_seconds": 0.000796816,
+      "max_seconds": 0.000796816,
+      "min_seconds": 0.000796816
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11105:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000723574,
+      "mean_seconds": 0.000723574,
+      "max_seconds": 0.000723574,
+      "min_seconds": 0.000723574
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10068:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000712851,
+      "mean_seconds": 0.000712851,
+      "max_seconds": 0.000712851,
+      "min_seconds": 0.000712851
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8293:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000712171,
+      "mean_seconds": 0.000712171,
+      "max_seconds": 0.000712171,
+      "min_seconds": 0.000712171
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9348:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000652352,
+      "mean_seconds": 0.000652352,
+      "max_seconds": 0.000652352,
+      "min_seconds": 0.000652352
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9199:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000631428,
+      "mean_seconds": 0.000631428,
+      "max_seconds": 0.000631428,
+      "min_seconds": 0.000631428
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9926:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000608453,
+      "mean_seconds": 0.000608453,
+      "max_seconds": 0.000608453,
+      "min_seconds": 0.000608453
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8374:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000560894,
+      "mean_seconds": 0.000560894,
+      "max_seconds": 0.000560894,
+      "min_seconds": 0.000560894
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3409:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000547435,
+      "mean_seconds": 0.000547435,
+      "max_seconds": 0.000547435,
+      "min_seconds": 0.000547435
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11696:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000529607,
+      "mean_seconds": 0.000529607,
+      "max_seconds": 0.000529607,
+      "min_seconds": 0.000529607
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8325:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000449432,
+      "mean_seconds": 0.000449432,
+      "max_seconds": 0.000449432,
+      "min_seconds": 0.000449432
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9206:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000441605,
+      "mean_seconds": 0.000441605,
+      "max_seconds": 0.000441605,
+      "min_seconds": 0.000441605
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9223:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000430188,
+      "mean_seconds": 0.000430188,
+      "max_seconds": 0.000430188,
+      "min_seconds": 0.000430188
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9230:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00041808,
+      "mean_seconds": 0.00041808,
+      "max_seconds": 0.00041808,
+      "min_seconds": 0.00041808
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9583:ForStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000412067,
+      "mean_seconds": 0.000412067,
+      "max_seconds": 0.000412067,
+      "min_seconds": 0.000412067
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8386:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000404277,
+      "mean_seconds": 0.000404277,
+      "max_seconds": 0.000404277,
+      "min_seconds": 0.000404277
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8398:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000388691,
+      "mean_seconds": 0.000388691,
+      "max_seconds": 0.000388691,
+      "min_seconds": 0.000388691
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9208:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000381272,
+      "mean_seconds": 0.000381272,
+      "max_seconds": 0.000381272,
+      "min_seconds": 0.000381272
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8418:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000370082,
+      "mean_seconds": 0.000370082,
+      "max_seconds": 0.000370082,
+      "min_seconds": 0.000370082
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8408:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000367257,
+      "mean_seconds": 0.000367257,
+      "max_seconds": 0.000367257,
+      "min_seconds": 0.000367257
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9210:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000353639,
+      "mean_seconds": 0.000353639,
+      "max_seconds": 0.000353639,
+      "min_seconds": 0.000353639
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8428:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00033712,
+      "mean_seconds": 0.00033712,
+      "max_seconds": 0.00033712,
+      "min_seconds": 0.00033712
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9283:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000335044,
+      "mean_seconds": 0.000335044,
+      "max_seconds": 0.000335044,
+      "min_seconds": 0.000335044
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9561:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000334331,
+      "mean_seconds": 0.000334331,
+      "max_seconds": 0.000334331,
+      "min_seconds": 0.000334331
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9296:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000332859,
+      "mean_seconds": 0.000332859,
+      "max_seconds": 0.000332859,
+      "min_seconds": 0.000332859
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9565:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000321225,
+      "mean_seconds": 0.000321225,
+      "max_seconds": 0.000321225,
+      "min_seconds": 0.000321225
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9242:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00031557,
+      "mean_seconds": 0.00031557,
+      "max_seconds": 0.00031557,
+      "min_seconds": 0.00031557
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3360:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000315416,
+      "mean_seconds": 0.000315416,
+      "max_seconds": 0.000315416,
+      "min_seconds": 0.000315416
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9422:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000301999,
+      "mean_seconds": 0.000301999,
+      "max_seconds": 0.000301999,
+      "min_seconds": 0.000301999
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11569:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000292723,
+      "mean_seconds": 0.000292723,
+      "max_seconds": 0.000292723,
+      "min_seconds": 0.000292723
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9276:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000288308,
+      "mean_seconds": 0.000288308,
+      "max_seconds": 0.000288308,
+      "min_seconds": 0.000288308
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8645:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000283482,
+      "mean_seconds": 0.000283482,
+      "max_seconds": 0.000283482,
+      "min_seconds": 0.000283482
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3375:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000279267,
+      "mean_seconds": 0.000279267,
+      "max_seconds": 0.000279267,
+      "min_seconds": 0.000279267
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:52:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00027392,
+      "mean_seconds": 0.00027392,
+      "max_seconds": 0.00027392,
+      "min_seconds": 0.00027392
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8522:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000269691,
+      "mean_seconds": 0.000269691,
+      "max_seconds": 0.000269691,
+      "min_seconds": 0.000269691
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9183:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000260007,
+      "mean_seconds": 0.000260007,
+      "max_seconds": 0.000260007,
+      "min_seconds": 0.000260007
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3380:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000254353,
+      "mean_seconds": 0.000254353,
+      "max_seconds": 0.000254353,
+      "min_seconds": 0.000254353
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8567:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000252655,
+      "mean_seconds": 0.000252655,
+      "max_seconds": 0.000252655,
+      "min_seconds": 0.000252655
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3370:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000251757,
+      "mean_seconds": 0.000251757,
+      "max_seconds": 0.000251757,
+      "min_seconds": 0.000251757
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9438:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000251196,
+      "mean_seconds": 0.000251196,
+      "max_seconds": 0.000251196,
+      "min_seconds": 0.000251196
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8546:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000248722,
+      "mean_seconds": 0.000248722,
+      "max_seconds": 0.000248722,
+      "min_seconds": 0.000248722
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11586:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000248186,
+      "mean_seconds": 0.000248186,
+      "max_seconds": 0.000248186,
+      "min_seconds": 0.000248186
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10406:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000245838,
+      "mean_seconds": 0.000245838,
+      "max_seconds": 0.000245838,
+      "min_seconds": 0.000245838
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11485:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000243013,
+      "mean_seconds": 0.000243013,
+      "max_seconds": 0.000243013,
+      "min_seconds": 0.000243013
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8558:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000240891,
+      "mean_seconds": 0.000240891,
+      "max_seconds": 0.000240891,
+      "min_seconds": 0.000240891
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3410:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000240596,
+      "mean_seconds": 0.000240596,
+      "max_seconds": 0.000240596,
+      "min_seconds": 0.000240596
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10253:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000240525,
+      "mean_seconds": 0.000240525,
+      "max_seconds": 0.000240525,
+      "min_seconds": 0.000240525
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8575:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000238157,
+      "mean_seconds": 0.000238157,
+      "max_seconds": 0.000238157,
+      "min_seconds": 0.000238157
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11635:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000238053,
+      "mean_seconds": 0.000238053,
+      "max_seconds": 0.000238053,
+      "min_seconds": 0.000238053
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3385:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000238036,
+      "mean_seconds": 0.000238036,
+      "max_seconds": 0.000238036,
+      "min_seconds": 0.000238036
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10273:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000236732,
+      "mean_seconds": 0.000236732,
+      "max_seconds": 0.000236732,
+      "min_seconds": 0.000236732
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3365:PipelineAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000230486,
+      "mean_seconds": 0.000230486,
+      "max_seconds": 0.000230486,
+      "min_seconds": 0.000230486
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10260:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000223477,
+      "mean_seconds": 0.000223477,
+      "max_seconds": 0.000223477,
+      "min_seconds": 0.000223477
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8446:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000223169,
+      "mean_seconds": 0.000223169,
+      "max_seconds": 0.000223169,
+      "min_seconds": 0.000223169
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10106:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000221968,
+      "mean_seconds": 0.000221968,
+      "max_seconds": 0.000221968,
+      "min_seconds": 0.000221968
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10765:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000221529,
+      "mean_seconds": 0.000221529,
+      "max_seconds": 0.000221529,
+      "min_seconds": 0.000221529
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10022:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000220409,
+      "mean_seconds": 0.000220409,
+      "max_seconds": 0.000220409,
+      "min_seconds": 0.000220409
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10488:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000214861,
+      "mean_seconds": 0.000214861,
+      "max_seconds": 0.000214861,
+      "min_seconds": 0.000214861
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10154:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000214553,
+      "mean_seconds": 0.000214553,
+      "max_seconds": 0.000214553,
+      "min_seconds": 0.000214553
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8321:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000213445,
+      "mean_seconds": 0.000213445,
+      "max_seconds": 0.000213445,
+      "min_seconds": 0.000213445
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11479:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000213356,
+      "mean_seconds": 0.000213356,
+      "max_seconds": 0.000213356,
+      "min_seconds": 0.000213356
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10115:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000212951,
+      "mean_seconds": 0.000212951,
+      "max_seconds": 0.000212951,
+      "min_seconds": 0.000212951
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10332:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000212335,
+      "mean_seconds": 0.000212335,
+      "max_seconds": 0.000212335,
+      "min_seconds": 0.000212335
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9274:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000211549,
+      "mean_seconds": 0.000211549,
+      "max_seconds": 0.000211549,
+      "min_seconds": 0.000211549
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9114:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000210605,
+      "mean_seconds": 0.000210605,
+      "max_seconds": 0.000210605,
+      "min_seconds": 0.000210605
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10187:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00021037,
+      "mean_seconds": 0.00021037,
+      "max_seconds": 0.00021037,
+      "min_seconds": 0.00021037
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11215:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00021012,
+      "mean_seconds": 0.00021012,
+      "max_seconds": 0.00021012,
+      "min_seconds": 0.00021012
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9971:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000209056,
+      "mean_seconds": 0.000209056,
+      "max_seconds": 0.000209056,
+      "min_seconds": 0.000209056
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9623:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000208519,
+      "mean_seconds": 0.000208519,
+      "max_seconds": 0.000208519,
+      "min_seconds": 0.000208519
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11113:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000206593,
+      "mean_seconds": 0.000206593,
+      "max_seconds": 0.000206593,
+      "min_seconds": 0.000206593
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10294:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000204509,
+      "mean_seconds": 0.000204509,
+      "max_seconds": 0.000204509,
+      "min_seconds": 0.000204509
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10076:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000203858,
+      "mean_seconds": 0.000203858,
+      "max_seconds": 0.000203858,
+      "min_seconds": 0.000203858
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3710:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000202597,
+      "mean_seconds": 0.000202597,
+      "max_seconds": 0.000202597,
+      "min_seconds": 0.000202597
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9937:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000202023,
+      "mean_seconds": 0.000202023,
+      "max_seconds": 0.000202023,
+      "min_seconds": 0.000202023
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9151:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000201662,
+      "mean_seconds": 0.000201662,
+      "max_seconds": 0.000201662,
+      "min_seconds": 0.000201662
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11227:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000201504,
+      "mean_seconds": 0.000201504,
+      "max_seconds": 0.000201504,
+      "min_seconds": 0.000201504
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10125:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00019978,
+      "mean_seconds": 0.00019978,
+      "max_seconds": 0.00019978,
+      "min_seconds": 0.00019978
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9613:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000199595,
+      "mean_seconds": 0.000199595,
+      "max_seconds": 0.000199595,
+      "min_seconds": 0.000199595
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3736:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000199362,
+      "mean_seconds": 0.000199362,
+      "max_seconds": 0.000199362,
+      "min_seconds": 0.000199362
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8368:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000197333,
+      "mean_seconds": 0.000197333,
+      "max_seconds": 0.000197333,
+      "min_seconds": 0.000197333
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3618:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000195934,
+      "mean_seconds": 0.000195934,
+      "max_seconds": 0.000195934,
+      "min_seconds": 0.000195934
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10094:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000195301,
+      "mean_seconds": 0.000195301,
+      "max_seconds": 0.000195301,
+      "min_seconds": 0.000195301
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10008:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.0001952,
+      "mean_seconds": 0.0001952,
+      "max_seconds": 0.0001952,
+      "min_seconds": 0.0001952
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8731:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000193317,
+      "mean_seconds": 0.000193317,
+      "max_seconds": 0.000193317,
+      "min_seconds": 0.000193317
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11329:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00019268,
+      "mean_seconds": 0.00019268,
+      "max_seconds": 0.00019268,
+      "min_seconds": 0.00019268
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:2089:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000192114,
+      "mean_seconds": 0.000192114,
+      "max_seconds": 0.000192114,
+      "min_seconds": 0.000192114
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8299:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000192105,
+      "mean_seconds": 0.000192105,
+      "max_seconds": 0.000192105,
+      "min_seconds": 0.000192105
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10645:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000191751,
+      "mean_seconds": 0.000191751,
+      "max_seconds": 0.000191751,
+      "min_seconds": 0.000191751
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10032:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000191554,
+      "mean_seconds": 0.000191554,
+      "max_seconds": 0.000191554,
+      "min_seconds": 0.000191554
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9990:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000190169,
+      "mean_seconds": 0.000190169,
+      "max_seconds": 0.000190169,
+      "min_seconds": 0.000190169
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9648:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000190032,
+      "mean_seconds": 0.000190032,
+      "max_seconds": 0.000190032,
+      "min_seconds": 0.000190032
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8770:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000190001,
+      "mean_seconds": 0.000190001,
+      "max_seconds": 0.000190001,
+      "min_seconds": 0.000190001
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11513:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000189575,
+      "mean_seconds": 0.000189575,
+      "max_seconds": 0.000189575,
+      "min_seconds": 0.000189575
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9591:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000189136,
+      "mean_seconds": 0.000189136,
+      "max_seconds": 0.000189136,
+      "min_seconds": 0.000189136
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9444:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000188856,
+      "mean_seconds": 0.000188856,
+      "max_seconds": 0.000188856,
+      "min_seconds": 0.000188856
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3390:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000187958,
+      "mean_seconds": 0.000187958,
+      "max_seconds": 0.000187958,
+      "min_seconds": 0.000187958
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10139:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000187566,
+      "mean_seconds": 0.000187566,
+      "max_seconds": 0.000187566,
+      "min_seconds": 0.000187566
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8414:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000186383,
+      "mean_seconds": 0.000186383,
+      "max_seconds": 0.000186383,
+      "min_seconds": 0.000186383
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10285:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000185631,
+      "mean_seconds": 0.000185631,
+      "max_seconds": 0.000185631,
+      "min_seconds": 0.000185631
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11207:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000185132,
+      "mean_seconds": 0.000185132,
+      "max_seconds": 0.000185132,
+      "min_seconds": 0.000185132
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8382:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000184736,
+      "mean_seconds": 0.000184736,
+      "max_seconds": 0.000184736,
+      "min_seconds": 0.000184736
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8595:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182947,
+      "mean_seconds": 0.000182947,
+      "max_seconds": 0.000182947,
+      "min_seconds": 0.000182947
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8404:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182688,
+      "mean_seconds": 0.000182688,
+      "max_seconds": 0.000182688,
+      "min_seconds": 0.000182688
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11240:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182547,
+      "mean_seconds": 0.000182547,
+      "max_seconds": 0.000182547,
+      "min_seconds": 0.000182547
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3672:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182524,
+      "mean_seconds": 0.000182524,
+      "max_seconds": 0.000182524,
+      "min_seconds": 0.000182524
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8301:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182477,
+      "mean_seconds": 0.000182477,
+      "max_seconds": 0.000182477,
+      "min_seconds": 0.000182477
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9569:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000182218,
+      "mean_seconds": 0.000182218,
+      "max_seconds": 0.000182218,
+      "min_seconds": 0.000182218
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10259:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000181825,
+      "mean_seconds": 0.000181825,
+      "max_seconds": 0.000181825,
+      "min_seconds": 0.000181825
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3540:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000181607,
+      "mean_seconds": 0.000181607,
+      "max_seconds": 0.000181607,
+      "min_seconds": 0.000181607
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11535:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00018156,
+      "mean_seconds": 0.00018156,
+      "max_seconds": 0.00018156,
+      "min_seconds": 0.00018156
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3326:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000180694,
+      "mean_seconds": 0.000180694,
+      "max_seconds": 0.000180694,
+      "min_seconds": 0.000180694
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8434:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000180528,
+      "mean_seconds": 0.000180528,
+      "max_seconds": 0.000180528,
+      "min_seconds": 0.000180528
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3631:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000179813,
+      "mean_seconds": 0.000179813,
+      "max_seconds": 0.000179813,
+      "min_seconds": 0.000179813
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10773:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000179813,
+      "mean_seconds": 0.000179813,
+      "max_seconds": 0.000179813,
+      "min_seconds": 0.000179813
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9640:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000179786,
+      "mean_seconds": 0.000179786,
+      "max_seconds": 0.000179786,
+      "min_seconds": 0.000179786
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9997:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000179779,
+      "mean_seconds": 0.000179779,
+      "max_seconds": 0.000179779,
+      "min_seconds": 0.000179779
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8460:ForEachStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000179651,
+      "mean_seconds": 0.000179651,
+      "max_seconds": 0.000179651,
+      "min_seconds": 0.000179651
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11096:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.0001794,
+      "mean_seconds": 0.0001794,
+      "max_seconds": 0.0001794,
+      "min_seconds": 0.0001794
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11544:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000178825,
+      "mean_seconds": 0.000178825,
+      "max_seconds": 0.000178825,
+      "min_seconds": 0.000178825
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8376:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000178479,
+      "mean_seconds": 0.000178479,
+      "max_seconds": 0.000178479,
+      "min_seconds": 0.000178479
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10734:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000178435,
+      "mean_seconds": 0.000178435,
+      "max_seconds": 0.000178435,
+      "min_seconds": 0.000178435
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11629:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000177926,
+      "mean_seconds": 0.000177926,
+      "max_seconds": 0.000177926,
+      "min_seconds": 0.000177926
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9628:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000177697,
+      "mean_seconds": 0.000177697,
+      "max_seconds": 0.000177697,
+      "min_seconds": 0.000177697
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10197:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000177587,
+      "mean_seconds": 0.000177587,
+      "max_seconds": 0.000177587,
+      "min_seconds": 0.000177587
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3608:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000176026,
+      "mean_seconds": 0.000176026,
+      "max_seconds": 0.000176026,
+      "min_seconds": 0.000176026
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10519:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000175897,
+      "mean_seconds": 0.000175897,
+      "max_seconds": 0.000175897,
+      "min_seconds": 0.000175897
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10800:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00017581,
+      "mean_seconds": 0.00017581,
+      "max_seconds": 0.00017581,
+      "min_seconds": 0.00017581
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8552:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000175233,
+      "mean_seconds": 0.000175233,
+      "max_seconds": 0.000175233,
+      "min_seconds": 0.000175233
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9205:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000174838,
+      "mean_seconds": 0.000174838,
+      "max_seconds": 0.000174838,
+      "min_seconds": 0.000174838
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11524:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000174826,
+      "mean_seconds": 0.000174826,
+      "max_seconds": 0.000174826,
+      "min_seconds": 0.000174826
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10165:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00017456,
+      "mean_seconds": 0.00017456,
+      "max_seconds": 0.00017456,
+      "min_seconds": 0.00017456
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9072:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000173749,
+      "mean_seconds": 0.000173749,
+      "max_seconds": 0.000173749,
+      "min_seconds": 0.000173749
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9043:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000173509,
+      "mean_seconds": 0.000173509,
+      "max_seconds": 0.000173509,
+      "min_seconds": 0.000173509
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9522:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000171906,
+      "mean_seconds": 0.000171906,
+      "max_seconds": 0.000171906,
+      "min_seconds": 0.000171906
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9484:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000170833,
+      "mean_seconds": 0.000170833,
+      "max_seconds": 0.000170833,
+      "min_seconds": 0.000170833
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10571:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000170552,
+      "mean_seconds": 0.000170552,
+      "max_seconds": 0.000170552,
+      "min_seconds": 0.000170552
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9010:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000170129,
+      "mean_seconds": 0.000170129,
+      "max_seconds": 0.000170129,
+      "min_seconds": 0.000170129
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11397:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000169987,
+      "mean_seconds": 0.000169987,
+      "max_seconds": 0.000169987,
+      "min_seconds": 0.000169987
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3391:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000169678,
+      "mean_seconds": 0.000169678,
+      "max_seconds": 0.000169678,
+      "min_seconds": 0.000169678
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11553:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000169495,
+      "mean_seconds": 0.000169495,
+      "max_seconds": 0.000169495,
+      "min_seconds": 0.000169495
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8998:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000168453,
+      "mean_seconds": 0.000168453,
+      "max_seconds": 0.000168453,
+      "min_seconds": 0.000168453
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8487:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000167724,
+      "mean_seconds": 0.000167724,
+      "max_seconds": 0.000167724,
+      "min_seconds": 0.000167724
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10202:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000167473,
+      "mean_seconds": 0.000167473,
+      "max_seconds": 0.000167473,
+      "min_seconds": 0.000167473
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10238:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000167391,
+      "mean_seconds": 0.000167391,
+      "max_seconds": 0.000167391,
+      "min_seconds": 0.000167391
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3698:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000167289,
+      "mean_seconds": 0.000167289,
+      "max_seconds": 0.000167289,
+      "min_seconds": 0.000167289
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10021:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00016678,
+      "mean_seconds": 0.00016678,
+      "max_seconds": 0.00016678,
+      "min_seconds": 0.00016678
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9038:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000166766,
+      "mean_seconds": 0.000166766,
+      "max_seconds": 0.000166766,
+      "min_seconds": 0.000166766
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10329:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00016658,
+      "mean_seconds": 0.00016658,
+      "max_seconds": 0.00016658,
+      "min_seconds": 0.00016658
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10572:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000166574,
+      "mean_seconds": 0.000166574,
+      "max_seconds": 0.000166574,
+      "min_seconds": 0.000166574
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11453:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000166139,
+      "mean_seconds": 0.000166139,
+      "max_seconds": 0.000166139,
+      "min_seconds": 0.000166139
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10473:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000166135,
+      "mean_seconds": 0.000166135,
+      "max_seconds": 0.000166135,
+      "min_seconds": 0.000166135
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3597:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000164548,
+      "mean_seconds": 0.000164548,
+      "max_seconds": 0.000164548,
+      "min_seconds": 0.000164548
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3569:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000164508,
+      "mean_seconds": 0.000164508,
+      "max_seconds": 0.000164508,
+      "min_seconds": 0.000164508
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11100:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000163615,
+      "mean_seconds": 0.000163615,
+      "max_seconds": 0.000163615,
+      "min_seconds": 0.000163615
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10757:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000163411,
+      "mean_seconds": 0.000163411,
+      "max_seconds": 0.000163411,
+      "min_seconds": 0.000163411
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8545:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00016326,
+      "mean_seconds": 0.00016326,
+      "max_seconds": 0.00016326,
+      "min_seconds": 0.00016326
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10465:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000162933,
+      "mean_seconds": 0.000162933,
+      "max_seconds": 0.000162933,
+      "min_seconds": 0.000162933
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10689:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000162814,
+      "mean_seconds": 0.000162814,
+      "max_seconds": 0.000162814,
+      "min_seconds": 0.000162814
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11239:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000162197,
+      "mean_seconds": 0.000162197,
+      "max_seconds": 0.000162197,
+      "min_seconds": 0.000162197
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10340:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000162001,
+      "mean_seconds": 0.000162001,
+      "max_seconds": 0.000162001,
+      "min_seconds": 0.000162001
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10503:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00016179,
+      "mean_seconds": 0.00016179,
+      "max_seconds": 0.00016179,
+      "min_seconds": 0.00016179
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10304:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000161731,
+      "mean_seconds": 0.000161731,
+      "max_seconds": 0.000161731,
+      "min_seconds": 0.000161731
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8473:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000161597,
+      "mean_seconds": 0.000161597,
+      "max_seconds": 0.000161597,
+      "min_seconds": 0.000161597
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10495:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000161385,
+      "mean_seconds": 0.000161385,
+      "max_seconds": 0.000161385,
+      "min_seconds": 0.000161385
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9632:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000161359,
+      "mean_seconds": 0.000161359,
+      "max_seconds": 0.000161359,
+      "min_seconds": 0.000161359
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3720:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000160596,
+      "mean_seconds": 0.000160596,
+      "max_seconds": 0.000160596,
+      "min_seconds": 0.000160596
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11454:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000160539,
+      "mean_seconds": 0.000160539,
+      "max_seconds": 0.000160539,
+      "min_seconds": 0.000160539
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8691:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000159863,
+      "mean_seconds": 0.000159863,
+      "max_seconds": 0.000159863,
+      "min_seconds": 0.000159863
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3660:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000159855,
+      "mean_seconds": 0.000159855,
+      "max_seconds": 0.000159855,
+      "min_seconds": 0.000159855
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10367:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000159776,
+      "mean_seconds": 0.000159776,
+      "max_seconds": 0.000159776,
+      "min_seconds": 0.000159776
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9311:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00015977,
+      "mean_seconds": 0.00015977,
+      "max_seconds": 0.00015977,
+      "min_seconds": 0.00015977
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:2085:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000159312,
+      "mean_seconds": 0.000159312,
+      "max_seconds": 0.000159312,
+      "min_seconds": 0.000159312
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10557:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000159094,
+      "mean_seconds": 0.000159094,
+      "max_seconds": 0.000159094,
+      "min_seconds": 0.000159094
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3641:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000158637,
+      "mean_seconds": 0.000158637,
+      "max_seconds": 0.000158637,
+      "min_seconds": 0.000158637
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8703:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000157359,
+      "mean_seconds": 0.000157359,
+      "max_seconds": 0.000157359,
+      "min_seconds": 0.000157359
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8583:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000157323,
+      "mean_seconds": 0.000157323,
+      "max_seconds": 0.000157323,
+      "min_seconds": 0.000157323
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10303:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000157232,
+      "mean_seconds": 0.000157232,
+      "max_seconds": 0.000157232,
+      "min_seconds": 0.000157232
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10772:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000157219,
+      "mean_seconds": 0.000157219,
+      "max_seconds": 0.000157219,
+      "min_seconds": 0.000157219
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10176:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000156996,
+      "mean_seconds": 0.000156996,
+      "max_seconds": 0.000156996,
+      "min_seconds": 0.000156996
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10249:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000156797,
+      "mean_seconds": 0.000156797,
+      "max_seconds": 0.000156797,
+      "min_seconds": 0.000156797
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10523:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000156534,
+      "mean_seconds": 0.000156534,
+      "max_seconds": 0.000156534,
+      "min_seconds": 0.000156534
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11630:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000156197,
+      "mean_seconds": 0.000156197,
+      "max_seconds": 0.000156197,
+      "min_seconds": 0.000156197
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11493:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000155589,
+      "mean_seconds": 0.000155589,
+      "max_seconds": 0.000155589,
+      "min_seconds": 0.000155589
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9273:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000154679,
+      "mean_seconds": 0.000154679,
+      "max_seconds": 0.000154679,
+      "min_seconds": 0.000154679
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3680:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000154525,
+      "mean_seconds": 0.000154525,
+      "max_seconds": 0.000154525,
+      "min_seconds": 0.000154525
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10210:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000154171,
+      "mean_seconds": 0.000154171,
+      "max_seconds": 0.000154171,
+      "min_seconds": 0.000154171
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9370:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000153477,
+      "mean_seconds": 0.000153477,
+      "max_seconds": 0.000153477,
+      "min_seconds": 0.000153477
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11460:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00015344,
+      "mean_seconds": 0.00015344,
+      "max_seconds": 0.00015344,
+      "min_seconds": 0.00015344
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9929:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000152827,
+      "mean_seconds": 0.000152827,
+      "max_seconds": 0.000152827,
+      "min_seconds": 0.000152827
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8393:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00015282,
+      "mean_seconds": 0.00015282,
+      "max_seconds": 0.00015282,
+      "min_seconds": 0.00015282
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10313:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000152443,
+      "mean_seconds": 0.000152443,
+      "max_seconds": 0.000152443,
+      "min_seconds": 0.000152443
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3551:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00015232,
+      "mean_seconds": 0.00015232,
+      "max_seconds": 0.00015232,
+      "min_seconds": 0.00015232
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10191:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000151761,
+      "mean_seconds": 0.000151761,
+      "max_seconds": 0.000151761,
+      "min_seconds": 0.000151761
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9931:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000151545,
+      "mean_seconds": 0.000151545,
+      "max_seconds": 0.000151545,
+      "min_seconds": 0.000151545
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9186:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000151441,
+      "mean_seconds": 0.000151441,
+      "max_seconds": 0.000151441,
+      "min_seconds": 0.000151441
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8300:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000151057,
+      "mean_seconds": 0.000151057,
+      "max_seconds": 0.000151057,
+      "min_seconds": 0.000151057
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11270:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000150444,
+      "mean_seconds": 0.000150444,
+      "max_seconds": 0.000150444,
+      "min_seconds": 0.000150444
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10799:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00015026,
+      "mean_seconds": 0.00015026,
+      "max_seconds": 0.00015026,
+      "min_seconds": 0.00015026
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8760:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000149424,
+      "mean_seconds": 0.000149424,
+      "max_seconds": 0.000149424,
+      "min_seconds": 0.000149424
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10532:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.0001493,
+      "mean_seconds": 0.0001493,
+      "max_seconds": 0.0001493,
+      "min_seconds": 0.0001493
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9635:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000149095,
+      "mean_seconds": 0.000149095,
+      "max_seconds": 0.000149095,
+      "min_seconds": 0.000149095
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9934:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00014895,
+      "mean_seconds": 0.00014895,
+      "max_seconds": 0.00014895,
+      "min_seconds": 0.00014895
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9429:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000148928,
+      "mean_seconds": 0.000148928,
+      "max_seconds": 0.000148928,
+      "min_seconds": 0.000148928
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3685:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000147802,
+      "mean_seconds": 0.000147802,
+      "max_seconds": 0.000147802,
+      "min_seconds": 0.000147802
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9930:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000147768,
+      "mean_seconds": 0.000147768,
+      "max_seconds": 0.000147768,
+      "min_seconds": 0.000147768
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9120:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00014754,
+      "mean_seconds": 0.00014754,
+      "max_seconds": 0.00014754,
+      "min_seconds": 0.00014754
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10491:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000147463,
+      "mean_seconds": 0.000147463,
+      "max_seconds": 0.000147463,
+      "min_seconds": 0.000147463
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10289:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000147027,
+      "mean_seconds": 0.000147027,
+      "max_seconds": 0.000147027,
+      "min_seconds": 0.000147027
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9241:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000146753,
+      "mean_seconds": 0.000146753,
+      "max_seconds": 0.000146753,
+      "min_seconds": 0.000146753
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9644:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000146003,
+      "mean_seconds": 0.000146003,
+      "max_seconds": 0.000146003,
+      "min_seconds": 0.000146003
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9483:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000145413,
+      "mean_seconds": 0.000145413,
+      "max_seconds": 0.000145413,
+      "min_seconds": 0.000145413
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9936:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000144311,
+      "mean_seconds": 0.000144311,
+      "max_seconds": 0.000144311,
+      "min_seconds": 0.000144311
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:9580:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000144089,
+      "mean_seconds": 0.000144089,
+      "max_seconds": 0.000144089,
+      "min_seconds": 0.000144089
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3395:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000144009,
+      "mean_seconds": 0.000144009,
+      "max_seconds": 0.000144009,
+      "min_seconds": 0.000144009
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10243:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000143776,
+      "mean_seconds": 0.000143776,
+      "max_seconds": 0.000143776,
+      "min_seconds": 0.000143776
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8424:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000142641,
+      "mean_seconds": 0.000142641,
+      "max_seconds": 0.000142641,
+      "min_seconds": 0.000142641
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:11402:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000141703,
+      "mean_seconds": 0.000141703,
+      "max_seconds": 0.000141703,
+      "min_seconds": 0.000141703
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3404:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000141564,
+      "mean_seconds": 0.000141564,
+      "max_seconds": 0.000141564,
+      "min_seconds": 0.000141564
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3401:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000139791,
+      "mean_seconds": 0.000139791,
+      "max_seconds": 0.000139791,
+      "min_seconds": 0.000139791
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10336:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000139537,
+      "mean_seconds": 0.000139537,
+      "max_seconds": 0.000139537,
+      "min_seconds": 0.000139537
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10510:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000139175,
+      "mean_seconds": 0.000139175,
+      "max_seconds": 0.000139175,
+      "min_seconds": 0.000139175
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8452:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000139044,
+      "mean_seconds": 0.000139044,
+      "max_seconds": 0.000139044,
+      "min_seconds": 0.000139044
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3582:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000138127,
+      "mean_seconds": 0.000138127,
+      "max_seconds": 0.000138127,
+      "min_seconds": 0.000138127
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8954:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000137922,
+      "mean_seconds": 0.000137922,
+      "max_seconds": 0.000137922,
+      "min_seconds": 0.000137922
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10266:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000136075,
+      "mean_seconds": 0.000136075,
+      "max_seconds": 0.000136075,
+      "min_seconds": 0.000136075
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10293:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000134753,
+      "mean_seconds": 0.000134753,
+      "max_seconds": 0.000134753,
+      "min_seconds": 0.000134753
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3402:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00013388,
+      "mean_seconds": 0.00013388,
+      "max_seconds": 0.00013388,
+      "min_seconds": 0.00013388
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:10180:IfStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.00013346,
+      "mean_seconds": 0.00013346,
+      "max_seconds": 0.00013346,
+      "min_seconds": 0.00013346
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3740:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000131976,
+      "mean_seconds": 0.000131976,
+      "max_seconds": 0.000131976,
+      "min_seconds": 0.000131976
+    },
+    {
+      "label": "Test-AgentInstructions.SelfTest.ps1:3405:AssignmentStatementAst",
+      "count": 1,
+      "inclusive_total_seconds": 0.000127897,
+      "mean_seconds": 0.000127897,
+      "max_seconds": 0.000127897,
+      "min_seconds": 0.000127897
+    }
+  ],
+  "unmatched_begins": [
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1405:PipelineAst",
+      "count": 8
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1423:AssignmentStatementAst",
+      "count": 1
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1887:PipelineAst",
+      "count": 2
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1900:PipelineAst",
+      "count": 1
+    }
+  ],
+  "orphan_ends": []
+}

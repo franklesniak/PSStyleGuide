@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "released_at": "2026-10-06T08:11:35.744142+00:00",
+  "role": "runtime-diagnostic-non-acceptance",
+  "state": "released_not_yet_launched",
+  "run_id": "tf68-h5ec-20261006-one",
+  "writer": "a06_tf_generator_owner",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\manifest.authorized.json",
+  "manifest_sha256": "8f5ab6e16eeeefaad91a7a5657506d21091ffcbcb4657b5fbe840b68a58c0fd7",
+  "preparation_sha256": "30fd7fc7eaf04dff214a17fdc549ac14e0ce50802c91a56e8e1d7e4e87eb1288",
+  "scripts": {
+    "launch.py": "48b2d77bbfd81522dff92715393a246a9357c51dff3e39050b93fea76e21e0af",
+    "inside.py": "1b0469cb86c1925cb1543dce12a509ff24ea0c621fda1588a8df69cfb5a79a1e",
+    "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "instrument.ps1": "f24787b7d183cb3fb5880b0d2ca131f7f03c7bb43aa9a4a2e5bd09910ed8aae4",
+    "manifest.prepared.json": "c93dd6becd9296309224c22fc2fd1464883c8b2840c4d166957f04fa98018ad3",
+    "summarize.py": "0b90ddb702eb01c15d4e02695688a9add8580b6306ac31e0f6a70adbba05d6ec",
+    "PLAN.md": "23559bc40429734f6be2c29f0c4b33f70af230fb210f8e0dbf3e5672e403b79f"
+  },
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "maximum_runs": 1,
+  "host_timeout_seconds": 2700,
+  "instruction_timeout_seconds": 2550,
+  "root_verification": "Read exact launcher/inside/common/instrumentation and superseding verification; independently checked actual Git source hashes and reversible insertions for both files, 374/135 statements, below 1MiB each, and actual uninstrumented $? pair. Private and host index/config/refs/source/dependencies guarded. No product or CI action released.",
+  "next_action": "Sole writer launches once, records native process/run state, then measures actual bottleneck and prepares distinct repair decision before any product edit."
+}

@@ -1,0 +1,49 @@
+{
+  "state": "prepared_not_launched",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "created_utc": "2026-10-06T08:02:52.829432+00:00",
+  "scripts": {
+    "launch.py": "48b2d77bbfd81522dff92715393a246a9357c51dff3e39050b93fea76e21e0af",
+    "inside.py": "1b0469cb86c1925cb1543dce12a509ff24ea0c621fda1588a8df69cfb5a79a1e",
+    "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "instrument.ps1": "f24787b7d183cb3fb5880b0d2ca131f7f03c7bb43aa9a4a2e5bd09910ed8aae4",
+    "manifest.prepared.json": "c93dd6becd9296309224c22fc2fd1464883c8b2840c4d166957f04fa98018ad3",
+    "summarize.py": "0b90ddb702eb01c15d4e02695688a9add8580b6306ac31e0f6a70adbba05d6ec",
+    "PLAN.md": "23559bc40429734f6be2c29f0c4b33f70af230fb210f8e0dbf3e5672e403b79f"
+  },
+  "instrumentation": [
+    {
+      "Path": ".github/workflows/Test-AgentInstructions.ps1",
+      "SourceSha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "InstrumentedSha256": "cb3ea0889a7d09ec2663a6ff18e3883d2f0d8ac0ea31e2af6bef78446ca0be7b",
+      "StatementCount": 374,
+      "OriginalReconstructed": true,
+      "ParseErrors": 0
+    },
+    {
+      "Path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "SourceSha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "InstrumentedSha256": "56a605132e672291acadaf9bf3bf2f0aca1068a3c54831e685c685aadf35ca97",
+      "StatementCount": 135,
+      "OriginalReconstructed": true,
+      "ParseErrors": 0
+    }
+  ],
+  "preparation_command": [
+    "pwsh",
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\instrument.ps1",
+    "-SourceRoot",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+    "-OutputDirectory",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\prepared-instrumentation"
+  ],
+  "preparation_exit": 0,
+  "diagnostic_runs_started": 0,
+  "prelaunch_correction": "Excluded outer if(SelfTest) marker to preserve ordinary checker child diagnostics; no run occurred.",
+  "identity_guard_strengthened": true,
+  "static_verification_sha256": "5e6d1070a86dc753ad9aa6ddc1feebd5df8e10d97f9fbbf001d2cd66de951cd6"
+}

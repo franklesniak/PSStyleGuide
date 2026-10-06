@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-06T08:27:40.410219+00:00",
+  "root_verified": true,
+  "result_sha256": "bdf4bb0203b45bf3ec686aa7b8b8cc9bca4b7359451e93b8cf62e91ed479007d",
+  "log_sha256": "f2eeda840571ab2f83f213685d3690617cef4ad393b161cb2c0e78d339c59a58",
+  "host_status_sha256": "6e3aef662104adff0e01f7afe36fc9637b9901948904047f35d74ebaeedf2989",
+  "source_files": 80,
+  "dependency_files": 1914,
+  "private_identity_equal": true,
+  "host_identity_equal": true,
+  "instruction_exit": 0,
+  "duration_seconds": 778.037921,
+  "role": "runtime-diagnostic-non-acceptance",
+  "restriction": "Successful instrumented diagnostic does not replace current CI or acceptance validation. No internal cause is attributed beyond measured caller boundary.",
+  "publication_format_adjustments": {
+    "reason": "Markdown lint: unquoted command placeholders and multiple blank lines. Formatting only; original scratch artifacts and their hashes remain unchanged.",
+    "files": {
+      "PLAN.md": {
+        "source_sha256": "23559bc40429734f6be2c29f0c4b33f70af230fb210f8e0dbf3e5672e403b79f",
+        "canonical_sha256": "2f2725c53378b8329c9c5f7f4d578b8ee85d8765a4b25ca27cc9e0582c37c927"
+      },
+      "REPORT.md": {
+        "source_sha256": "5a169d34421dc85cf9014020749919a2a52e562d51bdb6b5573ae4894781b2fd",
+        "canonical_sha256": "ee3f027337e3754a2d6da97f3e8cd7e82b73d6884fcc97c99b30c2d3309f6fb8"
+      }
+    },
+    "link_relocation": "Canonical activation directory is TF68-round5-activation; worker scratch directory was TF68-round5-setup-activation. Canonical relative link corrected."
+  }
+}

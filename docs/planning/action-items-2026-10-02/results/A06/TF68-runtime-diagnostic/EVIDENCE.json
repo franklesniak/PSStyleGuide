@@ -1,0 +1,554 @@
+{
+  "captured_utc": "2026-10-06T08:34:11.773371+00:00",
+  "status": "completed-one-diagnostic-next-proposal-only",
+  "non_acceptance": true,
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "source_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "diagnostic_tree": "598d1f6e88dc0506c8c077b16e0b8b63bb6ecaad",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tool_session_id": 48338,
+  "native_exit": 0,
+  "container_exit": 0,
+  "private_guard_equal": true,
+  "host_guard_equal": true,
+  "commands": [
+    {
+      "name": "instruction-selftest-timed",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-SelfTest",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-06T08:12:55.950582+00:00",
+      "timeout_seconds": 2550,
+      "state": "passed",
+      "pid": 87,
+      "exit": 0,
+      "finished_at": "2026-10-06T08:25:53.988503+00:00",
+      "log_sha256": "f2eeda840571ab2f83f213685d3690617cef4ad393b161cb2c0e78d339c59a58"
+    }
+  ],
+  "duration_seconds": 778.037921,
+  "author_seconds": 563.753555261,
+  "author_percent": 72.45836482319736,
+  "common_dispatch_seconds": 478.279645115,
+  "common_dispatch_percent": 61.47253651856386,
+  "major_groups": [
+    {
+      "line": 3313,
+      "call": "Assert-AgentSetupSelfTest",
+      "seconds": 7.125772853
+    },
+    {
+      "line": 3315,
+      "call": "Assert-StagedInputSelfTest",
+      "seconds": 0.061395895
+    },
+    {
+      "line": 3316,
+      "call": "Assert-ApplicationRuntimeSelfTest",
+      "seconds": 0.506012973
+    },
+    {
+      "line": 3317,
+      "call": "Assert-GitRevisionTextSelfTest",
+      "seconds": 11.895983939
+    },
+    {
+      "line": 3318,
+      "call": "Assert-PublishedBaselineCapacitySelfTest",
+      "seconds": 0.383474882
+    },
+    {
+      "line": 3319,
+      "call": "Assert-DocumentMetadataClassificationSelfTest",
+      "seconds": 0.676615779
+    },
+    {
+      "line": 3320,
+      "call": "Assert-OptionalMetadataSelfTest",
+      "seconds": 7.339349973
+    },
+    {
+      "line": 3321,
+      "call": "Assert-DocumentMetadataPlacementSelfTest",
+      "seconds": 3.444807944
+    },
+    {
+      "line": 3322,
+      "call": "Assert-PublishedMetadataGitFixture",
+      "seconds": 0.219877545
+    },
+    {
+      "line": 3323,
+      "call": "Assert-ClassificationAdmissionGitFixture",
+      "seconds": 11.578979783
+    },
+    {
+      "line": 3324,
+      "call": "Assert-AuthorFinalizationGitFixture",
+      "seconds": 563.753555261
+    }
+  ],
+  "timing_event_count": 2428,
+  "incomplete_intervals": [
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1405:PipelineAst",
+      "count": 8
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1423:AssignmentStatementAst",
+      "count": 1
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1887:PipelineAst",
+      "count": 2
+    },
+    {
+      "pid": 87,
+      "label": "Test-AgentInstructions.SelfTest.ps1:1900:PipelineAst",
+      "count": 1
+    }
+  ],
+  "orphan_ends": [],
+  "criteria": [
+    {
+      "name": "Security and test fidelity",
+      "weight": 30
+    },
+    {
+      "name": "Measured-target confidence",
+      "weight": 25
+    },
+    {
+      "name": "Reliable completion progress",
+      "weight": 20
+    },
+    {
+      "name": "Maintainer/operator usability",
+      "weight": 15
+    },
+    {
+      "name": "Verification precision",
+      "weight": 7
+    },
+    {
+      "name": "Change cost",
+      "weight": 3
+    }
+  ],
+  "options": [
+    {
+      "id": "A",
+      "name": "Keep code and wait without another diagnostic",
+      "scores": [
+        10,
+        3,
+        2,
+        4,
+        5,
+        10
+      ],
+      "total": 54.0,
+      "limits": "Preserves controls but leaves a repeat service failure unexplained."
+    },
+    {
+      "id": "B",
+      "name": "Profile one reconstructed immutable author case with an original/timed pair; then select a repair",
+      "scores": [
+        10,
+        10,
+        8,
+        9,
+        10,
+        9
+      ],
+      "total": 94.2,
+      "limits": "Best next decision; provides no immediate product-speed guarantee."
+    },
+    {
+      "id": "C",
+      "name": "Bounded queue of two independent immutable-case checkouts; mutable cases stay serial",
+      "scores": [
+        9,
+        7,
+        7,
+        7,
+        7,
+        5
+      ],
+      "total": 75.4,
+      "limits": "Targets the measured boundary; equivalence and actual CPU/host gain remain unproved."
+    },
+    {
+      "id": "D",
+      "name": "Parallelize the existing shared fixture dispatcher",
+      "scores": [
+        1,
+        7,
+        3,
+        2,
+        2,
+        8
+      ],
+      "total": 33.3,
+      "limits": "Ineligible: checkout, baseline and checker mutations would race."
+    },
+    {
+      "id": "E",
+      "name": "Partition complete author scenarios into independent full fixtures/jobs",
+      "scores": [
+        9,
+        7,
+        6,
+        5,
+        6,
+        3
+      ],
+      "total": 69.1,
+      "limits": "Can preserve cases but duplicates costly initialization and complicates coordinated failure handling."
+    },
+    {
+      "id": "F",
+      "name": "Add per-invocation exact-identity parser/static-context reuse",
+      "scores": [
+        8,
+        5,
+        7,
+        7,
+        6,
+        5
+      ],
+      "total": 66.7,
+      "limits": "Potential benefit; neither repeated internal work nor safe invalidation key is measured yet."
+    },
+    {
+      "id": "G",
+      "name": "Use a persistent or batched parser/runtime process",
+      "scores": [
+        7,
+        4,
+        7,
+        5,
+        5,
+        3
+      ],
+      "total": 56.9,
+      "limits": "Could amortize startup but creates a protocol, lifecycle and per-input isolation contract."
+    },
+    {
+      "id": "H",
+      "name": "Change private clock mechanism to checked source instrumentation",
+      "scores": [
+        7,
+        3,
+        6,
+        6,
+        5,
+        5
+      ],
+      "total": 54.5,
+      "limits": "No measured clock bottleneck; revisits C97 exact-source and scope/readback protections."
+    },
+    {
+      "id": "I",
+      "name": "Reuse one PowerShell runspace across full checker cases",
+      "scores": [
+        5,
+        5,
+        6,
+        4,
+        4,
+        4
+      ],
+      "total": 49.5,
+      "limits": "May leak runtime caches/global/breakpoint/native status; requires proof of fresh-case equivalence."
+    },
+    {
+      "id": "J",
+      "name": "Batch file-identity inquiries while retaining every check",
+      "scores": [
+        9,
+        2,
+        2,
+        5,
+        5,
+        5
+      ],
+      "total": 48.5,
+      "limits": "Legitimate batching may preserve safety, but only11.54s of completed inquiries was measured; low-value primary target."
+    },
+    {
+      "id": "K",
+      "name": "Retry existing hosted setup no more than hourly",
+      "scores": [
+        10,
+        2,
+        3,
+        5,
+        3,
+        9
+      ],
+      "total": 53.3,
+      "limits": "Could pass but is not a causal repair or reliable completion claim; current run remains cancelled."
+    },
+    {
+      "id": "L",
+      "name": "Configure a larger supported runner",
+      "scores": [
+        9,
+        3,
+        5,
+        5,
+        4,
+        3
+      ],
+      "total": 55.7,
+      "limits": "Capacity, cost and actual gain are unqualified; requires the appropriate owner/platform setting authority."
+    },
+    {
+      "id": "M",
+      "name": "Bootstrap the dedicated review workflow through a separate normally accepted PR",
+      "scores": [
+        10,
+        4,
+        4,
+        4,
+        5,
+        3
+      ],
+      "total": 58.4,
+      "limits": "Its own legacy setup must pass; no failing-CI exception or deadline reset."
+    },
+    {
+      "id": "N",
+      "name": "Land normally only after all current CI/reviews are green, then prove dedicated activation",
+      "scores": [
+        10,
+        6,
+        4,
+        7,
+        7,
+        9
+      ],
+      "total": 71.1,
+      "limits": "Conditional prior B93.5 sequence; unavailable while current dynamic CI is cancelled."
+    },
+    {
+      "id": "O",
+      "name": "Increase repository YAML timeouts again",
+      "scores": [
+        10,
+        1,
+        1,
+        3,
+        2,
+        8
+      ],
+      "total": 42.8,
+      "limits": "Does not establish control over the observed service20-minute ceiling; already59/45 coding budgets."
+    },
+    {
+      "id": "P",
+      "name": "Skip cases or snapshot checks, accept failed setup, or cache whole pass results across distinct inputs",
+      "scores": [
+        0,
+        2,
+        0,
+        1,
+        1,
+        8
+      ],
+      "total": 9.6,
+      "limits": "Ineligible: removes coverage, invents acceptance or bypasses actual changed input validation."
+    },
+    {
+      "id": "Q",
+      "name": "Optimize an internal validator algorithm now without attribution",
+      "scores": [
+        7,
+        2,
+        5,
+        5,
+        3,
+        3
+      ],
+      "total": 46.5,
+      "limits": "No specific internal algorithm was measured; choose B before such a repair."
+    }
+  ],
+  "selected": "B",
+  "selected_score": 94.2,
+  "next_run_authorized": false,
+  "full_run_repeat_authorized": false,
+  "product_repair_selected": false,
+  "diagnostic_runs": 1,
+  "product_writes": 0,
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\ROOT-RELEASE.json",
+      "sha256": "53de789b22d6f4140e9d99fdfad665db19c88fc1c65a2ef9b68718bbf068dd7b",
+      "bytes": 1996
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\manifest.authorized.json",
+      "sha256": "8f5ab6e16eeeefaad91a7a5657506d21091ffcbcb4657b5fbe840b68a58c0fd7",
+      "bytes": 1202
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\PREPARATION.json",
+      "sha256": "30fd7fc7eaf04dff214a17fdc549ac14e0ce50802c91a56e8e1d7e4e87eb1288",
+      "bytes": 2413
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\PLAN.md",
+      "sha256": "23559bc40429734f6be2c29f0c4b33f70af230fb210f8e0dbf3e5672e403b79f",
+      "bytes": 6146
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\VERIFICATION.md",
+      "sha256": "986ebdbf740a5b23f2f30ecbf67d1e5bc74d6038bc17b73825a4f559f06d583c",
+      "bytes": 1754
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\identity-and-instrumentation-audit.json",
+      "sha256": "5e6d1070a86dc753ad9aa6ddc1feebd5df8e10d97f9fbbf001d2cd66de951cd6",
+      "bytes": 1514
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\caller-scope-audit.json",
+      "sha256": "7ae396a8044cea0ec4d082ad1f37da0e243e3eb65d1c502676f8f4711216548e",
+      "bytes": 4054
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\instrument.ps1",
+      "sha256": "f24787b7d183cb3fb5880b0d2ca131f7f03c7bb43aa9a4a2e5bd09910ed8aae4",
+      "bytes": 3639
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\launch.py",
+      "sha256": "48b2d77bbfd81522dff92715393a246a9357c51dff3e39050b93fea76e21e0af",
+      "bytes": 7855
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\inside.py",
+      "sha256": "1b0469cb86c1925cb1543dce12a509ff24ea0c621fda1588a8df69cfb5a79a1e",
+      "bytes": 12087
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\common.py",
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\summarize.py",
+      "sha256": "0b90ddb702eb01c15d4e02695688a9add8580b6306ac31e0f6a70adbba05d6ec",
+      "bytes": 1684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\launch-session.json",
+      "sha256": "aecdf643997aec8abe941badb83b131968755203a1daa6215edd4bacf05ddc12",
+      "bytes": 868
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\container-identity.json",
+      "sha256": "320189e7de50c0367c501558b70d2cf831ca3802d5f900ffb247b513375d03a4",
+      "bytes": 670
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\prepared-instrumentation\\instrumentation.json",
+      "sha256": "8f5c11c8f595974afab33bbf9d257f0946aaf5d45d9b6b027bdd9d3b1a91cd98",
+      "bytes": 419436
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\timing-final.json",
+      "sha256": "24989fea7ba0f30602726eb2d3304e188041c2ef0a63f0732156bfe34425852a",
+      "bytes": 130887
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\timing-intermediate-1.json",
+      "sha256": "5074c5772ad458b008de3f8eb0839039cb988c7ad6bd6289f3a5c01779436d69",
+      "bytes": 38445
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\timing-intermediate-2.json",
+      "sha256": "244569e66e08febc33bcc66a4179c208358bb11dd5d64fc2318e7920a72aaee5",
+      "bytes": 94480
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\status.json",
+      "sha256": "6e3aef662104adff0e01f7afe36fc9637b9901948904047f35d74ebaeedf2989",
+      "bytes": 1291
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\result.json",
+      "sha256": "bdf4bb0203b45bf3ec686aa7b8b8cc9bca4b7359451e93b8cf62e91ed479007d",
+      "bytes": 1212
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\before.json",
+      "sha256": "d11edf883a81fef126b87a990fe4c8de7315fc2240796742da2a51f7552600c7",
+      "bytes": 414074
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\instruction-selftest-timed-after.json",
+      "sha256": "d11edf883a81fef126b87a990fe4c8de7315fc2240796742da2a51f7552600c7",
+      "bytes": 414074
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\host-source-after.json",
+      "sha256": "43ad2d301042b38e8def817761b6d48bae69a749045b9d39c1c5dd6a2a0e9379",
+      "bytes": 402067
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\instruction-selftest-timed.log",
+      "sha256": "f2eeda840571ab2f83f213685d3690617cef4ad393b161cb2c0e78d339c59a58",
+      "bytes": 241600
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\output\\runtime.json",
+      "sha256": "e618361e29a0deb3fc697694f7d409b196be9f818b952b725dd4e5a8df250f66",
+      "bytes": 451
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\inputs\\source-before.json",
+      "sha256": "43ad2d301042b38e8def817761b6d48bae69a749045b9d39c1c5dd6a2a0e9379",
+      "bytes": 402067
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\runs\\tf68-h5ec-20261006-one\\inputs\\payload-hashes.json",
+      "sha256": "d4a7653a188b13f84791e08d2ca558f2f34140db790b2c7b7064ca1474f3db81",
+      "bytes": 916
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-5ec4bdc\\37430212759\\attempt-1\\log.txt",
+      "sha256": "5a9d4911cabda2e3d9851adcf997f1e7b3858ae88460c25a1296efca9a3f0a5e",
+      "bytes": 340167
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair\\runs\\a06-tf-peer-20261006-round4-repair\\output\\result.json",
+      "sha256": "2cccef5df96690f038b2ff2edd28f3796a5bc552455673d72e10209840fb6fb0",
+      "bytes": 2300
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\caller-scope-audit.before-terminology-correction.json",
+      "sha256": "a716da17dc791916dfe2a3ae82df393cfa7adeeadf394a53ebab193a654c32e1",
+      "bytes": 3771
+    }
+  ],
+  "report_sha256": "5a169d34421dc85cf9014020749919a2a52e562d51bdb6b5573ae4894781b2fd",
+  "incomplete_interval_explanation": {
+    "1405": "8 intentional inquiry refusals",
+    "1423": "1 changed-identity refusal",
+    "1887": "2 delayed-clock regression mutants",
+    "1900": "1 missing-status-message mutant, native exit0"
+  }
+}

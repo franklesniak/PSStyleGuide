@@ -1,0 +1,29 @@
+{
+  "verified_at": "2026-10-06T08:57:09.490625+00:00",
+  "private_identity_equal": true,
+  "host_identity_equal": true,
+  "source_files": 80,
+  "dependencies": 1914,
+  "pair": {
+    "state": "passed",
+    "non_acceptance": true,
+    "selected_children": 2,
+    "bootstrap_separate": true,
+    "control_exit": 0,
+    "profile_exit": 0,
+    "control_seconds": 12.664242049999984,
+    "profile_seconds": 12.583976793999966,
+    "stdout_equal": true,
+    "non_marker_stderr_equal": true,
+    "exact_argv_cwd_equal": true,
+    "original_clock_guard_retained": true,
+    "prior_ephemeral_identity_replayed": false
+  },
+  "artifacts": {
+    "run-status.json": "98b0e5035ff9547c3a2b3016dcc125a65da94ec45f53eb1318fb74987f3130dc",
+    "run-result.json": "afd2712dd272864c4d0cb05fc8442efa5637396a5941799472976b454ac71234",
+    "pair-result.json": "c76a29dc19717affda92126a5f2e174e051868710f04521e25ccfcb8d949cf73",
+    "case.json": "58c54b965a930665172fc614f4ef54b3ceb879c73b5b83c25af47039be9d676a"
+  },
+  "scope": "Read terminal results, exact stdout and both complete guard objects; internal marker attribution is still under analysis. Diagnostic only, not acceptance."
+}

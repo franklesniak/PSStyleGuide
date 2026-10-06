@@ -1,0 +1,51 @@
+{
+  "state": "passed",
+  "role": "runtime-attribution-pair-non-acceptance",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "workspace": "/work/validation-tf68-h5ec-20261006-pair-one-wpq4hrhp",
+  "started_at": "2026-10-06T08:55:04.042103+00:00",
+  "commands": [
+    {
+      "name": "attribution-pair",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/pair-driver.ps1",
+        "-RepositoryRootPath",
+        "/work/validation-tf68-h5ec-20261006-pair-one-wpq4hrhp/repository",
+        "-OutputDirectory",
+        "/output"
+      ],
+      "started_at": "2026-10-06T08:55:06.110271+00:00",
+      "timeout_seconds": 270,
+      "state": "passed",
+      "pid": 85,
+      "exit": 0,
+      "finished_at": "2026-10-06T08:56:00.770046+00:00",
+      "log_sha256": "fd7748bac8b0a03b32575d84e2b3e921ed70f547c4998bdb3081f43a1e639d8c"
+    }
+  ],
+  "non_acceptance": true,
+  "source_uninstrumented": true,
+  "diagnostic_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "pair": {
+    "state": "passed",
+    "non_acceptance": true,
+    "selected_children": 2,
+    "bootstrap_separate": true,
+    "control_exit": 0,
+    "profile_exit": 0,
+    "control_seconds": 12.664242049999984,
+    "profile_seconds": 12.583976793999966,
+    "stdout_equal": true,
+    "non_marker_stderr_equal": true,
+    "exact_argv_cwd_equal": true,
+    "original_clock_guard_retained": true,
+    "prior_ephemeral_identity_replayed": false
+  },
+  "finished_at": "2026-10-06T08:56:00.969447+00:00"
+}

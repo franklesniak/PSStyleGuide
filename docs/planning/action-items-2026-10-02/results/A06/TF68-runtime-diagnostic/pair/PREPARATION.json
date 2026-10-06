@@ -1,0 +1,95 @@
+{
+  "state": "prepared_not_executed",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "bootstrap_separate": true,
+  "maximum_selected_children": 2,
+  "whole_container_timeout_seconds": 300,
+  "parent_timeout_seconds": 270,
+  "child_timeout_seconds": 90,
+  "source_and_dependencies_unmodified": true,
+  "no_native_actions": true,
+  "static_preparation_failure": "First clock literal audit used unsupported AST SafeGetValue; corrected to read the exact StringConstantExpressionAst.Value; final static audit passed. No fixture executed.",
+  "artifacts": [
+    {
+      "name": "author-catalog.json",
+      "bytes": 594,
+      "sha256": "511d8525324aed3aac961cad648e7fe85b560ec4a7509eb429bc2ffa3a839ab4"
+    },
+    {
+      "name": "author-one-case.ps1",
+      "bytes": 37350,
+      "sha256": "08f6884ef389121a8455882bd66d8bd60cd04275a496ccba4f1b97b03d8fe5b2"
+    },
+    {
+      "name": "check-preparation.ps1",
+      "bytes": 3522,
+      "sha256": "acc737f03813973a22bfc5165c0ecfc11f5345299722c8faaffd370a8f1504d9"
+    },
+    {
+      "name": "common.py",
+      "bytes": 3597,
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a"
+    },
+    {
+      "name": "inside.py",
+      "bytes": 11036,
+      "sha256": "55ca1f61ae2d6a70d3b10007b140e603e67fbd16276623103c2c13a2b8990f93"
+    },
+    {
+      "name": "launch.py",
+      "bytes": 8031,
+      "sha256": "83bfccebd358818008e8117198b6dad1164e506bc7c365236573288e8ec4d197"
+    },
+    {
+      "name": "manifest.prepared.json",
+      "bytes": 2432,
+      "sha256": "48ebb4043a503da82e65434f6e08140fb0444c496698710b2e8fddd76a7b1f49"
+    },
+    {
+      "name": "pair-driver.ps1",
+      "bytes": 3992,
+      "sha256": "4cd9dd076c471c16d62ccf2514d1960100f3f5b6c9360b02c3d3dab82303649e"
+    },
+    {
+      "name": "preparation-check.json",
+      "bytes": 18555,
+      "sha256": "1476348ec762b01170d53cd96de1aefa356aac42eef866e44e04e7dd6ee2480b"
+    },
+    {
+      "name": "PREPARATION.md",
+      "bytes": 6507,
+      "sha256": "0d4775898b94dabb9e2256f116b6b9b60ccd0afc3906d92d67abb6f07e03f20e"
+    },
+    {
+      "name": "prepare-author.ps1",
+      "bytes": 6771,
+      "sha256": "1fd7dedca0574bb66d0c422e97282013af438805a9b0b1313cb06ee7abe4e789"
+    },
+    {
+      "name": "prepare-profile.ps1",
+      "bytes": 3613,
+      "sha256": "ddb1cd4b5a8b4ad43f674f73c6fc4133d8d7fdda05c92d49478fab57e498b2e2"
+    },
+    {
+      "name": "prepare-runner.py",
+      "bytes": 3781,
+      "sha256": "d6eee727c983fdd146e3a649eaf5c5fe4c4beb6f70d46764a8a46ef369ab7fc4"
+    },
+    {
+      "name": "profile-catalog.json",
+      "bytes": 50095,
+      "sha256": "724324c1359bd2aa64c2dd7bd9b4d5e6704cc850eec9d0382ae26fee4b6d129d"
+    },
+    {
+      "name": "profile.ps1",
+      "bytes": 514040,
+      "sha256": "8ee1207184f5515a10728567bc537a536eb64fceccdb20e2249d1a44fa06c841"
+    },
+    {
+      "name": "run-child.py",
+      "bytes": 2790,
+      "sha256": "7465b7c69e454c06471c597eaf9e5b4e314b02642fd7de8953ec8d9b730da92b"
+    }
+  ]
+}

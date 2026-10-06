@@ -1,0 +1,37 @@
+{
+  "state": "passed",
+  "role": "runtime-diagnostic-non-acceptance",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "workspace": "/work/validation-tf68-h5ec-20261006-one-kceat7e8",
+  "started_at": "2026-10-06T08:12:53.801349+00:00",
+  "commands": [
+    {
+      "name": "instruction-selftest-timed",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-SelfTest",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-06T08:12:55.950582+00:00",
+      "timeout_seconds": 2550,
+      "state": "passed",
+      "pid": 87,
+      "exit": 0,
+      "finished_at": "2026-10-06T08:25:53.988503+00:00",
+      "log_sha256": "f2eeda840571ab2f83f213685d3690617cef4ad393b161cb2c0e78d339c59a58"
+    }
+  ],
+  "non_acceptance": true,
+  "instrumented_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "diagnostic_tree": "598d1f6e88dc0506c8c077b16e0b8b63bb6ecaad",
+  "finished_at": "2026-10-06T08:25:54.181873+00:00"
+}

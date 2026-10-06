@@ -1,0 +1,117 @@
+{
+  "source_sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+  "kind": "static-scope-audit-not-a-performance-cause",
+  "mutable_state_boundaries": [
+    {
+      "line": 1507,
+      "text": "$strBaseline = $strSourceHead"
+    },
+    {
+      "line": 1510,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1538,
+      "text": "$objDocumentedResult = & $scriptblockInvokeCheck @('-InputRevision', $strCurrentCandidate,"
+    },
+    {
+      "line": 1568,
+      "text": "if ($intOptionalBaselineDifference -eq 1) { $strBaseline = & $scriptblockCommit }"
+    },
+    {
+      "line": 1591,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1600,
+      "text": "$strBaseline = $strBeforeOptionalBaseline"
+    },
+    {
+      "line": 1615,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1628,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1634,
+      "text": "$strBaseline = $strBeforeOptionalBaseline"
+    },
+    {
+      "line": 1649,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1653,
+      "text": "$strBaseline = $strBeforeCaseBaseline"
+    },
+    {
+      "line": 1681,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1686,
+      "text": "$strBaseline = $strBeforeLateMetadataBaseline"
+    },
+    {
+      "line": 1778,
+      "text": "$strBaseline = $strSpacedHead"
+    },
+    {
+      "line": 1782,
+      "text": "$strBaseline = $strBeforeSpacedBaseline"
+    },
+    {
+      "line": 1796,
+      "text": "$strBaseline = & $scriptblockCommit"
+    },
+    {
+      "line": 1801,
+      "text": "$strBaseline = $strBeforeFieldBaseline"
+    },
+    {
+      "line": 1855,
+      "text": "$objLocalResult = & $scriptblockInvokeCheck @() $objFixtureUtcNow $strValidatorPath $true"
+    },
+    {
+      "line": 1866,
+      "text": "$objModeResult = & $scriptblockInvokeCheck $arrMode $objFixtureUtcNow $strValidatorPath $false"
+    },
+    {
+      "line": 1874,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strRequireDateMutant, [Text.UTF8Encoding]::new($false))"
+    },
+    {
+      "line": 1876,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strValidatorContent, [Text.UTF8Encoding]::new($false))"
+    },
+    {
+      "line": 1884,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strClockMutation, [Text.UTF8Encoding]::new($false))"
+    },
+    {
+      "line": 1893,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strValidatorContent, [Text.UTF8Encoding]::new($false))"
+    },
+    {
+      "line": 1897,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strStatusMutant, [Text.UTF8Encoding]::new($false))"
+    },
+    {
+      "line": 1906,
+      "text": "[IO.File]::WriteAllText($strValidatorPath, $strValidatorContent, [Text.UTF8Encoding]::new($false))"
+    }
+  ],
+  "conclusions": [
+    "The common checker dispatcher mutates one shared fixture checkout and cannot simply run concurrently.",
+    "Baseline changes during fixture construction; any immutable queue must capture each exact B/H rather than read a later closure value.",
+    "Actual validator worktree bytes are deliberately changed by required-date, delayed-clock regression and missing-status-message mutants; checking out only B in a queued worker would lose those controls.",
+    "Documented accepted-base worktree, local/staged, proposed H/wrong-checkout, invalid-mode and mutable checker cases must remain serial unless independently redesigned/proven.",
+    "A prospective independent-checkout queue is conditional, not established equivalent or implemented."
+  ],
+  "terminology_correction": {
+    "superseded_sha256": "a716da17dc791916dfe2a3ae82df393cfa7adeeadf394a53ebab193a654c32e1",
+    "detail": "Line1900 keeps native exit0 and replaces the expected limited-status message. It is not a child-exit mutation."
+  }
+}

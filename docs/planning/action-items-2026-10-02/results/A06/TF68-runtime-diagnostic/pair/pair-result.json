@@ -1,0 +1,15 @@
+{
+  "state": "passed",
+  "non_acceptance": true,
+  "selected_children": 2,
+  "bootstrap_separate": true,
+  "control_exit": 0,
+  "profile_exit": 0,
+  "control_seconds": 12.664242049999984,
+  "profile_seconds": 12.583976793999966,
+  "stdout_equal": true,
+  "non_marker_stderr_equal": true,
+  "exact_argv_cwd_equal": true,
+  "original_clock_guard_retained": true,
+  "prior_ephemeral_identity_replayed": false
+}

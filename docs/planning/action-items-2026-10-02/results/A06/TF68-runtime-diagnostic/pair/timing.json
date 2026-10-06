@@ -1,0 +1,287 @@
+{
+  "role": "non-acceptance internal attribution",
+  "marker_events": 812,
+  "completed_labels": 36,
+  "completed_intervals": 406,
+  "orphan_ends": [],
+  "incomplete": [],
+  "timing": [
+    {
+      "label": "Test-AgentInstructions.ps1:6283:AssignmentStatementAst",
+      "count": 35,
+      "total_seconds": 6.412807837,
+      "minimum_seconds": 0.038449731,
+      "maximum_seconds": 0.786875522
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8245:PipelineAst",
+      "count": 5,
+      "total_seconds": 3.17734507,
+      "minimum_seconds": 0.28742963,
+      "maximum_seconds": 1.583921138
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:3405:AssignmentStatementAst",
+      "count": 59,
+      "total_seconds": 2.849128858,
+      "minimum_seconds": 0.033058927,
+      "maximum_seconds": 0.093809723
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:6154:AssignmentStatementAst",
+      "count": 17,
+      "total_seconds": 2.646960403,
+      "minimum_seconds": 0.045199405,
+      "maximum_seconds": 0.528985701
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:6584:AssignmentStatementAst",
+      "count": 7,
+      "total_seconds": 1.995820728,
+      "minimum_seconds": 0.134361012,
+      "maximum_seconds": 0.76985825
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:6645:AssignmentStatementAst",
+      "count": 5,
+      "total_seconds": 1.59070639,
+      "minimum_seconds": 0.144514894,
+      "maximum_seconds": 0.797674558
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:4408:AssignmentStatementAst",
+      "count": 12,
+      "total_seconds": 1.4981916,
+      "minimum_seconds": 0.039131322,
+      "maximum_seconds": 0.355875646
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:4430:AssignmentStatementAst",
+      "count": 11,
+      "total_seconds": 1.473503746,
+      "minimum_seconds": 0.047044421,
+      "maximum_seconds": 0.320943106
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:3927:AssignmentStatementAst",
+      "count": 7,
+      "total_seconds": 1.336721533,
+      "minimum_seconds": 0.115877775,
+      "maximum_seconds": 0.247394805
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8150:PipelineAst",
+      "count": 1,
+      "total_seconds": 1.056505791,
+      "minimum_seconds": 1.056505791,
+      "maximum_seconds": 1.056505791
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8218:AssignmentStatementAst",
+      "count": 3,
+      "total_seconds": 0.5168402400000001,
+      "minimum_seconds": 0.117500098,
+      "maximum_seconds": 0.225184286
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7373:PipelineAst",
+      "count": 2,
+      "total_seconds": 0.457938984,
+      "minimum_seconds": 0.221783855,
+      "maximum_seconds": 0.236155129
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:2025:AssignmentStatementAst",
+      "count": 62,
+      "total_seconds": 0.432233161,
+      "minimum_seconds": 0.001256341,
+      "maximum_seconds": 0.04505703
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7092:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.249328599,
+      "minimum_seconds": 0.249328599,
+      "maximum_seconds": 0.249328599
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:5270:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.246519616,
+      "minimum_seconds": 0.246519616,
+      "maximum_seconds": 0.246519616
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8062:PipelineAst",
+      "count": 20,
+      "total_seconds": 0.20409432,
+      "minimum_seconds": 0.003396873,
+      "maximum_seconds": 0.042417105
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8149:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.194214697,
+      "minimum_seconds": 0.194214697,
+      "maximum_seconds": 0.194214697
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7091:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.190207494,
+      "minimum_seconds": 0.190207494,
+      "maximum_seconds": 0.190207494
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:749:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.15719283,
+      "minimum_seconds": 0.15719283,
+      "maximum_seconds": 0.15719283
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:1918:AssignmentStatementAst",
+      "count": 67,
+      "total_seconds": 0.119833651,
+      "minimum_seconds": 0.001165054,
+      "maximum_seconds": 0.014167702
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7840:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.088859774,
+      "minimum_seconds": 0.088859774,
+      "maximum_seconds": 0.088859774
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:449:PipelineAst",
+      "count": 13,
+      "total_seconds": 0.08249759699999999,
+      "minimum_seconds": 0.003408737,
+      "maximum_seconds": 0.020957998
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7026:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.063629025,
+      "minimum_seconds": 0.063629025,
+      "maximum_seconds": 0.063629025
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:3241:AssignmentStatementAst",
+      "count": 59,
+      "total_seconds": 0.059658509,
+      "minimum_seconds": 3.8235e-05,
+      "maximum_seconds": 0.05249238
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:1481:AssignmentStatementAst",
+      "count": 3,
+      "total_seconds": 0.03343385,
+      "minimum_seconds": 0.001893033,
+      "maximum_seconds": 0.028739874
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:2617:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.023138475,
+      "minimum_seconds": 0.023138475,
+      "maximum_seconds": 0.023138475
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:2785:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.020613814,
+      "minimum_seconds": 0.020613814,
+      "maximum_seconds": 0.020613814
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7745:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.017263629,
+      "minimum_seconds": 0.017263629,
+      "maximum_seconds": 0.017263629
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7991:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.016285159,
+      "minimum_seconds": 0.016285159,
+      "maximum_seconds": 0.016285159
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8027:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.01001311,
+      "minimum_seconds": 0.01001311,
+      "maximum_seconds": 0.01001311
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7973:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.008562942,
+      "minimum_seconds": 0.008562942,
+      "maximum_seconds": 0.008562942
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:2456:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.005732957,
+      "minimum_seconds": 0.005732957,
+      "maximum_seconds": 0.005732957
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:7773:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.004646709,
+      "minimum_seconds": 0.004646709,
+      "maximum_seconds": 0.004646709
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8009:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.004086832,
+      "minimum_seconds": 0.004086832,
+      "maximum_seconds": 0.004086832
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:8165:PipelineAst",
+      "count": 1,
+      "total_seconds": 0.003846768,
+      "minimum_seconds": 0.003846768,
+      "maximum_seconds": 0.003846768
+    },
+    {
+      "label": "Test-AgentInstructions.ps1:1555:AssignmentStatementAst",
+      "count": 1,
+      "total_seconds": 0.001582869,
+      "minimum_seconds": 0.001582869,
+      "maximum_seconds": 0.001582869
+    }
+  ],
+  "control_seconds": 12.664242049999984,
+  "profile_seconds": 12.583976793999966,
+  "case": {
+    "Role": "non-acceptance reconstructed first current-date case",
+    "Baseline": "3a4ebd27a222b5c8ce11daba49cdc1691a75e44e",
+    "Candidate": "7d355852d6ff5c23dfbf3c62ab2e0427600d22af",
+    "Clock": "2026-10-06T08:55:15.3320190+00:00",
+    "ExpectedDate": "2026-10-06",
+    "ExpectedExit": 0,
+    "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=3a4ebd27a222b5c8ce11daba49cdc1691a75e44e H=7d355852d6ff5c23dfbf3c62ab2e0427600d22af",
+    "PriorEphemeralIdentityReplayed": false
+  },
+  "bootstrap": {
+    "Role": "ordinary original-validator bootstrap; separate from two selected children",
+    "State": "completed",
+    "ElapsedSeconds": 8.7548707
+  },
+  "private_identity_equal": true,
+  "host_identity_equal": true,
+  "source_count": 80,
+  "dependency_count": 1914,
+  "exact_argv_cwd_clock_arguments_equal": true,
+  "raw_stdout_equal": true,
+  "non_marker_stderr_equal": true,
+  "clock_guard_retained": true
+}

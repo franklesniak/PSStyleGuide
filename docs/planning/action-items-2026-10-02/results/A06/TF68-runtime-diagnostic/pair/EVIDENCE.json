@@ -1,0 +1,361 @@
+{
+  "role": "proposed update to existing TF68 runtime finding; no product implementation",
+  "diagnostic_state": "passed",
+  "native_session": 42016,
+  "native_exit": 0,
+  "authorized_manifest_sha256": "112b8f14bfde0a8f6c8e158ae9c19776ced0265e37ea943be8dbc178cea948ca",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "source_count": 80,
+  "dependency_count": 1914,
+  "private_and_host_identity_equal": true,
+  "weights": [
+    30,
+    25,
+    20,
+    15,
+    7,
+    3
+  ],
+  "scores": [
+    {
+      "option": "A",
+      "scores": [
+        10,
+        10,
+        2,
+        2,
+        9,
+        10
+      ],
+      "total": 71.3,
+      "eligible": true
+    },
+    {
+      "option": "B",
+      "scores": [
+        10,
+        10,
+        6.5,
+        5,
+        10,
+        8
+      ],
+      "total": 84.9,
+      "eligible": true
+    },
+    {
+      "option": "C",
+      "scores": [
+        9.5,
+        9.5,
+        8.5,
+        9,
+        9,
+        7
+      ],
+      "total": 91.15,
+      "eligible": true
+    },
+    {
+      "option": "D",
+      "scores": [
+        5,
+        6,
+        8,
+        6,
+        5,
+        7
+      ],
+      "total": 60.6,
+      "eligible": true
+    },
+    {
+      "option": "E",
+      "scores": [
+        8,
+        8,
+        5,
+        6,
+        7,
+        7
+      ],
+      "total": 70.0,
+      "eligible": true
+    },
+    {
+      "option": "F",
+      "scores": [
+        8,
+        8,
+        6,
+        7,
+        7,
+        6
+      ],
+      "total": 73.2,
+      "eligible": true
+    },
+    {
+      "option": "G",
+      "scores": [
+        6,
+        7,
+        5,
+        5,
+        6,
+        4
+      ],
+      "total": 58.4,
+      "eligible": true
+    },
+    {
+      "option": "H",
+      "scores": [
+        8,
+        8,
+        7,
+        7,
+        7,
+        5
+      ],
+      "total": 74.9,
+      "eligible": true
+    },
+    {
+      "option": "I",
+      "scores": [
+        8,
+        8,
+        6,
+        6,
+        7,
+        4
+      ],
+      "total": 71.1,
+      "eligible": true
+    },
+    {
+      "option": "J",
+      "scores": [
+        6,
+        6,
+        3,
+        5,
+        6,
+        5
+      ],
+      "total": 52.2,
+      "eligible": true
+    },
+    {
+      "option": "K",
+      "scores": [
+        8,
+        9,
+        2,
+        3,
+        5,
+        7
+      ],
+      "total": 60.6,
+      "eligible": true
+    },
+    {
+      "option": "L",
+      "scores": [
+        0,
+        0,
+        1,
+        1,
+        0,
+        9
+      ],
+      "total": 6.2,
+      "eligible": false
+    }
+  ],
+  "selected_proposal": "C",
+  "selected_total": 91.15,
+  "implementation_authorized": false,
+  "limitations": [
+    "One reconstructed first successful current-date immutable case; not prior ephemeral identity replay.",
+    "Separate bounded streams differ from original merged-pipeline transport; both children use same adapter.",
+    "Instrumentation and second-run order prevent a stable speedup claim.",
+    "No repeated-input census or cache-hit count; no individual JSON/schema-loop attribution.",
+    "Service-runner margin unproved; cancelled current CI remains merge blocker."
+  ],
+  "artifacts": [
+    {
+      "path": "ROOT-RELEASE.json",
+      "bytes": 1452,
+      "sha256": "371673fea1578a993720c40ac3c7382c9480dfb0a18fd1816bb22597aea1e327"
+    },
+    {
+      "path": "manifest.authorized.json",
+      "bytes": 2431,
+      "sha256": "112b8f14bfde0a8f6c8e158ae9c19776ced0265e37ea943be8dbc178cea948ca"
+    },
+    {
+      "path": "manifest.prepared.json",
+      "bytes": 2432,
+      "sha256": "48ebb4043a503da82e65434f6e08140fb0444c496698710b2e8fddd76a7b1f49"
+    },
+    {
+      "path": "PREPARATION.md",
+      "bytes": 6507,
+      "sha256": "0d4775898b94dabb9e2256f116b6b9b60ccd0afc3906d92d67abb6f07e03f20e"
+    },
+    {
+      "path": "PREPARATION.json",
+      "bytes": 3153,
+      "sha256": "e8f656f7c9164ecd323e769538ce34f7eb82edfcf37505a4fc0540d626dda466"
+    },
+    {
+      "path": "preparation-check.json",
+      "bytes": 18555,
+      "sha256": "1476348ec762b01170d53cd96de1aefa356aac42eef866e44e04e7dd6ee2480b"
+    },
+    {
+      "path": "REPORT.md",
+      "bytes": 15781,
+      "sha256": "671384f7872f0010ad404bf347a658f49e661c522729d02cb1ac6a52e03d549d"
+    },
+    {
+      "path": "timing.json",
+      "bytes": 9121,
+      "sha256": "a8435cb1577f34d04ce01d795e0894c2c3675bb53677eeabfe592518189ad401"
+    },
+    {
+      "path": "analyze.py",
+      "bytes": 2793,
+      "sha256": "670b063bca223409f9824b3381a046b6bbca3e6fc6c4daa1089b6361707aca6d"
+    },
+    {
+      "path": "finalize-report.py",
+      "bytes": 3651,
+      "sha256": "59a3b2a6754f72add74513c87062dc216eb41c33f4955264d6efd5e8519c1909"
+    },
+    {
+      "path": "launch-session.json",
+      "bytes": 453,
+      "sha256": "0297510baa816b4e480748c34388c4b89d16743606ba39294d87c8c86288f1b5"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/status.json",
+      "bytes": 1327,
+      "sha256": "98b0e5035ff9547c3a2b3016dcc125a65da94ec45f53eb1318fb74987f3130dc"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/container.log",
+      "bytes": 30,
+      "sha256": "4766b18e475d80c9af5d98cb008d0ec72bbfffbcecae148de58b5a5c910242e8"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/inputs/source-before.json",
+      "bytes": 402147,
+      "sha256": "0c3fcbe6b63fa1a7770b8fcaf8c952e52691617de8d7a960c3935fcec957953a"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/inputs/payload-hashes.json",
+      "bytes": 1153,
+      "sha256": "48e7b2b8e5506f37c37c01dea405cc35784a28bf8b71e0f7e45900fbc27634a9"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/attribution-pair-after.json",
+      "bytes": 414074,
+      "sha256": "4e08fb3bef6c890251cb378e65b394e26d6bc50434371bde748930d885f80572"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/attribution-pair.log",
+      "bytes": 76,
+      "sha256": "fd7748bac8b0a03b32575d84e2b3e921ed70f547c4998bdb3081f43a1e639d8c"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/before.json",
+      "bytes": 414074,
+      "sha256": "4e08fb3bef6c890251cb378e65b394e26d6bc50434371bde748930d885f80572"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/bootstrap-output.txt",
+      "bytes": 194,
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/bootstrap.json",
+      "bytes": 146,
+      "sha256": "877273fb82b0b69fcf97dc3a1f386cd565f3da32af59e1542d0afa82bb7df50e"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/case.json",
+      "bytes": 490,
+      "sha256": "58c54b965a930665172fc614f4ef54b3ceb879c73b5b83c25af47039be9d676a"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/control-child.json",
+      "bytes": 8185,
+      "sha256": "5e554fb6725f9e88367f2821cc67a95217c6540a6650677fe48b1b4da1da4c4e"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/control-stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/control-stdout.txt",
+      "bytes": 225,
+      "sha256": "60a6940feddd67f43558591902cefa7c346ae84c75105138834f343821df2b8a"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/control.spec.json",
+      "bytes": 8056,
+      "sha256": "42f349b65d02c4e2eb4c3b91de1d5aa7943ad9d0648d16019fe1b2bf5205d4f6"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/fixture-adaptation.json",
+      "bytes": 328,
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/host-source-after.json",
+      "bytes": 402147,
+      "sha256": "0c3fcbe6b63fa1a7770b8fcaf8c952e52691617de8d7a960c3935fcec957953a"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/pair-result.json",
+      "bytes": 408,
+      "sha256": "c76a29dc19717affda92126a5f2e174e051868710f04521e25ccfcb8d949cf73"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/profile-child.json",
+      "bytes": 87489,
+      "sha256": "20ed14ced853cf27f9385e20cdf1d68ca9835958c37ad6724ee5f7fca833d9ef"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/profile-stderr.txt",
+      "bytes": 78492,
+      "sha256": "6f4cf725222e5304ca8f811c83579d3796c79945d6a14d59c1af17cb69a308b8"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/profile-stdout.txt",
+      "bytes": 225,
+      "sha256": "60a6940feddd67f43558591902cefa7c346ae84c75105138834f343821df2b8a"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/profile.spec.json",
+      "bytes": 8056,
+      "sha256": "f2c1f2d5b41eddb6cde3e5a823a640c4bd8c3b90b7733435f3b66ea01bff85f3"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/result.json",
+      "bytes": 1624,
+      "sha256": "afd2712dd272864c4d0cb05fc8442efa5637396a5941799472976b454ac71234"
+    },
+    {
+      "path": "runs/tf68-h5ec-20261006-pair-one/output/runtime.json",
+      "bytes": 457,
+      "sha256": "29dc640ca13f69609ebdd0780d43f558cc20b661724013c91b0a5a7466067030"
+    }
+  ]
+}

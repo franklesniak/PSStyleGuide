@@ -1,0 +1,13 @@
+{
+  "verified_at": "2026-10-06T09:07:09.816480+00:00",
+  "artifact_hashes_verified": 34,
+  "score_totals_verified": 12,
+  "marker_events": 812,
+  "intervals": 406,
+  "labels": 36,
+  "global_nested_stack_complete": true,
+  "source_report_sha256": "671384f7872f0010ad404bf347a658f49e661c522729d02cb1ac6a52e03d549d",
+  "source_evidence_sha256": "9b6d4f94720dd4f6689e54e160008c33bdaacd835cf812cca70eac3c5e0a286a",
+  "timing_sha256": "a8435cb1577f34d04ce01d795e0894c2c3675bb53677eeabfe592518189ad401",
+  "role": "independent root verification of diagnostic evidence; not product acceptance"
+}
