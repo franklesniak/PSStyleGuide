@@ -1,0 +1,21 @@
+{
+  "status": "ROOT_SELECTED_A97.8_NO_PRODUCT_CHANGE",
+  "selected_at": "2026-10-06T20:46:59.338902+00:00",
+  "finding": "PS235-R1",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "report_sha256": "d07727cfe5d3552cb9dd662b3e5499f833a79cbe0e0203a4ede89c26cdd6bb2b",
+  "evidence_sha256": "2bbdad3d40a9be8df18e79bb560370b9071c34e7dc12aaa3890e9fc1bb71c334",
+  "verified_references": 11,
+  "raw_committed_rows": 10,
+  "native_expected_outcomes": 14,
+  "options_scored": 11,
+  "displayed_before_selection": "Validation; eleven options; unique detailed weighted rubric; all ratings and scores; controlled-English actions",
+  "selected_option": "A",
+  "score": 97.8,
+  "material_product_change": false,
+  "reply_status": "pending",
+  "resolution_status": "pending",
+  "CI_hold": "cancelled remains nonpassing; no merge",
+  "round_deadline_counters": "unchanged"
+}

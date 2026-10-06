@@ -1,0 +1,89 @@
+{
+  "test_merge_commit": {
+    "sha": "4bea7763920c0562e5f83c62b788b97436e5938c",
+    "node_id": "C_kwDOQkjdhNoAKDRiZWE3NzYzOTIwYzA1NjJlNWY4M2M2MmI3ODhiOTc0MzZlNTkzOGM",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/4bea7763920c0562e5f83c62b788b97436e5938c",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/4bea7763920c0562e5f83c62b788b97436e5938c",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-06T20:08:14Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-06T20:08:14Z"
+    },
+    "tree": {
+      "sha": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/a716a1f8ff7e4f385e089b0f056adbcde9c973cb"
+    },
+    "message": "Merge 504cd7672ac9604ace765a4f451346f801f09ddd into 98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "parents": [
+      {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      },
+      {
+        "sha": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/504cd7672ac9604ace765a4f451346f801f09ddd",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/504cd7672ac9604ace765a4f451346f801f09ddd"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxVUuCRC1aQ7uu5UhlAAAeb4QABwfYR2sy2/1haF0nztiyPSV\ndqLSu92WKQXO2P7K5gnPx1QbFe4UHvHzosVyIrhBlnwXthtD2KYqn+zAlw+Wty8k\ndOwQm6fzG76Z6la/UlUE0GVtTwg5a5R5Wm4Q0LWvsV3oq2uo7aj0+/RiaPwFFSqo\nonfZRFeJFaVuGhFCnc4xMLihntkQUNejmQGiz5R1iTDePBmJxFSSaQInBrjC2OPu\ng50Gd/Ee9Q7YOCz/d6yeugU9NvOJh9B7g4TnPvVswibZZ4jeilWrfqnQnPPXqQKW\nZK+UP93haMd8QHUlvkolmt9yP3dl2P1OTeVcgLBI2ZlGP0fRj5gNwf85tUiFfwmA\nw65tFlNpFDLGxjwDtY57IlcnOx2SLwDIVZOQg/rOUud9JK4z02xxa2DHRFp3NWu/\n9uNb8K/hDOdjgSJyA2EAJyuaoVH1MLtyKu3lyJ9qB66+crSts9TT09CLqV1yY3I9\nBCskvaHVE2BB3YHnfMa6+z4F7SEC4GpegOYrhw6yEjimMLfPP5sc9+CznyHAGjEZ\npIJdQnfk5wrJswpuFrTSuetSQmKE81DH4yEUJ4hl2CSd3rgXPD7NJrrRP9rdnQkK\nFxLpYNPA+CenXF8uJlmy9vF/r1jL+7Ny2J+kTKHaeg9ZF264yWttPngy5NeH9uBf\nhPLI+zfJLsiLJypy/ShL\n=E8St\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree a716a1f8ff7e4f385e089b0f056adbcde9c973cb\nparent 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nparent 504cd7672ac9604ace765a4f451346f801f09ddd\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791317294 -0500\ncommitter GitHub <noreply@github.com> 1791317294 -0500\n\nMerge 504cd7672ac9604ace765a4f451346f801f09ddd into 98177628b7bc02c646724bfc8aa0fd73fed0cd24\n",
+      "verified_at": "2026-10-06T20:08:14Z"
+    }
+  },
+  "candidate_commit": {
+    "sha": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "node_id": "C_kwDOQkjdhNoAKDUwNGNkNzY3MmFjOTYwNGFjZTc2NWE0ZjQ1MTM0NmY4MDFmMDlkZGQ",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/504cd7672ac9604ace765a4f451346f801f09ddd",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/504cd7672ac9604ace765a4f451346f801f09ddd",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-06T19:48:28Z"
+    },
+    "committer": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-06T19:48:28Z"
+    },
+    "tree": {
+      "sha": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/a716a1f8ff7e4f385e089b0f056adbcde9c973cb"
+    },
+    "message": "Carry accepted validator and review setup fixes back to PowerShell",
+    "parents": [
+      {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    ],
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null,
+      "verified_at": null
+    }
+  },
+  "main": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+    "object": {
+      "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "type": "commit",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+    }
+  },
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+}

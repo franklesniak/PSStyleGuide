@@ -1,0 +1,419 @@
+{
+  "id": 37524396256,
+  "attempt": 1,
+  "name": "Running Copilot Code Review",
+  "event": "dynamic",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "conclusion": "cancelled",
+  "captured_at": "2026-10-06T20:37:12.648383+00:00",
+  "log_exit": 0,
+  "log_sha256": "acdbd11438b2e791ec6fe738b1705d55a4e5ff9521ae3b093618736bd081cca3",
+  "log_bytes": 508081,
+  "jobs": [
+    {
+      "id": 112477600458,
+      "name": "copilot-pull-request-reviewer",
+      "conclusion": "cancelled",
+      "runner": "GitHub Actions 1000094259",
+      "steps": [
+        {
+          "name": "Set up job",
+          "conclusion": "success"
+        },
+        {
+          "name": "Initialize",
+          "conclusion": "success"
+        },
+        {
+          "name": "Validate runner OS",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Validate firewall settings (Linux)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Validate firewall settings (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Prepare Copilot (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Prepare Copilot (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Acquire published main reference",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Activate repository hooks",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Run complete repository validation",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Download Autofind (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Download Autofind (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Generate agent firewall CA (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Start MCP Servers (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Start MCP Servers (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Setup Agent (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Setup Agent (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Download git-proxy (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Download git-proxy (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Processing Request (Linux)",
+          "conclusion": "cancelled"
+        },
+        {
+          "name": "Processing Request (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Clean Up (Linux)",
+          "conclusion": "success"
+        },
+        {
+          "name": "Clean Up (Windows)",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "[Optional] Archive Details",
+          "conclusion": "skipped"
+        },
+        {
+          "name": "Complete job",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "limit": "Collection only. Missing logs remain incomplete. Earlier successful jobs in a partial retry must be reconciled separately; no acceptance is inferred."
+}

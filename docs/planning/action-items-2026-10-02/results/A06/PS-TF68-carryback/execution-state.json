@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_reviews_and_CI_pending",
+  "status": "round1_Copilot_Lite_finding_CI_cancelled_no_merge",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,26 +89,10 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [
-    {
-      "kind": "Copilot_review_result",
-      "pr": 235,
-      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
-      "request_event_id": 32633869034,
-      "requested_at": "2026-10-06T20:10:01Z",
-      "workflow_run_id": 37524396256
-    },
-    {
-      "kind": "Codex_review_result",
-      "pr": 235,
-      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
-      "trigger_comment_id": 6024639747,
-      "requested_at": "2026-10-06T20:15:50Z"
-    }
-  ],
+  "pending_native_operations": [],
   "local_operation": "No active local test/Git write; PR235 published; hosted CI may run.",
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Capture complete review baselines, reconcile automatic activity, then one Balanced Copilot request and confirmed Codex trigger.",
+  "next_action": "Finish ordered R1 no-change disposition and independent native review readiness; retain CI merge hold. At or after21:10:11Z reconcile native state and attempt one supported same-input CI rerun if still needed. Do not retry solely for Lite or bypass cancelled CI.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -343,6 +327,11 @@
       "scope": "unexecuted planning publisher",
       "finding": "Copied selection prefix referenced wrong A14 folder; assertion stopped before Git mutation.",
       "repair": "Select exact owned PS-TF68-carryback prefix and require only named changed files; preserve all unrelated paths."
+    },
+    {
+      "scope": "private saved hosted-log reader",
+      "finding": "The initial reader assumed the PR audit schema for the push audit and stopped before recording acceptance.",
+      "repair": "Preserve original reader; use exact event-specific authoritySource and fields. PR event-main includes B/test-merge-H; push remote-main omits B/H. Both raw audits CLEAN at actual B981; run/jobs identify H504. No product/test/native operation repeated."
     }
   ],
   "local_runner_findings": {
@@ -372,7 +361,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "1649522474c8ec1e50295439fc86c8a309462a01",
+  "planning_checkpoint": "dee4582870574a67cadfd3f2a44a69b9ffbbd072",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -397,7 +386,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-06T20:16:37.774940+00:00",
+  "updated_at": "2026-10-06T20:46:59.338902+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -469,19 +458,33 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-baseline.json",
       "baseline_sha256": "a0f9e24652501326de88eced015b1f571eab902ba032a625da88a01a6647c6aa",
       "copilot": {
-        "status": "confirmed_pending_result",
+        "status": "completed_findings",
         "channel": "Balanced UI",
         "selected_effort": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "request_event_id": 32633869034,
         "request_issued_at": "2026-10-06T20:10:01Z",
         "confirmed_by": "new_authenticated_request_event",
         "workflow_run_id": 37524396256,
-        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-copilot-readback.json"
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-copilot-readback.json",
+        "setup_observation": {
+          "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-pending-jobs-2026.json",
+          "workflow_run_id": 37524396256,
+          "job_id": 112477600458,
+          "actual_step": "Run complete repository validation",
+          "status": "in_progress",
+          "dedicated_service_selection_proved": false
+        },
+        "observed_effort_source": "authenticated completed review overview",
+        "review_id": 5434209468,
+        "submitted_at": "2026-10-06T20:28:56Z",
+        "review_body_sha256": "7fdb3abb4d4e840a54aa3465744e5fc461f2912c250202d755a2335eb2987180",
+        "workflow_conclusion": "cancelled",
+        "workflow_terminal_at": "2026-10-06T20:31:36Z"
       },
       "codex": {
-        "status": "confirmed_pending_result",
+        "status": "clean",
         "manual_trigger_issued": true,
         "comment": "@codex review",
         "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-baseline.json",
@@ -491,7 +494,20 @@
         "trigger_comment_id": 6024639747,
         "trigger_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#issuecomment-6024639747",
         "requested_at": "2026-10-06T20:15:50Z",
-        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json"
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json",
+        "latest_summary": {
+          "comment_id": 6024517148,
+          "updated_at": "2026-10-06T20:16:18Z",
+          "body_sha256": "bc9fc0e33370755bea3f05a01312703ead4a4cd8e7222e99b0932a22dda5a854",
+          "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2019.json"
+        },
+        "result_comment_id": 6024708462,
+        "result_created_at": "2026-10-06T20:20:04Z",
+        "result_body_sha256": "3049b2281a2ef6f3b2717841c4a1dd5d3853bbff1a3a6170a01265bb04a7ca77",
+        "summary_updated_at": "2026-10-06T20:20:07Z",
+        "summary_body_sha256": "b29fe38fc9838440460d08d7e87c64da753900045bffa8e5eafde097d38d05ba",
+        "attribution": "Authenticated author, new result excluded from pre-request complete baseline, exact reviewed commit, post-trigger time, manual-trigger completed summary, unchanged B/H/body",
+        "result_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2024.json"
       },
       "automatic_codex": {
         "status": "authenticated_terminal",
@@ -504,38 +520,37 @@
         "findings_observed": 0,
         "manual_attribution": "Excluded; PR-open trigger is distinct from the required manual request after Copilot confirmation"
       },
-      "findings": []
+      "findings": [
+        {
+          "id": "PS235-R1",
+          "comment_id": 4200122706,
+          "review_id": 5434209468,
+          "thread_id": "PRRT_kwDOQkjdhM6ppYLF",
+          "status": "refuted_A97.8_reply_pending",
+          "path": ".github/workflows/copilot-code-review.yml",
+          "line": 886,
+          "exact_guard_controls": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PR235-round1-R1\\linux-guard-validation\\result.json",
+          "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PR235-round1-R1\\ROOT-DECISION.json",
+          "score": 97.8
+        }
+      ]
     }
   ],
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json",
-    "captured_at": "2026-10-06T20:15:59.632270+00:00",
-    "sha256": "c150d153cf7a05fc4b36080f31d1f219f552852385b9523fc6032d8364ddfb5c"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2038.json",
+    "captured_at": "2026-10-06T20:36:29.383171+00:00",
+    "sha256": "373fc30b59ba5b9735359a9f42d28026fdf82c3d7a6a94a0e14a64301f852568"
   },
   "CI_observation": {
-    "captured_at": "2026-10-06T20:15:59.632270+00:00",
-    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-codex-readback.json",
+    "captured_at": "2026-10-06T20:36:29.383171+00:00",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2038.json",
     "workflows": [
       {
         "id": 37524396256,
         "name": "Running Copilot Code Review",
         "event": "dynamic",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37524154494,
-        "name": "Agent instruction validation",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37524154228,
-        "name": "Copilot setup steps",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "cancelled"
       },
       {
         "id": 37524154208,
@@ -573,18 +588,18 @@
         "conclusion": "success"
       },
       {
-        "id": 37524110694,
+        "id": 37524154494,
         "name": "Agent instruction validation",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
       },
       {
-        "id": 37524110641,
+        "id": 37524154228,
         "name": "Copilot setup steps",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 37524110707,
@@ -613,10 +628,65 @@
         "event": "push",
         "status": "completed",
         "conclusion": "success"
+      },
+      {
+        "id": 37524110641,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37524110694,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
       }
     ],
-    "failed_or_cancelled": [],
+    "failed_or_cancelled": [
+      {
+        "id": 37524396256,
+        "attempt": 1,
+        "conclusion": "cancelled",
+        "job_id": 112477600458,
+        "native_cause": "The job has exceeded the maximum execution time of 20m0s"
+      }
+    ],
     "retry_requested": false,
     "merge_allowed": false
+  },
+  "hosted_progress": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2033-hosted-proof.json",
+    "sha256": "9aa8e14c1661913ea799a30616cc240a96f275f77a906975b65b08c9ab90f058",
+    "verified_terminal_ordinary_runs": 13,
+    "all_CI_passed": false,
+    "dedicated_service_selection_proved": false
+  },
+  "B99_read_only_preparation": {
+    "worker": "a06_conversion_cold_packet",
+    "status": "root_verified_proposal_selection_pending",
+    "directory": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006",
+    "product_execution_released": false
+  },
+  "native_gates_baseline": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-native-gates-baseline.json",
+    "sha256": "09d1c6352d3fa5cde928a584a45c5e88236a4080ba3e51c58d16db7feb93346c",
+    "ruleset": 24419725,
+    "required_check_names": [
+      "policy",
+      "markdownlint",
+      "verify_generated_artifacts"
+    ],
+    "bypass": "never",
+    "merge_state_observed": "UNSTABLE",
+    "not_merge_authority": true
+  },
+  "CI_retry": {
+    "last_relaunch_at": null,
+    "observed_initial_launch_at": "2026-10-06T20:10:11Z",
+    "next_conservative_attempt_not_before": "2026-10-06T21:10:11Z",
+    "retry_requested": false,
+    "rule": "At most one relaunch per hour per PR. Conservatively count the original20:10:11 launch for the first interval; no scheduled automation. Reconcile native run/head/body/review surfaces before a single supported rerun."
   }
 }

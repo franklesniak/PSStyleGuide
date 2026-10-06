@@ -1,0 +1,33 @@
+[
+  {
+    "job_id": 112477600458,
+    "pages": [
+      [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/franklesniak/PSStyleGuide/blob/504cd7672ac9604ace765a4f451346f801f09ddd/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job has exceeded the maximum execution time of 20m0s",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/franklesniak/PSStyleGuide/blob/504cd7672ac9604ace765a4f451346f801f09ddd/.github",
+          "start_line": 877,
+          "start_column": null,
+          "end_line": 877,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The operation was canceled.",
+          "raw_details": ""
+        }
+      ]
+    ]
+  }
+]

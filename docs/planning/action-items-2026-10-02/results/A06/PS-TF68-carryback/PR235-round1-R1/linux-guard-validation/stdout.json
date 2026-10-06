@@ -1,0 +1,242 @@
+{
+  "status": "PASS_EXACT_GUARD_14_CONTROLS",
+  "git": "git version 2.43.0",
+  "workflow_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+  "guard_sha256": "1ce41462bd0087c0d0845ff756df8f92291ed4d8e48c597f71e9edb0d9ec716b",
+  "cases": [
+    {
+      "layout": "legacy_node_only",
+      "case": "clean",
+      "action": null,
+      "path": null,
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "pass",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_node_only",
+      "case": "clean",
+      "action": null,
+      "path": null,
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "pass",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_full",
+      "case": "clean",
+      "action": null,
+      "path": null,
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/ci-toolchain.json",
+        "requirements-dev.txt",
+        ".github/workflows/Invoke-LockedPythonHook.ps1",
+        ".pre-commit-config.yaml",
+        ".github/workflows/install-husky.mjs",
+        ".husky/pre-commit",
+        ".github/workflows/lint-staged-markdown.mjs"
+      ],
+      "expected": "pass",
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "layout": "legacy_node_only",
+      "case": "untracked",
+      "action": "untracked",
+      "path": "package.json",
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "::error::Untracked setup inputs changed: package.json\n",
+      "stderr": ""
+    },
+    {
+      "layout": "legacy_node_only",
+      "case": "ignored",
+      "action": "ignored",
+      "path": "package.json",
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "::error::Untracked setup inputs changed: package.json\n",
+      "stderr": ""
+    },
+    {
+      "layout": "legacy_node_only",
+      "case": "staged_add",
+      "action": "staged_add",
+      "path": "package.json",
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/package.json b/package.json\nnew file mode 100644\nindex 0000000..a7557cd\n--- /dev/null\n+++ b/package.json\n@@ -0,0 +1 @@\n+injected\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_node_only",
+      "case": "untracked",
+      "action": "untracked",
+      "path": "requirements-dev.txt",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "::error::Untracked setup inputs changed: requirements-dev.txt\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_node_only",
+      "case": "ignored",
+      "action": "ignored",
+      "path": "requirements-dev.txt",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "::error::Untracked setup inputs changed: requirements-dev.txt\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_node_only",
+      "case": "staged_add",
+      "action": "staged_add",
+      "path": "requirements-dev.txt",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/requirements-dev.txt b/requirements-dev.txt\nnew file mode 100644\nindex 0000000..a7557cd\n--- /dev/null\n+++ b/requirements-dev.txt\n@@ -0,0 +1 @@\n+injected\n",
+      "stderr": ""
+    },
+    {
+      "layout": "legacy_node_only",
+      "case": "tracked-modify",
+      "action": "modify",
+      "path": ".github/workflows/package.json",
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/.github/workflows/package.json b/.github/workflows/package.json\nindex 180b47c..5ea2ed4 100644\n--- a/.github/workflows/package.json\n+++ b/.github/workflows/package.json\n@@ -1 +1 @@\n-baseline\n+changed\n",
+      "stderr": ""
+    },
+    {
+      "layout": "legacy_node_only",
+      "case": "tracked-delete",
+      "action": "staged_delete",
+      "path": ".github/workflows/package-lock.json",
+      "baseline_present": [
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/.github/workflows/package-lock.json b/.github/workflows/package-lock.json\ndeleted file mode 100644\nindex 180b47c..0000000\n--- a/.github/workflows/package-lock.json\n+++ /dev/null\n@@ -1 +0,0 @@\n-baseline\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_node_only",
+      "case": "tracked-modify",
+      "action": "modify",
+      "path": "package.json",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/package.json b/package.json\nindex 180b47c..5ea2ed4 100644\n--- a/package.json\n+++ b/package.json\n@@ -1 +1 @@\n-baseline\n+changed\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_full",
+      "case": "tracked-modify",
+      "action": "modify",
+      "path": "requirements-dev.txt",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/ci-toolchain.json",
+        "requirements-dev.txt",
+        ".github/workflows/Invoke-LockedPythonHook.ps1",
+        ".pre-commit-config.yaml",
+        ".github/workflows/install-husky.mjs",
+        ".husky/pre-commit",
+        ".github/workflows/lint-staged-markdown.mjs"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/requirements-dev.txt b/requirements-dev.txt\nindex 180b47c..5ea2ed4 100644\n--- a/requirements-dev.txt\n+++ b/requirements-dev.txt\n@@ -1 +1 @@\n-baseline\n+changed\n",
+      "stderr": ""
+    },
+    {
+      "layout": "modern_full",
+      "case": "tracked-delete",
+      "action": "staged_delete",
+      "path": ".github/workflows/ci-toolchain.json",
+      "baseline_present": [
+        "package.json",
+        "package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/ci-toolchain.json",
+        "requirements-dev.txt",
+        ".github/workflows/Invoke-LockedPythonHook.ps1",
+        ".pre-commit-config.yaml",
+        ".github/workflows/install-husky.mjs",
+        ".husky/pre-commit",
+        ".github/workflows/lint-staged-markdown.mjs"
+      ],
+      "expected": "reject",
+      "exit": 1,
+      "stdout": "diff --git a/.github/workflows/ci-toolchain.json b/.github/workflows/ci-toolchain.json\ndeleted file mode 100644\nindex 180b47c..0000000\n--- a/.github/workflows/ci-toolchain.json\n+++ /dev/null\n@@ -1 +0,0 @@\n-baseline\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Exact final Bash guard only; tiny synthetic Git contents do not claim full legacy dependency installation or hostile-writer safety."
+}

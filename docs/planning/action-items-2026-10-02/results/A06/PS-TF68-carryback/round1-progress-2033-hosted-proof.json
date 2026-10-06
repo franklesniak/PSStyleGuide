@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "status": "HOSTED_PROGRESS_VERIFIED_NOT_MERGE_ACCEPTANCE",
+  "verified_at": "2026-10-06T20:31:03.999688+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "body_sha256": "be9536173efc43fc2cec8faaf9a0777d85f688e2751ddea5d77e234a71c67c91",
+  "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-progress-2033.json",
+  "snapshot_sha256": "09e6296a93beedcc393318cb9a2bd8834f727be13a4cfa9cc66e1779424866f3",
+  "native_commits": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-hosted-input-commits.json",
+  "native_commits_sha256": "3ff522a1993135a3eb9a3b375cf701a8b3920ca3c345a54a014d715010a5a12f",
+  "synthetic_test_merge": "4bea7763920c0562e5f83c62b788b97436e5938c",
+  "synthetic_tree_equals_candidate": true,
+  "terminal_runs_verified": [
+    {
+      "id": 37524154208,
+      "attempt": 1,
+      "name": "Dev container boundary",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154208\\attempt-1\\log.txt",
+      "log_sha256": "81d305a440ddbc2f4711dc7dd4e14ae75b235da1a5b2790361e98e10e4b7fe9c",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154208\\attempt-1\\jobs.json",
+      "jobs_sha256": "5467e6fa3569e90f0d0ec51265df93e9e5c1d74bb9fde4554bfe5f93b1397c68",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154208\\attempt-1\\run.json",
+      "run_sha256": "c8e8760ef7db7e99eac10347dfdab902e1f8db0ac08ceb757e99fdb173eb935f",
+      "conclusion": "success",
+      "skipped_jobs": []
+    },
+    {
+      "id": 37524154909,
+      "attempt": 1,
+      "name": "Agent instruction validation",
+      "event": "pull_request_target",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154909\\attempt-1\\log.txt",
+      "log_sha256": "622ad035adc8351df9765b4b2162ccd47948f9791de671caaeaa97245c74a128",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154909\\attempt-1\\jobs.json",
+      "jobs_sha256": "cfff9360a888594ec1b9eabfcc253519618854d7bbeca0a6a261f48f43fc4655",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154909\\attempt-1\\run.json",
+      "run_sha256": "4a9ef350f62891a7229191d3b6cfbba90bab4ce007a8d53657f99c577c4bd66f",
+      "conclusion": "success",
+      "skipped_jobs": [
+        "Test proposed instruction and workflow behavior"
+      ],
+      "classification": "maintenance_required; exact accepted B/H; not merge authority"
+    },
+    {
+      "id": 37524154355,
+      "attempt": 1,
+      "name": "Copilot code review preparation",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154355\\attempt-1\\log.txt",
+      "log_sha256": "420ab713073ff9f6b47fab33b3532b873142b58b1f9efd29c7c09241ffb88d6b",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154355\\attempt-1\\jobs.json",
+      "jobs_sha256": "7097c7f0593c18dca31479f263a36e39aa0deba22d19fd617ed94c08779e8d7f",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154355\\attempt-1\\run.json",
+      "run_sha256": "3b6314704de80ef0e45ba2790e8f31b1ce8bdff024b505a7475f24d86a702d58",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "ordinary_preparation_steps": 14,
+      "dedicated_service_selection_proved": false
+    },
+    {
+      "id": 37524154327,
+      "attempt": 1,
+      "name": "Markdown Lint",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154327\\attempt-1\\log.txt",
+      "log_sha256": "0abcc89ee1c764841fd77173d6c5a792171604d8a0eb7c730e022a93d621bb4d",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154327\\attempt-1\\jobs.json",
+      "jobs_sha256": "29e01641ed736d61fabe4834bfa9e4156118bb1219e0fbb109cd4339922eb953",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154327\\attempt-1\\run.json",
+      "run_sha256": "bb7369b067486cbeea61c3186a36c825a9003aadb5f0dc6ce99e25888d68dbf4",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "audit": {
+        "status": "CLEAN",
+        "unresolved": [],
+        "acceptedPackages": 0,
+        "unusedExceptions": [],
+        "proposedState": false,
+        "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "authoritySource": "event-main",
+        "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+        "installedGraphRoots": [
+          ".github/workflows"
+        ],
+        "findings": [],
+        "applicable": true,
+        "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "head": "4bea7763920c0562e5f83c62b788b97436e5938c"
+      }
+    },
+    {
+      "id": 37524154479,
+      "attempt": 1,
+      "name": "Build Style Guide Artifacts",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154479\\attempt-1\\log.txt",
+      "log_sha256": "a9b9824753beaca52bbfd904579604ca164061c6a1e0b3e6044d4f70253906ce",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154479\\attempt-1\\jobs.json",
+      "jobs_sha256": "c11e6e6de2895959acd579d144c2368ceb1a9d671091bee1654d5c1f84d8c1cb",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154479\\attempt-1\\run.json",
+      "run_sha256": "d3164f269af0d8a3c995dfb649346ce6a2fcacfb2859c35931668895a18b3809",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "generator_platform_proof": {
+        "generator_windows_51": {
+          "job_id": 112476772459,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_windows_7": {
+          "job_id": 112476772192,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_linux_7": {
+          "job_id": 112476771824,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      },
+      "artifact_bytes": "equal"
+    },
+    {
+      "id": 37524154494,
+      "attempt": 1,
+      "name": "Agent instruction validation",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154494\\attempt-1\\log.txt",
+      "log_sha256": "58248035c48aa0d92b474573e0dd6a6b1a2e23e59371a6620d4f62ffecf095c4",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154494\\attempt-1\\jobs.json",
+      "jobs_sha256": "3752d6c35e5fae7d7f7b180d92b86f772346cc82eec7849ffb23e74932b31fd8",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154494\\attempt-1\\run.json",
+      "run_sha256": "e9a72dd14d2529b1317b83e67d252ae35abe0c1da1ad42a019a9991d81803536",
+      "conclusion": "success",
+      "skipped_jobs": [
+        "Classify maintenance and validate ordinary instructions"
+      ],
+      "Node_results": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "mutation_selftest": "passed"
+    },
+    {
+      "id": 37524154228,
+      "attempt": 1,
+      "name": "Copilot setup steps",
+      "event": "pull_request",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154228\\attempt-1\\log.txt",
+      "log_sha256": "f0a28f3117c41ffd2704e226ddbb0b76e32a3d0af58ac50eb20b06077032667a",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154228\\attempt-1\\jobs.json",
+      "jobs_sha256": "41bf8f38f927d9268bab6a9a925130ac4e96239da194a53c9ced9df931cccc89",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524154228\\attempt-1\\run.json",
+      "run_sha256": "75ffcfafbbea04f91a1c67dc349d8928d3b4e3001bc10f64af556e2aee0e52e1",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "hooks": [
+        "check json...............................................................Passed",
+        "check yaml...............................................................Passed",
+        "fix end of files.........................................................Passed",
+        "trim trailing whitespace.................................................Passed",
+        "yamllint.................................................................Passed",
+        "Lint GitHub Actions workflow files.......................................Passed",
+        "Validate Dependabot Config (v2)..........................................Passed",
+        "Validate GitHub Workflows................................................Passed",
+        "staged Markdown..........................................................Passed",
+        "workflow policy contract.................................................Passed",
+        "agent instruction contract and mutation tests............................Passed"
+      ],
+      "final_immutable_guard": "success"
+    },
+    {
+      "id": 37524110707,
+      "attempt": 1,
+      "name": "Dev container boundary",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110707\\attempt-1\\log.txt",
+      "log_sha256": "389e741d9605cead5644a5f71d6f2c3247a216bdaf83a205bb6239adbe0680d6",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110707\\attempt-1\\jobs.json",
+      "jobs_sha256": "eeaaf6e7cf4838a348f724931493f1d8ea6d55cf7865fead373c6589632851ab",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110707\\attempt-1\\run.json",
+      "run_sha256": "6b27af805ae60cb562a5ed5ea69e3d889c5b6fa0a783e2bb6d0d28fb7c41d22a",
+      "conclusion": "success",
+      "skipped_jobs": []
+    },
+    {
+      "id": 37524110671,
+      "attempt": 1,
+      "name": "Markdown Lint",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110671\\attempt-1\\log.txt",
+      "log_sha256": "7d17e85614ad3e2033cc7795c692b9d0d0d7d43c7de1cb36e00a1eb3616b561b",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110671\\attempt-1\\jobs.json",
+      "jobs_sha256": "d1ceb55b3f5a8e962d704816d4f1904e84d865432114348453a126654703f989",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110671\\attempt-1\\run.json",
+      "run_sha256": "4fbc7f730af55560bbc181551962a4f79455f056185755260554ef64bce83599",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "audit": {
+        "status": "CLEAN",
+        "unresolved": [],
+        "acceptedPackages": 0,
+        "unusedExceptions": [],
+        "proposedState": false,
+        "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "authoritySource": "remote-main",
+        "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+        "installedGraphRoots": [
+          ".github/workflows"
+        ],
+        "findings": [],
+        "applicable": true
+      }
+    },
+    {
+      "id": 37524110807,
+      "attempt": 1,
+      "name": "Copilot code review preparation",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110807\\attempt-1\\log.txt",
+      "log_sha256": "44f1dd22272d3ecfdcf7733985c3c781fa2c9f54305dbee5d38901b380c570b6",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110807\\attempt-1\\jobs.json",
+      "jobs_sha256": "1e755695b7acc804e05f3e9bbc6406a8603c3a5feeeb651c2305ec834b63cb3e",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110807\\attempt-1\\run.json",
+      "run_sha256": "41a53dfdbf9bf28e11e99805f8f240a96e80b6e4f6fedc843cd384a4ad7c6c75",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "ordinary_preparation_steps": 14,
+      "dedicated_service_selection_proved": false
+    },
+    {
+      "id": 37524110612,
+      "attempt": 1,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110612\\attempt-1\\log.txt",
+      "log_sha256": "5c426dd3394d63af09f845ffe94b7da055b1c2b49f6c6d355db1296cc9d873e9",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110612\\attempt-1\\jobs.json",
+      "jobs_sha256": "2e9f1cb9c9f99554b0a4ae5bab85421a68b745597ad6fbaf1d1f0c947fa156ef",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110612\\attempt-1\\run.json",
+      "run_sha256": "2b25d3bac3c9048237f84adab99b2523d5d51ac894c291201b292c33d3599682",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "generator_platform_proof": {
+        "generator_windows_51": {
+          "job_id": 112476619753,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_windows_7": {
+          "job_id": 112476619997,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_linux_7": {
+          "job_id": 112476620122,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      },
+      "artifact_bytes": "equal"
+    },
+    {
+      "id": 37524110641,
+      "attempt": 1,
+      "name": "Copilot setup steps",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110641\\attempt-1\\log.txt",
+      "log_sha256": "beda098dddb7c0ad599abf696c92295af4eada8770ae0147b2bc104c5dbffb2a",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110641\\attempt-1\\jobs.json",
+      "jobs_sha256": "b2c311506c9aa0a82883815818570d133663f69d4344c783b94d8cc2e21e997b",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110641\\attempt-1\\run.json",
+      "run_sha256": "0b5e27a7ff36bc6234080a55447fe499d6b276ed5ff9bb8e10e8f03ec2e4a7a2",
+      "conclusion": "success",
+      "skipped_jobs": [],
+      "hooks": [
+        "check json...............................................................Passed",
+        "check yaml...............................................................Passed",
+        "fix end of files.........................................................Passed",
+        "trim trailing whitespace.................................................Passed",
+        "yamllint.................................................................Passed",
+        "Lint GitHub Actions workflow files.......................................Passed",
+        "Validate Dependabot Config (v2)..........................................Passed",
+        "Validate GitHub Workflows................................................Passed",
+        "staged Markdown..........................................................Passed",
+        "workflow policy contract.................................................Passed",
+        "agent instruction contract and mutation tests............................Passed"
+      ],
+      "final_immutable_guard": "success"
+    },
+    {
+      "id": 37524110694,
+      "attempt": 1,
+      "name": "Agent instruction validation",
+      "event": "push",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110694\\attempt-1\\log.txt",
+      "log_sha256": "87d6b1d1baf939532070e7ca8a16d49e88d8a960b8c97d24e1cc6e78358fa3ef",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110694\\attempt-1\\jobs.json",
+      "jobs_sha256": "2392a75b3ec59f5fc23583d4ebedeef77db344594bc9cbd30851dcedf5475678",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37524110694\\attempt-1\\run.json",
+      "run_sha256": "ee2cdf4821b4c67e00b293fb5e18895291a9286d28f03174b2e6f657094e5864",
+      "conclusion": "success",
+      "skipped_jobs": [
+        "Classify maintenance and validate ordinary instructions"
+      ],
+      "Node_results": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "mutation_selftest": "passed"
+    }
+  ],
+  "pending_runs": [
+    {
+      "id": 37524396256,
+      "name": "Running Copilot Code Review",
+      "event": "dynamic"
+    }
+  ],
+  "limits": "No merge or paired acceptance. Recheck current native inputs/CI/reviews and actual service setup. Original failed local wrappers remain failed."
+}

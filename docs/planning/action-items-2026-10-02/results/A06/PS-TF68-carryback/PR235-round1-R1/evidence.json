@@ -1,0 +1,687 @@
+{
+  "status": "finding_refuted_no_product_change_recommended",
+  "prepared_at": "2026-10-06T20:40:18.501306+00:00",
+  "execution_authorized": false,
+  "finding": {
+    "review_id": 5434209468,
+    "comment_id": 4200122706,
+    "effort_observed": "Lite",
+    "path": ".github/workflows/copilot-code-review.yml",
+    "line": 886,
+    "saved_objects": [
+      {
+        "id": 5434209468,
+        "body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 1 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This immutable-input guard hard-codes files that the workflow itself classifies as absent for\u2026](#discussion_r4200122706) \u00b7 New\n</details>\n\n<details>\n<summary><strong>What changed in this PR</strong></summary>\n\nCarries shared validation / review setup fixes back into the PowerShell repo, including a dedicated Copilot review-prep workflow, improved metadata/finalization self-tests, and Markdown parser structural reuse/strict conversion safeguards.\n\n**Changes:**\n- Adds a dedicated `copilot-code-review.yml` workflow (review-only setup) plus related validator updates to treat it as an optional governed input.\n- Introduces bounded Markdown parse structural snapshot reuse and a native JSON structural converter path with comprehensive self-tests.\n- Updates CI helper tests/fixtures, timeouts, KaTeX override documentation, and a few metadata/version annotations.\n\n| File | Description |\r\n| ---- | ----------- |\r\n| docs/\u200bdependency-maintenance.md | Documents KaTeX override rationale/constraints and updates metadata date. |\r\n| .github/\u200bworkflows/\u200bscripts-README.md | Updates metadata date. |\r\n| .github/\u200bworkflows/\u200bpackage.json | Adds an npm `overrides` entry to pin KaTeX under a specific parent. |\r\n| .github/\u200bworkflows/\u200bcopilot-code-review.yml | Adds dedicated Copilot review preparation workflow (locked tool setup / guards, no aggregate validation). |\r\n| .github/\u200bworkflows/\u200bagent-instructions.yml | Extends job/step timeouts for instruction/workflow behavior testing. |\r\n| .github/\u200bworkflows/\u200bTest-StyleGuideArtifacts.ps1 | Updates versions and corrects output type annotation for artifact parsing. |\r\n| .github/\u200bworkflows/\u200bTest-CiHelpers.test.mjs | Updates fixtures/tests for Git discovery via required PowerShell 7 and validates new review workflow behavior parity. |\r\n| .github/\u200bworkflows/\u200bTest-AgentInstructions.ps1 | Adds optional review workflow input handling, structural reuse plumbing, and native JSON structural conversion option. |\r\n| .github/\u200bworkflows/\u200bTest-AgentInstructions.SelfTest.ps1 | Adds/extends self-tests for native conversion parity, reuse behavior, and finalization/clock handling. |\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>\n\n---\n\n\ud83d\udca1 <a href=\"/franklesniak/PSStyleGuide/new/main?filename=.github/skills/code-review/SKILL.md\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Add a `code-review` agent skill</a> or configure MCP servers for context-aware, tailored reviews. <a href=\"https://docs.github.com/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui#mcp-servers-and-agent-skills\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Learn more in the docs.</a>",
+        "state": "COMMENTED",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#pullrequestreview-5434209468",
+        "submitted_at": "2026-10-06T20:28:56Z"
+      },
+      {
+        "pull_request_review_id": 5434209468,
+        "id": 4200122706,
+        "path": ".github/workflows/copilot-code-review.yml",
+        "body": "This immutable-input guard hard-codes files that the workflow itself classifies as absent for legacy/node-only layouts (e.g., `package.json`, `requirements-dev.txt`, `ci-toolchain.json`). In those layouts, `git diff ... -- <missing path>` will fail with a pathspec error, causing the workflow to fail even though the earlier `Detect locked validation-tool layout` step explicitly allows those inputs to be absent. Make `setup_inputs` conditional on `steps.toolchain.outputs.layout` / `steps.toolchain.outputs.validation` (mirroring the later immutable list logic), so legacy runs only check `.github/workflows/package*.json` (and any other guaranteed-present files), while modern/full runs check the expanded set.",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4200122706",
+        "line": 886
+      }
+    ]
+  },
+  "inputs": {
+    "H": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "B": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "read_only_before": {
+      "HEAD": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "status": ""
+    },
+    "read_only_after": {
+      "HEAD": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "status": ""
+    },
+    "raw_committed_blobs": [
+      {
+        "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "state": "absent"
+      },
+      {
+        "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        "bytes": 51809
+      },
+      {
+        "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "bytes": 123582
+      },
+      {
+        "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      {
+        "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      {
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "bytes": 44995
+      },
+      {
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        "bytes": 51809
+      },
+      {
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        "bytes": 130003
+      },
+      {
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      {
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+        "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+        "bytes": 285244
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-progress-2033.json",
+      "sha256": "09e6296a93beedcc393318cb9a2bd8834f727be13a4cfa9cc66e1779424866f3",
+      "bytes": 524991
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/linux-guard-validation/probe.py",
+      "sha256": "2d036befffc39bd4feb5be58f6c00a06905a3a149093bde599b8a75558db8eff",
+      "bytes": 5031
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/linux-guard-validation/copilot-code-review.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/linux-guard-validation/stdout.json",
+      "sha256": "f451221221e23f5267ba19d7f0617337e8c8f7e608bb06c256794399d2d6ab8a",
+      "bytes": 8138
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/linux-guard-validation/result.json",
+      "sha256": "5aea8acf9557cd6d9d5aad1ce9e1d8b8946fc23eb00fe9104552e704255e4aa8",
+      "bytes": 1282
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/linux-guard-validation/runtime-resolution.json",
+      "sha256": "3e5c8d4856faa621390498c33b0fc0c2fd5c7a248d4812a1e8fa2902308e6197",
+      "bytes": 418
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
+      "bytes": 3357
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-validation/runs/ps-carryback-20261006-linux-final-validation-one/output/affected-node.log",
+      "sha256": "ad39e4118754675075c14b90d9ee1b321ca9be91238dbdcf3080ab66a9070922",
+      "bytes": 122644
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/source-catalog.json",
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "bytes": 18558
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/dependency-catalog.json",
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "bytes": 400393
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/windows-focused/ROOT-FINAL-VERIFICATION.json",
+      "sha256": "979427dc7d769a8ddd0c624f839c8b7d57b10c58892b9ece1a9ca18f92125993",
+      "bytes": 4761
+    }
+  ],
+  "root_native_control": {
+    "guard_sha256": "1ce41462bd0087c0d0845ff756df8f92291ed4d8e48c597f71e9edb0d9ec716b",
+    "workflow_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+    "status": "PASS_EXACT_GUARD_14_CONTROLS",
+    "case_count": 14,
+    "cases": [
+      {
+        "layout": "legacy_node_only",
+        "case": "clean",
+        "action": null,
+        "path": null,
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "pass",
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_node_only",
+        "case": "clean",
+        "action": null,
+        "path": null,
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "pass",
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_full",
+        "case": "clean",
+        "action": null,
+        "path": null,
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json",
+          ".github/workflows/ci-toolchain.json",
+          "requirements-dev.txt",
+          ".github/workflows/Invoke-LockedPythonHook.ps1",
+          ".pre-commit-config.yaml",
+          ".github/workflows/install-husky.mjs",
+          ".husky/pre-commit",
+          ".github/workflows/lint-staged-markdown.mjs"
+        ],
+        "expected": "pass",
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "layout": "legacy_node_only",
+        "case": "untracked",
+        "action": "untracked",
+        "path": "package.json",
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "::error::Untracked setup inputs changed: package.json\n",
+        "stderr": ""
+      },
+      {
+        "layout": "legacy_node_only",
+        "case": "ignored",
+        "action": "ignored",
+        "path": "package.json",
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "::error::Untracked setup inputs changed: package.json\n",
+        "stderr": ""
+      },
+      {
+        "layout": "legacy_node_only",
+        "case": "staged_add",
+        "action": "staged_add",
+        "path": "package.json",
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/package.json b/package.json\nnew file mode 100644\nindex 0000000..a7557cd\n--- /dev/null\n+++ b/package.json\n@@ -0,0 +1 @@\n+injected\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_node_only",
+        "case": "untracked",
+        "action": "untracked",
+        "path": "requirements-dev.txt",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "::error::Untracked setup inputs changed: requirements-dev.txt\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_node_only",
+        "case": "ignored",
+        "action": "ignored",
+        "path": "requirements-dev.txt",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "::error::Untracked setup inputs changed: requirements-dev.txt\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_node_only",
+        "case": "staged_add",
+        "action": "staged_add",
+        "path": "requirements-dev.txt",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/requirements-dev.txt b/requirements-dev.txt\nnew file mode 100644\nindex 0000000..a7557cd\n--- /dev/null\n+++ b/requirements-dev.txt\n@@ -0,0 +1 @@\n+injected\n",
+        "stderr": ""
+      },
+      {
+        "layout": "legacy_node_only",
+        "case": "tracked-modify",
+        "action": "modify",
+        "path": ".github/workflows/package.json",
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/.github/workflows/package.json b/.github/workflows/package.json\nindex 180b47c..5ea2ed4 100644\n--- a/.github/workflows/package.json\n+++ b/.github/workflows/package.json\n@@ -1 +1 @@\n-baseline\n+changed\n",
+        "stderr": ""
+      },
+      {
+        "layout": "legacy_node_only",
+        "case": "tracked-delete",
+        "action": "staged_delete",
+        "path": ".github/workflows/package-lock.json",
+        "baseline_present": [
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/.github/workflows/package-lock.json b/.github/workflows/package-lock.json\ndeleted file mode 100644\nindex 180b47c..0000000\n--- a/.github/workflows/package-lock.json\n+++ /dev/null\n@@ -1 +0,0 @@\n-baseline\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_node_only",
+        "case": "tracked-modify",
+        "action": "modify",
+        "path": "package.json",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/package.json b/package.json\nindex 180b47c..5ea2ed4 100644\n--- a/package.json\n+++ b/package.json\n@@ -1 +1 @@\n-baseline\n+changed\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_full",
+        "case": "tracked-modify",
+        "action": "modify",
+        "path": "requirements-dev.txt",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json",
+          ".github/workflows/ci-toolchain.json",
+          "requirements-dev.txt",
+          ".github/workflows/Invoke-LockedPythonHook.ps1",
+          ".pre-commit-config.yaml",
+          ".github/workflows/install-husky.mjs",
+          ".husky/pre-commit",
+          ".github/workflows/lint-staged-markdown.mjs"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/requirements-dev.txt b/requirements-dev.txt\nindex 180b47c..5ea2ed4 100644\n--- a/requirements-dev.txt\n+++ b/requirements-dev.txt\n@@ -1 +1 @@\n-baseline\n+changed\n",
+        "stderr": ""
+      },
+      {
+        "layout": "modern_full",
+        "case": "tracked-delete",
+        "action": "staged_delete",
+        "path": ".github/workflows/ci-toolchain.json",
+        "baseline_present": [
+          "package.json",
+          "package-lock.json",
+          ".github/workflows/package.json",
+          ".github/workflows/package-lock.json",
+          ".github/workflows/ci-toolchain.json",
+          "requirements-dev.txt",
+          ".github/workflows/Invoke-LockedPythonHook.ps1",
+          ".pre-commit-config.yaml",
+          ".github/workflows/install-husky.mjs",
+          ".husky/pre-commit",
+          ".github/workflows/lint-staged-markdown.mjs"
+        ],
+        "expected": "reject",
+        "exit": 1,
+        "stdout": "diff --git a/.github/workflows/ci-toolchain.json b/.github/workflows/ci-toolchain.json\ndeleted file mode 100644\nindex 180b47c..0000000\n--- a/.github/workflows/ci-toolchain.json\n+++ /dev/null\n@@ -1 +0,0 @@\n-baseline\n",
+        "stderr": ""
+      }
+    ],
+    "result": {
+      "started_at": "2026-10-06T20:34:11.372446+00:00",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--name",
+        "ps235-r1-git-guard-20261006",
+        "--pull=never",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop=ALL",
+        "--security-opt=no-new-privileges",
+        "--pids-limit=64",
+        "--memory=512m",
+        "--cpus=1",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=64m",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PR235-round1-R1\\linux-guard-validation,target=/input,readonly",
+        "--entrypoint",
+        "python3",
+        "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "-I",
+        "-S",
+        "-B",
+        "/input/probe.py"
+      ],
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "source_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "driver_sha256": "2d036befffc39bd4feb5be58f6c00a06905a3a149093bde599b8a75558db8eff",
+      "exit": 0,
+      "stdout_sha256": "f451221221e23f5267ba19d7f0617337e8c8f7e608bb06c256794399d2d6ab8a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "finished_at": "2026-10-06T20:34:20.545369+00:00",
+      "container_absent": true
+    },
+    "runtime_resolution": {
+      "PATH": "/opt/psstyleguide-runtime/venv/bin:/opt/psstyleguide-runtime/node/bin:/opt/research-misc/pre-commit-cache/repokhj4agnw/golangenv-default/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "guard_git": "/usr/local/bin/git",
+      "guard_git_version": "git version 2.55.0",
+      "fixture_builder_git_version": "git version 2.43.0",
+      "bash": "GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)"
+    },
+    "actual_guard_git": "2.55.0",
+    "fixture_builder_git": "2.43.0",
+    "limits": "Exact final Bash guard only; tiny synthetic Git contents do not claim full legacy dependency installation or hostile-writer safety."
+  },
+  "existing_evidence_reuse": {
+    "selected_successful_TAP_lines": [
+      "ok 313 - Copilot immutable inputs compare acquired HEAD, index and worktree: clean",
+      "ok 314 - Copilot immutable inputs compare acquired HEAD, index and worktree: worktree",
+      "ok 315 - Copilot immutable inputs compare acquired HEAD, index and worktree: index",
+      "ok 316 - Copilot immutable inputs compare acquired HEAD, index and worktree: index-masked",
+      "ok 317 - Copilot immutable inputs compare acquired HEAD, index and worktree: untracked",
+      "ok 318 - Copilot immutable inputs compare acquired HEAD, index and worktree: ignored-untracked",
+      "ok 355 - dedicated review setup preserves every preparation guard and omits only the aggregate",
+      "ok 356 - dedicated review actual capability selection: declared",
+      "ok 357 - dedicated review actual capability selection: historical",
+      "ok 358 - dedicated review actual capability selection: missing-current-input",
+      "ok 359 - dedicated review actual locked install admission: clean",
+      "ok 360 - dedicated review actual locked install admission: bad-lock",
+      "ok 361 - dedicated review actual locked install admission: native-failure",
+      "ok 362 - dedicated review actual final immutable guard: clean",
+      "ok 363 - dedicated review actual final immutable guard: worktree",
+      "ok 364 - dedicated review actual final immutable guard: index-masked",
+      "ok 365 - dedicated review actual final immutable guard: untracked"
+    ],
+    "total_TAP": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "original_node_wrapper": "failed_unchanged",
+    "earlier_cold_pair": "failed_unchanged; no reinterpretation",
+    "local_summary_status": "local_product_validation_passed_with_explicit_evidence_reuse",
+    "no_execution_by_worker": true
+  },
+  "primary_docs": [
+    {
+      "url": "https://git-scm.com/docs/git-diff",
+      "support": "HEAD/index/worktree path-filtered comparison and exit-code differences; native evidence establishes absent-path claim"
+    },
+    {
+      "url": "https://git-scm.com/docs/git-ls-files",
+      "support": "others, exclusion activation, optional error-unmatch"
+    }
+  ],
+  "decision": {
+    "weights": {
+      "C": 35,
+      "S": 27,
+      "U": 19,
+      "E": 11,
+      "M": 5,
+      "R": 3
+    },
+    "rating_scale": "0 contradiction;1 major gap;2 material partial gaps;3 workable tradeoffs;4 strong bounded gap;5 satisfied/minimal uncertainty",
+    "formula": "sum(weight * rating) / 5",
+    "options": [
+      {
+        "option": "A",
+        "description": "Retain static union; refute claim",
+        "ratings": {
+          "C": 5,
+          "S": 5,
+          "U": 5,
+          "E": 4,
+          "M": 5,
+          "R": 5
+        },
+        "total": 97.8
+      },
+      {
+        "option": "B",
+        "description": "Narrow by layout/capability only",
+        "ratings": {
+          "C": 3,
+          "S": 1,
+          "U": 5,
+          "E": 3,
+          "M": 4,
+          "R": 4
+        },
+        "total": 58.4
+      },
+      {
+        "option": "C",
+        "description": "Initially tracked paths only",
+        "ratings": {
+          "C": 2,
+          "S": 1,
+          "U": 4,
+          "E": 2,
+          "M": 3,
+          "R": 3
+        },
+        "total": 43.8
+      },
+      {
+        "option": "D",
+        "description": "Initially existing filesystem paths only",
+        "ratings": {
+          "C": 2,
+          "S": 2,
+          "U": 4,
+          "E": 2,
+          "M": 3,
+          "R": 3
+        },
+        "total": 49.2
+      },
+      {
+        "option": "E",
+        "description": "Snapshot all paths/absence; retain guard",
+        "ratings": {
+          "C": 5,
+          "S": 5,
+          "U": 4,
+          "E": 4,
+          "M": 2,
+          "R": 2
+        },
+        "total": 89.2
+      },
+      {
+        "option": "F",
+        "description": "Require all union paths to exist",
+        "ratings": {
+          "C": 1,
+          "S": 5,
+          "U": 0,
+          "E": 2,
+          "M": 5,
+          "R": 5
+        },
+        "total": 46.4
+      },
+      {
+        "option": "G",
+        "description": "Drop untracked check or add exclusions",
+        "ratings": {
+          "C": 2,
+          "S": 1,
+          "U": 5,
+          "E": 2,
+          "M": 5,
+          "R": 5
+        },
+        "total": 50.8
+      },
+      {
+        "option": "H",
+        "description": "Narrow plus complete unchanged-absence guard",
+        "ratings": {
+          "C": 4,
+          "S": 5,
+          "U": 4,
+          "E": 3,
+          "M": 2,
+          "R": 2
+        },
+        "total": 80.0
+      },
+      {
+        "option": "I",
+        "description": "Whole repository diff plus static untracked union",
+        "ratings": {
+          "C": 4,
+          "S": 5,
+          "U": 4,
+          "E": 3,
+          "M": 2,
+          "R": 3
+        },
+        "total": 80.6
+      },
+      {
+        "option": "J",
+        "description": "Retain plus permanent regression test/comment",
+        "ratings": {
+          "C": 5,
+          "S": 5,
+          "U": 5,
+          "E": 4,
+          "M": 3,
+          "R": 4
+        },
+        "total": 95.2
+      },
+      {
+        "option": "K",
+        "description": "Defer for more native evidence",
+        "ratings": {
+          "C": 3,
+          "S": 4,
+          "U": 2,
+          "E": 1,
+          "M": 5,
+          "R": 5
+        },
+        "total": 60.4
+      }
+    ],
+    "recommended": "A",
+    "total": 97.8,
+    "product_edits_proposed": false,
+    "root_disposition_pending": true
+  },
+  "preserved": {
+    "transfers": [
+      2,
+      4,
+      6,
+      6
+    ],
+    "no_native_polling": true,
+    "no_state_or_counter_changes": true
+  },
+  "report": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/PR235-round1-R1/REPORT.md",
+    "sha256": "d07727cfe5d3552cb9dd662b3e5499f833a79cbe0e0203a4ede89c26cdd6bb2b"
+  }
+}
