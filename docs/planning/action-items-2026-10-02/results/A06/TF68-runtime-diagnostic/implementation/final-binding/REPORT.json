@@ -1,0 +1,251 @@
+{
+  "status": "PASS_LOCAL_FINAL_BINDING",
+  "created_utc": "2026-10-06T11:20:42.4379582+00:00",
+  "material_findings": [],
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "parent": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "body_path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/pr-body-runtime-C-final.md",
+  "body_sha256": "2ecba758159fb7ba1d541fee1d36d701620da4d5f41fefc0dcf0288ab857d4f8",
+  "title": "Converge generator validation and make review setup reliable",
+  "source_hashes": {
+    ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+  },
+  "whole_pr_paths": [
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-ExactGitPathSet.ps1",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-StyleGuideGenerator.ps1",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/package-lock.json",
+    ".github/workflows/package.json",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/workflow-policy-cases.json",
+    "docs/dependency-maintenance.md"
+  ],
+  "parent_delta_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "source_count": 80,
+  "dependency_count": 1914,
+  "accepted_source_count": 78,
+  "accepted_dependency_count": 1910,
+  "generated_blobs_unchanged": true,
+  "clean_worktree": true,
+  "validation": {
+    "run_id": "tf68-20261006-runtime-repaired-final-validation",
+    "session": 94369,
+    "terminal_exit": 0,
+    "affected_classifier_tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "mandatory_hooks_passed": 11,
+    "mandatory_hooks_skipped": 0,
+    "aggregate_seconds": 789.023305,
+    "payload_hashes_verified": 7,
+    "command_logs_verified": 3,
+    "complete_three_private_guards_equal": true,
+    "complete_host_guards_equal": true,
+    "historical_600_and_platform_not_new_head_results": true
+  },
+  "normal_commit_exit": 0,
+  "actual_endpoint_modes": [
+    "AcceptedMaintenance",
+    "AcceptedContent",
+    "FinalizeMetadataNow",
+    "MetadataClassificationOnly",
+    "ProposedPolicy"
+  ],
+  "actual_endpoint_exits": [
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "audit": {
+    "status": "CLEAN",
+    "findings": 0,
+    "accepted_exceptions": 0,
+    "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "authority_source": "local-origin-main"
+  },
+  "native_prepublication_context": {
+    "captured_at": "2026-10-06T06:16:52.901602-05:00",
+    "number": 68,
+    "state": "open",
+    "merged": false,
+    "draft": false,
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+    "title": "Converge generator validation and make review setup reliable",
+    "updated_at": "2026-10-06T08:02:19Z",
+    "labels": []
+  },
+  "peer_paths": 10,
+  "peer_candidate_hashes_verified": 10,
+  "remaining_gates": [
+    "publish and verify exact head/title/body",
+    "fresh exact-input Codex/Copilot reviews and dispositions",
+    "successful required current hosted CI",
+    "actual dedicated Copilot setup selection/completion",
+    "normal landing and landed-workflow verification",
+    "conditional peer repair and paired/human gates"
+  ],
+  "cancelled_prior_run": "37430212759",
+  "merge_waiver": false,
+  "round": 5,
+  "original_deadline": "2026-10-13T23:47:31Z",
+  "transfers": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "cap": 12
+  },
+  "reviewer_tests_launched": false,
+  "product_or_native_mutations": false,
+  "descendants": 0,
+  "checked_evidence": [
+    {
+      "sha256": "2ecba758159fb7ba1d541fee1d36d701620da4d5f41fefc0dcf0288ab857d4f8",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/pr-body-runtime-C-final.md"
+    },
+    {
+      "sha256": "24a9d388351dec17bf10c2ca3f53a54eaff4000d8e2ac48119133cc5cdc650bb",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/runtime-C-prepublication-native.json"
+    },
+    {
+      "sha256": "3a8166bec9dedb5c9f87f652bdce34e4ba1bdb62baea40c8dce9335f2dbe4e58",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/final-quality/round4-repair-final-binding.json"
+    },
+    {
+      "sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/final-quality/runtime-C-source-review.json"
+    },
+    {
+      "sha256": "b844e0627b0300dd0fccfb051c8ba9bf0f2ac815c80e357646450e472bf6e293",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/final-quality/runtime-C-mutation-final-source-review.json"
+    },
+    {
+      "sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\manifest.authorized.json"
+    },
+    {
+      "sha256": "b0323fead8c91cff6cda167847b3f4f252f885ca88eb64233c1a41963f030f42",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-RESULT-VERIFICATION.json"
+    },
+    {
+      "sha256": "4e7aa9ffec53197e51923bef717e2c4ee3c3e925c180dd43b17a556c0cb08f5f",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/status.json"
+    },
+    {
+      "sha256": "ad05b828c12a04e698a59b2923941771ed771db507f77cfb3f9cf8fc310feb6b",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/result.json"
+    },
+    {
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/aggregate.log"
+    },
+    {
+      "sha256": "b5d8ff09a15d9aa87280a2072743acc90f99496e361166e380926f0f897a630f",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/affected-node.log"
+    },
+    {
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/staged-preflight.log"
+    },
+    {
+      "sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/inputs/source-before.json"
+    },
+    {
+      "sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/host-source-after.json"
+    },
+    {
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/before.json"
+    },
+    {
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/staged-preflight-after.json"
+    },
+    {
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/affected-node-after.json"
+    },
+    {
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation/output/aggregate-after.json"
+    },
+    {
+      "sha256": "9306fe1d31b4ea1381a8dddfa351921e5a032fc3539f5710c1639c4c5c87d253",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/commit-runtime-C-repaired-candidate.py"
+    },
+    {
+      "sha256": "51e52929fbf110195e060d10cf00175cbfd94445c0960b57ebfc9fb02143809c",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/validate-runtime-C-repaired-endpoints.py"
+    },
+    {
+      "sha256": "c9a2721ba26333df4aef7610fa4f7aed7a98f76f6f5b4d2aed4078f472fe33b9",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-runtime-C-repaired-commit.log"
+    },
+    {
+      "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-current-audit-ed9eea2.log"
+    },
+    {
+      "sha256": "30905b4a2376b1aaa4f1290c5fb3a7839af0c3308c281cbfa4d23cf0830b49b1",
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\COMMITTED-LOCAL-VALIDATION.json"
+    },
+    {
+      "sha256": "50caddf4b1fdf39f331654045fec79f4a8e1ec33fc38dc402157426898b6b14d",
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\PEER-READINESS-REPAIRED.json"
+    },
+    {
+      "sha256": "166b0e6ee84838183ff22d4d2163fb63b5eeb8b3c038d109a0072c55045d0437",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation/comparison/REPORT.md"
+    },
+    {
+      "sha256": "f1aa6f50852f4cae6b6182c5229f938441f70e00af3458baeaaa98a16e27c5d0",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation/comparison/timing.json"
+    },
+    {
+      "sha256": "e94398dd6ad5d76ae4a5a68bc050757414c53915330608eb17321e9ef0927589",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-AcceptedMaintenance-ed9eea2.log"
+    },
+    {
+      "sha256": "70ad4866dd6af503b663812a16067caa4d8307a872418c9d7cc82db74371c6ca",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-AcceptedContent-ed9eea2.log"
+    },
+    {
+      "sha256": "b3c79d5079ed967278538390701230b41fe5add436cd91d91e625c9ea6d7755e",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-FinalizeMetadataNow-ed9eea2.log"
+    },
+    {
+      "sha256": "78a6880134bdc645f7d2f8c6d1fb78608b63a7e8607decab2df46f67328067d7",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-MetadataClassificationOnly-ed9eea2.log"
+    },
+    {
+      "sha256": "81e36b7f9203c372dfacea16058e0004aafedfb8b6431b7da312daef3d40edcb",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-ProposedPolicy-ed9eea2.log"
+    }
+  ]
+}

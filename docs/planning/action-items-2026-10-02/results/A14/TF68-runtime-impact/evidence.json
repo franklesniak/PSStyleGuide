@@ -1,0 +1,2954 @@
+{
+  "created_utc": "2026-10-06T11:36:55.705094+00:00",
+  "disposition": "conditional-no-trigger for immutable proposed TF68 input; candidate not accepted",
+  "refs": {
+    "TF_candidate": {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad"
+    },
+    "TF_accepted_base": {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631"
+    },
+    "PS_accepted": {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    },
+    "TF_pre_runtime": {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e"
+    }
+  },
+  "changed_scope_count": 19,
+  "changed_scope": [
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "diff_raw_sha256": "11bba8ff5970438e4539edc3fd4dd7f3fea5ccf5dea65f056f3336e9f476c08e",
+      "hunks": [
+        {
+          "extent": "-22 +22",
+          "context": " const selectorPaths = new Set(["
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "diff_raw_sha256": "57c87561152f715ea6b18f60199ae94b7a379bb909fec2f2d930d96166028f2b",
+      "hunks": [
+        {
+          "extent": "-407,0 +408,12",
+          "context": " function Invoke-FixtureNode {"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "diff_raw_sha256": "0ef7a3c5d718992ea33064f053ff37e39ccd629fa4774c236da0d73a574788af",
+      "hunks": [
+        {
+          "extent": "-13 +13",
+          "context": " and lone CR to LF at the final payload boundary."
+        },
+        {
+          "extent": "-19,2 +19,18",
+          "context": " $ErrorActionPreference = 'Stop'"
+        },
+        {
+          "extent": "-69 +85",
+          "context": " function ConvertTo-LowerHex {"
+        },
+        {
+          "extent": "-118 +134",
+          "context": " function Get-Sha256Hex {"
+        },
+        {
+          "extent": "-173 +189",
+          "context": " function Get-FileSha256Hex {"
+        },
+        {
+          "extent": "-234 +250",
+          "context": " function Test-PathTextIsSafe {"
+        },
+        {
+          "extent": "-306 +322",
+          "context": " function Assert-OrdinaryPathComponent {"
+        },
+        {
+          "extent": "-400 +416",
+          "context": " function Get-OrdinaryDestinationState {"
+        },
+        {
+          "extent": "-485 +501",
+          "context": " function Test-FileSystemEntry {"
+        },
+        {
+          "extent": "-544 +560",
+          "context": " function Assert-OrdinaryAbsolutePath {"
+        },
+        {
+          "extent": "-624 +640",
+          "context": " function Test-PathContainedByRoot {"
+        },
+        {
+          "extent": "-652 +668",
+          "context": " function Initialize-WindowsFileIdentityType {"
+        },
+        {
+          "extent": "-679 +695",
+          "context": " function Initialize-WindowsFileIdentityType {"
+        },
+        {
+          "extent": "-684 +700",
+          "context": " function Initialize-WindowsFileIdentityType {"
+        },
+        {
+          "extent": "-694 +710",
+          "context": " using System.Runtime.InteropServices;"
+        },
+        {
+          "extent": "-772 +788",
+          "context": " function Get-OrdinaryFileIdentity {"
+        },
+        {
+          "extent": "-785 +801",
+          "context": " function Get-OrdinaryFileIdentity {"
+        },
+        {
+          "extent": "-853 +869",
+          "context": " function Assert-TrackedFile {"
+        },
+        {
+          "extent": "-911 +927",
+          "context": " function ConvertFrom-StrictUtf8 {"
+        },
+        {
+          "extent": "-962 +978",
+          "context": " function ConvertTo-NormalizedUtf8 {"
+        },
+        {
+          "extent": "-1011 +1027",
+          "context": " function New-CopilotPayload {"
+        },
+        {
+          "extent": "-1030 +1046",
+          "context": " function New-CopilotPayload {"
+        },
+        {
+          "extent": "-1032 +1048",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1036 +1052",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1042 +1058",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1047 +1063",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1063 +1079",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1081,2 +1097,2",
+          "context": " function New-TerraformInstructionsPayload {"
+        },
+        {
+          "extent": "-1125 +1141",
+          "context": " function New-ChatPayload {"
+        },
+        {
+          "extent": "-1151 +1167",
+          "context": " function New-ChatPayload {"
+        },
+        {
+          "extent": "-1154,0 +1171,49",
+          "context": " function New-ChatPayload {"
+        },
+        {
+          "extent": "-1176 +1241",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1194 +1259",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1214,8 +1279",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1223,6 +1281,5",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1230,9 +1287,2",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1240,10 +1290,12",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1251,3 +1303,4",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1256,26 +1309,7",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1284,2 +1318,2",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1287,32 +1321,7",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1320,19 +1329,2",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1341,10 +1333,5",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1353,13 +1340,4",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1367,2 +1345,2",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1369,0 +1348",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1371,14 +1350,18",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1387,5 +1370,5",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1393,2 +1376",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1396,0 +1379",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1398 +1381,3",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1400,3 +1385,2",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1409 +1392,0",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1411,21 +1394,9",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1433,4 +1403,0",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1439,59 +1406,9",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1499,2 +1416,6",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1504,9 +1425,3",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1514,6 +1429",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1521,0 +1432",
+          "context": " function New-FullPayload {"
+        },
+        {
+          "extent": "-1528 +1439",
+          "context": " function New-StyleGuidePayloadMap {"
+        },
+        {
+          "extent": "-1552 +1463",
+          "context": " function New-StyleGuidePayloadMap {"
+        },
+        {
+          "extent": "-1562 +1473",
+          "context": " function New-StyleGuidePayloadMap {"
+        },
+        {
+          "extent": "-1586 +1497",
+          "context": " function New-StyleGuidePayloadMap {"
+        },
+        {
+          "extent": "-1645 +1556",
+          "context": " function New-ArtifactRecord {"
+        },
+        {
+          "extent": "-1692 +1603",
+          "context": " function Initialize-AtomicFileReplacementType {"
+        },
+        {
+          "extent": "-1719 +1630",
+          "context": " function Initialize-AtomicFileReplacementType {"
+        },
+        {
+          "extent": "-1724 +1635",
+          "context": " function Initialize-AtomicFileReplacementType {"
+        },
+        {
+          "extent": "-1731 +1642",
+          "context": " using System.IO;"
+        },
+        {
+          "extent": "-1754 +1665",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-1794 +1705",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-1806 +1717",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-1821,0 +1733,3",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-1893 +1807",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-2012 +1926",
+          "context": " function Write-StyleGuideArtifact {"
+        },
+        {
+          "extent": "-2190 +2104",
+          "context": " function Write-GeneratorResult {"
+        },
+        {
+          "extent": "-2210 +2124",
+          "context": " $hashtableDestinationMap = [ordered]@{"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "diff_raw_sha256": "f868e6669fccdcaf21c86f7f515c3aa462d6bb7fbd2fef5e1e9b59615589c3d2",
+      "hunks": [
+        {
+          "extent": "-36 +36",
+          "context": ""
+        },
+        {
+          "extent": "-53,0 +54,335",
+          "context": " $hashtableRuntimeContext = $RuntimeContext"
+        },
+        {
+          "extent": "-893,0 +1229,312",
+          "context": " function Assert-ClassificationAdmissionGitFixture {"
+        },
+        {
+          "extent": "-921 +1568",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-925,0 +1573,6",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-943,2 +1595,0",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1145,24 +1796,4",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1174,3 +1805,6",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1178,0 +1813,3",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1180,0 +1818,16",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1181,0 +1835,67",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1333,5 +2053,5",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1651,3 +2371,4",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1661,2 +2382,4",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1665,2 +2387,0",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-1671,2 +2392",
+          "context": " function Assert-AuthorFinalizationGitFixture {"
+        },
+        {
+          "extent": "-2297 +3017",
+          "context": " function Assert-PublishedBaselineCapacitySelfTest {"
+        },
+        {
+          "extent": "-2343,2 +3063,6",
+          "context": " function Assert-PublishedBaselineCapacitySelfTest {"
+        },
+        {
+          "extent": "-2500 +3224",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2572,15 +3296,23",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2670,5 +3402,22",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2677,2 +3426,2",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2680 +3429",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2683 +3432,16",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-2684,0 +3449,39",
+          "context": " function Assert-AgentSetupSelfTest {"
+        },
+        {
+          "extent": "-3022,0 +3826",
+          "context": " if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "diff_raw_sha256": "05128e75a1e06df99f4f000413b809b1dca948a024f68b4d6b837658edc95c22",
+      "hunks": [
+        {
+          "extent": "-26 +26",
+          "context": ""
+        },
+        {
+          "extent": "-94,0 +95",
+          "context": " $script:arrPushGovernedExactPaths = @("
+        },
+        {
+          "extent": "-343 +344",
+          "context": " function Get-AgentSetupInputSpec {"
+        },
+        {
+          "extent": "-349 +350",
+          "context": " function Get-AgentSetupInputSpec {"
+        },
+        {
+          "extent": "-358,0 +360",
+          "context": " function Get-AgentSetupInputSpec {"
+        },
+        {
+          "extent": "-367 +369,5",
+          "context": " function Get-AgentSetupInputSpec {"
+        },
+        {
+          "extent": "-377 +383,4",
+          "context": " function Read-AgentSetupInputContent {"
+        },
+        {
+          "extent": "-403 +412",
+          "context": " function Read-AgentSetupInputContent {"
+        },
+        {
+          "extent": "-413,0 +423,18",
+          "context": " function Read-AgentSetupInputContent {"
+        },
+        {
+          "extent": "-587 +614",
+          "context": " function Get-AgentSetupContractFailure {"
+        },
+        {
+          "extent": "-681,14 +708,18",
+          "context": " function Get-AgentSetupContractFailure {"
+        },
+        {
+          "extent": "-1824,0 +1856,2",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-1834,0 +1868,4",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-1844 +1881,2",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-1850 +1888",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-1856 +1894,2",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-1884,0 +1924",
+          "context": " function Get-GitRegularFileBlobId {"
+        },
+        {
+          "extent": "-3145,0 +3186,193",
+          "context": " function Invoke-MarkdownParserProcess {"
+        },
+        {
+          "extent": "-3162,0 +3396,3",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3178 +3414",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3188,2 +3424",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3191,2 +3426",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3194,175 +3427,0",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3369,0 +3429,9",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3371,6 +3439,2",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3378,68 +3442,228",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3447,33 +3671,9",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3481,2 +3681,2",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3485,3 +3685,33",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3491,77 +3721,33",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3569,66 +3755,9",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-3636,8 +3765,178",
+          "context": " function Get-MarkdownParseContext {"
+        },
+        {
+          "extent": "-4341,0 +4641,6",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4357 +4662",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4365,2 +4670",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4368,18 +4672,3",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4387,7 +4676,11",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4396 +4689",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4398,3 +4691,3",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4403,6 +4695,0",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4410,6 +4697,26",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4416,0 +4724,33",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4419,11 +4759,24",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-4431,23 +4783,0",
+          "context": " function Get-PublishedEndpointLastUpdatedFailure {"
+        },
+        {
+          "extent": "-6072,0 +6403,3",
+          "context": " function Test-DocumentMetadataHeaderIntent {"
+        },
+        {
+          "extent": "-6088 +6421",
+          "context": " function Test-DocumentMetadataHeaderIntent {"
+        },
+        {
+          "extent": "-6091 +6424,4",
+          "context": " function Test-DocumentMetadataHeaderIntent {"
+        },
+        {
+          "extent": "-6115 +6451",
+          "context": " function Test-DocumentMetadataHeaderIntent {"
+        },
+        {
+          "extent": "-6191,0 +6528,3",
+          "context": " function Get-DocumentMetadataContext {"
+        },
+        {
+          "extent": "-6207 +6546",
+          "context": " function Get-DocumentMetadataContext {"
+        },
+        {
+          "extent": "-6215 +6554,3",
+          "context": " function Get-DocumentMetadataContext {"
+        },
+        {
+          "extent": "-6245 +6586",
+          "context": " function Get-DocumentMetadataContext {"
+        },
+        {
+          "extent": "-6502,0 +6844,6",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-6519 +6866",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-6541 +6888,4",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-6544 +6894",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-6605 +6955",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-6723 +7072,0",
+          "context": " function Get-PublishedEndpointMetadataFailure {"
+        },
+        {
+          "extent": "-8032,15 +8381,42",
+          "context": " foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {"
+        },
+        {
+          "extent": "-8049,5 +8425,25",
+          "context": " foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {"
+        },
+        {
+          "extent": "-8055,52 +8451,22",
+          "context": " foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {"
+        },
+        {
+          "extent": "-8108,10 +8474,18",
+          "context": " foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {"
+        },
+        {
+          "extent": "-8118,0 +8493",
+          "context": " $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision))"
+        },
+        {
+          "extent": "-8120 +8494,0",
+          "context": " $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision))"
+        },
+        {
+          "extent": "-8122,24 +8496",
+          "context": " $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision))"
+        },
+        {
+          "extent": "-8147,5 +8498,2",
+          "context": " foreach ($strPersonalMemoryPath in @('CLAUDE.local.md', 'nested/CLAUDE.local.md'"
+        },
+        {
+          "extent": "-8153,20 +8501,4",
+          "context": " foreach ($strPublicInstructionPath in @('CLAUDE.md', 'nested/CLAUDE.md', 'tools/"
+        },
+        {
+          "extent": "-8174,8 +8506,24",
+          "context": " foreach ($objDecisionContext in @("
+        },
+        {
+          "extent": "-8183,8 +8531",
+          "context": " foreach ($objDecisionContext in @("
+        },
+        {
+          "extent": "-8192,5 +8533,21",
+          "context": " $listRepositoryFailures.AddRange([string[]] @(Get-NestedClaudeImportFailure `"
+        },
+        {
+          "extent": "-8198,3 +8555,49",
+          "context": " foreach ($objDocumentContext in $listGovernedDocumentContexts) {"
+        },
+        {
+          "extent": "-8202 +8604,0",
+          "context": " foreach ($objDocumentContext in $listGovernedDocumentContexts) {"
+        },
+        {
+          "extent": "-8204,17 +8606,8",
+          "context": " foreach ($objDocumentContext in $listGovernedDocumentContexts) {"
+        },
+        {
+          "extent": "-8222,0 +8616",
+          "context": " foreach ($objDocumentContext in $listGovernedDocumentContexts) {"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "diff_raw_sha256": "8205dc1908bc25985f2abb5c1014abcf50c90d94a4707b2747839c8fa1b55a73",
+      "hunks": [
+        {
+          "extent": "-22,0 +23,265",
+          "context": " const quote = value => `'${value.replaceAll(\"'\", \"''\")}'`;"
+        },
+        {
+          "extent": "-39 +304",
+          "context": " test('actual workflows cover every live push and PR base with an isolated target"
+        },
+        {
+          "extent": "-472,0 +738,119",
+          "context": " exit 98"
+        },
+        {
+          "extent": "-477 +861",
+          "context": " for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've"
+        },
+        {
+          "extent": "-486 +870",
+          "context": " for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've"
+        },
+        {
+          "extent": "-499 +883",
+          "context": " for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've"
+        },
+        {
+          "extent": "-512 +896",
+          "context": " for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've"
+        },
+        {
+          "extent": "-559,13 +943,14",
+          "context": " for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've"
+        },
+        {
+          "extent": "-573,11 +958,11",
+          "context": " for (const mode of ['fetch-failure', 'retry-success', 'checkout-failure']) {"
+        },
+        {
+          "extent": "-585,50 +970,50",
+          "context": " for (const mode of ['', 'identity-native-failure', 'identity-multiline', 'empty-"
+        },
+        {
+          "extent": "-636,42 +1021,66",
+          "context": " fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output') + 1]);"
+        },
+        {
+          "extent": "-679 +1087,0",
+          "context": " if ('${executable}' === 'npm') {"
+        },
+        {
+          "extent": "-681 +1088,0",
+          "context": " if ('${executable}' === 'npm') {"
+        },
+        {
+          "extent": "-683,21 +1090",
+          "context": " if ('${executable}' === 'npm') {"
+        },
+        {
+          "extent": "-1012 +1399",
+          "context": " test('Copilot setup declares its input closure, supported environment and finite"
+        },
+        {
+          "extent": "-1022 +1409,3",
+          "context": " function copilotBodyFixture(t, workName = 'work') {"
+        },
+        {
+          "extent": "-1190,31 +1579,35",
+          "context": " else if(a.includes('check')&&${JSON.stringify(mode)}==='check-failure')process.e"
+        },
+        {
+          "extent": "-1280,2 +1673,2",
+          "context": " for (const historical of [false, true]) {"
+        },
+        {
+          "extent": "-1510,0 +1904,56",
+          "context": " test('Copilot isolated validation stops on native directory-change failure', { s"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "diff_raw_sha256": "031a9c93d2754c2de2ca85513fa8b7ae42211befd100637df726a7f268c29562",
+      "hunks": [
+        {
+          "extent": "-29 +29",
+          "context": " uses the module-qualified application resolver once before any Git invocation."
+        },
+        {
+          "extent": "-55,2 +55,2",
+          "context": " $ErrorActionPreference = 'Stop'"
+        },
+        {
+          "extent": "-109 +109",
+          "context": " function Test-WorktreeDirectoryIdentityEvidence {"
+        },
+        {
+          "extent": "-199 +199",
+          "context": " function Test-IgnoredControlFileEvidence {"
+        },
+        {
+          "extent": "-295 +295",
+          "context": " function Test-EmbeddedRepositoryBoundaryEvidence {"
+        },
+        {
+          "extent": "-386 +386",
+          "context": " function Test-AncestorBoundaryValidation {"
+        },
+        {
+          "extent": "-514 +514",
+          "context": " function Test-PromisorRemoteActive {"
+        },
+        {
+          "extent": "-600 +600",
+          "context": " function Test-PromisorRemoteEvidence {"
+        },
+        {
+          "extent": "-661 +661",
+          "context": " function Test-TrackedOnlyWorktreeEvidence {"
+        },
+        {
+          "extent": "-837 +837",
+          "context": " function Test-NativeExitResetInvariant {"
+        },
+        {
+          "extent": "-894 +894",
+          "context": " function Test-TrackedOnlyEntryCeiling {"
+        },
+        {
+          "extent": "-966 +966",
+          "context": " function Test-EffectiveConfigNativeExitReset {"
+        },
+        {
+          "extent": "-1039 +1039",
+          "context": " function Get-BoundedFileDigest {"
+        },
+        {
+          "extent": "-1129 +1129",
+          "context": " function Read-BoundedFileContent {"
+        },
+        {
+          "extent": "-1225 +1225",
+          "context": " function Assert-OrdinaryTreeUnder {"
+        },
+        {
+          "extent": "-1324 +1324",
+          "context": " function Assert-UnoccupiedControlSlot {"
+        },
+        {
+          "extent": "-1412 +1412",
+          "context": " function Assert-OrdinaryAbsoluteFile {"
+        },
+        {
+          "extent": "-1509 +1509",
+          "context": " function Get-GitExecutableRecord {"
+        },
+        {
+          "extent": "-1576 +1576",
+          "context": " function ConvertTo-NativeArgumentString {"
+        },
+        {
+          "extent": "-1659 +1659",
+          "context": " function Stop-NativeProcessTree {"
+        },
+        {
+          "extent": "-1742 +1742",
+          "context": " function Invoke-GitRaw {"
+        },
+        {
+          "extent": "-1986 +1986",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-2071 +2071",
+          "context": " function ConvertTo-IgnoredExclusionPath {"
+        },
+        {
+          "extent": "-2163 +2163",
+          "context": " function ConvertTo-SubmoduleExclusionPath {"
+        },
+        {
+          "extent": "-2270 +2270",
+          "context": " function ConvertTo-TrackedRelativePathSet {"
+        },
+        {
+          "extent": "-2363 +2363",
+          "context": " function New-ExpectedPathKeySet {"
+        },
+        {
+          "extent": "-2453 +2453",
+          "context": " function Assert-OrdinaryRepositoryRoot {"
+        },
+        {
+          "extent": "-2547 +2547",
+          "context": " function Get-FramedStringMapDigest {"
+        },
+        {
+          "extent": "-2696 +2696",
+          "context": " function Get-TreeEvidence {"
+        },
+        {
+          "extent": "-3041 +3041",
+          "context": " function Get-GitAdministrativePathRecord {"
+        },
+        {
+          "extent": "-3150 +3150",
+          "context": " function Get-BoundedControlFileComponent {"
+        },
+        {
+          "extent": "-3232 +3232",
+          "context": " function Get-EffectiveConfigComponent {"
+        },
+        {
+          "extent": "-3373 +3373",
+          "context": " function Resolve-ActiveSharedIndexRecord {"
+        },
+        {
+          "extent": "-3501 +3501",
+          "context": " function Get-SplitIndexBracketedEvidence {"
+        },
+        {
+          "extent": "-3621 +3621",
+          "context": " function Get-HeadResolvedReferenceComponent {"
+        },
+        {
+          "extent": "-3736 +3736",
+          "context": " function Get-GitControlSurfaceEvidence {"
+        },
+        {
+          "extent": "-3951 +3951",
+          "context": " function Get-PathSetControlInputDigest {"
+        },
+        {
+          "extent": "-4121 +4121",
+          "context": " function ConvertFrom-NulIndexRecordStream {"
+        },
+        {
+          "extent": "-4212 +4212",
+          "context": " function Add-KeySet {"
+        },
+        {
+          "extent": "-4268 +4268",
+          "context": " function Write-VerifierResult {"
+        },
+        {
+          "extent": "-4318 +4317,0",
+          "context": " try {"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "diff_raw_sha256": "3837eec3828f1a1c33404079606d58ca8ad3f8f73f3bb047954e74a3fb8cda82",
+      "hunks": [
+        {
+          "extent": "-3,7 +3,13",
+          "context": ""
+        },
+        {
+          "extent": "-11,3 +17,3",
+          "context": " interface schemas, filesystem changes, Git controls and runner communication fil"
+        },
+        {
+          "extent": "-28,0 +35,7",
+          "context": " if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or"
+        },
+        {
+          "extent": "-33 +46",
+          "context": " $arrArtifacts = @("
+        },
+        {
+          "extent": "-73 +86",
+          "context": " function Invoke-GitRaw {"
+        },
+        {
+          "extent": "-78,0 +92,2",
+          "context": " function Invoke-GitRaw {"
+        },
+        {
+          "extent": "-107 +122,3",
+          "context": " function Invoke-GitRaw {"
+        },
+        {
+          "extent": "-115 +132,5",
+          "context": " function Invoke-GitRaw {"
+        },
+        {
+          "extent": "-150,2 +171,2",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-158 +179",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-163,0 +185,2",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-165,3 +188,17",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-171 +207,0",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-174 +210",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-178 +213,0",
+          "context": " function ConvertFrom-NulPathRecordStream {"
+        },
+        {
+          "extent": "-223 +258",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-230,0 +266,2",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-235 +272,5",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-240,2 +281,6",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-244 +289",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-254,2 +299,8",
+          "context": " function Assert-AllowedPathSet {"
+        },
+        {
+          "extent": "-282 +333,3",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-297 +350",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-299,0 +353,2",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-302 +357,3",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-328 +385,3",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-332 +391,3",
+          "context": " function Get-GitControlSurfaceDigest {"
+        },
+        {
+          "extent": "-416 +477",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-418,0 +480,2",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-434 +497,3",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-452 +517,3",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-457 +524,3",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-460 +529,30",
+          "context": " function Get-WorktreeFileDigestMap {"
+        },
+        {
+          "extent": "-462,6 +560,21",
+          "context": " $objWorktreeBefore = Get-WorktreeFileDigestMap"
+        },
+        {
+          "extent": "-471 +584",
+          "context": " try {"
+        },
+        {
+          "extent": "-474,2 +587",
+          "context": " try {"
+        },
+        {
+          "extent": "-477,0 +590,7",
+          "context": " if ([string]::IsNullOrEmpty($strPowerShellPath) -or"
+        },
+        {
+          "extent": "-479,19 +598,12",
+          "context": " if ([string]::IsNullOrEmpty($strPowerShellPath) -or"
+        },
+        {
+          "extent": "-499,6 +611,35",
+          "context": " try {"
+        },
+        {
+          "extent": "-506,6 +646,0",
+          "context": " try {"
+        },
+        {
+          "extent": "-512,0 +648,2",
+          "context": " try {"
+        },
+        {
+          "extent": "-518,0 +656",
+          "context": " $intGeneratorExit = $LASTEXITCODE"
+        },
+        {
+          "extent": "-522 +660",
+          "context": " if ($arrResult.Count -ne 1) {"
+        },
+        {
+          "extent": "-536 +674",
+          "context": " if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {"
+        },
+        {
+          "extent": "-557 +695",
+          "context": " if ($listFailedChecks.Count -ne 0) {"
+        },
+        {
+          "extent": "-560 +698",
+          "context": " $arrExpectedArtifactRecords = @("
+        },
+        {
+          "extent": "-593 +731,3",
+          "context": " foreach ($strChannel in $arrChannelPaths) {"
+        },
+        {
+          "extent": "-610 +750,3",
+          "context": " foreach ($strPath in $objWorktreeAfter.Keys) {"
+        },
+        {
+          "extent": "-613 +755,5",
+          "context": " if ($listChanged.Count -ne 0) {"
+        },
+        {
+          "extent": "-620,5 +765,0",
+          "context": " if ($listChanged.Count -ne 0) {"
+        },
+        {
+          "extent": "-626,3 +767,8",
+          "context": " Write-Information 'state-recovery: published-example tests passed' -InformationA"
+        },
+        {
+          "extent": "-631 +777",
+          "context": " if ($null -eq $objPathSetResult -or $objPathSetResult.GetType() -ne [System.Mana"
+        },
+        {
+          "extent": "-640 +786,9",
+          "context": " foreach ($objGitResult in @($objWorking, $objStaged, $objUntracked)) {"
+        },
+        {
+          "extent": "-642,4 +795,0",
+          "context": " foreach ($objGitResult in @($objWorking, $objStaged, $objUntracked)) {"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "diff_raw_sha256": "b2bb3456fc3dfbb7d752a9a9d8fdd6c99307703570c4cfc4a4c8f9abfea34f01",
+      "hunks": [
+        {
+          "extent": "-0,0 +1,488",
+          "context": ""
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "diff_raw_sha256": "e03ef4fbd0f93553b4732a1dccaee2ddbece07f5e6cb7a457fc702091155ef71",
+      "hunks": [
+        {
+          "extent": "-455,0 +456,5",
+          "context": " function helperCall(line) {"
+        },
+        {
+          "extent": "-501 +506",
+          "context": " function validateWorkflowObject(fileName, workflow, contract) {"
+        },
+        {
+          "extent": "-505,2 +510,8",
+          "context": " function validateWorkflowObject(fileName, workflow, contract) {"
+        },
+        {
+          "extent": "-508 +519,47",
+          "context": " function validateWorkflowObject(fileName, workflow, contract) {"
+        },
+        {
+          "extent": "-509,0 +567",
+          "context": " function validateWorkflowObject(fileName, workflow, contract) {"
+        },
+        {
+          "extent": "-518 +576,9",
+          "context": " function validateWorkflowObject(fileName, workflow, contract) {"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "diff_raw_sha256": "5f0792bf3038b4d59e6793f0ff8653583c58c517ad30abc9a30656ea6de2ed91",
+      "hunks": [
+        {
+          "extent": "-29,10 +29",
+          "context": " const fixtures = {"
+        },
+        {
+          "extent": "-47 +38,16",
+          "context": " test('valid small workflow interfaces; build requires no Node installation', ()"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "diff_raw_sha256": "4c9b3a045228272676efae778f3229f0e62532b30c8e1b282c527a98a42dd39d",
+      "hunks": [
+        {
+          "extent": "-111 +111",
+          "context": " jobs:"
+        },
+        {
+          "extent": "-164,0 +165",
+          "context": " jobs:"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "diff_raw_sha256": "478933e6d48643805e7618bed6962c6a4c31c9d29c98c69c679a30d7c7bc97f9",
+      "hunks": [
+        {
+          "extent": "-7 +7,257",
+          "context": " jobs:"
+        },
+        {
+          "extent": "-11,0 +268,2",
+          "context": " jobs:"
+        },
+        {
+          "extent": "-23,3 +281,112",
+          "context": " jobs:"
+        },
+        {
+          "extent": "-37,0 +405,2",
+          "context": " jobs:"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "diff_raw_sha256": "1ce38d1e9022caf64635a19b8d016abadfa18543e72318f45a7da430ef2f7ca4",
+      "hunks": [
+        {
+          "extent": "-0,0 +1,887",
+          "context": ""
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "diff_raw_sha256": "0b09475434f71efb08aeb8c8529a7851bfe7c810242de988893e0630a5767396",
+      "hunks": [
+        {
+          "extent": "-309,3 +309,3",
+          "context": ""
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "diff_raw_sha256": "3139342d68263ef02adc64c8078a09fe9966e4f1362cc18ad5c494ea9780f11a",
+      "hunks": [
+        {
+          "extent": "-32,0 +33,5",
+          "context": ""
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "diff_raw_sha256": "d8e4297527c96d86eb6cbead2a9690e1dd264aa4073ae4690117c7f252e3abd7",
+      "hunks": [
+        {
+          "extent": "-8 +8",
+          "context": ""
+        },
+        {
+          "extent": "-34,0 +35",
+          "context": " This table lists the workflow tools and helpers in this directory. It excludes `"
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "diff_raw_sha256": "21d4b2c03bdc5cb4ce8ea54dbde3ba0498ffb1d225c81430472d00492d52aa97",
+      "hunks": [
+        {
+          "extent": "-63 +63",
+          "context": ""
+        },
+        {
+          "extent": "-96 +96",
+          "context": ""
+        },
+        {
+          "extent": "-113 +113",
+          "context": ""
+        },
+        {
+          "extent": "-127 +127",
+          "context": ""
+        },
+        {
+          "extent": "-143 +143",
+          "context": ""
+        },
+        {
+          "extent": "-157 +157",
+          "context": ""
+        },
+        {
+          "extent": "-171 +171",
+          "context": ""
+        },
+        {
+          "extent": "-185 +185",
+          "context": ""
+        },
+        {
+          "extent": "-199 +199",
+          "context": ""
+        },
+        {
+          "extent": "-213 +213",
+          "context": ""
+        },
+        {
+          "extent": "-227 +227",
+          "context": ""
+        },
+        {
+          "extent": "-765,0 +766,158",
+          "context": ""
+        }
+      ]
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "diff_raw_sha256": "819dddb1d7677471701630dcc7c871bbc235a104b26315545a98b61d1141e7f3",
+      "hunks": [
+        {
+          "extent": "-7 +7",
+          "context": ""
+        },
+        {
+          "extent": "-35,0 +36,2",
+          "context": " Prefer a maintained compatible package fix. Use the normal reviewed dependency P"
+        }
+      ]
+    }
+  ],
+  "objects": [
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "raw_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "raw_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+      "bytes": 91158,
+      "raw_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7fc19eb68200935eb8909b64c2a3caa5aece76e5",
+      "bytes": 277358,
+      "raw_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "296c31173cfbc38156e44669d5585b3e6c627be3",
+      "bytes": 503244,
+      "raw_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "bytes": 130059,
+      "raw_sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "raw_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "bytes": 36081,
+      "raw_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "raw_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "raw_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "raw_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/agent-instructions.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "bytes": 12893,
+      "raw_sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "bytes": 25744,
+      "raw_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "bytes": 45016,
+      "raw_sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/package-lock.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "bytes": 38834,
+      "raw_sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/package.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "670083e767627cfed90a61f788021dba88de1091",
+      "bytes": 994,
+      "raw_sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+      "bytes": 13470,
+      "raw_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "raw_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": "docs/dependency-maintenance.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+      "bytes": 10453,
+      "raw_sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "raw_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "bytes": 3088,
+      "raw_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/markdownlint.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+      "bytes": 6714,
+      "raw_sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": "CONTRIBUTING.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+      "bytes": 9117,
+      "raw_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": "AGENTS.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+      "bytes": 32746,
+      "raw_sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+      "bytes": 6063,
+      "raw_sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+      "bytes": 25554,
+      "raw_sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "bytes": 95329,
+      "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "bytes": 229955,
+      "raw_sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "bytes": 482175,
+      "raw_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "bytes": 100007,
+      "raw_sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "bytes": 253918,
+      "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "bytes": 31949,
+      "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": false
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+      "bytes": 26228,
+      "raw_sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "raw_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/agent-instructions.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+      "bytes": 12865,
+      "raw_sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+      "bytes": 4348,
+      "raw_sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "present": false
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package-lock.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "bytes": 38836,
+      "raw_sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "bytes": 902,
+      "raw_sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+      "bytes": 13086,
+      "raw_sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "raw_sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "docs/dependency-maintenance.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+      "bytes": 9874,
+      "raw_sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "raw_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "bytes": 3088,
+      "raw_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/markdownlint.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+      "bytes": 6714,
+      "raw_sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "CONTRIBUTING.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+      "bytes": 9117,
+      "raw_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+    },
+    {
+      "role": "TF_accepted_base",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "AGENTS.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+      "bytes": 32746,
+      "raw_sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "raw_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "raw_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+      "bytes": 90995,
+      "raw_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "bytes": 229936,
+      "raw_sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "bytes": 482175,
+      "raw_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "bytes": 123582,
+      "raw_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "raw_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "bytes": 36090,
+      "raw_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "raw_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "raw_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "raw_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/agent-instructions.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+      "bytes": 12837,
+      "raw_sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "bytes": 25715,
+      "raw_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "present": false
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package-lock.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "bytes": 38822,
+      "raw_sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "bytes": 844,
+      "raw_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "bytes": 13541,
+      "raw_sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "raw_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "docs/dependency-maintenance.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+      "bytes": 9867,
+      "raw_sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "bytes": 51809,
+      "raw_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "bytes": 3081,
+      "raw_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/markdownlint.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+      "bytes": 6686,
+      "raw_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "CONTRIBUTING.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+      "bytes": 9114,
+      "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "AGENTS.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b",
+      "bytes": 32654,
+      "raw_sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d"
+    }
+  ],
+  "prior_rebindings": [
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/NpmTools.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/build.yml",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/scripts-README.md",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": "AGENTS.md",
+      "match": true
+    },
+    {
+      "role": "PS_accepted",
+      "path": "CONTRIBUTING.md",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/build.yml",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/NpmTools.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/scripts-README.md",
+      "match": true
+    },
+    {
+      "role": "TF_accepted_base",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "match": true
+    }
+  ],
+  "raw_comparisons": [
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "scope": "whole raw blob",
+      "byte_equal": true,
+      "PS_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "TF_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "scope": "whole raw blob",
+      "byte_equal": true,
+      "PS_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "TF_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "scope": "whole raw blob",
+      "byte_equal": true,
+      "PS_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "TF_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "scope": "whole raw blob",
+      "byte_equal": true,
+      "PS_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "TF_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "scope": "whole raw blob",
+      "byte_equal": true,
+      "PS_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "TF_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "scope": "raw suffix after END LANGUAGE DESCRIPTOR newline",
+      "byte_equal": true,
+      "bytes": 89884,
+      "sha256": "a481700e469bb0d8d27d91569d1cb2b7cf5fc7a5085094ee19ef76ae8caafa36",
+      "PS_byte_offset": 1111,
+      "TF_byte_offset": 1274
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "scope": "raw suffix from New-StyleGuidePayloadMap through entry point, including publication and cleanup",
+      "byte_equal": true,
+      "bytes": 37938,
+      "sha256": "be7c9e789a943f5b84fdfa2455df4689f79770385fe08ca3388eb9ec4dc29e03"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "scope": "complete top-level function Get-NodeApplicationContext",
+      "byte_equal": true,
+      "PS_sha256": "56348bd228457560ed222eb65315da9247ac286579c974f24b191f2509dfead3",
+      "TF_sha256": "56348bd228457560ed222eb65315da9247ac286579c974f24b191f2509dfead3",
+      "PS_bytes": 4970,
+      "TF_bytes": 4970
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "scope": "complete top-level function Invoke-MarkdownParserProcess",
+      "byte_equal": true,
+      "PS_sha256": "15c3c25a3eff543d3dd00d320337735029a003a2528a220990b61796d1014511",
+      "TF_sha256": "15c3c25a3eff543d3dd00d320337735029a003a2528a220990b61796d1014511",
+      "PS_bytes": 8799,
+      "TF_bytes": 8799
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "scope": "complete top-level function Read-RepositoryInputData",
+      "byte_equal": true,
+      "PS_sha256": "a2d01f2673cb0b9ffe04e397c45c067dc7749bd4e60b9b57bcf7cc8365a46021",
+      "TF_sha256": "a2d01f2673cb0b9ffe04e397c45c067dc7749bd4e60b9b57bcf7cc8365a46021",
+      "PS_bytes": 9237,
+      "TF_bytes": 9237
+    }
+  ],
+  "inspected_regions": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 3186,
+      "end": 3382,
+      "bytes": 8149,
+      "raw_sha256": "8e40f533ef7561bd527f41f4253adbb278b79bfb2e151533d8090b4635f48aa8"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 3429,
+      "end": 3453,
+      "bytes": 1134,
+      "raw_sha256": "d228354cd2d80ea1daf3295f51cb1744d157d2b01399231c63905361bcab64d8"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 3597,
+      "end": 3646,
+      "bytes": 3034,
+      "raw_sha256": "bf5a2f940ed06473295ef8ac8c728adab388c696c4a339f2b10baefe89be079b"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 3910,
+      "end": 3943,
+      "bytes": 1811,
+      "raw_sha256": "4c5245aa635285348f1a11072c82160801db3a56e70d7cab474467f64ba166a2"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 4676,
+      "end": 4786,
+      "bytes": 5312,
+      "raw_sha256": "efcfd3285855c467b887ff4bd328b16ef3bb193234bb6d91402a43cf23ab772b"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 8381,
+      "end": 8472,
+      "bytes": 5250,
+      "raw_sha256": "b497a35b91312f058a87772ccd083f3c4f1861d11da04d02761c5420ac94878c"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 8553,
+      "end": 8617,
+      "bytes": 3187,
+      "raw_sha256": "f1a142f743217c63823b5540a60bf012bdb75f4585b6d8b5e26fb8ac548d3988"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "start": 420,
+      "end": 451,
+      "bytes": 1876,
+      "raw_sha256": "3ef2955c7b39e7c02a76f0039e08b74e73a0b3caafe4a521ca218f4c69bc5616"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "start": 54,
+      "end": 386,
+      "bytes": 18952,
+      "raw_sha256": "85e9268f692dc60ea7a275081a4e416d7390d4b34de55e1db108c5eb957d780a"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "start": 1364,
+      "end": 1539,
+      "bytes": 10373,
+      "raw_sha256": "1cc5ffa26c8dfee7542dc13764a4054e0bf375559c3af45cb0c478ce30c797cb"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "start": 2387,
+      "end": 2406,
+      "bytes": 1659,
+      "raw_sha256": "b00fd6de3c36feb0426d47b56d708c8e0eed164abc509bfb8caca329ff54f8e3"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "start": 1797,
+      "end": 1849,
+      "bytes": 2316,
+      "raw_sha256": "f161b9d6d6f757d1365d17707f063c6cc6269c3ef49097d0b7b0f7b353aef66b"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "start": 1850,
+      "end": 2068,
+      "bytes": 12925,
+      "raw_sha256": "af0d0f861305ce5eae8c1b2c304b8626335fc0c2f23b1e631f186382d71900cb"
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "start": 4321,
+      "end": 4421,
+      "bytes": 5996,
+      "raw_sha256": "0b03197a9f688eee0e67c1ac9fac156876fcdab8688abf491e1467a06ce159b5"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "start": 1,
+      "end": 141,
+      "bytes": 6620,
+      "raw_sha256": "359e62b0687e55263725cfde5df99bb7e28e482ddc3bdac8bcc25d436ca31c38"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "start": 514,
+      "end": 553,
+      "bytes": 2846,
+      "raw_sha256": "55e8b1ef38696fdbf000550c83e060fe07c31c7931882634a7da19d457f746cf"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "start": 775,
+      "end": 887,
+      "bytes": 6094,
+      "raw_sha256": "808f3c7868bd36866701d5dd28641145144bf6785985a67135cbf70cf9df206e"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "start": 345,
+      "end": 465,
+      "bytes": 5772,
+      "raw_sha256": "ba277e0996bbc3cdff547a3e5ef6b969debb040444ca9c6b03c4c3ef20e48b8b"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 350,
+      "end": 398,
+      "bytes": 3623,
+      "raw_sha256": "810dcae0f7db25b943c876970a8b30ae3d2484417dd473f20f6edc43245875a3"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 460,
+      "end": 488,
+      "bytes": 1313,
+      "raw_sha256": "217fb5f568f67e1a51392b92c3a62171aa46e64c619d7c557fcfe6e7cbc3961a"
+    }
+  ],
+  "retired_path_absences": [
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "present": false
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "present": false
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "present": false
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "present": false
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "present": false
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "present": false
+    },
+    {
+      "role": "TF_candidate",
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "present": false
+    },
+    {
+      "role": "PS_accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "present": false
+    }
+  ],
+  "input_hashes": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "bytes": 10905,
+      "raw_sha256": "21cfdc10881b1c6c38fe458549af978dc1bde1a7f67fc2d44c8d43bc0e55facc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "bytes": 10209,
+      "raw_sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "bytes": 16434,
+      "raw_sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\ROUTING-AND-PARALLELISM.md",
+      "bytes": 3410,
+      "raw_sha256": "8dcdc68eb243fdebd79043036641dfd4dc0ae20d12296b5eca39de78017d69a2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A14.md",
+      "bytes": 3587,
+      "raw_sha256": "6d715ac454f858c7329d064f9bee2b62d86d84648d93c47524de27ad3af20484"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\RESULT.md",
+      "bytes": 19248,
+      "raw_sha256": "59492c45d4ce9829163131b7454f2baa52ab7305e366b4dc42bb0976663a7a7a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\postA06-source\\REPORT.md",
+      "bytes": 7954,
+      "raw_sha256": "b19dbbcb07baf56debda97d415f2633549d53130a543d05d12d7833039bbb4c9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\postA06-source\\evidence.json",
+      "bytes": 86776,
+      "raw_sha256": "6521ac6f6478d2664cdc9eeee245de2cb675aefcb0c975ccaa8a186ab98ab03d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\native-evidence.json",
+      "bytes": 21761,
+      "raw_sha256": "6a103ca8b56c7fa01412ef1b77bfac32cea967051b495ec8abc1dc0eda7afd12"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\native-issues.json",
+      "bytes": 5350,
+      "raw_sha256": "b78dfb4daf758199bdee30decfc65d0daf150b845b9a6c013be29150a89e2b02"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\platform-proof.json",
+      "bytes": 11594,
+      "raw_sha256": "a0fca2c670444418aef6a77759977aede8dda9ef89424e010ac5f7746e9bae43"
+    }
+  ],
+  "reused_platform_evidence": [
+    {
+      "run": 37456293100,
+      "attempt": 1,
+      "event": "pull_request",
+      "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+      "checkout_revision": "c057d5456b5ae5dbf5ae1a9fd6dfbd153346ea77",
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112244616737,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T11:25:55.3785985Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T11:26:09.6098009Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112244616606,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T11:25:58.9232813Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T11:26:23.1575253Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112244616229,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T11:25:58.4033353Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T11:26:16.3479605Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "c057d5456b5ae5dbf5ae1a9fd6dfbd153346ea77"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "c057d5456b5ae5dbf5ae1a9fd6dfbd153346ea77"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "c057d5456b5ae5dbf5ae1a9fd6dfbd153346ea77"
+          }
+        }
+      },
+      "all_jobs": "success",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293100\\attempt-1\\log.txt",
+      "log_sha256": "705eb37087b426cf1458cdf5ff1e8cf00c4224cc843aff8aa90c178bfd334178",
+      "local_log_hash_matches": true
+    },
+    {
+      "run": 37456283891,
+      "attempt": 1,
+      "event": "push",
+      "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+      "checkout_revision": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112244585724,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T11:25:43.3846976Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-06T11:25:58.0596143Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112244585610,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T11:25:55.6023004Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-06T11:26:20.7755251Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112244585442,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T11:25:49.7593548Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-06T11:26:07.3393568Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "ed9eea201cfd70a88a6b982b29904e2f6206a692"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "ed9eea201cfd70a88a6b982b29904e2f6206a692"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "ed9eea201cfd70a88a6b982b29904e2f6206a692"
+          }
+        }
+      },
+      "all_jobs": "success",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283891\\attempt-1\\log.txt",
+      "log_sha256": "34c2106e358381986ed04fa67b2e3895bf444a775c574a159fb5c9b6d4fc2a70",
+      "local_log_hash_matches": true
+    }
+  ],
+  "platform_limits": "Existing root evidence and local log hash bindings only. 156 assertions twice per cell for three platforms on PR and push; no new test, hostile-race, universal alias or runtime-reuse test claim.",
+  "retained_decisions": [
+    "D92 B96: keep PS155 open as maintainer-owned conditional residual",
+    "D93 B100: preserve PS156 retirement and historical limits"
+  ],
+  "new_material_finding": false,
+  "new_decision_required": false,
+  "remaining_triggers": [
+    "Concrete supported-caller failure bound to input, host and observed result.",
+    "Explicit admission of an untrusted concurrent writer or hostile writable parent.",
+    "Specific useful handle-relative/no-follow/identity primitive with supported portability and failure behavior.",
+    "Changed writer, privileged promotion consumer, shared/self-hosted runner, credential projection or parent/storage authority.",
+    "A current supported consumer requiring a retired PS156 property; date/version/runner availability alone is insufficient.",
+    "Actual accepted TF pair, conditional PS carryback, qualified R5 runtime/root/product-5.1 and A16/A17 recovery callers; final A18/A19 inputs."
+  ],
+  "remaining_gates": [
+    "Current-head required reviews and all CI; no failing-CI merge.",
+    "Actual dedicated review activation and service behavior.",
+    "Normal TF landing/landed evidence, conditional ten-path PS carryback and paired reverse comparison.",
+    "Accepted-pair and later relevant caller/authority/issue/runner refresh."
+  ],
+  "counters": {
+    "A14_transfers": "0/8",
+    "A14_review": "assessment only; no new clock",
+    "TF68_round": "6",
+    "TF68_deadline_utc": "2026-10-13T23:47:31Z",
+    "A06_A03_A21_A07_transfers": "1/3/5/5 of 12"
+  },
+  "native_state_limit": "Source acceptance and candidate publication/review status supplied by coordinator/STATUS; no fresh remote refs, issue/comment or runner census.",
+  "tests_run": [],
+  "writes": [
+    "REPORT.md",
+    "evidence.json"
+  ],
+  "next_action": "After TF68 acceptance, bind actual landed commit/tree, relevant service/platform evidence and reverse comparison; recheck only changed A14 predicates.",
+  "coordinator_update": {
+    "Codex_clean_result": 6015355951,
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "result_at": "2026-10-06T11:33:19Z",
+    "status_at": "2026-10-06T11:35:14Z",
+    "pending": "four ordinary jobs and dynamic37456500523 live; no product acceptance or merge",
+    "attribution": "coordinator message; no additional native lookup by this worker"
+  }
+}

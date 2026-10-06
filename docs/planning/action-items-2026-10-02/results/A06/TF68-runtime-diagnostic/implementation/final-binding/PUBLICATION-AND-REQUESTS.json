@@ -1,0 +1,104 @@
+{
+  "updated_at": "2026-10-06T11:28:24.330843+00:00",
+  "publication": {
+    "status": "published_verified",
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "parent": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-prepublication-baseline-final.json",
+    "baseline_sha256": "fff7bc6ab3153ba5a0dc6f1e33e53248dbf33cb424d9191637381c5d5af5fbbe",
+    "old_body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+    "new_body_sha256": "2ecba758159fb7ba1d541fee1d36d701620da4d5f41fefc0dcf0288ab857d4f8",
+    "requested_at": "2026-10-06T11:25:10.301520+00:00",
+    "body_command": {
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-final-body-update.log",
+      "sha256": "81f26363d37ebfba0058c8e1bc4a107a5c4cb6a1fe0959aa784e57f16d211297"
+    },
+    "push_requested_at": "2026-10-06T11:25:14.073741+00:00",
+    "push_command": {
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-final-topic-push.log",
+      "sha256": "889df4254c1ff6cbc91e4329ef55bb40a1bce34f4fe64c7be16b9e47dbcb0ca3"
+    },
+    "verified_at": "2026-10-06T11:25:27.545468+00:00"
+  },
+  "round": {
+    "round": 6,
+    "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "2ecba758159fb7ba1d541fee1d36d701620da4d5f41fefc0dcf0288ab857d4f8",
+    "started_at": "2026-10-06T11:27:02.132224+00:00",
+    "deadline": "2026-10-13T23:47:31+00:00",
+    "first_request_basis": "Pre-issue timestamp; fixed original PR clock and transfers retained. Complete baseline excludes automatic reviewer activity.",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-new-head-baseline.json",
+    "baseline_sha256": "72f4e51d2756a510afd03d31d2fa0fbcc202f31c996a7e4834143da2e8335533",
+    "copilot": {
+      "status": "confirmed_pending",
+      "requested_at": "2026-10-06T11:27:02.132224+00:00",
+      "effort_selected": null,
+      "effort_preferred": "Balanced",
+      "observed_effort": null,
+      "channel_attempt": 1,
+      "channel": "GitHub CLI @copilot fallback",
+      "fallback_reason": "Previously authenticated Edge browser3 is unavailable. Available browser inventory contains only IAB and MCP Apps. IAB opened the exact PR and displays Sign in and Sign in to comment, with no authenticated request control. Supported UI cannot submit Balanced. AGENTS.md prescribes CLI @copilot fallback; no browser authentication or effort inferred.",
+      "command": {
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-copilot-cli-request.log",
+        "sha256": "81f26363d37ebfba0058c8e1bc4a107a5c4cb6a1fe0959aa784e57f16d211297"
+      },
+      "request_event_id": 32593286249,
+      "native_requested_at": "2026-10-06T11:27:04Z",
+      "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-copilot.json"
+    },
+    "codex": {
+      "status": "confirmed_pending",
+      "automatic_reconciled": true,
+      "manual_trigger_issued": true,
+      "channel": "GitHub CLI PR comment",
+      "requested_at": "2026-10-06T11:27:15.585770+00:00",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-copilot.json",
+      "command": {
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-codex-trigger.log",
+        "sha256": "234d66a3068cfe07451ceb4258ae4d872e761eeb693b91b17684228c8e973bd8"
+      },
+      "trigger_comment": 6015264487,
+      "native_requested_at": "2026-10-06T11:27:17Z",
+      "trigger_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6015264487"
+    },
+    "request_set_terminal": false,
+    "clean": false,
+    "findings": []
+  },
+  "remaining_gates": [
+    "both current remote reviews and dispositions",
+    "all current CI success",
+    "independent final native binding",
+    "normal source landing and landed validation",
+    "actual dedicated setup activation",
+    "conditional peer repair and paired acceptance"
+  ],
+  "ci_relaunches_this_turn": 0,
+  "product_merges_this_turn": 0,
+  "fixed_deadline": "2026-10-13T23:47:31+00:00",
+  "transfers": {
+    "A06": {
+      "used": 1,
+      "cap": 12
+    },
+    "A03": {
+      "used": 3,
+      "cap": 12
+    },
+    "A21": {
+      "used": 5,
+      "cap": 12
+    },
+    "A07": {
+      "used": 5,
+      "cap": 12
+    }
+  }
+}

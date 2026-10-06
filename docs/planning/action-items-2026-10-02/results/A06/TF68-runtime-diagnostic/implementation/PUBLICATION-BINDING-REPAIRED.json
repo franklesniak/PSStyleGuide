@@ -1,0 +1,489 @@
+{
+  "planning_commit": "ab673c9bbb96b8d27aecc4ab44e0291836dccee2",
+  "publication_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-repaired-evidence-planning-publication.json",
+  "receipt_sha256": "2690e7efa63199e38b6d5b87bf69f60098f644b030297acee36daad1dda21767",
+  "captured_at": "2026-10-06T11:30:53.998254+00:00",
+  "rows": [
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/MUTATION-INVESTIGATION.json",
+      "mode": "100644",
+      "blob": "8a7cbc584026d0b0bb4ea558e8a80dd4cd11cfd4",
+      "source_sha256": "a7d4614c75c436261b9c06aacd215c26207a27565e6be0c5f65f18f871118b87",
+      "published_sha256": "7dbd0ea45deb29f5f2c2a2b6e89ac65bfdbae71350fb69fe79810373628382b0",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/MUTATION-REPAIR-RELEASE.json",
+      "mode": "100644",
+      "blob": "a601234295808abedf6ca45f4b2e06ecf97c057c",
+      "source_sha256": "bc159e42f5209def665b2839f008f3cef5b462edd720b1eef982723261f11452",
+      "published_sha256": "bc159e42f5209def665b2839f008f3cef5b462edd720b1eef982723261f11452",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/MUTATION-REPAIR.md",
+      "mode": "100644",
+      "blob": "7db1889e7b2c7a2b452c3db572a0a3b95ce6540f",
+      "source_sha256": "d76fd085ca0aefc5b9c014091135384c58be2e271f55253d56c8ce2841b0cd98",
+      "published_sha256": "d76fd085ca0aefc5b9c014091135384c58be2e271f55253d56c8ce2841b0cd98",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/PEER-READINESS-REPAIRED.json",
+      "mode": "100644",
+      "blob": "a9b25f9a81ce779f2cd87e0ec6582ec9f02cfe2f",
+      "source_sha256": "50caddf4b1fdf39f331654045fec79f4a8e1ec33fc38dc402157426898b6b14d",
+      "published_sha256": "50caddf4b1fdf39f331654045fec79f4a8e1ec33fc38dc402157426898b6b14d",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/PEER-READINESS.json",
+      "mode": "100644",
+      "blob": "ab97610a3ed18bdb65096849791ef95867e07134",
+      "source_sha256": "2639a2e5bffdeef889633efca8314479a6e652b49b1cd0a081ac2138266160e9",
+      "published_sha256": "2639a2e5bffdeef889633efca8314479a6e652b49b1cd0a081ac2138266160e9",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/PEER-READINESS.md",
+      "mode": "100644",
+      "blob": "34d0ab46479a860da988f75b8cbe0b93bab2efc0",
+      "source_sha256": "2c96bfd653c7edd86f71091c1f990a85f887e381b757fc03d920262a5a55dc98",
+      "published_sha256": "2c96bfd653c7edd86f71091c1f990a85f887e381b757fc03d920262a5a55dc98",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/PUBLICATION-BINDING.json",
+      "mode": "100644",
+      "blob": "15db063dd1812342e9913fcf262652322851c519",
+      "source_sha256": "0da1d76c8e59a89e8ecf83a04a16f1854fa218deed14c8db6eb8831101678633",
+      "published_sha256": "0da1d76c8e59a89e8ecf83a04a16f1854fa218deed14c8db6eb8831101678633",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-failed/FAILURE.json",
+      "mode": "100644",
+      "blob": "5703f0dd0403abbbaac629be995b4757abc5c08d",
+      "source_sha256": "787fe2cbadc60c4c7fdea327a07789d65e1a83b3b8e4c0490264867c836d3322",
+      "published_sha256": "97d5a55972570c099943c149bad6d8567bc7b9ed2bd8f8c3e615297da85987e9",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-failed/aggregate.log",
+      "mode": "100644",
+      "blob": "380c38209e73b3a3f54480126b53a56a9f6b6bee",
+      "source_sha256": "eeefa5e5919d8f31a60d3ac9e94930b22bed582a53d75f5ebe89d2f182e5dd5e",
+      "published_sha256": "eeefa5e5919d8f31a60d3ac9e94930b22bed582a53d75f5ebe89d2f182e5dd5e",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-failed/result.json",
+      "mode": "100644",
+      "blob": "ae9d2a5447b7e51769056b55cbcaf3087758c7cd",
+      "source_sha256": "879445ac94cf030b731cc42b473aba03eb39aef9bd8694a4b14e7aae22b12215",
+      "published_sha256": "879445ac94cf030b731cc42b473aba03eb39aef9bd8694a4b14e7aae22b12215",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-failed/status.json",
+      "mode": "100644",
+      "blob": "46e61fd04ed4fd234e9838f6de43d529a1a19795",
+      "source_sha256": "b55c535717980409a69c2936734b35f7dcffa396bf03cae57eb5ea8411a2f104",
+      "published_sha256": "b55c535717980409a69c2936734b35f7dcffa396bf03cae57eb5ea8411a2f104",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/ARTIFACT-INDEX.json",
+      "mode": "100644",
+      "blob": "154add32c4ae69e36f3b5c318c72b5353ecdc480",
+      "source_sha256": "8a7539e6f7132fd9e38c66f115e8520d88111a2f8708387ee0b5dac9a6cd1576",
+      "published_sha256": "8a7539e6f7132fd9e38c66f115e8520d88111a2f8708387ee0b5dac9a6cd1576",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/AcceptedContent.log",
+      "mode": "100644",
+      "blob": "8f77712f695485d87c3ca1c2adf63af0757ec859",
+      "source_sha256": "70ad4866dd6af503b663812a16067caa4d8307a872418c9d7cc82db74371c6ca",
+      "published_sha256": "1399a56f49a8b39ebc58ed454eed64965b2f478dbcd4cd813ab3d007235006bb",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/AcceptedMaintenance.log",
+      "mode": "100644",
+      "blob": "dab035b609d104d24017af9a2cecbb06ceaa53dc",
+      "source_sha256": "e94398dd6ad5d76ae4a5a68bc050757414c53915330608eb17321e9ef0927589",
+      "published_sha256": "e94398dd6ad5d76ae4a5a68bc050757414c53915330608eb17321e9ef0927589",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/COMMITTED-LOCAL-VALIDATION.json",
+      "mode": "100644",
+      "blob": "f4169fde70ab8f191f40721b7ce5338bc2240558",
+      "source_sha256": "30905b4a2376b1aaa4f1290c5fb3a7839af0c3308c281cbfa4d23cf0830b49b1",
+      "published_sha256": "30905b4a2376b1aaa4f1290c5fb3a7839af0c3308c281cbfa4d23cf0830b49b1",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/FinalizeMetadataNow.log",
+      "mode": "100644",
+      "blob": "b28b122a95cb47aa78ff56c93913326bff9fe41d",
+      "source_sha256": "b3c79d5079ed967278538390701230b41fe5add436cd91d91e625c9ea6d7755e",
+      "published_sha256": "63d352e1354dae7d3d7f1aeef9145a0d7b6f05d8bc382ac6ba30a8d46b2a1d02",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/MetadataClassificationOnly.log",
+      "mode": "100644",
+      "blob": "e374e86600741b8b6ec7942ec8372f44f4091be0",
+      "source_sha256": "78a6880134bdc645f7d2f8c6d1fb78608b63a7e8607decab2df46f67328067d7",
+      "published_sha256": "d93188c3d6f4ac20c347ae3455fa13509708335ae7304c8ddafe78738d88217f",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/ProposedPolicy.log",
+      "mode": "100644",
+      "blob": "8d02984e9f59d0ce8fb131a90a45cb430ffeaf1a",
+      "source_sha256": "81e36b7f9203c372dfacea16058e0004aafedfb8b6431b7da312daef3d40edcb",
+      "published_sha256": "32f6e19484feb176fa2feafc23cb5b3d2ce7fd31b7c65659bd8ccd5d65ba1081",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/ROOT-READINESS.json",
+      "mode": "100644",
+      "blob": "8b84caaee19e0da0a8955fb035dfac4730b29aa9",
+      "source_sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1",
+      "published_sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/ROOT-RELEASE.json",
+      "mode": "100644",
+      "blob": "8dccfa9aa7685aa461e26df0406b59fcdad92f11",
+      "source_sha256": "f11e72034f1f007ef62462f07191ca9095809d04e3213b39853a981d0e828e68",
+      "published_sha256": "f11e72034f1f007ef62462f07191ca9095809d04e3213b39853a981d0e828e68",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/ROOT-RESULT-VERIFICATION.json",
+      "mode": "100644",
+      "blob": "a0ed03516570deb63a6585f90654604c256e1d6c",
+      "source_sha256": "b0323fead8c91cff6cda167847b3f4f252f885ca88eb64233c1a41963f030f42",
+      "published_sha256": "b0323fead8c91cff6cda167847b3f4f252f885ca88eb64233c1a41963f030f42",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/affected-node-after.json",
+      "mode": "100644",
+      "blob": "c7c45460e0bfd1260e0d02c72ae1b98f272d5afb",
+      "source_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "published_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/affected-node.log",
+      "mode": "100644",
+      "blob": "9cd9b949441951544050eb7fee2c88f748720205",
+      "source_sha256": "b5d8ff09a15d9aa87280a2072743acc90f99496e361166e380926f0f897a630f",
+      "published_sha256": "b5d8ff09a15d9aa87280a2072743acc90f99496e361166e380926f0f897a630f",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/aggregate-after.json",
+      "mode": "100644",
+      "blob": "c7c45460e0bfd1260e0d02c72ae1b98f272d5afb",
+      "source_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "published_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/aggregate.log",
+      "mode": "100644",
+      "blob": "421a5fe77eb48f0e3737d3cfe2825e0fe0704d10",
+      "source_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "published_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/before.json",
+      "mode": "100644",
+      "blob": "c7c45460e0bfd1260e0d02c72ae1b98f272d5afb",
+      "source_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "published_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/current-audit.json",
+      "mode": "100644",
+      "blob": "5147c9983733a596e337566255e8a0471d6e4246",
+      "source_sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+      "published_sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/fixture-adaptation.json",
+      "mode": "100644",
+      "blob": "fdb42236152b1c51cca4ff5634c9336c8b9284d8",
+      "source_sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "published_sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/host-source-after.json",
+      "mode": "100644",
+      "blob": "62007a8060b8a9e21b34a402e24a2daff2f3c05b",
+      "source_sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "published_sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/host-source-before.json",
+      "mode": "100644",
+      "blob": "62007a8060b8a9e21b34a402e24a2daff2f3c05b",
+      "source_sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "published_sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/manifest.json",
+      "mode": "100644",
+      "blob": "7d8c75c716aea8beb72e292472d05f0774b47e64",
+      "source_sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+      "published_sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/normal-commit.log",
+      "mode": "100644",
+      "blob": "c346cb091551b4f5078b66bc5e6746b805d9e26d",
+      "source_sha256": "c9a2721ba26333df4aef7610fa4f7aed7a98f76f6f5b4d2aed4078f472fe33b9",
+      "published_sha256": "c9a2721ba26333df4aef7610fa4f7aed7a98f76f6f5b4d2aed4078f472fe33b9",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/result.json",
+      "mode": "100644",
+      "blob": "6320d1d34fac0132af709440d805142bfafb24d7",
+      "source_sha256": "ad05b828c12a04e698a59b2923941771ed771db507f77cfb3f9cf8fc310feb6b",
+      "published_sha256": "ad05b828c12a04e698a59b2923941771ed771db507f77cfb3f9cf8fc310feb6b",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/runtime.json",
+      "mode": "100644",
+      "blob": "e172622eca8202ef83b58caadf6a2b9524d3797f",
+      "source_sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+      "published_sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/staged-preflight-after.json",
+      "mode": "100644",
+      "blob": "c7c45460e0bfd1260e0d02c72ae1b98f272d5afb",
+      "source_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "published_sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/staged-preflight.log",
+      "mode": "100644",
+      "blob": "15910882e00c9667b2c6d90adafaeb42cd96297d",
+      "source_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "published_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-validation-repaired/status.json",
+      "mode": "100644",
+      "blob": "f583d93235458e673a6f4bd3f1f129d648729ae6",
+      "source_sha256": "4e7aa9ffec53197e51923bef717e2c4ee3c3e925c180dd43b17a556c0cb08f5f",
+      "published_sha256": "4e7aa9ffec53197e51923bef717e2c4ee3c3e925c180dd43b17a556c0cb08f5f",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/ARTIFACT-INDEX.json",
+      "mode": "100644",
+      "blob": "cfb8456cdacb3299580b8025dcc40c98fd202a25",
+      "source_sha256": "c3379813177ff3c5a111b533d8dd7af93a9d4716c61bf53a19d48b4c7a036c5f",
+      "published_sha256": "c3379813177ff3c5a111b533d8dd7af93a9d4716c61bf53a19d48b4c7a036c5f",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/IMPLEMENTATION.md",
+      "mode": "100644",
+      "blob": "39984742540d20d8b29ba5eda3d6b006a7946423",
+      "source_sha256": "d5f98ca13ffb2ebdafd60a2dc5f39b284e783cfeea5b9657c0b78a1597f3bdeb",
+      "published_sha256": "d5f98ca13ffb2ebdafd60a2dc5f39b284e783cfeea5b9657c0b78a1597f3bdeb",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/REPORT.md",
+      "mode": "100644",
+      "blob": "5672883d2548cfb054c9af242b19a20d7d947195",
+      "source_sha256": "3c46255afac1feec590fb80715eebba3d355a15b62dd8528b1e4482960b8ed02",
+      "published_sha256": "3c46255afac1feec590fb80715eebba3d355a15b62dd8528b1e4482960b8ed02",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/ROOT-READINESS.json",
+      "mode": "100644",
+      "blob": "abcd0b1025fbde9a03ee27dc2b730098c58e3cb5",
+      "source_sha256": "1b9d45d4683bc659b9c9277844c2b4626e354c7c06c6012d386788cc1ac29552",
+      "published_sha256": "1b9d45d4683bc659b9c9277844c2b4626e354c7c06c6012d386788cc1ac29552",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/ROOT-RESULT-VERIFICATION.json",
+      "mode": "100644",
+      "blob": "bda08143544c13ca810552ae8be05e6d6775369d",
+      "source_sha256": "a46fd209fbb40d10a9a0fe82d73fb0046de6a1579d15480fc3ecb482cd4781b7",
+      "published_sha256": "a46fd209fbb40d10a9a0fe82d73fb0046de6a1579d15480fc3ecb482cd4781b7",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-1-stdout.txt",
+      "mode": "100644",
+      "blob": "4f781ba0d9613763e1093b8ae11f9663ca7e4d42",
+      "source_sha256": "9c94e2dcb6779646b727c1e3d8720f712ebc309703aa2d5dd0619eb2828bf395",
+      "published_sha256": "9c94e2dcb6779646b727c1e3d8720f712ebc309703aa2d5dd0619eb2828bf395",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-2-stdout.txt",
+      "mode": "100644",
+      "blob": "8007f10675faaa9a3a5db6bdc5a1a5524ced4d7c",
+      "source_sha256": "a89fa09d1e32a91de286c5d5bf33b0e8cfb0ec31229ba0498b117f85536f6f6d",
+      "published_sha256": "a89fa09d1e32a91de286c5d5bf33b0e8cfb0ec31229ba0498b117f85536f6f6d",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-3-stdout.txt",
+      "mode": "100644",
+      "blob": "57c455c8b49a0d3754b0ae3db0a1ddd033762dc2",
+      "source_sha256": "51e94b53a508e526e30b54998e69d385ab594141b078cff2446b020291da0a52",
+      "published_sha256": "51e94b53a508e526e30b54998e69d385ab594141b078cff2446b020291da0a52",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-4-stdout.txt",
+      "mode": "100644",
+      "blob": "7f373858fe20359f33bd0f22d604028e51ab70fb",
+      "source_sha256": "16be4a675d86dfd8f5da2042d107dbe06d77072964d7a7cc583cb63f019e061b",
+      "published_sha256": "16be4a675d86dfd8f5da2042d107dbe06d77072964d7a7cc583cb63f019e061b",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-5-stdout.txt",
+      "mode": "100644",
+      "blob": "e808779c261089e111e5a5938a1d3b5f87dc23bd",
+      "source_sha256": "655edbff30fe931aeaac6a6b833aa1d4ce88d137bb0431869e72b8ab14a85443",
+      "published_sha256": "655edbff30fe931aeaac6a6b833aa1d4ce88d137bb0431869e72b8ab14a85443",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/case-6-stdout.txt",
+      "mode": "100644",
+      "blob": "03ef6690e256d7d722429bc95092b5a0be52d653",
+      "source_sha256": "7ae6a18427f25794c34aa510ba97024db53b226f7b2214106003b2d019a31a2b",
+      "published_sha256": "7ae6a18427f25794c34aa510ba97024db53b226f7b2214106003b2d019a31a2b",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/constructor-result.json",
+      "mode": "100644",
+      "blob": "40738c8cf1026d2efd25ce875aaad73e739cc88e",
+      "source_sha256": "423df2caa92d13bf8f5b4861d4d9d3749372a24546c030c1792d7f74c25b9b54",
+      "published_sha256": "706a79a5a499ce5e3abe77e5742f418cdeef18df83cbf6b3eff6ef92842831ca",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/constructor.ps1",
+      "mode": "100644",
+      "blob": "34c66359d5cfcd663e1581988ae9fd8273c25a05",
+      "source_sha256": "e994a9a92419f440cc3230140e53de7ad11780ee4a7400b784859a82cce64a56",
+      "published_sha256": "e994a9a92419f440cc3230140e53de7ad11780ee4a7400b784859a82cce64a56",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/evidence.json",
+      "mode": "100644",
+      "blob": "59c6da5f539d4a47f5762843f5810bf484bcbde7",
+      "source_sha256": "f87671b008063da4cb548444c16ababb7c8d04449faa1bd2ecee37e006e6736a",
+      "published_sha256": "f87671b008063da4cb548444c16ababb7c8d04449faa1bd2ecee37e006e6736a",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/independent-source-review.json",
+      "mode": "100644",
+      "blob": "432f9e86f0762115738931e731ba329600e9e51c",
+      "source_sha256": "b844e0627b0300dd0fccfb051c8ba9bf0f2ac815c80e357646450e472bf6e293",
+      "published_sha256": "d9e2ecf9a0c1968ba36a228ae385ee9db8db9c1389d10840e529247893ffa7f3",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/independent-source-review.md",
+      "mode": "100644",
+      "blob": "ce33ba72027a0c6755101f1f07d42369e554a985",
+      "source_sha256": "ae5b8eeec14892982e891dca91d401ff02bb24282d810f345328b36ed673026f",
+      "published_sha256": "453cbc83cba97cb3c0809aba63386a3b726fc52e9b6d1a24e97ce003f9e723a4",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/manifest.json",
+      "mode": "100644",
+      "blob": "c6a8f76e3c7de6da2fe0665ac310d4290ff95def",
+      "source_sha256": "762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f",
+      "published_sha256": "762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/metadata-disposition.json",
+      "mode": "100644",
+      "blob": "a9cde248fddaeec7c7826357242106ebf609cbc7",
+      "source_sha256": "f5d32148da23308158fdb403b197a9aad8c9f7694bce090756d8db42e31135dd",
+      "published_sha256": "a67cf4807b33d8891337d6aa0137a8718ffc111a5f562dfd720cc182bdbd7721",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/quality-final.json",
+      "mode": "100644",
+      "blob": "1afd0acaa64a3f4eff007162acf9a8e07e4457bc",
+      "source_sha256": "db73f1729fc734485dc93a390d00dd6aa7eb3556b695701d8ed64614b0fc9541",
+      "published_sha256": "ce9f8063a6ed2574c61b9cc65801bdee2ee3176bdc644966e71524996a335c97",
+      "relationship": "Git CRLF-to-LF text normalization only"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/result.json",
+      "mode": "100644",
+      "blob": "9148145401e6f87ab2464bd2f968872d0e0f2823",
+      "source_sha256": "944c706f31596bfb1d0e9c5f6b985152faafbc67170b459eff4e5c1b0fd07f4a",
+      "published_sha256": "944c706f31596bfb1d0e9c5f6b985152faafbc67170b459eff4e5c1b0fd07f4a",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/six-actual-cases.log",
+      "mode": "100644",
+      "blob": "0f7421e60474d52f9c3887ca86dd5a9fe5f56ae9",
+      "source_sha256": "69551396d5e13eb6861086b77aec4166e1af7e5c34f52c5f9f4f1071a262b9e3",
+      "published_sha256": "69551396d5e13eb6861086b77aec4166e1af7e5c34f52c5f9f4f1071a262b9e3",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/six-result.json",
+      "mode": "100644",
+      "blob": "8b8f72fabb09cf7a8e121907a1c83d48c5d59cb3",
+      "source_sha256": "0c6e6b607773907af617bce1de797715e049f8a5f7f0d15ae5ba9b3552118329",
+      "published_sha256": "0c6e6b607773907af617bce1de797715e049f8a5f7f0d15ae5ba9b3552118329",
+      "relationship": "identical"
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutation-repair/status.json",
+      "mode": "100644",
+      "blob": "2be8e4ca7490fe82243bbc3005f5a31b4c75df74",
+      "source_sha256": "50253035e1ba9382eb4673700bb246064dceaefa93f447ac8741ad1c23d2c139",
+      "published_sha256": "50253035e1ba9382eb4673700bb246064dceaefa93f447ac8741ad1c23d2c139",
+      "relationship": "identical"
+    }
+  ],
+  "scope": "Immutable published evidence only. Source hashes identify original captured bytes. Published hashes identify Git-normalized bytes. Mutable STATUS/RESULT/execution-state excluded; no source/evidence hash was rewritten."
+}
