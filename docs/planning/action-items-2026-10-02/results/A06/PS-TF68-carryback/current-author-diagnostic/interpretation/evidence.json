@@ -1,0 +1,410 @@
+{
+  "schema": 1,
+  "finding": "CURRENT-AUTHOR-STRUCTURAL-COST-1",
+  "state": "PROPOSAL_ONLY_NOT_SELECTED_OR_EXECUTED",
+  "generated_utc": "2026-10-06T23:28:55.805173+00:00",
+  "report_sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "references": {
+    "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+    "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-RESULT-VERIFICATION.json": "83b7981748cc7364b13fab3c701ac43ecf0baa68357dc003b5d503998e0f7ee7",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\manifest.authorized.json": "daa7c5c001d29ca8aacaf2dbc1dea4178946afe11ade292e84347cfd5558228b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-READINESS.json": "0fc1409723fe00ffde85bfacec7f8edede9b54b69c2fbb313fb7209204831d6a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\recovery-proof.json": "cbd7080292bcb22dedf73723d97a4ff532d3fa90b4884e7ca006e55c2968b25e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\source-catalog.json": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\REPORT.md": "08d47709347089791dd70c9ebf6355a96db4b5192a24fdd57b62585e09aa01de",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json": "a0cf4f33772433ab4d923eabae47ff6c28d2fc2b5b5ff9630e24aa776f563000",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\ROOT-DECISION.json": "62e52332198093580f099207574965f2d6d2d6d7a9ec6ad6ca625bff7484018a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R2-converter-metadata-cache.md": "8dad90140bdb010bd19c2c65a8e75a2199aa805cf00674c4dc4189683831226f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R3-npm-environment-duplication.md": "c89f83e0a44fce755c87188e74114f98c5d5db86ffa1ffec533b65b3e5b2c1a0",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\status.json": "85e6e8dbd715e6e3f78cc638782013486740c4e755871caa16bf8515551091d4",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\pair-judgment.json": "8ab18f4e6c52378f1312dbb56988fd9220b216103e47bc67731b591209ff5948",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\case.json": "a04ac04f3ee99d54c3175c386793861b3e5e9b96e7a60b82aa60c0f3537f9cce",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-child.json": "249ff7f3813fcf0141fac9ab574bb212d01847a900a051b85b19eb030b6b8c3e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-child.json": "3283eae16519ad7ea9e9be5aadca41ecac5ca27db62fc5c3d2f13014c2dfed0f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control.spec.json": "25b7b724b72c53a994e2af4dcf4bc71c3ceeb5766d7b65885dccc10cf91876df",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile.spec.json": "8816dab984360ef26361e542d2457561dd4ba2d4830e64b7d9e64dd2eeca2e36",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stdout.txt": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stdout.txt": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stderr.txt": "347a6e420435c03582223fe0e0c8230059ae2f47a02e00655d893baebf20d1d6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stderr.txt": "5b86ad3bce407308b7739cae3cf321195929e026ce97c746087c3c5f7b065f93",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\result.json": "89eabc84f67b26856a460b6b44bc372634bad55a6c52d72a031e4b2843c3bbd8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair-cleanup.json": "f1a7f04620e9a3caf2d9ee2e433c3901e396342b8312392f2a183bd867886c5a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\setup-cleanup.json": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\terminal-cleanup.json": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair-after.json": "5fa53e10d0984282b09981238534def53ea0ab846926e6ab75306e634be85183",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\host-source-after.json": "0f5dc300047b775b0c8ff0afb5785343837a9b2ac85ffb73cb6b96e833abf664",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\before.json": "0a43f6b14d101f3678dda6c48613de04d707473d8af38ee4a4ac9bd870f192b8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\runtime.json": "5aaf20faa1c73703268348e6c894d63b3111475dd210f0f422c5801a7f43792d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\manifest.json": "daa7c5c001d29ca8aacaf2dbc1dea4178946afe11ade292e84347cfd5558228b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\payload-hashes.json": "fc6d78be36f14a15e2d8efed4e7a90690484a2f78170b714f4d5622a84726ee5",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\candidate.tar": "8814c60f8f279a8a08b8f41797ee55b5188551a1c5b168c047de114fe2067226",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\dependencies.tar": "c09f273178c5d18b1da93878f6c7badf2fca9f7deaca503dff395da1d1badd8b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\source-before.json": "04b5b7049b01d3dd859554e30d10caadbe95eede9bede15360439d4e043b44ff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\control.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\timing.ps1": "a8a270de1df84aca2216f45c07e981315b5f45b78a6930fcdf95636f7d27b5a9"
+  },
+  "primary_sources": [
+    {
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_logical_operators?view=powershell-7.6",
+      "scope": "Short-circuit evaluation and equal logical-operator precedence, not speed."
+    },
+    {
+      "url": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-7.6",
+      "scope": "Array count semantics, not pipeline cost."
+    }
+  ],
+  "validated": {
+    "existing_run_passed_at_one_case_scope": true,
+    "raw_counts": {
+      "control": {
+        "generic": 4,
+        "parser-call": 52,
+        "structural": 44,
+        "reuse": 8
+      },
+      "profile": {
+        "generic": 4,
+        "parser-call": 52,
+        "structural": 44,
+        "reuse": 8
+      }
+    },
+    "stdout_equal": true,
+    "nonmarker_stderr_equal": true,
+    "argv_cwd_clock_equal": true,
+    "native_exits_52_zero": true,
+    "spans_recomputed": 574,
+    "phase_totals_recomputed": 14,
+    "structural_family_three_seconds": 3.260921081,
+    "three_percent_caller": 40.693366843861995,
+    "three_percent_timing_child": 27.23297392008834,
+    "control_seconds": 11.629018591000005,
+    "timing_seconds": 11.974164447,
+    "observed_difference_seconds": 0.3451458559999949,
+    "observed_difference_percent": 2.9679706270924027,
+    "outside_caller_seconds": 3.9607673410000004,
+    "whole_child_measurement_scope": "one pair with shared count observers; no stable benchmark or provider cause",
+    "product_source_raw_hashes_current": true
+  },
+  "six_prospective_sites": [
+    {
+      "line": 3832,
+      "owner": "objRawProseBlock",
+      "field": "code"
+    },
+    {
+      "line": 3834,
+      "owner": "objRawProseBlock",
+      "field": "links"
+    },
+    {
+      "line": 3886,
+      "owner": "objRawCell",
+      "field": "code"
+    },
+    {
+      "line": 3888,
+      "owner": "objRawCell",
+      "field": "links"
+    },
+    {
+      "line": 3954,
+      "owner": "objRawListItem",
+      "field": "code"
+    },
+    {
+      "line": 3956,
+      "owner": "objRawListItem",
+      "field": "links"
+    }
+  ],
+  "equivalence_scope": "Keep the preceding array-type rejection and exact original nonempty filter; conditionally bypass only the zero-count predicate evaluation. No new helper/cache/native/schema mechanism.",
+  "materiality": {
+    "measured_schema_family_cost": true,
+    "separate_pipeline_subcost_measured": false,
+    "empty_array_frequency_measured": false,
+    "candidate_speedup_measured": false,
+    "hosted_timeout_cause_established": false,
+    "scope": "bounded implementation-and-evaluation opportunity only; not publishable repair until mandatory net-benefit and correctness gates pass"
+  },
+  "rubric": {
+    "criteria": [
+      "C",
+      "U",
+      "S",
+      "E",
+      "M",
+      "T"
+    ],
+    "weights": [
+      36,
+      23,
+      22,
+      11,
+      5,
+      3
+    ],
+    "rows": [
+      {
+        "option": "A",
+        "ratings": [
+          10,
+          6,
+          10,
+          10,
+          10,
+          10
+        ],
+        "weighted_total": 90.8
+      },
+      {
+        "option": "B",
+        "ratings": [
+          10,
+          7,
+          10,
+          10,
+          10,
+          10
+        ],
+        "weighted_total": 93.1
+      },
+      {
+        "option": "C",
+        "ratings": [
+          10,
+          8,
+          10,
+          8,
+          9,
+          7
+        ],
+        "weighted_total": 91.8
+      },
+      {
+        "option": "D",
+        "ratings": [
+          10,
+          9,
+          10,
+          8,
+          9,
+          7
+        ],
+        "weighted_total": 94.1
+      },
+      {
+        "option": "E",
+        "ratings": [
+          9,
+          9,
+          9,
+          8,
+          8,
+          6
+        ],
+        "weighted_total": 87.5
+      },
+      {
+        "option": "F",
+        "ratings": [
+          9,
+          8,
+          9,
+          8,
+          9,
+          6
+        ],
+        "weighted_total": 85.7
+      },
+      {
+        "option": "G",
+        "ratings": [
+          8,
+          8,
+          8,
+          7,
+          6,
+          4
+        ],
+        "weighted_total": 76.7
+      },
+      {
+        "option": "H",
+        "ratings": [
+          7,
+          9,
+          7,
+          6,
+          5,
+          3
+        ],
+        "weighted_total": 71.3
+      },
+      {
+        "option": "I",
+        "ratings": [
+          6,
+          8,
+          6,
+          5,
+          5,
+          3
+        ],
+        "weighted_total": 62.1
+      },
+      {
+        "option": "J",
+        "ratings": [
+          6,
+          7,
+          6,
+          5,
+          6,
+          4
+        ],
+        "weighted_total": 60.6
+      },
+      {
+        "option": "K",
+        "ratings": [
+          10,
+          4,
+          9,
+          5,
+          7,
+          5
+        ],
+        "weighted_total": 75.5
+      },
+      {
+        "option": "L",
+        "ratings": [
+          1,
+          7,
+          0,
+          4,
+          7,
+          10
+        ],
+        "weighted_total": 30.6
+      },
+      {
+        "option": "M",
+        "ratings": [
+          7,
+          9,
+          7,
+          6,
+          4,
+          2
+        ],
+        "weighted_total": 70.5
+      },
+      {
+        "option": "N",
+        "ratings": [
+          10,
+          6,
+          10,
+          8,
+          9,
+          8
+        ],
+        "weighted_total": 87.5
+      },
+      {
+        "option": "O",
+        "ratings": [
+          2,
+          8,
+          1,
+          4,
+          6,
+          7
+        ],
+        "weighted_total": 37.3
+      },
+      {
+        "option": "P",
+        "ratings": [
+          8,
+          7,
+          7,
+          4,
+          6,
+          5
+        ],
+        "weighted_total": 69.2
+      }
+    ],
+    "all_totals_recomputed": true,
+    "recommended_option": "D",
+    "recommended_score": 94.1,
+    "owner_selection": false,
+    "changed_from_draft": "Mandatory benefit gate reduces maintenance/cost ratings; D now94.1, no-change B93.1 remains legitimate."
+  },
+  "future_comparison_proposal": {
+    "execution_authorized": false,
+    "exact_packet_not_prepared_here": true,
+    "current_completed_pair_repeat_authorized": false,
+    "variants": [
+      "exact_H_preimage",
+      "frozen_uncommitted_final_candidate"
+    ],
+    "new_shared_fixture_clock_endpoints": true,
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "fresh_serial_children": 4,
+    "phase_markers": false,
+    "shared_counts_exits_observers": true,
+    "maximum_child_seconds": 120,
+    "complete_envelope_seconds": 600,
+    "maximum_output_bytes": 2097152,
+    "maximum_events": 2000,
+    "auto_repeat": false,
+    "mandatory_before_commit_new_review": true,
+    "acceptance": {
+      "all_correctness_output_count_oracle_guard_cleanup_parity": true,
+      "candidate_faster_in_both_opposite_order_pairs": true,
+      "median_gain_minimum_percent": 5,
+      "median_gain_minimum_seconds": 0.5,
+      "environmental_or_pair_discrepancy_inconclusive_means_no_change": true,
+      "absence_or_inconclusive_benefit": "no_change",
+      "normal_final_input_quality_endpoints_required": true
+    },
+    "limits": "Two observations per variant mitigate order bias; cannot establish stable benchmark or hosted savings. Shared ceilings may stop incomplete work. No wider profile."
+  },
+  "boundaries": {
+    "product_writes": 0,
+    "tests_probes_parsers": 0,
+    "payload_imports": 0,
+    "containers": 0,
+    "installs": 0,
+    "native_writes": 0,
+    "reruns": 0,
+    "source_frozen": true,
+    "B99_frozen": true,
+    "prior_R2_R3_no_change_retained": true,
+    "provider_inquiry_authorization": "pending; no message sent",
+    "round": 1,
+    "spent_same_input_service_cap": "3/3",
+    "deadline": "2026-10-14T20:09:39.767792Z",
+    "transfers": [
+      2,
+      4,
+      6,
+      6
+    ]
+  }
+}

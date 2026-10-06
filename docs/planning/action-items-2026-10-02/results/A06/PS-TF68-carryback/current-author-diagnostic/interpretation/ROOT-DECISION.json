@@ -1,0 +1,80 @@
+{
+  "schema": 1,
+  "finding": "CURRENT-AUTHOR-STRUCTURAL-COST-1",
+  "selected_utc": "2026-10-06T23:31:13.601019+00:00",
+  "status": "D94.1_selected_source_preparation_only",
+  "selected_option": "D",
+  "score": 94.1,
+  "root_read_full_report": true,
+  "root_checked_references": 40,
+  "root_recomputed_scores": 16,
+  "options_rubric_table_selection_displayed_before_source_release": true,
+  "rationale": "Bounded reversible test of a narrow equivalent shortcut; mandatory practical benefit and no-change fallback prevent unsupported publication. Inquiry remains independent and unauthorized.",
+  "report_sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+  "evidence_sha256": "3480c0ed80c31489d7d5dfc15002d276180917364f1df6e505aa93030760c801",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "branch": "codex/tf68-compareback",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "native_PR_last_read": "open and unmerged; H/B unchanged via GitHub connector during current turn",
+  "native_body_sha256": "ed04460a0027db720ccebadf9c610c69d277ab701d1438c27303871edfd3dfd5",
+  "source_writer": "a06_conversion_cold_packet",
+  "allowed_product_paths": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "private_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial",
+  "preimage_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-before.json",
+  "source_edits_released": true,
+  "tests_released": false,
+  "measurement_released": false,
+  "commit_push_review_merge_released": false,
+  "external_message_authorized": false,
+  "cap": "3/3 exhausted; no reset",
+  "round": 1,
+  "deadline": "2026-10-14T20:09:39.767792Z",
+  "transfers": [
+    2,
+    4,
+    6,
+    6
+  ],
+  "B99": "frozen",
+  "comparison": {
+    "execution_authorized": false,
+    "exact_packet_not_prepared_here": true,
+    "current_completed_pair_repeat_authorized": false,
+    "variants": [
+      "exact_H_preimage",
+      "frozen_uncommitted_final_candidate"
+    ],
+    "new_shared_fixture_clock_endpoints": true,
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "fresh_serial_children": 4,
+    "phase_markers": false,
+    "shared_counts_exits_observers": true,
+    "maximum_child_seconds": 120,
+    "complete_envelope_seconds": 600,
+    "maximum_output_bytes": 2097152,
+    "maximum_events": 2000,
+    "auto_repeat": false,
+    "mandatory_before_commit_new_review": true,
+    "acceptance": {
+      "all_correctness_output_count_oracle_guard_cleanup_parity": true,
+      "candidate_faster_in_both_opposite_order_pairs": true,
+      "median_gain_minimum_percent": 5,
+      "median_gain_minimum_seconds": 0.5,
+      "environmental_or_pair_discrepancy_inconclusive_means_no_change": true,
+      "absence_or_inconclusive_benefit": "no_change",
+      "normal_final_input_quality_endpoints_required": true
+    },
+    "limits": "Two observations per variant mitigate order bias; cannot establish stable benchmark or hosted savings. Shared ceilings may stop incomplete work. No wider profile."
+  },
+  "next_action": "One writer prepares the exact two-script candidate and meaningful parity controls; root reviews before final-input execution."
+}

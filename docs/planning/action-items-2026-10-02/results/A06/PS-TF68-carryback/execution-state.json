@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_CI_hold_one_current_diagnostic_verified_interpretation_active",
+  "status": "round1_CI_hold_D94.1_empty_array_source_trial_active",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -109,7 +109,7 @@
     "finished_at": "2026-10-06T23:12:23.321923+00:00"
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Read current author-case interpretation and finding-specific proposal; display and select the supported next action before product changes. No local test is active. Support inquiry is still unsent pending authorization; CI3/3hold and B99 freeze remain.",
+  "next_action": "One writer prepares the exact two-script candidate and meaningful parity controls; root reviews before final-input execution.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -378,7 +378,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "c14c1f31a883b12e2ea7b4a798728f8a798e53de",
+  "planning_checkpoint": "a8b1a8cf89d14a680e4017110645512208a0b567",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -1138,7 +1138,7 @@
     }
   },
   "CI_recovery_proposal": {
-    "status": "P95_one_pair_verified_interpretation_active",
+    "status": "P95_diagnostic_verified_D94.1_source_trial_selected",
     "worker": "ps_carryback_final_quality",
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion",
     "scope": "Validate current cancellation and exhausted recovery, compare supported options and prepare exact next action without CI, product, settings or external-message mutation.",
@@ -1169,6 +1169,21 @@
       "canonical_report_sha256": "42019858bdd8844de404bc6a642ccb207db9f8824b6a7838b09996817a449548",
       "canonical_format_note": "D07: table cell padding only; private report and its original evidence hash remain unchanged.",
       "root_verified_references": 84
+    },
+    "interpretation_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
+    "current_source_trial": {
+      "status": "source_preparation_only",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial",
+      "writer": "a06_conversion_cold_packet",
+      "allowed_paths": [
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+      ],
+      "tests_released": false,
+      "measurement_released": false,
+      "publication_released": false,
+      "benefit_gate_required": true,
+      "no_change_if_inconclusive": true
     }
   },
   "post_recovery_quality": {
@@ -1183,5 +1198,6 @@
     "root_verified_references": 45,
     "root_verified_at": "2026-10-06T22:57:28.064125+00:00",
     "canonical_directory": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\independent-quality\\post-recovery-findings"
-  }
+  },
+  "updated_utc": "2026-10-06T23:31:13.601019+00:00"
 }
