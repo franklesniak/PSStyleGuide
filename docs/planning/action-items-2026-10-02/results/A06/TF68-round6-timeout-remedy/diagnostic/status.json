@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "1a6399ba3ade587530e3a49bdc43bd41d0d0fab85cb039e2cb6687794d878669",
+  "started_at": "2026-10-06T12:26:01.531951+00:00",
+  "run_id": "tf68-ed9-20261006-context-pair-one",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "current-context-decoder-pair-non-acceptance",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "tf68-context-pair-tf68-ed9-20261006-context-pair-one",
+    "--label",
+    "psstyleguide.validation-manifest=1a6399ba3ade587530e3a49bdc43bd41d0d0fab85cb039e2cb6687794d878669",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T12:27:22.526675+00:00"
+}

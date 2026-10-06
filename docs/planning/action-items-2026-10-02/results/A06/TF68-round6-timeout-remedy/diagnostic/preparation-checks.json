@@ -1,0 +1,151 @@
+{
+  "state": "passed",
+  "scope": "Pure parser/manifest/marker controls only; no actual diagnostic execution",
+  "source_reconstruction_exact": true,
+  "control_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "profile_sha256": "08acb48310f2b8d85eb1560ed66d041af61f9a143f02257d6f919c9f2ca6bce4",
+  "insertion_count": 34,
+  "positive_synthetic_marker_check": true,
+  "negative_controls": [
+    {
+      "name": "wrong actual child identity",
+      "refused": true,
+      "reason": "marker identity/label"
+    },
+    {
+      "name": "orphan start",
+      "refused": true,
+      "reason": "incomplete timing interval"
+    },
+    {
+      "name": "orphan end",
+      "refused": true,
+      "reason": "orphan end"
+    },
+    {
+      "name": "unexpected field/body in marker",
+      "refused": true,
+      "reason": "malformed diagnostic marker"
+    },
+    {
+      "name": "missing native parser",
+      "refused": true,
+      "reason": "fresh native parser count"
+    },
+    {
+      "name": "missing schema family",
+      "refused": true,
+      "reason": "('schema-tableRows', 0, {'schema-topLevelBlocks': 1, 'schema-levelTwoHeadings': 1, 'json-outer-conversion': 1, 'schema-codeBlockRanges': 1, 'json-native-parse': 1, 'schema-headings': 1, 'schema-proseBlocks': 1, 'schema-tableRows': 0, 'schema-topLevelListItems': 1, 'decoder-preparation': 1, 'native-parser': 1, 'context': 1, 'snapshot-copy': 0})"
+    },
+    {
+      "name": "2000 event cap",
+      "refused": true,
+      "reason": "event cap"
+    },
+    {
+      "name": "2MiB diagnostic cap",
+      "refused": true,
+      "reason": "diagnostic byte cap"
+    },
+    {
+      "name": "unexpected stdout",
+      "refused": true,
+      "reason": "actual child identity/stdout"
+    },
+    {
+      "name": "unexpected stderr",
+      "refused": true,
+      "reason": "unexpected non-marker stderr"
+    },
+    {
+      "name": "nonzero native exit",
+      "refused": true,
+      "reason": "native failure"
+    },
+    {
+      "name": "same child PID",
+      "refused": true,
+      "reason": "actual child identity/stdout"
+    },
+    {
+      "name": "child failure state",
+      "refused": true,
+      "reason": "native failure"
+    },
+    {
+      "name": "different command",
+      "refused": true,
+      "reason": "('same-case contract', 'command')"
+    },
+    {
+      "name": "different cwd",
+      "refused": true,
+      "reason": "('same-case contract', 'cwd')"
+    },
+    {
+      "name": "different arguments",
+      "refused": true,
+      "reason": "('same-case contract', 'arguments')"
+    },
+    {
+      "name": "different clock",
+      "refused": true,
+      "reason": "('same-case contract', 'clock')"
+    },
+    {
+      "name": "different require_local",
+      "refused": true,
+      "reason": "('same-case contract', 'require_local')"
+    },
+    {
+      "name": "different timeout_seconds",
+      "refused": true,
+      "reason": "('same-case contract', 'timeout_seconds')"
+    },
+    {
+      "name": "unexpected assertion text",
+      "refused": true,
+      "reason": "actual expected author result"
+    },
+    {
+      "name": "missing release",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "wrong role",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "raised child cap",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "raised container cap",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "extra child",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "changed product scope",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "different candidate tree",
+      "refused": true,
+      "reason": ""
+    },
+    {
+      "name": "changed payload bytes",
+      "refused": true,
+      "reason": ""
+    }
+  ]
+}

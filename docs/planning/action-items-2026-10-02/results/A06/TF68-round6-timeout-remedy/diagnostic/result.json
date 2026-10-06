@@ -1,0 +1,58 @@
+{
+  "state": "passed",
+  "role": "current-context-decoder-pair-non-acceptance",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "workspace": "/work/validation-tf68-ed9-20261006-context-pair-one-4m1hstn2",
+  "started_at": "2026-10-06T12:26:16.387449+00:00",
+  "commands": [
+    {
+      "name": "context-attribution-pair",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/pair-driver.ps1",
+        "-RepositoryRootPath",
+        "/work/validation-tf68-ed9-20261006-context-pair-one-4m1hstn2/repository",
+        "-OutputDirectory",
+        "/output"
+      ],
+      "started_at": "2026-10-06T12:26:18.946423+00:00",
+      "timeout_seconds": 540,
+      "state": "passed",
+      "pid": 87,
+      "exit": 0,
+      "finished_at": "2026-10-06T12:27:19.127402+00:00",
+      "log_sha256": "5e6967a426fa8430a3fe27a9ca7ae4693f4e08ab1d76e724bfe6c5eddd3c1ad6"
+    }
+  ],
+  "non_acceptance": true,
+  "source_uninstrumented": true,
+  "diagnostic_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "pair": {
+    "state": "passed",
+    "non_acceptance": true,
+    "selected_children": 2,
+    "bootstrap_separate": true,
+    "control_pid": 5340,
+    "profile_pid": 5961,
+    "control_exit": 0,
+    "profile_exit": 0,
+    "control_seconds": 12.986890148999997,
+    "profile_seconds": 12.849493307000003,
+    "stdout_equal": true,
+    "non_marker_stderr_equal": true,
+    "exact_argv_cwd_clock_equal": true,
+    "context_count": 59,
+    "native_parser_count": 59,
+    "decoder_count": 51,
+    "reuse_hits": 8,
+    "event_count": 1322,
+    "interval_count": 661,
+    "prior_ephemeral_identity_replayed": false
+  },
+  "finished_at": "2026-10-06T12:27:19.386923+00:00"
+}

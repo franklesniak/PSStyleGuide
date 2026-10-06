@@ -1,0 +1,12 @@
+{
+  "versions": {
+    "node": "v24.18.1",
+    "npm": "11.16.0",
+    "python": "Python 3.12.3",
+    "pwsh": "7.6.3"
+  },
+  "path": "/opt/psstyleguide-runtime/venv/bin:/opt/psstyleguide-runtime/node/bin:/opt/research-misc/pre-commit-cache/repokhj4agnw/golangenv-default/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  "pyflakes": "absent in qualified image",
+  "network": "none",
+  "role": "current-context-decoder-pair-non-acceptance"
+}

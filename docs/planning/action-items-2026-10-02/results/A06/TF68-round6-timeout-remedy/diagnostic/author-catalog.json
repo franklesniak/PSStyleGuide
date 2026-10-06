@@ -1,0 +1,12 @@
+{
+  "Role": "prepared_not_executed",
+  "OriginalSelfTestSha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "SelectedSourceLine": 2038,
+  "OriginalPrefixExactExceptDeclaredNativeAdapter": true,
+  "OriginalFinallyRetained": true,
+  "LaterCasesNotExecuted": true,
+  "NativeArgumentArrayPreserved": true,
+  "Transport": "Bounded Python subprocess preserves argv/cwd/environment/exit and separate raw streams; cross-stream ordering is not retained",
+  "PreparedSha256": "118d4ca1256981d2a575ed40bf197522d0c8ccb0ac5db43f754b861c6d7e2220",
+  "ParseErrors": 0
+}

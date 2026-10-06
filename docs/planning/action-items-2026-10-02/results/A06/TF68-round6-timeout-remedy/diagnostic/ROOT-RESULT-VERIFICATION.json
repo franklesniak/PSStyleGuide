@@ -1,0 +1,122 @@
+{
+  "status": "PASS_CURRENT_CONTEXT_ATTRIBUTION_NOT_ACCEPTANCE",
+  "verified_at": "2026-10-06T12:29:06.605821+00:00",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "manifest_sha256": "1a6399ba3ade587530e3a49bdc43bd41d0d0fab85cb039e2cb6687794d878669",
+  "session": 42432,
+  "terminal_exit": 0,
+  "payload_hashes_verified": 16,
+  "host_and_private_guards_equal": true,
+  "source_files": 80,
+  "dependency_files": 1914,
+  "selected_children": 2,
+  "child_process_groups_empty": true,
+  "container_absent": true,
+  "outputs_equal": true,
+  "exact_case_equal": true,
+  "control_seconds": 12.986890148999997,
+  "timed_seconds": 12.849493307000003,
+  "event_count": 1322,
+  "interval_count": 661,
+  "timings": [
+    {
+      "label": "context",
+      "count": 59,
+      "seconds": 10.527130704
+    },
+    {
+      "label": "decoder-preparation",
+      "count": 51,
+      "seconds": 0.004112153999999999
+    },
+    {
+      "label": "json-native-parse",
+      "count": 51,
+      "seconds": 0.020988760999999998
+    },
+    {
+      "label": "json-outer-conversion",
+      "count": 51,
+      "seconds": 5.305516866
+    },
+    {
+      "label": "native-parser",
+      "count": 59,
+      "seconds": 2.8778640080000004
+    },
+    {
+      "label": "schema-codeBlockRanges",
+      "count": 51,
+      "seconds": 0.008055083000000001
+    },
+    {
+      "label": "schema-headings",
+      "count": 51,
+      "seconds": 0.01631756500000001
+    },
+    {
+      "label": "schema-levelTwoHeadings",
+      "count": 51,
+      "seconds": 0.006608462999999998
+    },
+    {
+      "label": "schema-proseBlocks",
+      "count": 51,
+      "seconds": 0.8005592450000001
+    },
+    {
+      "label": "schema-tableRows",
+      "count": 51,
+      "seconds": 0.37285690999999993
+    },
+    {
+      "label": "schema-topLevelBlocks",
+      "count": 51,
+      "seconds": 0.072337534
+    },
+    {
+      "label": "schema-topLevelListItems",
+      "count": 51,
+      "seconds": 0.360035239
+    },
+    {
+      "label": "snapshot-copy",
+      "count": 33,
+      "seconds": 0.5000728749999999
+    }
+  ],
+  "context_unmeasured_remainder_seconds": 0.181806001,
+  "outside_context_seconds": 2.3223626030000037,
+  "conversion_fraction_of_timed_case": 0.41289697105096895,
+  "case": {
+    "Role": "non-acceptance reconstructed first current-date case",
+    "Baseline": "86d14fdff7756a63888dd3cce4d8417861fe0588",
+    "Candidate": "291f3abe6781bd9e52ba8085f93c9a3e5f5fc195",
+    "Clock": "2026-10-06T12:26:31.2247555+00:00",
+    "ExpectedDate": "2026-10-06",
+    "ExpectedExit": 0,
+    "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=86d14fdff7756a63888dd3cce4d8417861fe0588 H=291f3abe6781bd9e52ba8085f93c9a3e5f5fc195",
+    "PriorEphemeralIdentityReplayed": false
+  },
+  "limitations": [
+    "One sequential diagnostic pair, not a stable speedup result.",
+    "Context contains all named leaf spans; never sum nested totals.",
+    "Root-shape, disposal, assembly and instrumentation gaps remain unmeasured remainder.",
+    "No source change; cancelled hosted CI remains a merge blocker."
+  ],
+  "evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\status.json": "153a0038bcdbcb7e0853ee9fe291e47f83306df3b63c1e35331152ea88bb1d8d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\result.json": "ea06f8a1b5b603e7f59706b93d5d8d9fb721f2d1a59dfa1a8be2fe003441df90",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\pair-result.json": "d66bfc75a378ab5b6be663114159b15b231adf75d70d38296c39d23c7dc2597f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\timing.json": "31a457a740ae2624f8e78f0ffde42f12c6774a070e15c3c50024a3de8e0e289c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\before.json": "18a30d03e8b780eeefbe61ea3f5e454516b9eb07d354fb5d288ffab3cdff1b3e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\context-attribution-pair-after.json": "18a30d03e8b780eeefbe61ea3f5e454516b9eb07d354fb5d288ffab3cdff1b3e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\host-source-after.json": "6cf50c8c14aba4e4b6d991a43f6d33cfd08f8cc4b1bf3c3548484d0450a13e03",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\control-child.json": "6b78a52b016cc4aa67c6fbc750f47fe6075590666ca4bc43029e9f050c75c92f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\profile-child.json": "a0b92b7259c40386b49c0ecc409d29ca78aab02aaeb86616203678897d42585d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\case.json": "8534bcadc86a6ce62a502159bf9a8833cbf4a88c1420c90eb1155b535135e39d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\runtime.json": "01d6b557712e5bfbb7bd5278ad1f2c3007f5fe359d82156a97c528d96733d932"
+  }
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "errors": [],
+    "name": "control.ps1",
+    "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+  },
+  {
+    "errors": [],
+    "name": "profile.ps1",
+    "sha256": "08acb48310f2b8d85eb1560ed66d041af61f9a143f02257d6f919c9f2ca6bce4"
+  },
+  {
+    "errors": [],
+    "name": "author-one-case.ps1",
+    "sha256": "118d4ca1256981d2a575ed40bf197522d0c8ccb0ac5db43f754b861c6d7e2220"
+  },
+  {
+    "errors": [],
+    "name": "pair-driver.ps1",
+    "sha256": "faefe0afdb7cfe736f1b350fa3945342794f0a952571f50861a91638731db86d"
+  },
+  {
+    "errors": [],
+    "name": "prepare-profile.ps1",
+    "sha256": "8ec636c1989354b3ea683712e471585da7c7f4cb8e294b738ad2e8ac97d67a16"
+  },
+  {
+    "errors": [],
+    "name": "prepare-author.ps1",
+    "sha256": "fbc70d18223df67835414c350486e0dcbeedcb26e7d9b4ce4011c9a6827a3614"
+  }
+]

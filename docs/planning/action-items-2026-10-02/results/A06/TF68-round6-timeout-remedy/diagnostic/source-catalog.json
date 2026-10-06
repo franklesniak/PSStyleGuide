@@ -1,0 +1,562 @@
+[
+  {
+    "path": ".claude/commands/review-loop.md",
+    "mode": "100644",
+    "blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+    "bytes": 4448,
+    "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+  },
+  {
+    "path": ".codex/config.toml",
+    "mode": "100644",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "bytes": 205,
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+  },
+  {
+    "path": ".gitattributes",
+    "mode": "100644",
+    "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+    "bytes": 19,
+    "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+  },
+  {
+    "path": ".github/copilot-instructions.md",
+    "mode": "100644",
+    "blob": "5de5474c3e2125d1f0171a305b094d514cc37ff5",
+    "bytes": 2522,
+    "sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6"
+  },
+  {
+    "path": ".github/dependabot.yml",
+    "mode": "100644",
+    "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+    "bytes": 112,
+    "sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+  },
+  {
+    "path": ".github/document-metadata-classification.json",
+    "mode": "100644",
+    "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+    "bytes": 387,
+    "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+  },
+  {
+    "path": ".github/instructions/docs.instructions.md",
+    "mode": "100644",
+    "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+    "bytes": 46254,
+    "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+  },
+  {
+    "path": ".github/instructions/yaml.instructions.md",
+    "mode": "100644",
+    "blob": "924d12c833d07def47d05137b532e622db622fa4",
+    "bytes": 54645,
+    "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+  },
+  {
+    "path": ".github/workflows/.markdownlint.jsonc",
+    "mode": "100644",
+    "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+    "bytes": 480,
+    "sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+  },
+  {
+    "path": ".github/workflows/Check-NpmAudit.mjs",
+    "mode": "100644",
+    "blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+    "bytes": 23280,
+    "sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322"
+  },
+  {
+    "path": ".github/workflows/Check-NpmAudit.test.mjs",
+    "mode": "100644",
+    "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+    "bytes": 42149,
+    "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2"
+  },
+  {
+    "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+    "mode": "100644",
+    "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+    "bytes": 6095,
+    "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+  },
+  {
+    "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    "mode": "100644",
+    "blob": "166d137206aff8f503911be9a569efbd204e023b",
+    "bytes": 26191,
+    "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+  },
+  {
+    "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    "mode": "100644",
+    "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+    "bytes": 91158,
+    "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+  },
+  {
+    "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+    "mode": "100644",
+    "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+    "bytes": 377161,
+    "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+  },
+  {
+    "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+    "mode": "100644",
+    "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+    "bytes": 154151,
+    "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+  },
+  {
+    "path": ".github/workflows/Initialize-CiToolchain.ps1",
+    "mode": "100644",
+    "blob": "906460d818674199b32294185ed6525c143b48bb",
+    "bytes": 5706,
+    "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+  },
+  {
+    "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "mode": "100644",
+    "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+    "bytes": 3127,
+    "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+  },
+  {
+    "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+    "mode": "100644",
+    "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+    "bytes": 1510,
+    "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+  },
+  {
+    "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "mode": "100644",
+    "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+    "bytes": 3017,
+    "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
+  },
+  {
+    "path": ".github/workflows/NpmTools.mjs",
+    "mode": "100644",
+    "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+    "bytes": 7656,
+    "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+  },
+  {
+    "path": ".github/workflows/NpmTools.test.mjs",
+    "mode": "100644",
+    "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+    "bytes": 13810,
+    "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+  },
+  {
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "mode": "100644",
+    "blob": "7fc19eb68200935eb8909b64c2a3caa5aece76e5",
+    "bytes": 277358,
+    "sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+  },
+  {
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "mode": "100644",
+    "blob": "296c31173cfbc38156e44669d5585b3e6c627be3",
+    "bytes": 503244,
+    "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+  },
+  {
+    "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+    "mode": "100644",
+    "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+    "bytes": 3088,
+    "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+  },
+  {
+    "path": ".github/workflows/Test-CiHelpers.test.mjs",
+    "mode": "100644",
+    "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+    "bytes": 130059,
+    "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+  },
+  {
+    "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+    "mode": "100644",
+    "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+    "bytes": 253908,
+    "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+  },
+  {
+    "path": ".github/workflows/Test-LocalValidation.test.mjs",
+    "mode": "100644",
+    "blob": "7965b2476cf022e6efea355d438162937bef04b3",
+    "bytes": 4039,
+    "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+  },
+  {
+    "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+    "mode": "100644",
+    "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+    "bytes": 22102,
+    "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+  },
+  {
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "mode": "100644",
+    "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+    "bytes": 36081,
+    "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+  },
+  {
+    "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+    "mode": "100644",
+    "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+    "bytes": 27656,
+    "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+  },
+  {
+    "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+    "mode": "100644",
+    "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+    "bytes": 31176,
+    "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+  },
+  {
+    "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    "mode": "100644",
+    "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+    "bytes": 17625,
+    "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+  },
+  {
+    "path": ".github/workflows/agent-instructions.yml",
+    "mode": "100644",
+    "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+    "bytes": 12893,
+    "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+  },
+  {
+    "path": ".github/workflows/build.yml",
+    "mode": "100644",
+    "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+    "bytes": 25744,
+    "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+  },
+  {
+    "path": ".github/workflows/ci-toolchain.json",
+    "mode": "100644",
+    "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+    "bytes": 91,
+    "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+  },
+  {
+    "path": ".github/workflows/copilot-code-review.yml",
+    "mode": "100644",
+    "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+    "bytes": 45016,
+    "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+  },
+  {
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "mode": "100644",
+    "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+    "bytes": 51830,
+    "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+  },
+  {
+    "path": ".github/workflows/devcontainer-ci.yml",
+    "mode": "100644",
+    "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+    "bytes": 8391,
+    "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+  },
+  {
+    "path": ".github/workflows/historical-supply-profile.json",
+    "mode": "100644",
+    "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+    "bytes": 2783,
+    "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+  },
+  {
+    "path": ".github/workflows/install-husky.mjs",
+    "mode": "100644",
+    "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+    "bytes": 625,
+    "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+  },
+  {
+    "path": ".github/workflows/lint-markdown.mjs",
+    "mode": "100644",
+    "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+    "bytes": 3218,
+    "sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+  },
+  {
+    "path": ".github/workflows/lint-markdown.test.mjs",
+    "mode": "100644",
+    "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+    "bytes": 26625,
+    "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+  },
+  {
+    "path": ".github/workflows/lint-nested-markdown.js",
+    "mode": "100644",
+    "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+    "bytes": 19388,
+    "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+  },
+  {
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "mode": "100644",
+    "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+    "bytes": 5745,
+    "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+  },
+  {
+    "path": ".github/workflows/markdownlint.yml",
+    "mode": "100644",
+    "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+    "bytes": 6714,
+    "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+  },
+  {
+    "path": ".github/workflows/npm-risk-exceptions.json",
+    "mode": "100644",
+    "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+    "bytes": 23,
+    "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+  },
+  {
+    "path": ".github/workflows/package-lock.json",
+    "mode": "100644",
+    "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+    "bytes": 38834,
+    "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176"
+  },
+  {
+    "path": ".github/workflows/package.json",
+    "mode": "100644",
+    "blob": "670083e767627cfed90a61f788021dba88de1091",
+    "bytes": 994,
+    "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649"
+  },
+  {
+    "path": ".github/workflows/scripts-README.md",
+    "mode": "100644",
+    "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+    "bytes": 13470,
+    "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467"
+  },
+  {
+    "path": ".github/workflows/workflow-policy-cases.json",
+    "mode": "100644",
+    "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+    "bytes": 26216,
+    "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+  },
+  {
+    "path": ".github/workflows/workflow-policy-contract.json",
+    "mode": "100644",
+    "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+    "bytes": 1496,
+    "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+  },
+  {
+    "path": ".gitignore",
+    "mode": "100644",
+    "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+    "bytes": 289,
+    "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+  },
+  {
+    "path": ".husky/pre-commit",
+    "mode": "100644",
+    "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+    "bytes": 3249,
+    "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+  },
+  {
+    "path": ".pre-commit-config.yaml",
+    "mode": "100644",
+    "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+    "bytes": 5405,
+    "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+  },
+  {
+    "path": ".vscode/settings.json",
+    "mode": "100644",
+    "blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+    "bytes": 46,
+    "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+  },
+  {
+    "path": "ACKNOWLEDGMENTS.md",
+    "mode": "100644",
+    "blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+    "bytes": 674,
+    "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+  },
+  {
+    "path": "AGENTS.md",
+    "mode": "100644",
+    "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+    "bytes": 32746,
+    "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+  },
+  {
+    "path": "CLAUDE.md",
+    "mode": "100644",
+    "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+    "bytes": 83433,
+    "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
+  },
+  {
+    "path": "CONTRIBUTING.md",
+    "mode": "100644",
+    "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+    "bytes": 9117,
+    "sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+  },
+  {
+    "path": "LICENSE",
+    "mode": "100644",
+    "blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+    "bytes": 1101,
+    "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+  },
+  {
+    "path": "README.md",
+    "mode": "100644",
+    "blob": "98f936f0dd1d2101dccf62ebf5f81b3e5f738453",
+    "bytes": 5053,
+    "sha256": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3"
+  },
+  {
+    "path": "STYLE_GUIDE.md",
+    "mode": "100644",
+    "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+    "bytes": 152868,
+    "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+  },
+  {
+    "path": "STYLE_GUIDE_CHAT.md",
+    "mode": "100644",
+    "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+    "bytes": 152962,
+    "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+  },
+  {
+    "path": "STYLE_GUIDE_FULL.md",
+    "mode": "100644",
+    "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+    "bytes": 222292,
+    "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+  },
+  {
+    "path": "STYLE_GUIDE_RATIONALE.md",
+    "mode": "100644",
+    "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+    "bytes": 73953,
+    "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+  },
+  {
+    "path": "copilot-instructions.md",
+    "mode": "100644",
+    "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+    "bytes": 152868,
+    "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+  },
+  {
+    "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+    "mode": "100644",
+    "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+    "bytes": 2179,
+    "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+  },
+  {
+    "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+    "mode": "100644",
+    "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+    "bytes": 65689,
+    "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+  },
+  {
+    "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+    "mode": "100644",
+    "blob": "9e04225a355997850e4817f9163868089a773332",
+    "bytes": 127363,
+    "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+  },
+  {
+    "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+    "mode": "100644",
+    "blob": "8e8d56ea567eab0f252916804b49b866cafeabc6",
+    "bytes": 16605,
+    "sha256": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94"
+  },
+  {
+    "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+    "mode": "100644",
+    "blob": "71ab82286d05e83ec83d66eb1ebd666d0d19386b",
+    "bytes": 21720,
+    "sha256": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16"
+  },
+  {
+    "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+    "mode": "100644",
+    "blob": "d44dba86a66f6dfc126247c97d81bfeeee8f3763",
+    "bytes": 11738,
+    "sha256": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec"
+  },
+  {
+    "path": "docs/dependency-maintenance.md",
+    "mode": "100644",
+    "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+    "bytes": 10453,
+    "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c"
+  },
+  {
+    "path": "package-lock.json",
+    "mode": "100644",
+    "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+    "bytes": 3566,
+    "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77"
+  },
+  {
+    "path": "package.json",
+    "mode": "100644",
+    "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+    "bytes": 837,
+    "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+  },
+  {
+    "path": "requirements-dev.txt",
+    "mode": "100644",
+    "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+    "bytes": 5920,
+    "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+  },
+  {
+    "path": "samples/test-nested-markdown-linting.md",
+    "mode": "100644",
+    "blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+    "bytes": 1086,
+    "sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+  },
+  {
+    "path": "samples/test-recursive-nested-markdown.md",
+    "mode": "100644",
+    "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+    "bytes": 1322,
+    "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+  },
+  {
+    "path": "terraform.instructions.md",
+    "mode": "100644",
+    "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+    "bytes": 153067,
+    "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+  }
+]

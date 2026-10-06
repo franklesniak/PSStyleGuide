@@ -1,0 +1,215 @@
+{
+  "TimingScope": "Structural Markdown only; native parser remains fresh; generic runtime/package decoder excluded; recursive conversion marked only at outer return and existing finally.",
+  "Markers": [
+    {
+      "Offset": 1674,
+      "Text": "\n# TF68_CTX_INSERT\n$script:__Tf6Next = 0; $script:__Tf6Events = 0\n# TF68_CTX_END\n",
+      "Label": "process-counter-init",
+      "Sequence": 0
+    },
+    {
+      "Offset": 137367,
+      "Text": "\n# TF68_CTX_INSERT\n$script:__Tf6Next++; $intTf6Context = $script:__Tf6Next; $boolTf6StructuralDecode = $false\n# TF68_CTX_END\n",
+      "Label": "context-init",
+      "Sequence": 1
+    },
+    {
+      "Offset": 137367,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|context|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($Content.Length),($LineCount))) }\n# TF68_CTX_END\n",
+      "Label": "begin/context",
+      "Sequence": 2
+    },
+    {
+      "Offset": 150093,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|native-parser|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/native-parser",
+      "Sequence": 3
+    },
+    {
+      "Offset": 150211,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|native-parser|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($objParserResult.Output.Length),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/native-parser",
+      "Sequence": 4
+    },
+    {
+      "Offset": 152085,
+      "Text": "\n# TF68_CTX_INSERT\n$boolTf6StructuralDecode = $true\n# TF68_CTX_END\n",
+      "Label": "structural-scope-on",
+      "Sequence": 5
+    },
+    {
+      "Offset": 152198,
+      "Text": "\n# TF68_CTX_INSERT\n$boolTf6StructuralDecode = $false\n# TF68_CTX_END\n",
+      "Label": "structural-scope-off",
+      "Sequence": 6
+    },
+    {
+      "Offset": 10537,
+      "Text": "\n# TF68_CTX_INSERT\n$boolTf6Decode = $MaximumBytes -eq 16777216 -and $null -ne (Get-Variable -Name boolTf6StructuralDecode -ErrorAction SilentlyContinue) -and $boolTf6StructuralDecode\n# TF68_CTX_END\n",
+      "Label": "decoder-scope-capture",
+      "Sequence": 7
+    },
+    {
+      "Offset": 10537,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|decoder-preparation|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($Content.Length),($MaximumBytes))) }\n# TF68_CTX_END\n",
+      "Label": "begin/decoder-preparation",
+      "Sequence": 8
+    },
+    {
+      "Offset": 12901,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|decoder-preparation|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/decoder-preparation",
+      "Sequence": 9
+    },
+    {
+      "Offset": 12901,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|json-native-parse|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/json-native-parse",
+      "Sequence": 10
+    },
+    {
+      "Offset": 12977,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|json-native-parse|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/json-native-parse",
+      "Sequence": 11
+    },
+    {
+      "Offset": 13159,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|json-outer-conversion|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/json-outer-conversion",
+      "Sequence": 12
+    },
+    {
+      "Offset": 13245,
+      "Text": "\n# TF68_CTX_INSERT\nif ($boolTf6Decode) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|json-outer-conversion|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/json-outer-conversion",
+      "Sequence": 13
+    },
+    {
+      "Offset": 152928,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-codeBlockRanges|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-codeBlockRanges",
+      "Sequence": 14
+    },
+    {
+      "Offset": 153970,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-codeBlockRanges|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listRanges.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-codeBlockRanges",
+      "Sequence": 15
+    },
+    {
+      "Offset": 153980,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-proseBlocks|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-proseBlocks",
+      "Sequence": 16
+    },
+    {
+      "Offset": 155572,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-proseBlocks|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listProseBlocks.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-proseBlocks",
+      "Sequence": 17
+    },
+    {
+      "Offset": 155582,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-tableRows|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-tableRows",
+      "Sequence": 18
+    },
+    {
+      "Offset": 158111,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-tableRows|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listTableRows.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-tableRows",
+      "Sequence": 19
+    },
+    {
+      "Offset": 158121,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-topLevelBlocks|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-topLevelBlocks",
+      "Sequence": 20
+    },
+    {
+      "Offset": 159804,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-topLevelBlocks|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listTopLevelBlocks.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-topLevelBlocks",
+      "Sequence": 21
+    },
+    {
+      "Offset": 159814,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-topLevelListItems|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-topLevelListItems",
+      "Sequence": 22
+    },
+    {
+      "Offset": 161768,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-topLevelListItems|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listTopLevelListItems.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-topLevelListItems",
+      "Sequence": 23
+    },
+    {
+      "Offset": 161778,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-headings|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-headings",
+      "Sequence": 24
+    },
+    {
+      "Offset": 163208,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-headings|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listHeadings.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-headings",
+      "Sequence": 25
+    },
+    {
+      "Offset": 163218,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|schema-levelTwoHeadings|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/schema-levelTwoHeadings",
+      "Sequence": 26
+    },
+    {
+      "Offset": 164523,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|schema-levelTwoHeadings|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,($listLevelTwoHeadings.Count),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/schema-levelTwoHeadings",
+      "Sequence": 27
+    },
+    {
+      "Offset": 151762,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|snapshot-copy|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/snapshot-copy",
+      "Sequence": 28
+    },
+    {
+      "Offset": 151907,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|snapshot-copy|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/snapshot-copy",
+      "Sequence": 29
+    },
+    {
+      "Offset": 165185,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|begin|snapshot-copy|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "begin/snapshot-copy",
+      "Sequence": 30
+    },
+    {
+      "Offset": 165326,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|snapshot-copy|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/snapshot-copy",
+      "Sequence": 31
+    },
+    {
+      "Offset": 151950,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|context|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(1),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/context",
+      "Sequence": 32
+    },
+    {
+      "Offset": 166088,
+      "Text": "\n# TF68_CTX_INSERT\nif ($true) { $script:__Tf6Events++; if ($script:__Tf6Events -gt 2000) { throw 'TF68 diagnostic event cap exceeded.' }; [Console]::Error.WriteLine(('TF68CTX|{0}|{1}|{2}|{3}|end|context|{4}|{5}' -f $PID,[Diagnostics.Stopwatch]::GetTimestamp(),[Diagnostics.Stopwatch]::Frequency,$intTf6Context,(0),(0))) }\n# TF68_CTX_END\n",
+      "Label": "end/context",
+      "Sequence": 33
+    }
+  ],
+  "ExactReconstruction": true,
+  "ControlSha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "Role": "prepared_not_executed",
+  "ProfileSha256": "08acb48310f2b8d85eb1560ed66d041af61f9a143f02257d6f919c9f2ca6bce4",
+  "ParseErrors": 0,
+  "OriginalSha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+}

@@ -1,0 +1,152 @@
+{
+  "captured_at": "2026-10-06T12:24:51.378796+00:00",
+  "state": "frozen_prepared_not_executed",
+  "source_head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "selftest_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "manifest_sha256": "013e07aaf9cc0d73c797f8b877bd5e7b5e483cd9d321486c6e54a45969b29d19",
+  "execution_authorized": false,
+  "source_count": 80,
+  "dependency_count": 1914,
+  "source_index_refs_config_clean_guard": "source-guard.json",
+  "validation": {
+    "pure_guard_checks": {
+      "native_exit": 0,
+      "negative_controls": 28,
+      "file": "preparation-checks.json"
+    },
+    "prepared_powershell_parse": {
+      "native_exit": 0,
+      "files": 6,
+      "parse_errors": 0,
+      "file": "prepared-parser.json"
+    },
+    "actual_pair_executed": false,
+    "container_launched": false,
+    "product_modified": false
+  },
+  "limits": [
+    "One currently unexecuted control/timed pair; root release required.",
+    "Inclusive context interval contains named leaf intervals; do not sum them.",
+    "Unmeasured root-shape/disposal/context/other remainder must be reported.",
+    "59 fresh parsers expected; count mismatch fails without automatic retry.",
+    "Orphan detection/cleanup code reviewed but no native orphan process launched in preparation.",
+    "No performance, hosted or acceptance result yet."
+  ],
+  "artifacts": {
+    "author-catalog.json": {
+      "sha256": "f53359bb5bb5c0627c347c7e28c6536e4f425561eb1c25604d7a5bb1617a141e",
+      "bytes": 594
+    },
+    "author-one-case.ps1": {
+      "sha256": "118d4ca1256981d2a575ed40bf197522d0c8ccb0ac5db43f754b861c6d7e2220",
+      "bytes": 37882
+    },
+    "bind-evidence.py": {
+      "sha256": "1fd98c3388ca10613a81b495facfb1022aa9a94085649a01f49cd084613e71da",
+      "bytes": 4553
+    },
+    "check-parser.ps1": {
+      "sha256": "b7e789a139ee706e8a2b8b7fad8c42c209e21373eb29802a9acfbfa8b5cb93d2",
+      "bytes": 722
+    },
+    "check-preparation-attempt1.py": {
+      "sha256": "b8b0fc410efa28eedff5572288398ae0401de00adbd004bb7a6ef78cfc4b8121",
+      "bytes": 4715
+    },
+    "check-preparation-attempt2.py": {
+      "sha256": "48823275d45fbcb1a37361fa59f3a245de3bafc38f34da3953f7d716641301ff",
+      "bytes": 5767
+    },
+    "check-preparation.py": {
+      "sha256": "b34d64184f1726c7b3390479dfad97ab68707d910eaee48bb42dc706e0fdb90f",
+      "bytes": 5803
+    },
+    "common.py": {
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    "control.ps1": {
+      "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "bytes": 503244
+    },
+    "inside.py": {
+      "sha256": "f6b1c78db0432800d86b4bc65dd078ba370ead9a210b49dc66ff6c06020ae261",
+      "bytes": 11084
+    },
+    "launch.py": {
+      "sha256": "5d7c37c82ca71eeea0daadf8d201df7b7b34525c78bb44bda3b47f2666f2b652",
+      "bytes": 8728
+    },
+    "manifest.prepared.json": {
+      "sha256": "013e07aaf9cc0d73c797f8b877bd5e7b5e483cd9d321486c6e54a45969b29d19",
+      "bytes": 3142
+    },
+    "owned-group.py": {
+      "sha256": "90a2d269eeefa64e09485d98129505c54fd5740b28f02d9e2b4aa6fa9f0e34d1",
+      "bytes": 1610
+    },
+    "pair-driver.ps1": {
+      "sha256": "faefe0afdb7cfe736f1b350fa3945342794f0a952571f50861a91638731db86d",
+      "bytes": 2337
+    },
+    "preparation-checks.json": {
+      "sha256": "f8ba20f69089033c18225f13a4e16ce7bb0a776b33263ae7d10fa14720bdc116",
+      "bytes": 3966
+    },
+    "preparation-failures.json": {
+      "sha256": "e926cb5cc1b9258bd94810f3f9118e1c394eace0caada0e449789fbe22f667cf",
+      "bytes": 761
+    },
+    "PREPARATION.md": {
+      "sha256": "ef919edbe5f51721d811d7f184a890aba76691f195189c234b76ce1a7c25594b",
+      "bytes": 10223
+    },
+    "prepare-author.ps1": {
+      "sha256": "fbc70d18223df67835414c350486e0dcbeedcb26e7d9b4ce4011c9a6827a3614",
+      "bytes": 6936
+    },
+    "prepare-profile-attempt1.ps1": {
+      "sha256": "e855d401a5bb5aaf77dae14563e95deb05f0df355c5a334b42260a2098694fa5",
+      "bytes": 7620
+    },
+    "prepare-profile.ps1": {
+      "sha256": "8ec636c1989354b3ea683712e471585da7c7f4cb8e294b738ad2e8ac97d67a16",
+      "bytes": 7621
+    },
+    "prepare-runner.py": {
+      "sha256": "a8963de36fd6109ecc0da3c6f6ff91604b0f06fb65d0fcbc09c849436c171d66",
+      "bytes": 7674
+    },
+    "prepared-parser.json": {
+      "sha256": "f591ce361df45a5ed72022fc6ba17cad302f150d3876da3f3b97087368901db4",
+      "bytes": 872
+    },
+    "profile-catalog.json": {
+      "sha256": "e59e54f1b02c7d88d8cf91065559a2aac7f6a5671ec6eb8308758a4b6f9920a9",
+      "bytes": 15758
+    },
+    "profile.ps1": {
+      "sha256": "08acb48310f2b8d85eb1560ed66d041af61f9a143f02257d6f919c9f2ca6bce4",
+      "bytes": 514155
+    },
+    "run-child.py": {
+      "sha256": "4210670c4a670399cd2383d5ae704851bea82d20aa092219c14fe9bd0b78ffcf",
+      "bytes": 3483
+    },
+    "source-catalog.json": {
+      "sha256": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675",
+      "bytes": 19093
+    },
+    "source-guard.json": {
+      "sha256": "4cd26650aa4d8850688877b3581161f01753f652da310ea04cf431d62e48e5a5",
+      "bytes": 419407
+    },
+    "validate-pair.py": {
+      "sha256": "06a5fde508896993be80f5e101ccf45941759395b645f22b5bfda1222a4e8dfa",
+      "bytes": 5052
+    }
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "source_artifact_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic",
+  "copied": [
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\PREPARATION.md",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\PREPARATION.md",
+      "source_sha256": "ef919edbe5f51721d811d7f184a890aba76691f195189c234b76ce1a7c25594b"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\evidence.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\evidence.json",
+      "source_sha256": "a06de7bfe38c34b4c8b0be1d579556c5ff9d9d2189a392486c5a3e6f8dd1f010"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\manifest.prepared.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\manifest.prepared.json",
+      "source_sha256": "013e07aaf9cc0d73c797f8b877bd5e7b5e483cd9d321486c6e54a45969b29d19"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\manifest.authorized.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\manifest.authorized.json",
+      "source_sha256": "1a6399ba3ade587530e3a49bdc43bd41d0d0fab85cb039e2cb6687794d878669"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\preparation-checks.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\preparation-checks.json",
+      "source_sha256": "f8ba20f69089033c18225f13a4e16ce7bb0a776b33263ae7d10fa14720bdc116"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\prepared-parser.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\prepared-parser.json",
+      "source_sha256": "f591ce361df45a5ed72022fc6ba17cad302f150d3876da3f3b97087368901db4"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\profile-catalog.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\profile-catalog.json",
+      "source_sha256": "e59e54f1b02c7d88d8cf91065559a2aac7f6a5671ec6eb8308758a4b6f9920a9"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\author-catalog.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\author-catalog.json",
+      "source_sha256": "f53359bb5bb5c0627c347c7e28c6536e4f425561eb1c25604d7a5bb1617a141e"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\source-catalog.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\source-catalog.json",
+      "source_sha256": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\ROOT-RESULT-VERIFICATION.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\ROOT-RESULT-VERIFICATION.json",
+      "source_sha256": "8419a6edd64091be0f4fe665f60726137b723fcb874e30b38a0381413360dff0"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\pair-result.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\pair-result.json",
+      "source_sha256": "d66bfc75a378ab5b6be663114159b15b231adf75d70d38296c39d23c7dc2597f"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\case.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\case.json",
+      "source_sha256": "8534bcadc86a6ce62a502159bf9a8833cbf4a88c1420c90eb1155b535135e39d"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\runtime.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\runtime.json",
+      "source_sha256": "01d6b557712e5bfbb7bd5278ad1f2c3007f5fe359d82156a97c528d96733d932"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\bootstrap.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\bootstrap.json",
+      "source_sha256": "36f3d21ddb96f5eebeb850a8d5d534b4e5ec6b5d6db556cd249a4516d1e52e84"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\timing.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\timing.json",
+      "source_sha256": "31a457a740ae2624f8e78f0ffde42f12c6774a070e15c3c50024a3de8e0e289c"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\result.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\result.json",
+      "source_sha256": "ea06f8a1b5b603e7f59706b93d5d8d9fb721f2d1a59dfa1a8be2fe003441df90"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\control-child.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\control-child.json",
+      "source_sha256": "6b78a52b016cc4aa67c6fbc750f47fe6075590666ca4bc43029e9f050c75c92f"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\profile-child.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\profile-child.json",
+      "source_sha256": "a0b92b7259c40386b49c0ecc409d29ca78aab02aaeb86616203678897d42585d"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\control.spec.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\control.spec.json",
+      "source_sha256": "a89bdd0ced7cbf6e712c568b032d238be58a2507a7d6713e51bcf521a5ef377e"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\output\\profile.spec.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\profile.spec.json",
+      "source_sha256": "4d32f2e79e4bf602aff2cda602ae4bb628202c9cad3ff923b4956dd3a031ba2f"
+    },
+    {
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic\\runs\\tf68-ed9-20261006-context-pair-one\\status.json",
+      "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\diagnostic\\status.json",
+      "source_sha256": "153a0038bcdbcb7e0853ee9fe291e47f83306df3b63c1e35331152ea88bb1d8d"
+    }
+  ],
+  "canonical_preparation_sha256": "9afc31cdbea266663d9a653cd9516de91c360d25a3a2804522b26af4e5b2093b",
+  "preparation_adjustment": "Markdown directive and trailing blank-line cleanup only; frozen source remains unchanged."
+}

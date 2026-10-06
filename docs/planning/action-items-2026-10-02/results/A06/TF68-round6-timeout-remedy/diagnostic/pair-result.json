@@ -1,0 +1,22 @@
+{
+  "state": "passed",
+  "non_acceptance": true,
+  "selected_children": 2,
+  "bootstrap_separate": true,
+  "control_pid": 5340,
+  "profile_pid": 5961,
+  "control_exit": 0,
+  "profile_exit": 0,
+  "control_seconds": 12.986890148999997,
+  "profile_seconds": 12.849493307000003,
+  "stdout_equal": true,
+  "non_marker_stderr_equal": true,
+  "exact_argv_cwd_clock_equal": true,
+  "context_count": 59,
+  "native_parser_count": 59,
+  "decoder_count": 51,
+  "reuse_hits": 8,
+  "event_count": 1322,
+  "interval_count": 661,
+  "prior_ephemeral_identity_replayed": false
+}
