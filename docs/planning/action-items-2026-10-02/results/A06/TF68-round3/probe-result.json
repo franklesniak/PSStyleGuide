@@ -1,0 +1,143 @@
+{
+  "powershell": "7.6.5",
+  "analyzer": "1.24.0",
+  "output_type": [
+    {
+      "variant": "Original",
+      "output_metadata": [
+        "System.Array"
+      ],
+      "outputs": [
+        {
+          "count": 0,
+          "bytes": [],
+          "name": "empty",
+          "types": []
+        },
+        {
+          "count": 1,
+          "bytes": [
+            "61"
+          ],
+          "name": "one",
+          "types": [
+            "System.Byte[]"
+          ]
+        },
+        {
+          "count": 2,
+          "bytes": [
+            "61",
+            "6263"
+          ],
+          "name": "two",
+          "types": [
+            "System.Byte[]",
+            "System.Byte[]"
+          ]
+        }
+      ],
+      "issues": []
+    },
+    {
+      "variant": "ByteArray",
+      "output_metadata": [
+        "System.Byte[]"
+      ],
+      "outputs": [
+        {
+          "count": 0,
+          "bytes": [],
+          "name": "empty",
+          "types": []
+        },
+        {
+          "count": 1,
+          "bytes": [
+            "61"
+          ],
+          "name": "one",
+          "types": [
+            "System.Byte[]"
+          ]
+        },
+        {
+          "count": 2,
+          "bytes": [
+            "61",
+            "6263"
+          ],
+          "name": "two",
+          "types": [
+            "System.Byte[]",
+            "System.Byte[]"
+          ]
+        }
+      ],
+      "issues": []
+    },
+    {
+      "variant": "StringByteArray",
+      "output_metadata": [
+        "System.Byte[]"
+      ],
+      "outputs": [
+        {
+          "count": 0,
+          "bytes": [],
+          "name": "empty",
+          "types": []
+        },
+        {
+          "count": 1,
+          "bytes": [
+            "61"
+          ],
+          "name": "one",
+          "types": [
+            "System.Byte[]"
+          ]
+        },
+        {
+          "count": 2,
+          "bytes": [
+            "61",
+            "6263"
+          ],
+          "name": "two",
+          "types": [
+            "System.Byte[]",
+            "System.Byte[]"
+          ]
+        }
+      ],
+      "issues": []
+    }
+  ],
+  "unknown_artifact": [
+    {
+      "message": "unknown-artifact",
+      "input_kind": "plain"
+    },
+    {
+      "message": "unknown-artifact",
+      "input_kind": "hostile-newline"
+    }
+  ],
+  "node_resolution": [
+    {
+      "start_error": "System.ComponentModel.Win32Exception: An error occurred trying to start process 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\first\\node.exe' with working directory 'C:\\Users\\flesniak\\GitHub\\PSStyleGuide'. The system cannot find the file specified.",
+      "case": "removed-after-resolution",
+      "selected_first": true,
+      "check_after_removal": false,
+      "fallback_exists": true,
+      "precheck_before_removal": true
+    },
+    {
+      "start_error": "System.ComponentModel.Win32Exception: An error occurred trying to start process 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\first\\node.exe' with working directory 'C:\\Users\\flesniak\\GitHub\\PSStyleGuide'. The specified executable is not a valid application for this OS platform.",
+      "exists": true,
+      "case": "invalid-existing-shim"
+    }
+  ],
+  "scope": "Private AST-extracted helper and native API probes; no artifact gate, generator publication or aggregate executed"
+}

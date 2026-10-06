@@ -1,0 +1,137 @@
+{
+  "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+  "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+  "index_sha256": "df34f1133c6359914b72ad799b5283457821f27bb00fc8ba42ec6b300280b8a8",
+  "refs_sha256": "42b5dacadf8797f27d438337de57bb9d0b368827e740bb27c10bd3c9553b6972",
+  "source_rows": [
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob ef2e3d08b54212da215790a8a61f4b259b5c81c8\t.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "tf_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob 9e52d7482e5105f8c661b1005ba0c76a8e2a939d\t.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "ps_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "equal": false
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob b3c9ad4caa86919ac1b66c457493f7d6b9d9b813\t.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "tf_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob 6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f\t.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "ps_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "equal": false
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob c7865981e4755df08eecdeed59af21cb2d09ac90\t.github/workflows/build.yml",
+      "tf_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob d46981e38b54e8f8df42158b06ad149ca8c20c45\t.github/workflows/build.yml",
+      "ps_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "equal": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+      "tf_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+      "ps_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+      "tf_sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob 2145cb90a7a5a2d292aac7375092dd6b33ea984e\t.github/workflows/Test-CiHelpers.test.mjs",
+      "ps_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "equal": false
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob dcd0cb93354a74de4a5d8323a7018511323e8bbe\t.github/workflows/Test-StyleGuideGenerator.ps1",
+      "tf_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob dcd0cb93354a74de4a5d8323a7018511323e8bbe\t.github/workflows/Test-StyleGuideGenerator.ps1",
+      "ps_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "equal": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "tf_entry": "100644 blob 731c3bde3ba87efa684eef380e0d99b9297d091c\t.github/workflows/workflow-policy-cases.json",
+      "tf_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "ps_entry": "100644 blob 731c3bde3ba87efa684eef380e0d99b9297d091c\t.github/workflows/workflow-policy-cases.json",
+      "ps_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "equal": true
+    }
+  ],
+  "review": {
+    "5423790591": {
+      "id": 5423790591,
+      "path": null,
+      "line": null,
+      "body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> \u00b7 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (6)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The new `unknown-artifact` failure is terse and loses the actionable context previously provided by\u2026](#discussion_r4191532093) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The new `unknown-artifact` failure is terse and loses the actionable context previously provided by\u2026](#discussion_r4191532114) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Node executable path is no longer validated after `Get-Command`. If `Source` resolves to a\u2026](#discussion_r4191532133) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`ConvertFrom-NulPathRecordStream` now emits one `byte[]` per record (or no output for empty input),\u2026](#discussion_r4191532148) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition +\u2026](#discussion_r4191532171) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition +\u2026](#discussion_r4191532191) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The runner label `windows-2025` is not a commonly available GitHub-hosted runner label (most repos\u2026](#discussion_r4190960581)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The runner label `windows-2025` is not a commonly available GitHub-hosted runner label (most repos\u2026](#discussion_r4190960527)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Embedding the full text of `Invoke-AgentInstructionFixtureClock` into a `pwsh -Command` string\u2026](#discussion_r4190960625)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#pullrequestreview-5423790591"
+    },
+    "4191532093": {
+      "id": 4191532093,
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "line": 1718,
+      "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532093"
+    },
+    "4191532114": {
+      "id": 4191532114,
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "line": 1734,
+      "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532114"
+    },
+    "4191532133": {
+      "id": 4191532133,
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "line": 593,
+      "body": "The Node executable path is no longer validated after `Get-Command`. If `Source` resolves to a non-existent path (or an unexpected shim), the later `Process.Start()` failure will be harder to diagnose and may produce a different error surface than intended. Add an explicit `[IO.File]::Exists($strSemanticNodePath)` check and throw the existing fixed diagnostic when missing (similar to the prior implementation).",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532133"
+    },
+    "4191532148": {
+      "id": 4191532148,
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "line": 190,
+      "body": "`ConvertFrom-NulPathRecordStream` now emits one `byte[]` per record (or no output for empty input), but the `OutputType` attribute was broadened to `[System.Array]` while the function documentation still states `System.Byte[]`. To keep contract documentation precise, update `OutputType` (and/or the docstring) to reflect that it outputs `System.Byte[]` objects.",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532148"
+    },
+    "4191532171": {
+      "id": 4191532171,
+      "path": ".github/workflows/build.yml",
+      "line": 11,
+      "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532171"
+    },
+    "4191532191": {
+      "id": 4191532191,
+      "path": ".github/workflows/build.yml",
+      "line": 139,
+      "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+      "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532191"
+    }
+  },
+  "raw_review_sha256": "a8182cec7227824be6bd2dfc87e96e89edba8c2ceb71afd458f851458428ab5e"
+}

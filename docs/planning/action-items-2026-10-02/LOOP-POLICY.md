@@ -3,6 +3,10 @@
 
 This is the single current lifecycle policy for A00–A21. Repository instructions and actual owner authority still govern their scopes. [STATUS.md](STATUS.md) holds progress; archived task bodies and old TEMP state do not select current work.
 
+## Owner CI direction, 2026-10-06
+
+Do not merge a PR while CI is failing. A CI relaunch is permitted at most once per hour for that PR; record the last relaunch timestamp and reconcile the accepted request before another attempt. Do not create scheduled retries without an explicit request. If a PR was merged with failing CI, pause project work and report the native status to the owner for triage. Do not treat a service disposition or a valid fallback review as proof that a cancelled or failed workflow passed. The current owner hold and its exact scope are recorded in [the audit](results/owner-ci-audit-2026-10-06/REPORT.md). This owner direction takes precedence over earlier lifecycle interpretations.
+
 ## One outcome, two loops
 
 | Limit | Counted unit | Stop condition | Reset rule |

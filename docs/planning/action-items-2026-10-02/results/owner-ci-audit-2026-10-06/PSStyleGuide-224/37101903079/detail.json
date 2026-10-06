@@ -1,0 +1,58 @@
+{
+  "repository": "PSStyleGuide",
+  "pr": 224,
+  "run": 37101903079,
+  "head": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+  "conclusion": "failure",
+  "log_exit": 0,
+  "log_sha256": "12d9da4c1f7c792b855140f71de7bf19e5150885185259f8e8d37b9da9e9f643",
+  "jobs": [
+    {
+      "id": 111142927851,
+      "name": "Test proposed instruction and workflow behavior",
+      "started_at": "2026-10-03T06:05:24Z",
+      "completed_at": "2026-10-03T06:25:09Z",
+      "conclusion": "failure",
+      "failed_steps": [
+        {
+          "name": "Test proposed behavior without publication authority",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 5,
+          "started_at": "2026-10-03T06:05:37Z",
+          "completed_at": "2026-10-03T06:25:08Z"
+        }
+      ]
+    },
+    {
+      "id": 111142928622,
+      "name": "Classify maintenance and validate ordinary instructions",
+      "started_at": "2026-10-03T06:05:23Z",
+      "completed_at": "2026-10-03T06:05:23Z",
+      "conclusion": "skipped",
+      "failed_steps": []
+    }
+  ],
+  "annotations": [
+    {
+      "job": 111142927851,
+      "name": "Test proposed instruction and workflow behavior",
+      "annotations": [
+        [
+          {
+            "path": ".github",
+            "blob_href": "https://github.com/franklesniak/PSStyleGuide/blob/3ba0f4d9686af41ae0e77c65ea374fff9d1cef53/.github",
+            "start_line": 51,
+            "start_column": null,
+            "end_line": 51,
+            "end_column": null,
+            "annotation_level": "failure",
+            "title": "",
+            "message": "Process completed with exit code 1.",
+            "raw_details": ""
+          }
+        ]
+      ]
+    }
+  ]
+}

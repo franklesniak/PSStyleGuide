@@ -1,0 +1,23 @@
+{
+  "node": "v24.18.1",
+  "source_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+  "windows_acquisition_equal": true,
+  "windows_acquisition_characters": 4679,
+  "proof_equal": false,
+  "proof_lines": [
+    {
+      "id": "generator_windows_51",
+      "lines": 23
+    },
+    {
+      "id": "generator_windows_7",
+      "lines": 23
+    },
+    {
+      "id": "generator_linux_7",
+      "lines": 23
+    }
+  ],
+  "anchor_error": "yaml-feature",
+  "scope": "Actual locked parser/policy and immutable build read only; no workflow execution or policy mutation"
+}

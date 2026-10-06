@@ -1,0 +1,10 @@
+{
+  "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+  "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+  "index_sha256": "df34f1133c6359914b72ad799b5283457821f27bb00fc8ba42ec6b300280b8a8",
+  "refs_sha256": "42b5dacadf8797f27d438337de57bb9d0b368827e740bb27c10bd3c9553b6972",
+  "source_path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+  "source_before_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+  "source_after_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+  "utc": "2026-10-06T04:57:18.029138+00:00"
+}

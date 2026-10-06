@@ -1,0 +1,62 @@
+{
+  "repository": "TerraformStyleGuide",
+  "pr": 67,
+  "run": 37338466878,
+  "head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
+  "conclusion": "cancelled",
+  "log_exit": 0,
+  "log_sha256": "97b899b3a6de9b532b2366419f03b9e462db5cffb81ffc01c8c4789aa19fa119",
+  "jobs": [
+    {
+      "id": 111859168634,
+      "name": "copilot-pull-request-reviewer",
+      "started_at": "2026-10-05T16:08:24Z",
+      "completed_at": "2026-10-05T16:28:44Z",
+      "conclusion": "cancelled",
+      "failed_steps": [
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "number": 77,
+          "started_at": "2026-10-05T16:09:19Z",
+          "completed_at": "2026-10-05T16:28:39Z"
+        }
+      ]
+    }
+  ],
+  "annotations": [
+    {
+      "job": 111859168634,
+      "name": "copilot-pull-request-reviewer",
+      "annotations": [
+        [
+          {
+            "path": ".github",
+            "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/443b2fe3cbeda18402f0432e5c95379d09096d6a/.github",
+            "start_line": 1,
+            "start_column": null,
+            "end_line": 1,
+            "end_column": null,
+            "annotation_level": "failure",
+            "title": "",
+            "message": "The job has exceeded the maximum execution time of 20m0s",
+            "raw_details": ""
+          },
+          {
+            "path": ".github",
+            "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/443b2fe3cbeda18402f0432e5c95379d09096d6a/.github",
+            "start_line": 152,
+            "start_column": null,
+            "end_line": 152,
+            "end_column": null,
+            "annotation_level": "failure",
+            "title": "",
+            "message": "The operation was canceled.",
+            "raw_details": ""
+          }
+        ]
+      ]
+    }
+  ]
+}

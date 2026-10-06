@@ -1,5 +1,5 @@
 {
-  "status": "round3_reviews_pending",
+  "status": "R8_aggregate_running",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -91,7 +91,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Collect exact-head hosted results and both existing review requests; obtain independent final binding before normal merge.",
+  "next_action": "Poll existing81857/run status; four wrappers and mandatory all-files hooks must pass. Then normal commit, actual B/newH endpoints, body/dispositions, new-input review/currentCI/final binding. No failing-CI merge and no hourly-limit bypass.",
   "checkout_exit": 0,
   "candidate_tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
   "implementation": {
@@ -293,7 +293,7 @@
       }
     ]
   },
-  "local_operations": "No local test, source freeze or product writer. Independent final binding passed. Both existing remote requests are confirmed; do not duplicate them.",
+  "local_operations": "Sole final R8 Linux validation session81857 on treea4e7ce6 and manifest3793f413; do not alter frozen source/index/refs/config/dependencies. First startup failed before tests, recovered original Docker image. Writer and quality reader idle.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "passed",
@@ -369,7 +369,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r5-candidate-readiness.json",
     "sha256": "f5ad6811220be5128885ab9add017e53380efc987735bd4a265426af0e1dbc61"
   },
-  "planning_checkpoint": "58aab1903eeb19d3f18fc32ab7359ecde9f45dd5",
+  "planning_checkpoint": "f644bc2f014c945ccb7c166f3677490d8440cae9",
   "commit": {
     "status": "committed",
     "expected_parent": "f89d47d6780db47df29be4eb6d79cab35051f598",
@@ -1465,21 +1465,28 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round3-current-head-baseline.json",
       "baseline_sha256": "d8c8f029e8c2dd710bbd94a719f0d3382411beab5cb71be71c219db8c60bacfc",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_with_findings",
         "requested_at": "2026-10-06T04:09:51.857265+00:00",
         "effort_selected": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "channel": "supported GitHub Reviewers UI",
         "request_event_id": 32566648692,
         "native_requested_at": "2026-10-06T04:09:55Z",
         "confirmation": "round3-after-copilot.json",
         "workflow_run": 37412403267,
-        "workflow_status": "in_progress",
-        "workflow_conclusion": null
+        "workflow_status": "completed",
+        "workflow_conclusion": "cancelled",
+        "observed_effort_source": "Root-read complete authenticated current-head review5423790591 explicit effort field.",
+        "review_id": 5423790591,
+        "submitted_at": "2026-10-06T04:28:28Z",
+        "review_body_sha256": "3787842c14ae3afb00df11ceebef0d1fe15f3d6550b5e5ef5a6f351b6f56821e",
+        "terminal_snapshot": "round3-progress-7.json",
+        "terminal_service_cause_verified": true,
+        "workflow_cause": "Authenticated attempt1 job112103539186 exceeded20m during complete repository validation; actual Lite review posted. No effort-only retry."
       },
       "codex": {
-        "status": "confirmed_pending",
+        "status": "completed_clean",
         "automatic_reconciled": true,
         "manual_trigger_issued": true,
         "channel": "manual PR comment",
@@ -1492,11 +1499,187 @@
         "author_id": 199175422,
         "summary_updated_at": "2026-10-06T04:10:34Z",
         "summary_body_sha256": "b2efcf93287db3ecce6e9c886eb48917075f7f7ad1d9106cca545536ef73b880",
-        "causal_binding": "Authenticated new Running summary on exact head after sole owner trigger6009155889; complete baseline excludes this activity."
+        "causal_binding": "Authenticated new Running summary on exact head after sole owner trigger6009155889; complete baseline excludes this activity.",
+        "terminal_snapshot": "round3-progress-3.json",
+        "result_comment": 6009202726,
+        "native_completed_at": "2026-10-06T04:14:51.789007Z",
+        "terminal_summary_body_sha256": "15f9a6cc3b027c1842b05ab4ef1bde2e3a0639e199d6ebc75daf3b939d512678",
+        "result_body_sha256": "67fcbc1d052385ab6ed0b215c7f0e642e1cde40aae73338ba95c49348402f496",
+        "attribution": "Authenticated post-trigger explicit no-findings result names current reviewed commit; exact-head summary changed from Running to Completed and complete thread/inline inventory is unchanged. No duplicate trigger."
       },
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
-      "findings": []
+      "findings": [
+        {
+          "id": "TF68-R6",
+          "title": "Unknown-artifact diagnostic",
+          "status": "selected_no_change_pending_native_disposition",
+          "comments": [
+            {
+              "comment_id": 4191532093,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaRY",
+              "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+              "line": 1718,
+              "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+              "body_sha256": "333f43fd8bf269320518f10331eaedd0e9a71c6ea6ad60dbcc7c03988d970c89"
+            },
+            {
+              "comment_id": 4191532114,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaRk",
+              "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+              "line": 1734,
+              "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+              "body_sha256": "333f43fd8bf269320518f10331eaedd0e9a71c6ea6ad60dbcc7c03988d970c89"
+            }
+          ],
+          "owner": "/root/a06_tf_generator_owner",
+          "constraints": "Read-only preparation; full owner options/rubric/table/selection before any product edit.",
+          "decision": "docs/planning/action-items-2026-10-02/results/A06/TF68-round3/R6-unknown-artifact.md",
+          "selected": "A",
+          "score": 96.5,
+          "displayed_before_implementation": true
+        },
+        {
+          "id": "TF68-R7",
+          "title": "First Node executable path validation",
+          "status": "selected_no_change_pending_native_disposition",
+          "comments": [
+            {
+              "comment_id": 4191532133,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaRs",
+              "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+              "line": 593,
+              "body": "The Node executable path is no longer validated after `Get-Command`. If `Source` resolves to a non-existent path (or an unexpected shim), the later `Process.Start()` failure will be harder to diagnose and may produce a different error surface than intended. Add an explicit `[IO.File]::Exists($strSemanticNodePath)` check and throw the existing fixed diagnostic when missing (similar to the prior implementation).",
+              "body_sha256": "37ad37d00b8824d9fd02cef17bb04907c606142ccf3404e51f54b284c4b3e282"
+            }
+          ],
+          "owner": "/root/a06_tf_generator_owner",
+          "constraints": "Read-only preparation; full owner options/rubric/table/selection before any product edit.",
+          "decision": "docs/planning/action-items-2026-10-02/results/A06/TF68-round3/R7-node-path.md",
+          "selected": "A",
+          "score": 98.5,
+          "displayed_before_implementation": true
+        },
+        {
+          "id": "TF68-R8",
+          "title": "NUL parser output type contract",
+          "status": "implemented_frozen_aggregate_running",
+          "comments": [
+            {
+              "comment_id": 4191532148,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaR0",
+              "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+              "line": 190,
+              "body": "`ConvertFrom-NulPathRecordStream` now emits one `byte[]` per record (or no output for empty input), but the `OutputType` attribute was broadened to `[System.Array]` while the function documentation still states `System.Byte[]`. To keep contract documentation precise, update `OutputType` (and/or the docstring) to reflect that it outputs `System.Byte[]` objects.",
+              "body_sha256": "760f4f7bc4a086746d867d296c45fca7b7669c4dd8b1dc56b808e2084ae4ffa5"
+            }
+          ],
+          "owner": "/root/a06_tf_generator_owner",
+          "constraints": "Read-only preparation; full owner options/rubric/table/selection before any product edit.",
+          "decision": "docs/planning/action-items-2026-10-02/results/A06/TF68-round3/R8-output-type.md",
+          "selected": "B",
+          "score": 100.0,
+          "displayed_before_implementation": true,
+          "release": {
+            "at": "2026-10-06T04:56:54.661310+00:00",
+            "parent_head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+            "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+            "preimage_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+            "scope": "Target OutputType byte[] and exactly script/target-function NOTES version only; no runtime-body or generated-output changes.",
+            "writer": "/root/a06_tf_generator_owner",
+            "root_validation": "Affected Linux wrapper cases plus mandatory final precommit all-files once; no separate full567 merely for annotation. Required actual B/newH metadata endpoints/current checks remain."
+          },
+          "parent_head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+          "candidate_tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+          "delta_paths": [
+            ".github/workflows/Test-StyleGuideArtifacts.ps1"
+          ],
+          "candidate_scope": [
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+            ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/Test-ExactGitPathSet.ps1",
+            ".github/workflows/Test-StyleGuideArtifacts.ps1",
+            ".github/workflows/Test-StyleGuideGenerator.ps1",
+            ".github/workflows/Validate-WorkflowPolicy.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/build.yml",
+            ".github/workflows/package-lock.json",
+            ".github/workflows/package.json",
+            ".github/workflows/scripts-README.md",
+            ".github/workflows/workflow-policy-cases.json",
+            "docs/dependency-maintenance.md"
+          ],
+          "implementation": {
+            "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\IMPLEMENTATION.md",
+            "report_sha256": "dacdc9b09a080d1087adaf627fab8dac07c6a6a3bcfc6aab7afd570fc6c2fd97",
+            "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\implementation-evidence.json",
+            "evidence_sha256": "196f9b14e739fda59e1fe161197ac3a78362699cd05d31bfeaf315965dd7aa0a"
+          },
+          "root_readiness": {
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r8-candidate-readiness.json",
+            "sha256": "4e3887311857fcc550b83a409cec118f3ea55731cb825b8c4eb3d15242b84cd6"
+          },
+          "aggregate": {
+            "status": "running",
+            "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-r8.json",
+            "manifest_sha256": "3793f413071183aac300ea4ca580562d5c92d28fb2bced15bc89aa0b661b0157",
+            "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r8\\runs\\a06-tf-peer-20261006-r8",
+            "session_id": 81857,
+            "launch_attempts": 2,
+            "first_attempt": "Local Docker unavailable before any run directory/container/test. Original qualified image verified after one ordinary start; no remote CI retry."
+          },
+          "independent_quality": {
+            "status": "PASS_BOUNDED_DECISION_AND_DELTA_REVIEW",
+            "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R8-decision-delta-review.md",
+            "report_sha256": "ca52537a4f3558592e4dd9a03d30c0a6054f3346c19a4687a93b5e43000bd027",
+            "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R8-decision-delta-review.json",
+            "evidence_sha256": "0ee261b04e4fcf3954c29a49bc20df4adc56146462c0778e193db67019391725",
+            "material_findings": [],
+            "remaining": "Final actual candidate aggregate/endpoints/body/current-native binding and acceptance."
+          },
+          "pair_implication": "Adds common artifact helper OutputType and two touched notes to prior five-path R1/R2/R5 PS carryback. Increment applicable A06 counter before actual post-TF destination repair; A03 unaffected by R8 itself."
+        },
+        {
+          "id": "TF68-R9",
+          "title": "Windows acquisition/proof duplication",
+          "status": "selected_no_change_pending_native_disposition",
+          "comments": [
+            {
+              "comment_id": 4191532171,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaSF",
+              "path": ".github/workflows/build.yml",
+              "line": 11,
+              "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+              "body_sha256": "26a90e9b2f70adfde574dc836c531bb449a0a9c49358cfe3c2291035f613f8a1"
+            },
+            {
+              "comment_id": 4191532191,
+              "thread_id": "PRRT_kwDOSAZRhc6pUaSS",
+              "path": ".github/workflows/build.yml",
+              "line": 139,
+              "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+              "body_sha256": "26a90e9b2f70adfde574dc836c531bb449a0a9c49358cfe3c2291035f613f8a1"
+            }
+          ],
+          "owner": "/root/a06_tf_generator_owner",
+          "constraints": "Read-only preparation; full owner options/rubric/table/selection before any product edit.",
+          "decision": "docs/planning/action-items-2026-10-02/results/A06/TF68-round3/R9-workflow-duplication.md",
+          "selected": "A",
+          "score": 94.0,
+          "displayed_before_implementation": true
+        }
+      ],
+      "status": "terminal_findings_under_decision",
+      "body_inventory": {
+        "declared_findings": 6,
+        "distinct_findings": 4,
+        "inline_findings": 6,
+        "body_only_findings": [],
+        "service_caveat": "Agentic setup exceeded20m; actual completed Lite fallback accepted under AGENTS. Findings require disposition."
+      }
     }
   ],
   "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-12.json",
@@ -4039,7 +4222,7 @@
       }
     }
   ],
-  "updated_at": "2026-10-06T04:15:54.624250+00:00",
+  "updated_at": "2026-10-06T05:03:28.278200+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
     "status": "Not executed and now stale: current R3/R4 findings invalidate zero-finding acceptance assumptions. Rebind only after actual dispositions/final input.",
@@ -4056,7 +4239,7 @@
       "accept-landed-tf68-r2.py": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
     }
   },
-  "last_goal_turn_classification": "Progress plus verified wait: Windows and Linux actual focuses passed; independent focused binding passed; source0f staged as0fe; sole aggregate25941 passed567Node tests and ten hooks, final instruction/mutation hook/host guard still pending;23-file planning checkpoint58aab19 published,2687 unrelated files preserved. No blocking owner decision.",
+  "last_goal_turn_classification": "Progress: four ordered decisions displayed, sole three-line R8 implemented and independently reviewed, final contract probes passed, immutable candidate staged and required final local validation launched after reconciled service start.",
   "partial_hosted_r2": {
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
     "push_behavior": {
@@ -4109,14 +4292,46 @@
     "image_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R5-linux-engine-image-verification.json"
   },
   "live_remote_observation": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round3-progress-1.json",
-    "captured_at": "2026-10-06T04:11:01.309001+00:00",
-    "pending_run_ids": [
-      37412403267,
-      37412265677,
-      37412265656,
-      37412263799,
-      37412263931
-    ]
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round3-progress-9.json",
+    "captured_at": "2026-10-06T04:40:37.022802+00:00",
+    "pending_run_ids": []
+  },
+  "next_poll_not_before": null,
+  "prepared_round3_followups": {
+    "status": "stale_not_executed",
+    "files": [
+      "accept-tf68-round3.py",
+      "merge-reviewed-tf68-r3.py",
+      "collect-landed-tf68-r3.py",
+      "accept-landed-tf68-r3.py"
+    ],
+    "restrictions": "New R6-R9 findings invalidate zero-finding assumptions. Do not execute or merely relax guards. Rebind after actual decisions and final input, preserving original review clock and counters."
+  },
+  "hosted_round3_ci": {
+    "status": "passed",
+    "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+    "proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\complete-ci-proof.json",
+    "sha256": "e678e21f951b339e30c10045cdd1e4a7908e4cf67ff45038a5c05448ee27218f",
+    "ordinary_runs_passed": 11
+  },
+  "owner_ci_hold": {
+    "status": "historical_cases_accepted_goal_resumed",
+    "recorded_at": "2026-10-06T04:47:06.151175+00:00",
+    "previous_status": "round3_findings_under_decision",
+    "report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\owner-ci-audit-2026-10-06\\REPORT.md",
+    "reason": "TF67 merged with cancelled final-head Copilot service workflow; separate PS224 postmerge failed workflow also disclosed. Ordinary final-head CI was successful.",
+    "ci_relaunch_minimum_interval_seconds": 3600,
+    "ci_relaunch_issued_during_audit": false,
+    "worker_status": "Existing owner resumed read-only unfinished R6-R9 packet; no product edit released.",
+    "next_action": "Finish and display R6-R9 decisions; follow the owner CI rule for any future candidate or review service run.",
+    "accepted_statement": "Looks like those two PRs are fine; there must have been a GitHub outage.",
+    "resume_authority": "Subsequent active-goal continuation; get_goal confirmed active2026-10-06T04:49:11Z.",
+    "resumed_at": "2026-10-06T04:50:24.156330+00:00",
+    "cause_limit": "Owner accepted both historical cases; native timeout and script-completion causes remain factual. No outage is established and no future failure exception is inferred."
+  },
+  "ci_retry_policy": {
+    "minimum_interval_seconds": 3600,
+    "last_relaunch_at": null,
+    "restriction": "No merge while CI is failing. No automatic retry schedule. Reconcile all native operations before a permitted relaunch. A new-input review cannot silently waive a cancelled/failed current workflow; acceptance of historical TF67/PS224 is not a blanket exemption."
   }
 }

@@ -1,0 +1,940 @@
+{
+  "status": "read-only proposal; not implementation authority",
+  "captured_utc": "2026-10-06T04:54:26.719637+00:00",
+  "inputs": {
+    "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+    "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+    "index_sha256": "df34f1133c6359914b72ad799b5283457821f27bb00fc8ba42ec6b300280b8a8",
+    "refs_sha256": "42b5dacadf8797f27d438337de57bb9d0b368827e740bb27c10bd3c9553b6972",
+    "source_rows": [
+      {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob ef2e3d08b54212da215790a8a61f4b259b5c81c8\t.github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "tf_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob 9e52d7482e5105f8c661b1005ba0c76a8e2a939d\t.github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "ps_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+        "equal": false
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob b3c9ad4caa86919ac1b66c457493f7d6b9d9b813\t.github/workflows/Test-StyleGuideArtifacts.ps1",
+        "tf_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob 6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f\t.github/workflows/Test-StyleGuideArtifacts.ps1",
+        "ps_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "equal": false
+      },
+      {
+        "path": ".github/workflows/build.yml",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob c7865981e4755df08eecdeed59af21cb2d09ac90\t.github/workflows/build.yml",
+        "tf_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob d46981e38b54e8f8df42158b06ad149ca8c20c45\t.github/workflows/build.yml",
+        "ps_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+        "equal": false
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+        "tf_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+        "ps_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "equal": true
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+        "tf_sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob 2145cb90a7a5a2d292aac7375092dd6b33ea984e\t.github/workflows/Test-CiHelpers.test.mjs",
+        "ps_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "equal": false
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob dcd0cb93354a74de4a5d8323a7018511323e8bbe\t.github/workflows/Test-StyleGuideGenerator.ps1",
+        "tf_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob dcd0cb93354a74de4a5d8323a7018511323e8bbe\t.github/workflows/Test-StyleGuideGenerator.ps1",
+        "ps_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        "equal": true
+      },
+      {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "tf_commit": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "tf_entry": "100644 blob 731c3bde3ba87efa684eef380e0d99b9297d091c\t.github/workflows/workflow-policy-cases.json",
+        "tf_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "ps_entry": "100644 blob 731c3bde3ba87efa684eef380e0d99b9297d091c\t.github/workflows/workflow-policy-cases.json",
+        "ps_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        "equal": true
+      }
+    ],
+    "review": {
+      "5423790591": {
+        "id": 5423790591,
+        "path": null,
+        "line": null,
+        "body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> \u00b7 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (6)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The new `unknown-artifact` failure is terse and loses the actionable context previously provided by\u2026](#discussion_r4191532093) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The new `unknown-artifact` failure is terse and loses the actionable context previously provided by\u2026](#discussion_r4191532114) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Node executable path is no longer validated after `Get-Command`. If `Source` resolves to a\u2026](#discussion_r4191532133) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`ConvertFrom-NulPathRecordStream` now emits one `byte[]` per record (or no output for empty input),\u2026](#discussion_r4191532148) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition +\u2026](#discussion_r4191532171) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition +\u2026](#discussion_r4191532191) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The runner label `windows-2025` is not a commonly available GitHub-hosted runner label (most repos\u2026](#discussion_r4190960581)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The runner label `windows-2025` is not a commonly available GitHub-hosted runner label (most repos\u2026](#discussion_r4190960527)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Embedding the full text of `Invoke-AgentInstructionFixtureClock` into a `pwsh -Command` string\u2026](#discussion_r4190960625)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#pullrequestreview-5423790591"
+      },
+      "4191532093": {
+        "id": 4191532093,
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "line": 1718,
+        "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532093"
+      },
+      "4191532114": {
+        "id": 4191532114,
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "line": 1734,
+        "body": "The new `unknown-artifact` failure is terse and loses the actionable context previously provided by `ValidateSet` binding errors. Consider throwing a more diagnostic message that includes the invalid `ArtifactId` and the allowed IDs (e.g., derived from `$DestinationMap.Keys`) so callers can quickly self-correct without debugging.",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532114"
+      },
+      "4191532133": {
+        "id": 4191532133,
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "line": 593,
+        "body": "The Node executable path is no longer validated after `Get-Command`. If `Source` resolves to a non-existent path (or an unexpected shim), the later `Process.Start()` failure will be harder to diagnose and may produce a different error surface than intended. Add an explicit `[IO.File]::Exists($strSemanticNodePath)` check and throw the existing fixed diagnostic when missing (similar to the prior implementation).",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532133"
+      },
+      "4191532148": {
+        "id": 4191532148,
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "line": 190,
+        "body": "`ConvertFrom-NulPathRecordStream` now emits one `byte[]` per record (or no output for empty input), but the `OutputType` attribute was broadened to `[System.Array]` while the function documentation still states `System.Byte[]`. To keep contract documentation precise, update `OutputType` (and/or the docstring) to reflect that it outputs `System.Byte[]` objects.",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532148"
+      },
+      "4191532171": {
+        "id": 4191532171,
+        "path": ".github/workflows/build.yml",
+        "line": 11,
+        "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532171"
+      },
+      "4191532191": {
+        "id": 4191532191,
+        "path": ".github/workflows/build.yml",
+        "line": 139,
+        "body": "The Windows 5.1 and Windows 7 generator jobs appear to duplicate substantial inline acquisition + proof logic (differing mainly by shell/ExpectedHost). This duplication increases the risk of the two drifting over time. If policy constraints allow, consider factoring the shared logic into a reusable unit (YAML anchor/alias, a composite action, or a checked-in helper script invoked by both jobs) so future fixes are applied once.",
+        "commit_id": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191532191"
+      }
+    },
+    "raw_review_sha256": "a8182cec7227824be6bd2dfc87e96e89edba8c2ceb71afd458f851458428ab5e"
+  },
+  "decisions": [
+    {
+      "finding": "TF68-R6",
+      "weights": {
+        "Caller correctness": 35,
+        "Bounded diagnostics": 25,
+        "Actual usability": 25,
+        "Paired clarity": 10,
+        "Cost": 5
+      },
+      "options": [
+        {
+          "option": "A",
+          "name": "Retain fixed precondition and current result contract",
+          "scores": [
+            10,
+            10,
+            9,
+            9,
+            10
+          ],
+          "total": 96.5,
+          "reason": "Only caller supplies its own map key; fixed failure and public result stay coherent."
+        },
+        {
+          "option": "B",
+          "name": "Add fixed allowed-ID text to private exception",
+          "scores": [
+            10,
+            9,
+            8,
+            7,
+            9
+          ],
+          "total": 89.0,
+          "reason": "Safe if kept static, but does not reach current CI output and duplicates language-specific descriptors."
+        },
+        {
+          "option": "C",
+          "name": "Echo supplied ID and destination keys",
+          "scores": [
+            9,
+            2,
+            7,
+            6,
+            9
+          ],
+          "total": 64.5,
+          "reason": "Direct debugging gains detail; unchecked length/newlines and current catch still prevent the claimed CI benefit."
+        },
+        {
+          "option": "D",
+          "name": "Add a bounded structured public diagnostic field",
+          "scores": [
+            9,
+            9,
+            9,
+            7,
+            4
+          ],
+          "total": 85.5,
+          "reason": "Can help a future caller; requires schema, verifier and hostile-field admission changes for an unreachable current case."
+        },
+        {
+          "option": "E",
+          "name": "Restore a fixed ValidateSet",
+          "scores": [
+            7,
+            8,
+            7,
+            5,
+            8
+          ],
+          "total": 71.0,
+          "reason": "Hardcodes language IDs and changes binding errors while the live map remains the real authority."
+        },
+        {
+          "option": "F",
+          "name": "Remove the explicit guard",
+          "scores": [
+            3,
+            5,
+            3,
+            4,
+            10
+          ],
+          "total": 39.5,
+          "reason": "Later lookup failure loses the stated private precondition; rejected."
+        },
+        {
+          "option": "G",
+          "name": "Add an implementation comment only",
+          "scores": [
+            10,
+            10,
+            9,
+            8,
+            8
+          ],
+          "total": 94.5,
+          "reason": "No runtime gain; existing output contract already explains pre-record failures."
+        }
+      ],
+      "selected": "A"
+    },
+    {
+      "finding": "TF68-R7",
+      "weights": {
+        "Selection and failure integrity": 30,
+        "Actionable diagnosis": 30,
+        "Security accuracy": 20,
+        "Compatibility and evidence": 15,
+        "Cost": 5
+      },
+      "options": [
+        {
+          "option": "A",
+          "name": "Keep first selected application and native start error",
+          "scores": [
+            10,
+            10,
+            10,
+            9,
+            10
+          ],
+          "total": 98.5,
+          "reason": "Actual missing/bad executable failures name the selected path and OS cause; no fallback or false success."
+        },
+        {
+          "option": "B",
+          "name": "Restore File.Exists and fixed missing-path error",
+          "scores": [
+            10,
+            8,
+            8,
+            9,
+            9
+          ],
+          "total": 88.0,
+          "reason": "Detects an already missing path early, but loses OS detail; cannot validate a shim or cover a later race."
+        },
+        {
+          "option": "C",
+          "name": "Normalize only Process.Start exceptions",
+          "scores": [
+            10,
+            7,
+            9,
+            8,
+            7
+          ],
+          "total": 84.5,
+          "reason": "Stable text but discards actionable OS failure detail unless a new bounded detail contract is designed."
+        },
+        {
+          "option": "D",
+          "name": "Combine existence check and narrow start normalization",
+          "scores": [
+            10,
+            7,
+            8,
+            8,
+            6
+          ],
+          "total": 82.0,
+          "reason": "Adds both boundaries without additional execution authority; retains the limitations of B and C."
+        },
+        {
+          "option": "E",
+          "name": "Pin or authenticate an executable beyond PATH selection",
+          "scores": [
+            8,
+            8,
+            9,
+            5,
+            2
+          ],
+          "total": 74.5,
+          "reason": "A different runtime-authority contract; no evidence here that authenticated executable identity is required."
+        },
+        {
+          "option": "F",
+          "name": "Re-resolve or fall back to another executable",
+          "scores": [
+            2,
+            6,
+            2,
+            3,
+            7
+          ],
+          "total": 36.0,
+          "reason": "Violates current first-application/no-fallback controls; ineligible."
+        },
+        {
+          "option": "G",
+          "name": "Remove the recovery semantic child",
+          "scores": [
+            1,
+            1,
+            1,
+            1,
+            10
+          ],
+          "total": 14.5,
+          "reason": "Would permit loss of a required semantic check; ineligible."
+        },
+        {
+          "option": "H",
+          "name": "Add a comment about the existing failure boundary",
+          "scores": [
+            10,
+            10,
+            10,
+            8,
+            8
+          ],
+          "total": 96.0,
+          "reason": "Same runtime semantics as A; duplicates the native-failure conventions already documented in this file."
+        }
+      ],
+      "selected": "A"
+    },
+    {
+      "finding": "TF68-R8",
+      "weights": {
+        "Contract precision": 35,
+        "Runtime preservation": 30,
+        "Tool compatibility": 20,
+        "Reader clarity": 10,
+        "Maintenance": 5
+      },
+      "options": [
+        {
+          "option": "A",
+          "name": "Keep broad System.Array with precise output prose",
+          "scores": [
+            7,
+            10,
+            10,
+            7,
+            10
+          ],
+          "total": 86.5,
+          "reason": "Truthful base type, but Get-Command metadata omits the already promised byte element type."
+        },
+        {
+          "option": "B",
+          "name": "Use OutputType([byte[]])",
+          "scores": [
+            10,
+            10,
+            10,
+            10,
+            10
+          ],
+          "total": 100.0,
+          "reason": "Exact built-in type, proven metadata and preserved values; full prospective file parses and analyzes cleanly."
+        },
+        {
+          "option": "C",
+          "name": "Use OutputType('System.Byte[]')",
+          "scores": [
+            10,
+            10,
+            9,
+            9,
+            9
+          ],
+          "total": 96.5,
+          "reason": "Equivalent extracted metadata; string indirection is unnecessary for an available built-in type and full-file variant was not separately tested."
+        },
+        {
+          "option": "D",
+          "name": "Broaden prose to System.Array",
+          "scores": [
+            5,
+            10,
+            10,
+            5,
+            9
+          ],
+          "total": 77.0,
+          "reason": "Documents less than the real byte-preserving contract and leaves imprecise tool metadata."
+        },
+        {
+          "option": "E",
+          "name": "Change emission as well as its annotation",
+          "scores": [
+            10,
+            7,
+            8,
+            8,
+            5
+          ],
+          "total": 82.5,
+          "reason": "Adds avoidable enumeration/runtime risk when existing output and analyzer already accept precise metadata."
+        },
+        {
+          "option": "F",
+          "name": "Declare both Array and Byte[]",
+          "scores": [
+            7,
+            10,
+            9,
+            6,
+            8
+          ],
+          "total": 82.5,
+          "reason": "Redundant broad type weakens the same discovery contract without improving actual values."
+        },
+        {
+          "option": "G",
+          "name": "Suppress analyzer rules around a precise type",
+          "scores": [
+            10,
+            10,
+            5,
+            6,
+            5
+          ],
+          "total": 83.5,
+          "reason": "No analyzer failure exists; an exemption reduces future defect detection without benefit."
+        }
+      ],
+      "selected": "B"
+    },
+    {
+      "finding": "TF68-R9",
+      "weights": {
+        "Bootstrap trust": 30,
+        "Independent admission": 30,
+        "Operator and test clarity": 20,
+        "Maintenance": 15,
+        "Cost": 5
+      },
+      "options": [
+        {
+          "option": "A",
+          "name": "Keep inline bodies and independent controls",
+          "scores": [
+            10,
+            10,
+            10,
+            6,
+            10
+          ],
+          "total": 94.0,
+          "reason": "Windows acquisition pair is equal; current proof and platform failure oracles remain explicit."
+        },
+        {
+          "option": "B",
+          "name": "Call repository acquisition helper before checkout",
+          "scores": [
+            1,
+            8,
+            5,
+            10,
+            4
+          ],
+          "total": 54.0,
+          "reason": "Helper is absent or unverified at this stage; ineligible."
+        },
+        {
+          "option": "C",
+          "name": "Factor only post-checkout proof helper",
+          "scores": [
+            10,
+            8,
+            9,
+            8,
+            6
+          ],
+          "total": 87.0,
+          "reason": "Feasible but needs helper/source admission and independent negative controls for the newly indirect proof."
+        },
+        {
+          "option": "D",
+          "name": "Use native YAML anchors and change parser admission",
+          "scores": [
+            10,
+            7,
+            8,
+            9,
+            6
+          ],
+          "total": 83.5,
+          "reason": "GitHub supports anchors; actual strict parser rejects them, so this needs a new policy boundary and independent tests."
+        },
+        {
+          "option": "E",
+          "name": "Centralize through reusable workflow or matrix",
+          "scores": [
+            9,
+            7,
+            7,
+            9,
+            4
+          ],
+          "total": 77.5,
+          "reason": "Changes finite job/host/output topology and verifier admission, not merely repeated text."
+        },
+        {
+          "option": "F",
+          "name": "Generate repeated blocks from a shared source",
+          "scores": [
+            10,
+            8,
+            7,
+            8,
+            5
+          ],
+          "total": 82.5,
+          "reason": "Adds source/emitted synchronization and shared-oracle risks while keeping generated duplication."
+        },
+        {
+          "option": "G",
+          "name": "Use an externally pinned bootstrap or composite action",
+          "scores": [
+            6,
+            8,
+            7,
+            7,
+            2
+          ],
+          "total": 67.5,
+          "reason": "New acquisition trust source and update obligation; no current correctness need supports that expansion."
+        }
+      ],
+      "selected": "A"
+    }
+  ],
+  "executed_results": [
+    {
+      "command": [
+        "python",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\prepare.py"
+      ],
+      "exit": 0,
+      "outcome": "Captured seven exact raw source rows and complete review/comments; clean input guards passed."
+    },
+    {
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\probe.ps1",
+        "-Directory",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3"
+      ],
+      "exit": 0,
+      "result": "probe-result.json",
+      "outcome": "Three annotation variants, plain/hostile unknown IDs, missing/invalid selected native executable controls passed."
+    },
+    {
+      "command": [
+        "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\workflow-probe.mjs"
+      ],
+      "exit": 0,
+      "result": "workflow-result.json",
+      "outcome": "Current workflow parsed, Windows acquisition equal, exact proof line counts and alias rejection recorded. Initial driver selector error exited 1; final corrected invocation alone credited."
+    },
+    {
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\full-file-probe.ps1",
+        "-Directory",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3"
+      ],
+      "exit": 0,
+      "session_id": 26647,
+      "result": "full-file-result.json",
+      "outcome": "Original and prospective type-literal full-file parser/analyzer warning/error counts all zero; neither script executed."
+    },
+    {
+      "command": [
+        "python",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\finish-packet.py"
+      ],
+      "exit": 0,
+      "outcome": "Asserted score arithmetic/unique winners and final immutable source, clean index and refs; wrote packet only."
+    }
+  ],
+  "runtimes": [
+    {
+      "path": "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+      "version": "7.6.5"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+      "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582",
+      "version": "24.18.1"
+    },
+    {
+      "module": "PSScriptAnalyzer",
+      "version": "1.24.0"
+    }
+  ],
+  "probe_results": {
+    "powershell": "7.6.5",
+    "analyzer": "1.24.0",
+    "output_type": [
+      {
+        "variant": "Original",
+        "output_metadata": [
+          "System.Array"
+        ],
+        "outputs": [
+          {
+            "count": 0,
+            "bytes": [],
+            "name": "empty",
+            "types": []
+          },
+          {
+            "count": 1,
+            "bytes": [
+              "61"
+            ],
+            "name": "one",
+            "types": [
+              "System.Byte[]"
+            ]
+          },
+          {
+            "count": 2,
+            "bytes": [
+              "61",
+              "6263"
+            ],
+            "name": "two",
+            "types": [
+              "System.Byte[]",
+              "System.Byte[]"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "variant": "ByteArray",
+        "output_metadata": [
+          "System.Byte[]"
+        ],
+        "outputs": [
+          {
+            "count": 0,
+            "bytes": [],
+            "name": "empty",
+            "types": []
+          },
+          {
+            "count": 1,
+            "bytes": [
+              "61"
+            ],
+            "name": "one",
+            "types": [
+              "System.Byte[]"
+            ]
+          },
+          {
+            "count": 2,
+            "bytes": [
+              "61",
+              "6263"
+            ],
+            "name": "two",
+            "types": [
+              "System.Byte[]",
+              "System.Byte[]"
+            ]
+          }
+        ],
+        "issues": []
+      },
+      {
+        "variant": "StringByteArray",
+        "output_metadata": [
+          "System.Byte[]"
+        ],
+        "outputs": [
+          {
+            "count": 0,
+            "bytes": [],
+            "name": "empty",
+            "types": []
+          },
+          {
+            "count": 1,
+            "bytes": [
+              "61"
+            ],
+            "name": "one",
+            "types": [
+              "System.Byte[]"
+            ]
+          },
+          {
+            "count": 2,
+            "bytes": [
+              "61",
+              "6263"
+            ],
+            "name": "two",
+            "types": [
+              "System.Byte[]",
+              "System.Byte[]"
+            ]
+          }
+        ],
+        "issues": []
+      }
+    ],
+    "unknown_artifact": [
+      {
+        "message": "unknown-artifact",
+        "input_kind": "plain"
+      },
+      {
+        "message": "unknown-artifact",
+        "input_kind": "hostile-newline"
+      }
+    ],
+    "node_resolution": [
+      {
+        "start_error": "System.ComponentModel.Win32Exception: An error occurred trying to start process 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\first\\node.exe' with working directory 'C:\\Users\\flesniak\\GitHub\\PSStyleGuide'. The system cannot find the file specified.",
+        "case": "removed-after-resolution",
+        "selected_first": true,
+        "check_after_removal": false,
+        "fallback_exists": true,
+        "precheck_before_removal": true
+      },
+      {
+        "start_error": "System.ComponentModel.Win32Exception: An error occurred trying to start process 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\first\\node.exe' with working directory 'C:\\Users\\flesniak\\GitHub\\PSStyleGuide'. The specified executable is not a valid application for this OS platform.",
+        "exists": true,
+        "case": "invalid-existing-shim"
+      }
+    ],
+    "scope": "Private AST-extracted helper and native API probes; no artifact gate, generator publication or aggregate executed"
+  },
+  "full_file_results": [
+    {
+      "parse_errors": [],
+      "variant": "Original",
+      "issues": []
+    },
+    {
+      "parse_errors": [],
+      "variant": "ProspectiveByteArray",
+      "issues": []
+    }
+  ],
+  "workflow_results": {
+    "node": "v24.18.1",
+    "source_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+    "windows_acquisition_equal": true,
+    "windows_acquisition_characters": 4679,
+    "proof_equal": false,
+    "proof_lines": [
+      {
+        "id": "generator_windows_51",
+        "lines": 23
+      },
+      {
+        "id": "generator_windows_7",
+        "lines": 23
+      },
+      {
+        "id": "generator_linux_7",
+        "lines": 23
+      }
+    ],
+    "anchor_error": "yaml-feature",
+    "scope": "Actual locked parser/policy and immutable build read only; no workflow execution or policy mutation"
+  },
+  "proposed_product_paths": [
+    ".github/workflows/Test-StyleGuideArtifacts.ps1"
+  ],
+  "proposed_changes": [
+    "ConvertFrom-NulPathRecordStream OutputType System.Array to byte[] only",
+    "Actual-UTC modification metadata for file and changed function only"
+  ],
+  "product_writes": false,
+  "final_guard": {
+    "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+    "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+    "seven_source_rows_unchanged": true,
+    "index_sha256": "df34f1133c6359914b72ad799b5283457821f27bb00fc8ba42ec6b300280b8a8",
+    "refs_sha256": "42b5dacadf8797f27d438337de57bb9d0b368827e740bb27c10bd3c9553b6972",
+    "unstaged_diff_empty": true,
+    "staged_diff_empty": true
+  },
+  "limits": [
+    "No production wrapper, aggregate, hosted job, Windows 5.1 or Linux probe executed in this round.",
+    "Native path tests are bounded Windows scratch API probes, not shim authentication or race guarantees.",
+    "Prospective full-file analysis changed only the annotation in memory; final metadata bytes still require final analysis after release.",
+    "No future cancelled CI exception is inferred; root owns no-failing-CI merge rule and hourly rerun limit.",
+    "Prior clean evidence remains bound to current 7dd, not future edited bytes."
+  ],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\build.yml",
+      "size": 25744,
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\finish-packet.py",
+      "size": 36483,
+      "sha256": "6e25315b78a00bc9e2c571c6e4cdca8727c71760c7ac53c77a525d35484176ed"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\full-file-probe.ps1",
+      "size": 1783,
+      "sha256": "245a18dc76a9dce6a496460ebd382e23ef787f74267e9f3df0daf5a831e54b2c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\full-file-result.json",
+      "size": 181,
+      "sha256": "b52d38a15efba3fad82f11bd5df8c0deff7f9dc4daf9ddcd03e04eaec3981298"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\Generate-StyleGuideArtifacts.ps1",
+      "size": 91158,
+      "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\inputs.json",
+      "size": 16785,
+      "sha256": "f1b05b385544c86284a9214d7c9dc853cb5fa06054d21868e03d7eec5bd00728"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\PREPARATION.md",
+      "size": 30079,
+      "sha256": "02e0164a5a762a84bf6c77cf0ac8e4cabd8e8b040d5ac400e32190bb3e33f33f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\prepare.py",
+      "size": 2096,
+      "sha256": "e8f5c1d07ce3a2e8c5465cad924c25b594776b483aa8180ecbb8367e2b671984"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\probe-result.json",
+      "size": 3548,
+      "sha256": "98d007b5447faf0121e22d974e6a2a35dfed2d6aae54c2f7d8a69d83b2347db8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\probe.log",
+      "size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\probe.ps1",
+      "size": 4894,
+      "sha256": "3d3f8286c09d052ddbf15fe5dc41f829b041652dd6ba5f728f36387f0b29bf0c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\Test-CiHelpers.test.mjs",
+      "size": 123638,
+      "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\Test-StyleGuideArtifacts.ps1",
+      "size": 36087,
+      "sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\Test-StyleGuideGenerator.ps1",
+      "size": 27656,
+      "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\Validate-WorkflowPolicy.mjs",
+      "size": 31176,
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\workflow-policy-cases.json",
+      "size": 26216,
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\workflow-probe.mjs",
+      "size": 1793,
+      "sha256": "b8e58b890969271e9bdd3f020460d14ad47c1e48b8f14d816bcecf21c5212c91"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\workflow-result.json",
+      "size": 583,
+      "sha256": "0415e3236ad41e1aeea7311bbe4a79c9b78f0b151a25628fe908991d224ffc6c"
+    }
+  ]
+}

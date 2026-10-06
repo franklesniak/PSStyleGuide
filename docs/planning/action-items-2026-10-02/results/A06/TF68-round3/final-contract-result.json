@@ -1,0 +1,76 @@
+{
+  "analyzer": "1.24.0",
+  "source_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+  "parse_errors": [],
+  "source_after_equal": true,
+  "output_metadata": [
+    "System.Byte[]"
+  ],
+  "malformed_cases": [
+    {
+      "message": "git-paths: missing final NUL",
+      "emitted_count": 0,
+      "name": "missing-final-NUL-after-valid-prefix"
+    },
+    {
+      "message": "git-paths: empty or duplicate record",
+      "emitted_count": 0,
+      "name": "empty-first-record"
+    },
+    {
+      "message": "git-paths: empty or duplicate record",
+      "emitted_count": 0,
+      "name": "empty-after-valid-prefix"
+    }
+  ],
+  "powershell": "7.6.5",
+  "original_control": {
+    "metadata": [
+      "System.Array"
+    ],
+    "rejected_by_precise_contract": true
+  },
+  "original_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+  "analyzer_issues": [],
+  "valid_cases": [
+    {
+      "count": 0,
+      "records": [],
+      "name": "empty"
+    },
+    {
+      "count": 1,
+      "records": [
+        {
+          "hex": "61",
+          "type": "System.Byte[]"
+        }
+      ],
+      "name": "one"
+    },
+    {
+      "count": 2,
+      "records": [
+        {
+          "hex": "61",
+          "type": "System.Byte[]"
+        },
+        {
+          "hex": "6263",
+          "type": "System.Byte[]"
+        }
+      ],
+      "name": "multiple"
+    },
+    {
+      "count": 1,
+      "records": [
+        {
+          "hex": "610AC3A9FF",
+          "type": "System.Byte[]"
+        }
+      ],
+      "name": "newline-and-non-ascii"
+    }
+  ]
+}

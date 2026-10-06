@@ -1,0 +1,37 @@
+{
+  "checked_at": "2026-10-06T04:55:12.214192+00:00",
+  "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+  "report_sha256": "02e0164a5a762a84bf6c77cf0ac8e4cabd8e8b040d5ac400e32190bb3e33f33f",
+  "evidence_sha256": "d9d126decbfc7e7f716832b57022d03599af978d36a94a12952ab0b35b0714cf",
+  "raw_source_rows_verified": 7,
+  "artifacts_verified": 18,
+  "all_score_arithmetic_verified": true,
+  "decisions": [
+    {
+      "finding": "TF68-R6",
+      "selected": "A",
+      "score": 96.5,
+      "options": 7
+    },
+    {
+      "finding": "TF68-R7",
+      "selected": "A",
+      "score": 98.5,
+      "options": 8
+    },
+    {
+      "finding": "TF68-R8",
+      "selected": "B",
+      "score": 100.0,
+      "options": 7
+    },
+    {
+      "finding": "TF68-R9",
+      "selected": "A",
+      "score": 94.0,
+      "options": 7
+    }
+  ],
+  "product_clean": true,
+  "limit": "Parent read full report and probe implementations/results. No product implementation or final acceptance is inferred. Display ordered options/rubrics/tables/selection before releasing R8."
+}

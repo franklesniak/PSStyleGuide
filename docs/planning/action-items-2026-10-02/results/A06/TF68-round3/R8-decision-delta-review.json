@@ -1,0 +1,114 @@
+{
+  "status": "PASS_BOUNDED_DECISION_AND_DELTA_REVIEW",
+  "reviewer": "/root/tf68_r8_quality",
+  "reviewer_role": "independent local final-quality reader; not remote Codex",
+  "captured_utc": "2026-10-06T05:01:04.696134+00:00",
+  "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+  "tree": "0fe10c22e777dba76ce7511def2216bd2ec3b996",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "paired_ps": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "final_source_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+  "candidate_blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+  "candidate_mode": "100644",
+  "material_findings": [],
+  "corrected_observations": [
+    {
+      "id": "R8-Q1",
+      "materiality": "nonmaterial wording",
+      "observation": "Canonical R8 said both gate callers, but source has working, staged and untracked callers at lines 790\u2013792.",
+      "disposition": "Coordinator corrected canonical record to All three gate callers; original frozen packet retained as historical evidence."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "R6",
+      "selection": "A",
+      "weighted_total": 96.5,
+      "conclusion": "Fixed guard/map caller/public structured catch justify no change; no unchecked ID echo or new schema."
+    },
+    {
+      "id": "R7",
+      "selection": "A",
+      "weighted_total": 98.5,
+      "conclusion": "First application remains authoritative; native failure propagates with disposal and no fallback. File existence neither authenticates shim nor closes race."
+    },
+    {
+      "id": "R8",
+      "selection": "B",
+      "weighted_total": 100,
+      "conclusion": "Precise built-in byte array metadata matches emitted records; runtime and prose unchanged."
+    },
+    {
+      "id": "R9",
+      "selection": "A",
+      "weighted_total": 94,
+      "conclusion": "No present acquisition drift; helper before checkout adds trust boundary; factoring proof/anchors would require deliberate admission changes."
+    }
+  ],
+  "independent_integrity_checks": {
+    "paired_raw_git_blob_mode_rows": 7,
+    "preparation_artifacts": 18,
+    "score_totals": 29,
+    "implementation_artifacts": 8,
+    "raw_tracked_files": 79,
+    "unchanged_raw_files": 78,
+    "changed_lines": 3,
+    "tests_run_by_reviewer": 0,
+    "native_mutations_by_reviewer": 0,
+    "product_writes_by_reviewer": 0
+  },
+  "credited_evidence": {
+    "final_probe_session": 12414,
+    "final_probe_exit": "0 recorded in frozen worker packet and confirmed by root terminal handoff",
+    "parser_errors": 0,
+    "analyzer_warnings_errors": 0,
+    "runtime": "PowerShell 7.6.5 / PSScriptAnalyzer 1.24.0",
+    "final_probe_cases": [
+      "precise discovery metadata",
+      "empty/one/multiple record boundaries and bytes",
+      "newline, UTF-8 and invalid UTF-8 preserved raw",
+      "missing final NUL after valid prefix rejects before output",
+      "empty first/after prefix rejects before output",
+      "original broad metadata rejected by precise contract"
+    ]
+  },
+  "pending_gates": [
+    "Root staged preflight and four selected Linux wrapper cases on final bytes",
+    "One mandatory final all-files pre-commit pass and normal commit checks",
+    "New commit and accepted endpoint/body final binding",
+    "New current-input remote Copilot/Codex reviews and complete finding disposition",
+    "Passing current CI, immediate premerge readiness and landed CI",
+    "After TF acceptance, PS carryback including Test-StyleGuideArtifacts.ps1 annotation and synchronized touched metadata, followed by raw accepted pair comparison"
+  ],
+  "limits": [
+    "This is bounded source and evidence review, not full PR acceptance or remote reviewer replacement.",
+    "No full gate/wrapper, Windows 5.1, Linux or hosted test was run by this reviewer.",
+    "Prior R5 full-suite/platform results retain original 7dd identities; new candidate acceptance is not inferred.",
+    "Scores are judgment weights rather than empirical certainty; no numeric score waives pending gates.",
+    "Root-owned subsequent staging is expected and not classified as source drift.",
+    "No future failing/cancelled CI exception inferred; hourly retry and original deadline/counters remain."
+  ],
+  "pair_implication": "R8 adds Test-StyleGuideArtifacts.ps1 to R5 prior five-path carryback list. Shared helper annotation and touched metadata must converge; no PS implementation before TF acceptance.",
+  "evidence_hashes": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\PREPARATION.md": "02e0164a5a762a84bf6c77cf0ac8e4cabd8e8b040d5ac400e32190bb3e33f33f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\evidence.json": "d9d126decbfc7e7f716832b57022d03599af978d36a94a12952ab0b35b0714cf",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\IMPLEMENTATION.md": "dacdc9b09a080d1087adaf627fab8dac07c6a6a3bcfc6aab7afd570fc6c2fd97",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\implementation-evidence.json": "196f9b14e739fda59e1fe161197ac3a78362699cd05d31bfeaf315965dd7aa0a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-probe.ps1": "a5c3f182f53221c94b5d31fa40bb3493e3d091d7c571447a3da5ac3e52e0279c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-result.json": "5bd9d84f50eb288fa1c91c1c4a690572b8dd6c3f6faf07625f846649a6fd7ff1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract.log": "57a545c94eaebb54fcaf434087f3076611bd2c4fcf1475fbc6a3eb33d54b1a4f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R5-final-binding.md": "3e04c17eb3c8bddcf036096cdc7dd0b7f3db26132890662d31b4b4778da3a9bd",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R5-final-binding.json": "82f34aa38d2c4a7ea9e4c3424b9c1a573db46268648e8329dec9aaced48f8a79",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R6-unknown-artifact.md": "aa95516addb7d932bb19aed20709095d08060149146d1ed64d8a2264707fe45c",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R7-node-path.md": "87309f9aa2adb12eb635144dadbcc95ed409b6711b47705079e1e0de70ab47a6",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R8-output-type.md": "cb801b016848530bf49314334e32f2eb45e2bbcdc977263234a1e51c06c67e96",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R9-workflow-duplication.md": "c6f45308308ead37bd7ad9bf2c4c8eb062903d3d951e70f0de3f5b8c738db0fb",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\root-verification.json": "17458644aa270903a64ed075166158ccf84649b34d512cd9085b24d2f36d2cb5"
+  },
+  "primary_sources": [
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_functions_outputtypeattribute?view=powershell-7.6",
+    "https://learn.microsoft.com/en-us/dotnet/api/system.io.file.exists?view=net-9.0",
+    "https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.start?view=net-9.0",
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations"
+  ]
+}
