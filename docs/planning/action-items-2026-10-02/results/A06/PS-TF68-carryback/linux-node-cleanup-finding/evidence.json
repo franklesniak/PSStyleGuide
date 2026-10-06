@@ -1,0 +1,604 @@
+{
+  "schema": "PS.NodeCleanupFinding.Proposal.v1",
+  "prepared_at_utc": "2026-10-06T19:23:25.034401+00:00",
+  "state": "PROPOSAL_ONLY_ROOT_SELECTION_REQUIRED",
+  "execution_authorized": false,
+  "selected_proposal": "H94.1",
+  "root_selected": false,
+  "finding": "Universal adopted-exit-zero predicate conflates negative-test assertion success with lifecycle observation for the full600 Node stage",
+  "product_defect_proved": false,
+  "historical_three_exit_causes": "Unknown; original argv/intermediate-parent/per-test causes not proved",
+  "old_packet": "failed_unchanged",
+  "old_cold_packet": "failed_unchanged",
+  "Node_assertions": {
+    "direct_exit": 0,
+    "TAP": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "duration_seconds": 204.03295867699998,
+    "command": [
+      "node",
+      "--test",
+      "--test-reporter=tap",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/NpmTools.test.mjs",
+      ".github/workflows/Check-NpmAudit.test.mjs",
+      ".github/workflows/Test-LocalValidation.test.mjs",
+      ".github/workflows/lint-markdown.test.mjs"
+    ],
+    "normal_passed_stage_receipt": false
+  },
+  "cleanup": {
+    "members_before": 82,
+    "all_state_Z": true,
+    "exact_waits": 82,
+    "zero_exit_waits": 79,
+    "exit128_waits": 2,
+    "SIGKILL_waits": 1,
+    "bad_waits": [
+      {
+        "identity": {
+          "pid": 2229,
+          "raw_stat": "2229 (sh) Z 1 645 645 0 -1 4227084 82 175 0 0 0 0 0 0 20 0 1 0 2040 0 0 18446744073709551615 0 0 0 0 0 0 0 4096 65538 1 0 0 17 6 0 0 0 0 0 0 0 0 0 0 0 0 32768\n",
+          "state": "Z",
+          "ppid": 1,
+          "group": 645,
+          "session": 645,
+          "start_ticks": 2040,
+          "observed_monotonic": 222.791371178,
+          "observed_utc": "2026-10-06T19:09:21.443412+00:00",
+          "comm": "sh\n",
+          "cmdline": "",
+          "exe": null,
+          "exe_identity": null,
+          "exe_unreadable": "FileNotFoundError"
+        },
+        "wait_pid": 2229,
+        "raw_status": 32768,
+        "exited": true,
+        "exit": 128,
+        "signaled": false,
+        "signal": null
+      },
+      {
+        "identity": {
+          "pid": 18141,
+          "raw_stat": "18141 (git) Z 1 645 645 0 -1 4227340 175 495 0 109 0 0 0 0 20 0 1 0 19007 0 0 18446744073709551615 0 0 0 0 0 0 0 0 20487 1 0 0 17 6 0 0 0 0 0 0 0 0 0 0 0 0 32768\n",
+          "state": "Z",
+          "ppid": 1,
+          "group": 645,
+          "session": 645,
+          "start_ticks": 19007,
+          "observed_monotonic": 222.793355382,
+          "observed_utc": "2026-10-06T19:09:21.445396+00:00",
+          "comm": "git\n",
+          "cmdline": "",
+          "exe": null,
+          "exe_identity": null,
+          "exe_unreadable": "FileNotFoundError"
+        },
+        "wait_pid": 18141,
+        "raw_status": 32768,
+        "exited": true,
+        "exit": 128,
+        "signaled": false,
+        "signal": null
+      },
+      {
+        "identity": {
+          "pid": 21565,
+          "raw_stat": "21565 (MainThread) Z 1 21530 21530 0 -1 4228364 4651 1567 0 0 1 0 0 0 20 0 1 0 22139 0 0 18446744073709551615 0 0 0 0 0 0 0 16781312 17922 1 0 0 17 5 0 0 0 0 0 0 0 0 0 0 0 0 9\n",
+          "state": "Z",
+          "ppid": 1,
+          "group": 21530,
+          "session": 21530,
+          "start_ticks": 22139,
+          "observed_monotonic": 222.793456078,
+          "observed_utc": "2026-10-06T19:09:21.445497+00:00",
+          "comm": "MainThread\n",
+          "cmdline": "",
+          "exe": null,
+          "exe_identity": null,
+          "exe_unreadable": "FileNotFoundError"
+        },
+        "wait_pid": 21565,
+        "raw_status": 9,
+        "exited": false,
+        "exit": null,
+        "signaled": true,
+        "signal": 9
+      }
+    ],
+    "observer_signals": [],
+    "members_after": [],
+    "collection_failure": null,
+    "wait_owner_PPIDs_match": true,
+    "each_member_one_PID_start_tick_wait": true,
+    "original_judgment": "failed",
+    "original_judgment_failure": "Unsuccessful adopted exit"
+  },
+  "ownership_scope": {
+    "owner_pid": 1,
+    "direct_Node_pid": 645,
+    "direct_Node_start_ticks": 1868,
+    "adopted_birth_ticks_min": 1878,
+    "adopted_birth_ticks_max": 22139,
+    "finished_monotonic": 222.806414953,
+    "clock_ticks_per_second": 100,
+    "one_async_direct_command_in_phase": true,
+    "setup_and_preflight_empty": true,
+    "per_test_original_birth_graph_proved": false,
+    "limit": "Adopted ancestry to isolated supervisor plus bounded command interval; not recovered former executable or test attribution"
+  },
+  "guards": {
+    "private_before_equals_terminal": true,
+    "host_before_equals_after": true,
+    "current78_source_equals_catalog": true,
+    "current1914_deps_equal_catalog": true,
+    "container_absent": true,
+    "terminal_empty": true,
+    "aggregate_started": false,
+    "ordinary_Node_after_file_present": false,
+    "read_only_Git_guard": {
+      "HEAD": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "index_rows_sha256": "3f88327bc2229cefc25e98962070c4697dfc6fa598322cc55bbe39ba75be8100",
+      "unstaged": ""
+    }
+  },
+  "source_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "source_catalog_sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+  "dependency_catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+  "rubric": {
+    "criteria": [
+      "Assertion semantics/failure boundary",
+      "Lifecycle safety/accountable ownership",
+      "Evidence sufficiency/honest reuse",
+      "Legitimate usability/bounded progress",
+      "Change/qualification risk",
+      "Scope/convergence fit"
+    ],
+    "weights": [
+      30,
+      25,
+      20,
+      15,
+      7,
+      3
+    ],
+    "scale": "0 absent/contradictory;5 conditional/incomplete;10 strong supported fit",
+    "formula": "sum(weight*score/10)",
+    "hard_constraints": "No negative-test omission, blanket/PID/name/value allowance, unknown/live/missing/ambiguous ownership, observer signals/cleanup errors/drift; strict other stages retained; failed history unchanged"
+  },
+  "all_options_scores": [
+    {
+      "id": "A",
+      "option": "Keep rule; defer",
+      "scores": [
+        4,
+        10,
+        5,
+        2,
+        10,
+        10
+      ],
+      "weighted_total": 60.0,
+      "constraint_or_limit": "Admissible hold; no resolution"
+    },
+    {
+      "id": "B",
+      "option": "Repeat unchanged full packet",
+      "scores": [
+        4,
+        10,
+        4,
+        3,
+        8,
+        9
+      ],
+      "weighted_total": 57.8,
+      "constraint_or_limit": "No semantic/cause repair"
+    },
+    {
+      "id": "C",
+      "option": "Node result only; omit observer",
+      "scores": [
+        3,
+        1,
+        3,
+        10,
+        8,
+        8
+      ],
+      "weighted_total": 40.5,
+      "constraint_or_limit": "Rejected: loses lifecycle safety"
+    },
+    {
+      "id": "D",
+      "option": "Disable maintenance or negative tests",
+      "scores": [
+        2,
+        2,
+        2,
+        7,
+        3,
+        2
+      ],
+      "weighted_total": 28.2,
+      "constraint_or_limit": "Rejected: changes behavior/safety coverage"
+    },
+    {
+      "id": "E",
+      "option": "PID/name/status allowance",
+      "scores": [
+        3,
+        4,
+        4,
+        8,
+        4,
+        7
+      ],
+      "weighted_total": 43.9,
+      "constraint_or_limit": "Rejected: no owner/cause proof"
+    },
+    {
+      "id": "F",
+      "option": "Product fixture descendant ownership",
+      "scores": [
+        7,
+        10,
+        6,
+        3,
+        3,
+        2
+      ],
+      "weighted_total": 65.2,
+      "constraint_or_limit": "Conditional: no product defect proved"
+    },
+    {
+      "id": "G",
+      "option": "Init/reaper discards outcomes",
+      "scores": [
+        4,
+        3,
+        3,
+        7,
+        5,
+        6
+      ],
+      "weighted_total": 41.3,
+      "constraint_or_limit": "Rejected without truthful receipts"
+    },
+    {
+      "id": "H",
+      "option": "Node-specific assertion owner + lifecycle observer + reuse/missing aggregate",
+      "scores": [
+        10,
+        9,
+        9,
+        10,
+        8,
+        10
+      ],
+      "weighted_total": 94.1,
+      "constraint_or_limit": "Selected proposal; new judgment needs qualification"
+    },
+    {
+      "id": "I",
+      "option": "Full Node native attribution first",
+      "scores": [
+        7,
+        10,
+        10,
+        6,
+        6,
+        7
+      ],
+      "weighted_total": 81.3,
+      "constraint_or_limit": "Valid diagnostic; availability/permission unknown"
+    },
+    {
+      "id": "J",
+      "option": "H plus full native attribution",
+      "scores": [
+        10,
+        10,
+        10,
+        6,
+        7,
+        8
+      ],
+      "weighted_total": 91.3,
+      "constraint_or_limit": "Valid; extra rerun/qualification"
+    },
+    {
+      "id": "K",
+      "option": "H plus forced-stop smoke",
+      "scores": [
+        10,
+        9,
+        9,
+        8,
+        8,
+        9
+      ],
+      "weighted_total": 90.8,
+      "constraint_or_limit": "Valid; cannot explain old128 exits"
+    },
+    {
+      "id": "L",
+      "option": "Serial per-file diagnostics",
+      "scores": [
+        8,
+        10,
+        8,
+        4,
+        6,
+        5
+      ],
+      "weighted_total": 76.7,
+      "constraint_or_limit": "Valid fallback; changes concurrency/argv"
+    },
+    {
+      "id": "M",
+      "option": "Missing aggregate only; finding open",
+      "scores": [
+        6,
+        10,
+        7,
+        9,
+        9,
+        10
+      ],
+      "weighted_total": 79.8,
+      "constraint_or_limit": "Valid partial proof, not resolution"
+    },
+    {
+      "id": "N",
+      "option": "Terminal status acceptance in all stages",
+      "scores": [
+        4,
+        7,
+        5,
+        9,
+        7,
+        8
+      ],
+      "weighted_total": 60.3,
+      "constraint_or_limit": "Rejected: loses strict non-test default"
+    }
+  ],
+  "selected_scope": "Node-only semantic judgment; unchanged collector; new bounded pure qualification; reuse completed assertions/guards; missing strict11-hook aggregate independently root-owned",
+  "required_new_controls": [
+    "DirectNode failure",
+    "Missing or mismatched TAP",
+    "Failed/cancelled/skipped/todo counts",
+    "Malformed raw/decoded terminal status",
+    "Foreign wait owner",
+    "Missing or duplicate identity",
+    "Live-before/eventually-empty",
+    "Observer-issued signals",
+    "Collection error",
+    "Residue",
+    "Owned nonzero/signaled observations only for successful Node stage",
+    "Unchanged strict default rejects same nonzero/signaled receipts"
+  ],
+  "unchanged_control_reuse": {
+    "real": 4,
+    "pure_strict": 10,
+    "collector_and_strict_filter_byte_identical": true
+  },
+  "attribution_diagnostic": "Conditional only if ownership/scope insufficient, assertion/lifecycle failures appear or product defect alleged; then revise same decision before one bounded Node-only current native trace if offline-qualified. No install/privilege expansion or retrospective old-PID attribution.",
+  "primary_sources": [
+    {
+      "url": "https://nodejs.org/download/release/v24.18.1/docs/api/test.html",
+      "scope": "Exact-version assertion/test-process owner semantics"
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man2/waitpid.2.html",
+      "scope": "Wait/reap/normal versus signal, not cause"
+    },
+    {
+      "url": "https://strace.io/",
+      "scope": "Optional tracer capability, not pinned availability"
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man1/strace.1.html",
+      "scope": "Project-linked tracing manual"
+    }
+  ],
+  "bound_artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "d8c28ce50204942f8f2f66edcda126b656b2594e3110fc8f75f8c1842a317c10",
+      "bytes": 11167
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\manifest.authorized.json",
+      "sha256": "8795485a2a5767d50bc09f46fc0fdf888197f7adc735a9c6b566f7d8fc59c0af",
+      "bytes": 4353
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\inside.py",
+      "sha256": "fab36fc8daf64a1c57580c571705e0f681d8c2388707b9d7fb4692f7e5c71516",
+      "bytes": 18929
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\launch.py",
+      "sha256": "eb901f4dc633a53e766f1f6d0b851817ae6e9089378414493dd144396320df75",
+      "bytes": 12395
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\common.py",
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\status.json",
+      "sha256": "f1a675c932f2ce65311aa4a6d1f3da9b0dee161f4d44564082b8040d0ce3ea7a",
+      "bytes": 96570
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\inputs\\source-before.json",
+      "sha256": "509a713fc3f03714b94c57bf235c847db2b126d1d3ee92b96690534a52764f6d",
+      "bytes": 401646
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\result.json",
+      "sha256": "dfd051d69ad125801940b5004f40ce055bf1239340391f0eb33304f81cf94ecc",
+      "bytes": 138837
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node-cleanup.json",
+      "sha256": "ff586828dba87887f914dbb3435931a8f8ac7c6efc41fcdfdf138a3ee92fb196",
+      "bytes": 106481
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node.log",
+      "sha256": "ad39e4118754675075c14b90d9ee1b321ca9be91238dbdcf3080ab66a9070922",
+      "bytes": 122644
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "bytes": 194
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\before.json",
+      "sha256": "6645ec02888241d2799fba4e1b2260d23ee942f45b889385d5d27f916487766d",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\terminal-after.json",
+      "sha256": "6645ec02888241d2799fba4e1b2260d23ee942f45b889385d5d27f916487766d",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\host-source-after.json",
+      "sha256": "509a713fc3f03714b94c57bf235c847db2b126d1d3ee92b96690534a52764f6d",
+      "bytes": 401646
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\setup-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\staged-preflight-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\terminal-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "bytes": 18558
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "bytes": 400393
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\NpmTools.mjs",
+      "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "bytes": 7656
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.test.mjs",
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "bytes": 26191
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Validate-WorkflowPolicy.test.mjs",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "bytes": 17625
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-CiHelpers.test.mjs",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "bytes": 130003
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\NpmTools.test.mjs",
+      "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "bytes": 13810
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Check-NpmAudit.test.mjs",
+      "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "bytes": 42149
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-LocalValidation.test.mjs",
+      "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "bytes": 4039
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\lint-markdown.test.mjs",
+      "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "bytes": 26625
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f",
+      "bytes": 9020
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\RECEIPT-POLICY-CHECKS.json",
+      "sha256": "4d0b3d5724f46dd3435b11f5887620080a64f707c46cd7e7ddc48639dcce563a",
+      "bytes": 1842
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "c02b8b68f7cf900cbe1f621ab425a257dba42ce05b3faa8516498f59fb14db76",
+      "bytes": 21951
+    }
+  ],
+  "report_sha256": "34679c2e49d09aca3453335603e0cac2ed2cfd52ac306480024031838cd5b26e",
+  "actions": {
+    "tests": 0,
+    "containers": 0,
+    "launchers": 0,
+    "payload_imports": 0,
+    "product_runner_Git_dependency_native_planning_state_writes": 0,
+    "descendants": 0,
+    "outputs": [
+      "REPORT.md",
+      "evidence.json"
+    ]
+  },
+  "current_transfers_unchanged": [
+    2,
+    4,
+    6,
+    6
+  ]
+}

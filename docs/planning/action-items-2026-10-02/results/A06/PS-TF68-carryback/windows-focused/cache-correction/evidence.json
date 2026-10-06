@@ -1,0 +1,1487 @@
+{
+  "schema": "PS-TF68-private-cache-correction-1",
+  "prepared_utc": "2026-10-06T19:16:33.7025032Z",
+  "state": "proposal-only-no-runner-edit-no-execution",
+  "classification": "Scratch environment defect; DECISION-PROCESS.md step 1 materiality short-note rule",
+  "source_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "staged_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "first_run": {
+    "state": "failed",
+    "primary_failure": {
+      "message": "Stage left private temporary data: runtime-qualification",
+      "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\runner.py\", line 169, in <module>\n    if list(TMP.iterdir()):raise RuntimeError('Stage left private temporary data: '+label)\n                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Stage left private temporary data: runtime-qualification\n"
+    },
+    "cleanup_failures": [
+      {
+        "guard": "owned-temp",
+        "error": "Fixture cleanup residue retained for diagnosis."
+      }
+    ],
+    "git_guard_equal": true,
+    "stages": [
+      {
+        "name": "fixture-init",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+          "-I",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\fixture-init.py",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "started_utc": "2026-10-06T14:09:56.628572-05:00",
+        "timeout_seconds": 180,
+        "exit": 0,
+        "state": "passed",
+        "cleanup": [],
+        "worker_pid": 64800,
+        "wrapper_exit": 0,
+        "job_before_cleanup": {
+          "total": 19,
+          "active": 0,
+          "terminated": 0
+        },
+        "job_after_cleanup": {
+          "total": 19,
+          "active": 0,
+          "terminated": 0
+        },
+        "finished_utc": "2026-10-06T14:09:57.649313-05:00",
+        "log_sha256": "39f77f4a30bf44201bdffa2f73246927dfe8f7c855f2bbd865fc41b7a4ad1f4c"
+      },
+      {
+        "name": "runtime-qualification",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\qualify.ps1",
+          "-PacketRoot",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused",
+          "-OutputPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\output\\runtime-identity.json"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "started_utc": "2026-10-06T14:10:01.129124-05:00",
+        "timeout_seconds": 60,
+        "exit": 0,
+        "state": "passed",
+        "cleanup": [],
+        "worker_pid": 59840,
+        "wrapper_exit": 0,
+        "job_before_cleanup": {
+          "total": 10,
+          "active": 0,
+          "terminated": 0
+        },
+        "job_after_cleanup": {
+          "total": 10,
+          "active": 0,
+          "terminated": 0
+        },
+        "finished_utc": "2026-10-06T14:10:10.866283-05:00",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "product_groups_executed": 0,
+    "preserved_files": [
+      {
+        "path": "runner.py",
+        "bytes": 14951,
+        "sha256": "3ada5b1943cd0d8bbc755ffd11ad60ae2f219b4a032f7b8678460942beb20ed0",
+        "attributes": 32
+      },
+      {
+        "path": "manifest.json",
+        "bytes": 47823,
+        "sha256": "ad890893b6f9d127eb30700827a7450849248db14bdba9d050bacee956b75f5c",
+        "attributes": 32
+      },
+      {
+        "path": "fixture-init.py",
+        "bytes": 972,
+        "sha256": "cc122f0a217c60aac862d09b8e66b3a9b1750dc0d658fe55aa9d447591aae6ea",
+        "attributes": 32
+      },
+      {
+        "path": "qualify.ps1",
+        "bytes": 1486,
+        "sha256": "d9b908f058fcf82cfa041ca4201d5e23d0d6cde309ec2d9bc8d33c3071fb8d08",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/owner.json",
+        "bytes": 176,
+        "sha256": "38c5f7344ae4300f08dffc712b7dd02199299be1805f97ef4cfb459d48224a06",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/result.json",
+        "bytes": 3836,
+        "sha256": "409d34c2bc5b39d9b7dca445b3fd5659f1a1f83cd2f73a50790c01c64bb1a01e",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/product-before.json",
+        "bytes": 610,
+        "sha256": "4bb18b170b7855c330b699df6d89680cbef82f517fc640984e0aa3ec83585106",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/product-after.json",
+        "bytes": 610,
+        "sha256": "4bb18b170b7855c330b699df6d89680cbef82f517fc640984e0aa3ec83585106",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/runtime-identity.json",
+        "bytes": 783,
+        "sha256": "6048ededc0546b992099b135bddfb4eb7ab18566fb2907940b04e2bad3165fad",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/fixture-init/result.json",
+        "bytes": 1032,
+        "sha256": "6f95a1271c5560044aa56b42442a7a96ba65a9ffafb1bcacfeae175a1aa4797c",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/fixture-init/native-result.json",
+        "bytes": 516,
+        "sha256": "c978aab2cd242d572df66a54b94c5c93a0af526e1a3f478c70e93ed6ccedd345",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/fixture-init/log.txt",
+        "bytes": 83,
+        "sha256": "39f77f4a30bf44201bdffa2f73246927dfe8f7c855f2bbd865fc41b7a4ad1f4c",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/runtime-qualification/result.json",
+        "bytes": 1262,
+        "sha256": "2aaaad43caf9b9fd06bf9e510be9e10d04d9dcf859fd2137d668a31198adf465",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/runtime-qualification/native-result.json",
+        "bytes": 738,
+        "sha256": "9dce06a3d910eb6a5a05203f32f9ca0951d85ea1503d19459d87b88fb75164f7",
+        "attributes": 32
+      },
+      {
+        "path": "run-one/output/runtime-qualification/log.txt",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "attributes": 32
+      }
+    ]
+  },
+  "cache": {
+    "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\tmp\\node-compile-cache",
+    "files": 70,
+    "bytes": 267224.0,
+    "directories": [
+      {
+        "path": "v24.18.1-x64-cf738c9d",
+        "attributes": 16
+      }
+    ],
+    "rows": [
+      {
+        "path": "v24.18.1-x64-cf738c9d/0336dc00",
+        "bytes": 1300,
+        "sha256": "f8b052f4874f4c126dc7eb2fc52b75aeed51f2ff802538bb65efbc10e4934cd1",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/073c7934",
+        "bytes": 1004,
+        "sha256": "054cef85bae284d97a0a5daa12c40c004e5401e24eca3582f8d0762762960df9",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/0960a029",
+        "bytes": 1468,
+        "sha256": "f5dfbe44ee5978545f783f8b941777594b6858dbfa731ee5e298cf096f626259",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/0a00020b",
+        "bytes": 3596,
+        "sha256": "fe1c7c58bb1e0c4b51e58c923d2d41879ccdcf8acc33d8cdd861c93cf2da1ef6",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/12b9c6fe",
+        "bytes": 3156,
+        "sha256": "f4b3914bf423f65aeea629dc47541d2d13c775de38a0738e02f144e0622fa4f6",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/14ce0dcc",
+        "bytes": 996,
+        "sha256": "7f905bce7939ac8938c6cc952fab0ac5e11881ad8a4237cf88ba41107e202ff0",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/1d396f13",
+        "bytes": 2044,
+        "sha256": "11d520d21815dc15565b653854dc2ca289c578fcdab094e392c74b5c161f817d",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/1f9ddffd",
+        "bytes": 1108,
+        "sha256": "31f6c0be23f93b44b0794ab0d7c15b6807ed160a33f9ba631142aa94ce5ca919",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/24e6af84",
+        "bytes": 86884,
+        "sha256": "b2e7685876e68ba3a05bd77097173e2a3ad860a364e1b17436a6c64a1fbc7f2b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/2717a4f8",
+        "bytes": 13108,
+        "sha256": "1aa0a1eb93aa574875a81608f259e890c92f5fa2ef22554ece3b3cd97eb11086",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/30211dcd",
+        "bytes": 2372,
+        "sha256": "58b690fd2bbcd983e9ba1882e6351917c335180cb157ab128a664c0452a6aa06",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/335530f4",
+        "bytes": 2268,
+        "sha256": "ddcf21f53145a852ed64739012aadbe8d4e37e175e52f40ccd248ef076d64a0d",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/34d6e8e9",
+        "bytes": 4876,
+        "sha256": "6ae04893060013af01e6bf16e66d1d0e973c4222534b490d0c67c0a94fbd7c53",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/388ae869",
+        "bytes": 1180,
+        "sha256": "099bdfbfccd8325bed7329c38767652a6f567db40060491e664bed6f8aba2c4b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/3bbf71a1",
+        "bytes": 8940,
+        "sha256": "9365c9aceffdf8e637aad772c7e006bf6b7068ac62a7bb2de4de254b4425ee37",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/43de3c8b",
+        "bytes": 2684,
+        "sha256": "e2020d5b57d66fc54fddd31218a34753bd201a113f7ffb3fa6963b9d720512be",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/4993004b",
+        "bytes": 1300,
+        "sha256": "665236f375644431640ee5a79201166f5553b5fd65afa53c0878e3203b0c9e19",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/4c95d405",
+        "bytes": 1068,
+        "sha256": "5c980df5576f6504d745016d49e688d425db6f68857e54496a3eedf1212c89ce",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/4cfb07a7",
+        "bytes": 3556,
+        "sha256": "f7d6da62c95326f3927d95c234c7391432e314713ac9241e94ce12e7c0175eb7",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/5b4d3235",
+        "bytes": 1068,
+        "sha256": "89678cb74a8fc56970bbc6e837cc71acb723e493406f5592f4b84d7e2e7cce6f",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/5dd6b06d",
+        "bytes": 1588,
+        "sha256": "2e928eb62a445a9ceb36b8f539faf09e52dc6bd48336c19a2ee7dbc1929524e6",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/65e0b21d",
+        "bytes": 1164,
+        "sha256": "8f185b6c80eb3e736b3cd861b2377fbab42e29cdb069d38533d535f7f3afa21b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/6b93b5dd",
+        "bytes": 2412,
+        "sha256": "f8a4e360d204f69a42bcc1157bed646d3e55f8229d949363d113f0e409c49b50",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/6dfb89f7",
+        "bytes": 1004,
+        "sha256": "2f7ff09f57591fe87097d13f60275b1e6bb75e3e0f1a003f6c57dcefd95c60e4",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/777c6271",
+        "bytes": 2572,
+        "sha256": "96aa018684b3382446366a2ea3ef175536fa9390b5a1d9043313061673efd853",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/79918fe6",
+        "bytes": 1012,
+        "sha256": "fc0b34d373ccd8a44a4d3d1a5df1caa7d894c4aef6724add8f23df06092a6b8c",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/81a74401",
+        "bytes": 4532,
+        "sha256": "651ff11cdc76572db1b89b6355f90360d73328d0182f919437f2282aee662bb9",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/824c0d67",
+        "bytes": 5796,
+        "sha256": "8194cd13dde0a52a227b0ffdf2d245da45881b38b3281d2b8f304e8e2c13c7ad",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/839751d3",
+        "bytes": 1028,
+        "sha256": "ed6f38101096dbc965c088e755fdd89b50b2706e53a23106f82d7d85099c0572",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/83e86053",
+        "bytes": 2388,
+        "sha256": "4ee3e0ce8a2f49f0717d5b1cbbd8da4694b305140635aa34e6d8c24cdb04588a",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/8fc630da",
+        "bytes": 964,
+        "sha256": "b30ff6fa75496b3eb64e1c10fc3dfc43c2a6b431712a790f7ac3a6c95cb4c31b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/90b929da",
+        "bytes": 2396,
+        "sha256": "e4b899a31fe241401e955847a78fa55fd0897b4376087f51b3972dd700b149b3",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/94209668",
+        "bytes": 1140,
+        "sha256": "14bd115a1e2e62d4bd89185c05d8a3c4abd11c3774b446f4fc352bc9d7089191",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/9520e975",
+        "bytes": 1372,
+        "sha256": "abdf7093554c797a2f3f9645c0a71c4efffe60f420887a8638c7677c868de97b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/9925fa19",
+        "bytes": 1188,
+        "sha256": "dcb3ad2cb26838337d0b2a21593276a1714133a0425ec50a3bf59a1967b1432a",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/9990d66c",
+        "bytes": 948,
+        "sha256": "6db2c1a9288266a9dd5ed60c2ea57f954b00bcf73471d5a25301e782cc8ae261",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/9c8cd7b4",
+        "bytes": 1468,
+        "sha256": "e328fd90c31c7fd07ec72ebe7c679fdab24725d57b5451e6efc5956adc6addf1",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/9f4ffa9a",
+        "bytes": 2468,
+        "sha256": "a6a8b794f61e1180cdff5d10b6a04c9e7ce6984f2408b80f2be31dd9393db90a",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a0e27a4c",
+        "bytes": 964,
+        "sha256": "5c39dd8690b1b53ce544b83381992b253c463fc8485e850ef66919660206a890",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a2656cb0",
+        "bytes": 1492,
+        "sha256": "b64a05b3ee9b1a07684d91773386c2a4d3a6077dc44e121c94bc35b0d29fdf00",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a3ab1b0b",
+        "bytes": 4484,
+        "sha256": "56a374cc41767d774829926c023ed91c0cf6d9853a7d49ee2eb5cb08dc2002fe",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a5b62ca0",
+        "bytes": 996,
+        "sha256": "cfdd22e2562099d4a11c30cf6f9dbf87265def81fe6b83c12beb1cbfe8d94ffa",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a7edefc8",
+        "bytes": 1028,
+        "sha256": "f28c9ee5c4376fba8c7f8b3bd62fec370d2ade5c97b48f07d43914410f01fcfa",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/a8b91714",
+        "bytes": 1012,
+        "sha256": "2783393619f29d4f9e8905a835346ff401bc38bdcc5d2e21a415b5d21150a193",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/af43c80f",
+        "bytes": 1036,
+        "sha256": "10d9e14c79ac4bab9a5b9ba5a1ef7478333d20b88cfb53790e4caa1ab57fa8cb",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/b6bac3b0",
+        "bytes": 1084,
+        "sha256": "2b3473a7682b3279d8da84c8956e345565d494fafd43ab124c7b2591010446be",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/c2a5a2d1",
+        "bytes": 1620,
+        "sha256": "5f7c4cf96cc0d39bea67b0211ff9a27bd5ae2764b0e43acf3d91aa8e673d0ce3",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/c44397a2",
+        "bytes": 1140,
+        "sha256": "d97fb420eb63e639f40157a631aacd2b71e7aeb4c084018ff40489d3209ace50",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/c80fa6c5",
+        "bytes": 1004,
+        "sha256": "4ef61ff7f5d8be3c90e1fe3909b94a35666027345751de4b280b43704f6bd4bc",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/c849d6e0",
+        "bytes": 1788,
+        "sha256": "b347c9bcc20e3dc049fb8dd4538ac15c9758e2c43e18c7e43944bb3a71c9ef0e",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/c97ccd84",
+        "bytes": 2676,
+        "sha256": "ac17bad4b268c04b9912c0933eb6902abe68a6d823d246f0dc9a39f8e971ade8",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/d2661db1",
+        "bytes": 996,
+        "sha256": "cd4f0c2d53db1f69ccbad68e9ae041e1c24e7668a7ba81f3049b0e76dbcccd67",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/d2cb92d3",
+        "bytes": 1156,
+        "sha256": "6fa11be6df47f65177e04701abac062198077dad5c1fff9890fc1b392715d865",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/d36f1ba1",
+        "bytes": 4740,
+        "sha256": "824e50806fb4fbb04316b73aa3997051030618327ebd08c4cdc0dd6d8c136721",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/db2fc081",
+        "bytes": 3700,
+        "sha256": "de7354317438df1514c5247a0329d4bdcd06f875303b13ed6e167c571248f9fa",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/dbcab758",
+        "bytes": 3852,
+        "sha256": "7f4251c68f2b9a4e90235b00e7d43a68c5c4002828bc6e97edd00bc4bf1e31fa",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/dbe938d6",
+        "bytes": 2068,
+        "sha256": "100d6b8aab299b5bc6ad53ec9c966277358763dc2580dd5956b522264546ace3",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/deb7ff4d",
+        "bytes": 8724,
+        "sha256": "d185db6b97f511098f4860b573506a6f3ee97c958ac5397442052cd5a43ff4ff",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/e00ea01c",
+        "bytes": 7516,
+        "sha256": "742f0a5c534dc1810dc6f4b5674294e261b80c494033a25b1dde6cff20c7873f",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/e13f1552",
+        "bytes": 1228,
+        "sha256": "8bcd0e0caea232e890baa9c6c7555210dcadd61acbc980cc7f4a544f3ab9d555",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/e6af5f12",
+        "bytes": 1204,
+        "sha256": "9c86efd7b3f9f8b8264401c12cff20d4c4c52e223868d16f3962b550f9e3f88b",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/e8a88ff2",
+        "bytes": 996,
+        "sha256": "db08c05f410d864da319c1527b587181559231094ce7cf332ab4b6e861e9b1f3",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/ed7d0016",
+        "bytes": 2356,
+        "sha256": "bd2383f92cccad186b4c6555a97a172907eb083241428cf5f19efc3f86a81c0f",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/ef3004ef",
+        "bytes": 1604,
+        "sha256": "5420b2093bd0b5f51e25b8a52479bd2fa84d456733af0d492cdc72eaac88a10a",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/f08ac9e6",
+        "bytes": 7252,
+        "sha256": "79650ed72d0d2e72c8472193fcf1f53b2c893bb3216805464edfdbaf51830481",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/f477baa0",
+        "bytes": 1500,
+        "sha256": "6e20571a55e4d62ba0a05657e2e0f04af8c53cb4841bdacc448bd26f228e285f",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/f75dc103",
+        "bytes": 3068,
+        "sha256": "fb468a19affa269e16bc4616005d4b04b1dff22c8d0d28131206bcbc5a896b1a",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/f8a0eae4",
+        "bytes": 10468,
+        "sha256": "6190594b27e630d5b9cfe1ae1c17585fb825acb0f0665c00b1c3d4ce3a1f458d",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/fc5d99bf",
+        "bytes": 1356,
+        "sha256": "763a08f91839fde7ed8995a41f486244a6ba87f43d1db7387d741b8db5840433",
+        "attributes": 32
+      },
+      {
+        "path": "v24.18.1-x64-cf738c9d/ffe283ac",
+        "bytes": 3700,
+        "sha256": "7ff68ff4a62188245122616352a07eadb6f58078c5c01f52eea43df23f11b088",
+        "attributes": 32
+      }
+    ],
+    "delete_or_move_performed": false
+  },
+  "bootstrap": {
+    "files": [
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "bytes": 56,
+        "sha256": "3ce7cba6f5128dd5f54c98b6a5036b0f850496878cc2e21044b675fe3c594e3e",
+        "attributes": 32
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\..\\lib\\cli.js",
+        "bytes": 419,
+        "sha256": "d97a2b1a2170d6094625956d6ad5ba5d5edfce26bc3787c51447c9737b6afc2d",
+        "attributes": 32
+      }
+    ],
+    "call_chain": "bin/npm-cli.js requires ../lib/cli.js; lib/cli.js lines 1-7 calls module.enableCompileCache() without a directory before loading the CLI entry",
+    "official_reference": "https://nodejs.org/download/release/v24.18.1/docs/api/module.html#module-compile-cache",
+    "behavior": "Without an explicit directory, NODE_COMPILE_CACHE overrides the default os.tmpdir()/node-compile-cache. The existing runner sets TEMP/TMP/TMPDIR and does not set NODE_COMPILE_CACHE."
+  },
+  "reuse": {
+    "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+    "catalog_checks": [
+      {
+        "kind": "source_catalog",
+        "catalog_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+        "catalog_sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+        "files": 78,
+        "fixture_mismatches": []
+      },
+      {
+        "kind": "dependency_catalog",
+        "catalog_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+        "catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+        "files": 1914,
+        "fixture_mismatches": []
+      }
+    ],
+    "private_git_files": [
+      {
+        "path": "COMMIT_EDITMSG",
+        "bytes": 28,
+        "sha256": "73bf6fb6ed0f6f9d4760e23f3d7380b864a742ef2df465be10899edaffd793ca",
+        "attributes": 32
+      },
+      {
+        "path": "config",
+        "bytes": 325,
+        "sha256": "a4fb57a817c7000ee7ed0280700e8f8252f3d39b336f7084f8a6b1d7410f9036",
+        "attributes": 32
+      },
+      {
+        "path": "description",
+        "bytes": 73,
+        "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee",
+        "attributes": 32
+      },
+      {
+        "path": "HEAD",
+        "bytes": 23,
+        "sha256": "f6f2b945f6c411b02ba3da9c7ace88dcf71b6af65ba2e0d89aa82900042b5a10",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/applypatch-msg.sample",
+        "bytes": 478,
+        "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/commit-msg.sample",
+        "bytes": 1972,
+        "sha256": "efc1401b0e99d1ff51494d154d98b46c1e99059bcd8bf9f73cecde19fd3eb23b",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/fsmonitor-watchman.sample",
+        "bytes": 4611,
+        "sha256": "9159720099ad5595b8e66645cbfd47763c1e920f46e0b50ae75e642bbec57ef0",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/post-update.sample",
+        "bytes": 189,
+        "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-applypatch.sample",
+        "bytes": 424,
+        "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-commit.sample",
+        "bytes": 1649,
+        "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-merge-commit.sample",
+        "bytes": 416,
+        "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-push.sample",
+        "bytes": 1374,
+        "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-rebase.sample",
+        "bytes": 4898,
+        "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/pre-receive.sample",
+        "bytes": 544,
+        "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/prepare-commit-msg.sample",
+        "bytes": 1492,
+        "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/push-to-checkout.sample",
+        "bytes": 2783,
+        "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/sendemail-validate.sample",
+        "bytes": 2308,
+        "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92",
+        "attributes": 32
+      },
+      {
+        "path": "hooks/update.sample",
+        "bytes": 3650,
+        "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106",
+        "attributes": 32
+      },
+      {
+        "path": "index",
+        "bytes": 8297,
+        "sha256": "a8ed3357f0e8137e943742d8a005bd5d666841db34f9a609aa7b0efc59da2157",
+        "attributes": 32
+      },
+      {
+        "path": "info/exclude",
+        "bytes": 240,
+        "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1",
+        "attributes": 32
+      },
+      {
+        "path": "logs/HEAD",
+        "bytes": 187,
+        "sha256": "ca78cc3b12982ea88be59e2e65bec9ce649882f04eeb4542130d1807391752bc",
+        "attributes": 32
+      },
+      {
+        "path": "logs/refs/heads/master",
+        "bytes": 187,
+        "sha256": "ca78cc3b12982ea88be59e2e65bec9ce649882f04eeb4542130d1807391752bc",
+        "attributes": 32
+      },
+      {
+        "path": "objects/00/9f29663399b9f9c0b669a214859a3b52dbb5a6",
+        "bytes": 147923,
+        "sha256": "ef56f4a691a6ea1f505535b219dbb93814e979f2830c91ccec9280ebcf51dc33",
+        "attributes": 33
+      },
+      {
+        "path": "objects/03/86f596033b6871f01bb4c7c8f471b1087476bd",
+        "bytes": 5444,
+        "sha256": "89c5326ad3de616461aca9e258337a3ca254fb129ca42e2c29abfafa7120c70f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/04/21d27aaf9d0facb15b5aa2a214d0757c768358",
+        "bytes": 431,
+        "sha256": "1ae1a667e98c91a36666eb5dbc8b39a1ad2be820167b22022417f455082dbbcc",
+        "attributes": 33
+      },
+      {
+        "path": "objects/06/8c7139a9e6a9276073211f48eca88464204362",
+        "bytes": 4106,
+        "sha256": "22fe825d105e14146aae271dfdd29a1805f6b2329e2f2e9201c2c4d2edbf41a4",
+        "attributes": 33
+      },
+      {
+        "path": "objects/07/802c6462b847fad0c4f511ac79e32cbdf38081",
+        "bytes": 59,
+        "sha256": "2cd9d084fb0450e8a901551b825423e17246b81694a11f40b854c76124ec7889",
+        "attributes": 33
+      },
+      {
+        "path": "objects/08/942d7df2fa607941ebb901e0477f1088175326",
+        "bytes": 1271,
+        "sha256": "df75e465cb72970911199345cba0dce3705b54f20b02536d4877ad03bd72114a",
+        "attributes": 33
+      },
+      {
+        "path": "objects/0b/0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+        "bytes": 18765,
+        "sha256": "b86e06235da47830c3f8360ba8f8e9224e739a1da2d5c78c7b910b4cb3ee127f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/0d/bd77c1fe581bc1b32aa97e4dfb6c5119192560",
+        "bytes": 2130,
+        "sha256": "7d8c63ca37aab90b669e9d8efc51f2e143172a944c9de1fe4f8d999ac8b11e21",
+        "attributes": 33
+      },
+      {
+        "path": "objects/0d/fff820ae8a7243a163d8e81924ba3788884753",
+        "bytes": 11764,
+        "sha256": "7732312831a65f3849afd3a81e21a2f7ad77435284b6cdf0ac71bf897b400261",
+        "attributes": 33
+      },
+      {
+        "path": "objects/0e/b1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "bytes": 37630,
+        "sha256": "22da12b5353e7d51880adc4c93967c04ba0ed130d66bdd2ddc03291a140c54b3",
+        "attributes": 33
+      },
+      {
+        "path": "objects/14/09f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "bytes": 2961,
+        "sha256": "6c4ca19e320061710d72643fca6213d7c04ebb1c3b54e2f47d4c6e58ee4e9e32",
+        "attributes": 33
+      },
+      {
+        "path": "objects/16/6d137206aff8f503911be9a569efbd204e023b",
+        "bytes": 7202,
+        "sha256": "e95c240b03e7ff1f0cd2630c1b987d2083ae71a112376aef8e59a4bf52123d0c",
+        "attributes": 33
+      },
+      {
+        "path": "objects/19/240ed44a8811d0a98bb0c67e4a732b5a749f58",
+        "bytes": 41408,
+        "sha256": "d24b676ffa48808492bf51dbd7e05e1b5cf32ea9b944e06ad8284063fc098006",
+        "attributes": 33
+      },
+      {
+        "path": "objects/1b/38ba7a9c6e441fb62b276795a951831c709dc9",
+        "bytes": 12376,
+        "sha256": "28c52b188d4088e2313401390cea305df0cc00b82c723e62125f0f4f8118f808",
+        "attributes": 33
+      },
+      {
+        "path": "objects/1d/06987410afac4fdf845d5d976dd9e984639156",
+        "bytes": 520,
+        "sha256": "2127e06084960c6dbe9b9678ac5c111900cb4f61587723d1ee368240143abb32",
+        "attributes": 33
+      },
+      {
+        "path": "objects/21/bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "bytes": 53662,
+        "sha256": "bb83b2888226a4d464ab599d9e56f9dd6cb005daa55a83d9e19c032de77e487d",
+        "attributes": 33
+      },
+      {
+        "path": "objects/22/4f6fba1aa90174dad8eec57dc6012697d8be33",
+        "bytes": 2091,
+        "sha256": "177225d1330d27a2ba450ec7951792df2ab36c878f8eed64ef36dc1ff89c3677",
+        "attributes": 33
+      },
+      {
+        "path": "objects/22/9ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "bytes": 3817,
+        "sha256": "bbf07488023ae8fbb5fed5d732a3287a53ba6753ffb0679da1152217552d4306",
+        "attributes": 33
+      },
+      {
+        "path": "objects/24/f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "bytes": 2069,
+        "sha256": "3df4f027641debf60987f00cb101cb6ea80dad54511b2594abdf6941c7ff6906",
+        "attributes": 33
+      },
+      {
+        "path": "objects/2e/714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "bytes": 242,
+        "sha256": "a72b0ef3c27a06192e39692b8d4295eb009e375ed920a2e0b8625879953c9c01",
+        "attributes": 33
+      },
+      {
+        "path": "objects/32/84f63d128288ce511391b693b1ba350b918f2c",
+        "bytes": 6346,
+        "sha256": "905f13afea53420d794c67cde29be9e9112407a376fc86fe37246fd8aeabb2ce",
+        "attributes": 33
+      },
+      {
+        "path": "objects/35/85d8534ff6b2820debe306c540f6c9cea187c2",
+        "bytes": 11971,
+        "sha256": "1ad23382cf5261c0477d7818cd42534ab0fa84b760bacbd281f3932b8aa0d955",
+        "attributes": 33
+      },
+      {
+        "path": "objects/38/1310a48f8b7f0c3482d5554c42b797cd685ed6",
+        "bytes": 529,
+        "sha256": "d906465f84350f8dca05c382a4d2fd6bedd96ee71430445c8b771b45e4371b0e",
+        "attributes": 33
+      },
+      {
+        "path": "objects/3f/4bb6c982b584aed1535e9ef04dd918f9069055",
+        "bytes": 5767,
+        "sha256": "c245e9c5e1988eca0fdaec42399edfea2b180bb85cc174f8a2d8ab0f3d70f89e",
+        "attributes": 33
+      },
+      {
+        "path": "objects/40/866784c2819516c3d41f0f7736d812d25e63f3",
+        "bytes": 50,
+        "sha256": "33a1026c7f0c77b6fe017bb18b3a4c4476fcf86025f54fa770250207073cc5d6",
+        "attributes": 33
+      },
+      {
+        "path": "objects/42/a14c3e115ae8c1ad939f26c09bc4965c4879bd",
+        "bytes": 58,
+        "sha256": "e0cd8aaa5a7d4fdcfb641acd1ca7bb5974a77d48d541908d041447d6a4dc7a4d",
+        "attributes": 33
+      },
+      {
+        "path": "objects/43/e08f56376b1b67b8e797b06649ab04fce12aed",
+        "bytes": 67554,
+        "sha256": "be912f789623f65413b3bb1ffaf33e5f5aae7ceace6dc9c3c28524d294178c00",
+        "attributes": 33
+      },
+      {
+        "path": "objects/49/4c6804f05c7ff54364e139004eeb67d8d879cd",
+        "bytes": 1447,
+        "sha256": "8ea7fee1a3b9a6477b429ab423539167fdda9d286aedad1052473ff8be45867f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/4c/bc97e2ce8822821ef3c14687f8d69787b939e7",
+        "bytes": 1058,
+        "sha256": "a34121baf754bf0011dcd23c45cc79add9c47fe4901b31cf4bd4a3818271dd28",
+        "attributes": 33
+      },
+      {
+        "path": "objects/53/d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 802,
+        "sha256": "72d1e8db1531b5994c8929f6847f3e961ef76db1fdf68f38b430803fa4903349",
+        "attributes": 33
+      },
+      {
+        "path": "objects/55/6538c7664327652bc42875b63a5bf6bc16783f",
+        "bytes": 53707,
+        "sha256": "995a7264ff914ff9b7c20f6498d249bb245442ebb2a620691fbc6abc23a00a00",
+        "attributes": 33
+      },
+      {
+        "path": "objects/59/054973e607c793e821f0ba21fc32143a716b43",
+        "bytes": 1510,
+        "sha256": "ae84b8a1f5ebdba686c1600c4c2f03a1016be0bc14ad63ab40df563aa9f0fa2a",
+        "attributes": 33
+      },
+      {
+        "path": "objects/5d/5f4ff4786321115438f0dbf84dee4777345b29",
+        "bytes": 111,
+        "sha256": "819be6af006960a20ae335979978dfca3b095c3a7281fd406d605cae0dc53c5a",
+        "attributes": 33
+      },
+      {
+        "path": "objects/5e/eadb1e9d9e2ddb77c9c7904861a2a19659e08c",
+        "bytes": 33106,
+        "sha256": "52440dfa1c1f284f707108af08bc6b4dbfd39eee95fdeca93728a5ca07f321d7",
+        "attributes": 33
+      },
+      {
+        "path": "objects/63/13b56c57848efce05faa7aa7e901ccfc2886ea",
+        "bytes": 35,
+        "sha256": "9ee05d31259d832aa9ccc78a30f4989fb494ca991681c108c7faf4b7dd74bb43",
+        "attributes": 33
+      },
+      {
+        "path": "objects/63/ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "bytes": 3046,
+        "sha256": "ff697ee36bc533e4f71e03e96c3aa0bd5fb0a5788571ead1e5d08c965c32e694",
+        "attributes": 33
+      },
+      {
+        "path": "objects/67/e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "bytes": 109551,
+        "sha256": "47231b934e8ca0b00fe2d1a4ef8c6c67b8487d224b9e85ee8a9eef4a676fc84f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/6a/12568776f6473472193bc98638f1856a7c9dec",
+        "bytes": 356,
+        "sha256": "d26c01301f569302f06301f4757f2b831963e35b5663aa7e15c2efbbf79c5f30",
+        "attributes": 33
+      },
+      {
+        "path": "objects/6c/ba9f91d15c47f3ce8b887ff12429231d22e833",
+        "bytes": 227,
+        "sha256": "58da3026db71bbbdc1cccc2f9707878adf3b8f8d6b8711e8fdbda2926ecc44c9",
+        "attributes": 33
+      },
+      {
+        "path": "objects/6d/53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+        "bytes": 4855,
+        "sha256": "9e3997b6e3454c235fc28985881a1dafbcfcaaba5cce7bbca31a841b642ebbe2",
+        "attributes": 33
+      },
+      {
+        "path": "objects/73/1c3bde3ba87efa684eef380e0d99b9297d091c",
+        "bytes": 3523,
+        "sha256": "c969c414e5b2d1ae85e363b42aa577f56ed06b251f67157c827d38a64d3bebdc",
+        "attributes": 33
+      },
+      {
+        "path": "objects/74/0a7749945acbf53e9981241ea553dc1431d3c8",
+        "bytes": 96,
+        "sha256": "0937058775bf523e416562c1e7ac62219e34433d1a7e03c0045a6eaad6b65456",
+        "attributes": 33
+      },
+      {
+        "path": "objects/76/3aaac2000166b570e39a0c3d8847aa231b294d",
+        "bytes": 1123,
+        "sha256": "bbd809b5771f5f5c37d7e3ac9ab36adff1d15d937444d7b5fa3a5b6e9c125b74",
+        "attributes": 33
+      },
+      {
+        "path": "objects/76/cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 65230,
+        "sha256": "e141b383b800cb1cf086d83960d57764eb1ebef76b099831e8e5ec5eeae298a9",
+        "attributes": 33
+      },
+      {
+        "path": "objects/79/65b2476cf022e6efea355d438162937bef04b3",
+        "bytes": 1593,
+        "sha256": "cf68474a915d1828338038f566d0ed0a3503310ccc5572c9cec2d28baed97f9f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/7a/4b71e6984af8f6558833ef3482f9342995b1a1",
+        "bytes": 145,
+        "sha256": "29d1d7f89ca2921a24c1b9103a53784a9b988ba5204b3688678a6fcd8b741487",
+        "attributes": 33
+      },
+      {
+        "path": "objects/7a/4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+        "bytes": 472,
+        "sha256": "76e90b42b2d5a7ecd75675dd93972f6bbaede421903c22892b812bce14242665",
+        "attributes": 33
+      },
+      {
+        "path": "objects/83/31d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "bytes": 803,
+        "sha256": "c76e02a01ff56526f25d06b6b835454919bbcda2a3aeac833642bdd6d709d011",
+        "attributes": 33
+      },
+      {
+        "path": "objects/85/905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 1358,
+        "sha256": "8cacddfeac3c0f266de9a9609ef78c0f03a70089f03489ca148c353dcb2024c8",
+        "attributes": 33
+      },
+      {
+        "path": "objects/89/eb76dba2ac64bf811cf4272b033a30de241d80",
+        "bytes": 171,
+        "sha256": "c73c48474943485e7b424c558da9b5c531f048ea8f6deae9fb9b8098323ff5c8",
+        "attributes": 33
+      },
+      {
+        "path": "objects/8a/14b8c284dc6b136836840e8641f497ba8d15d6",
+        "bytes": 2962,
+        "sha256": "3e3438407897e130af041c885262e99f6bc40e440e857df80e4f4541f2ade6f4",
+        "attributes": 33
+      },
+      {
+        "path": "objects/8a/23d9f6cd004bf8853fbab13ac1f7d8873d3d28",
+        "bytes": 94,
+        "sha256": "a69e64d36bfc64e696d161ce1fc74043da17dbefd6b77d9c7ac51cb18f057efd",
+        "attributes": 33
+      },
+      {
+        "path": "objects/8f/361e184eef8b292370d1d6e5b00425ab8226c2",
+        "bytes": 1861,
+        "sha256": "77f3cdcf39671fd314526a585ce545e589370c6bc32a31429d233931d920c6e6",
+        "attributes": 33
+      },
+      {
+        "path": "objects/92/6072a0cff995e10b22fb605642707b7b406101",
+        "bytes": 56,
+        "sha256": "435f18ceb0e000cf756cd2006cd6c56bbd5f7836f029369f9303afae207d118f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/92/6d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 206,
+        "sha256": "645dba32be27459cf441c9ab2c67d5b1525c796275b1f90accd55bd0e529ff18",
+        "attributes": 33
+      },
+      {
+        "path": "objects/95/5376a63be4ec2f85bb03593bacc703e163961d",
+        "bytes": 55,
+        "sha256": "c24d32ad49da1e390437efe9e1debb28c6c5bd14721738cc65f7f80c894614a8",
+        "attributes": 33
+      },
+      {
+        "path": "objects/9e/52d7482e5105f8c661b1005ba0c76a8e2a939d",
+        "bytes": 23279,
+        "sha256": "c019ba3cd8509442160ba1664d3e92108ae1d8290c289ecefb5c2ddffca157bf",
+        "attributes": 33
+      },
+      {
+        "path": "objects/9f/3a8f0db46457cbfc47f55bb6e298c3687d8e69",
+        "bytes": 199,
+        "sha256": "d830674ea28da79cc63e4a74b4cfbfc56e8ec77fa3bf0cf51ca5567f67885936",
+        "attributes": 33
+      },
+      {
+        "path": "objects/a1/0d44f6d61c9126d8aa8f4445926579eafbb67b",
+        "bytes": 13772,
+        "sha256": "0c8e90617ac840bf9c2a566fecc0a8d60fc23076b02ec47b1abc979390afc2c9",
+        "attributes": 33
+      },
+      {
+        "path": "objects/a7/16a1f8ff7e4f385e089b0f056adbcde9c973cb",
+        "bytes": 841,
+        "sha256": "79e560d9274a3c18013890a8a55d0bc1e9326744304a749148f32ddef8f373a4",
+        "attributes": 33
+      },
+      {
+        "path": "objects/a9/9303ac9e828eb1719fd669d969da31ab79c9e2",
+        "bytes": 8714,
+        "sha256": "bda0959136866035bf5f97b1d45348fef89b1a5172d474584ca3ebbbd4f3ebce",
+        "attributes": 33
+      },
+      {
+        "path": "objects/ad/e80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 2290,
+        "sha256": "bebade402785cf9311e15978120f3b7f4a29939952cbf495dda97cb37bee1095",
+        "attributes": 33
+      },
+      {
+        "path": "objects/af/b5ba370810e36a9c1ba103aa8e5691a3131581",
+        "bytes": 53627,
+        "sha256": "3aa4fb84d11430300ee296898ee85095d7a9bb8edd9402dd71e9321ae4a3d96e",
+        "attributes": 33
+      },
+      {
+        "path": "objects/b5/aac17ff77c7ce0f773ffd7534ec28749216fd0",
+        "bytes": 39,
+        "sha256": "ad4f16b871ff1c0a3db85fe09d5cdc3ffdf5a44bc951731b1575f6b68136f684",
+        "attributes": 33
+      },
+      {
+        "path": "objects/b6/8aa229ae32dae8ad62886e93e161f887f67a26",
+        "bytes": 11152,
+        "sha256": "f54b25d25a196cc2b2497e946e66429e4cbd39284d58768c09c1781f4eabc4e9",
+        "attributes": 33
+      },
+      {
+        "path": "objects/b7/11cec80333e409cb4e644eb94530653ca39109",
+        "bytes": 53689,
+        "sha256": "d87a5f3b1f07c78be5309237f3c4fb9c113a76bcbac4c5a60844fb22f31a45f3",
+        "attributes": 33
+      },
+      {
+        "path": "objects/bb/ccb6f224a56a77909ddd133b79adaea68564e1",
+        "bytes": 53,
+        "sha256": "7172b9d6358e3ca379abbae10cb53dec825efbd3f319666336b92998c2144c24",
+        "attributes": 33
+      },
+      {
+        "path": "objects/bd/358653a6366f9108d6f748ab1f4b02525f9c12",
+        "bytes": 8654,
+        "sha256": "79d59334cde4098ceed2db05f0bda4a159142be80e2d7e4cbf10738886d7abf3",
+        "attributes": 33
+      },
+      {
+        "path": "objects/bf/ad820fa092e7ff743e9ea90e782f61336df0d1",
+        "bytes": 10277,
+        "sha256": "82902809a1be86beea0fef12a439aa8a5e336f71fc18d67746406350a8216611",
+        "attributes": 33
+      },
+      {
+        "path": "objects/c0/6830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+        "bytes": 94630,
+        "sha256": "d087944adddcee8c545b41282f59c8fb1d0a425d8939f719d5faa30cbe1ee3d1",
+        "attributes": 33
+      },
+      {
+        "path": "objects/ca/79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+        "bytes": 107,
+        "sha256": "5dbb4d90e89be5d74130aff7f9b202684baed04ef40f3f5dcdaeb2c98d199294",
+        "attributes": 33
+      },
+      {
+        "path": "objects/cd/9b559b7254dab422b97e493bdb41c40b5511c1",
+        "bytes": 320,
+        "sha256": "2b12c3be434635c492e72729bde44a8d81040b1dfebc2d3ce34db11abe2caf1d",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d0/8b48b290d3779eee372120740c027fffc8ff39",
+        "bytes": 145,
+        "sha256": "01cf9154ff481a9ab61534ede460f44b6145b0dbf03a8484426a01c3240244aa",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d1/ea73040ebc936011269b802f57dee4ec05baf7",
+        "bytes": 1254,
+        "sha256": "a40a1c12290cefee5dec9d2ebac8b75fcf7d717587f971e5e3df4f7eab17fc53",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d2/a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+        "bytes": 4042,
+        "sha256": "15cd68a2fa6786d1681004c4df716436beb64b239ab9804fd29571d328855c68",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d4/6981e38b54e8f8df42158b06ad149ca8c20c45",
+        "bytes": 4329,
+        "sha256": "935acedbef2be910570d75794d0e6916a09ceaa5b227d3b8367ab4faf5acbfc9",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d4/8a162663a2392d36c74fb09afd08b2d802b94f",
+        "bytes": 4489,
+        "sha256": "4364d3800264b6e1e6e022eef93851f429ee6099e6d940c44653b995d612bfa1",
+        "attributes": 33
+      },
+      {
+        "path": "objects/d9/802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "bytes": 2741,
+        "sha256": "b90d8e87a7fe7806b44c08e16f6503742590c2f8d680097398f3a281ab805d99",
+        "attributes": 33
+      },
+      {
+        "path": "objects/dc/0d195c72d8404e45c6eb39cb102898fd22b667",
+        "bytes": 2371,
+        "sha256": "ccf624ec2f44fcf2e55e2aebcc61a95dcf342a65c0e0aa83a0b7ecdba746e19c",
+        "attributes": 33
+      },
+      {
+        "path": "objects/dc/d0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 8303,
+        "sha256": "a94e4a66bd92e7de832303eed7f80037b6b7514b9b693331600fe0288454d0fc",
+        "attributes": 33
+      },
+      {
+        "path": "objects/e3/d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "bytes": 7652,
+        "sha256": "6a69a0a899ecad1faf0a186b7fb394838e9198235a3d12cc46bd7beb6ab8d932",
+        "attributes": 33
+      },
+      {
+        "path": "objects/e6/221de4ca0f42b3a3c7230dfe88604d0cb31030",
+        "bytes": 5540,
+        "sha256": "f03c46a467429f7638481014a2b2567d3a86e9f6c06558bf779b4de14e63a515",
+        "attributes": 33
+      },
+      {
+        "path": "objects/e6/e566ed7de9fc065c98338d93ef08699e40b354",
+        "bytes": 1279,
+        "sha256": "014911ba2814fecc42b32c427ebf9bd9ee08618108f41f48e41e339c483a5607",
+        "attributes": 33
+      },
+      {
+        "path": "objects/e8/4229846f41875e0d215fb1bd9ee85df16b245f",
+        "bytes": 1609,
+        "sha256": "8e6f2f1d92b88b1fa6164ed39c8ebd263c2edadc99846dab94194e62a361f19f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/ed/ef19560d3403985d1417af4772d74bbf9eacf4",
+        "bytes": 21416,
+        "sha256": "c63df81670d7099494042abde21fa31e1df92d80da2b221463ccf42da094afe5",
+        "attributes": 33
+      },
+      {
+        "path": "objects/f0/fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 1430,
+        "sha256": "954decb8de2d9694b0ce30507bae9aeb02b46d82becf3c59cd8c2f11e762a45f",
+        "attributes": 33
+      },
+      {
+        "path": "objects/f1/0ae23380e94de3feb20d88274635c4fe2ed308",
+        "bytes": 1130,
+        "sha256": "88796b55120aa9cbbc6130d0f8af3d75b957030a4a8277eecb40b241d9eecf34",
+        "attributes": 33
+      },
+      {
+        "path": "objects/f6/6c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 1104,
+        "sha256": "681c723e4b1401cc2e37936db7412cb84e2c94430bb18684d631c2629515e697",
+        "attributes": 33
+      },
+      {
+        "path": "objects/fc/3fb7b657c62702f8b77b196735ff6a458c89e5",
+        "bytes": 23142,
+        "sha256": "716de11d68a9dba4b67a7f044e3276b19874324681952f8850f9db3b645755eb",
+        "attributes": 33
+      },
+      {
+        "path": "objects/fc/77effb1732726e1d7445c687023889fe7180f0",
+        "bytes": 656,
+        "sha256": "4b60a692e936c906ea023239d5340377ec1afab2378bf2066e3b6ef6a2a95e48",
+        "attributes": 33
+      },
+      {
+        "path": "refs/heads/master",
+        "bytes": 41,
+        "sha256": "18c7a0a02a7463955a2b768916073a6d0d2daadf0338716f1842ab05fde6a21d",
+        "attributes": 32
+      }
+    ],
+    "runtime_identity": {
+      "npm": "11.16.0",
+      "pwsh": "7.6.5",
+      "python": {
+        "version": [
+          3,
+          12,
+          10
+        ],
+        "executable": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe"
+      },
+      "git": "git version 2.55.0.windows.5",
+      "resolved": {
+        "pwsh": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "python": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+        "git": "C:\\Program Files\\Git\\cmd\\git.exe",
+        "node": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe"
+      },
+      "node": "v24.18.1"
+    },
+    "job_evidence_limit": "Two native-success commands completed with zero active descendants, zero terminated processes, and no job cleanup faults. No timeout/fault-injection qualification is inferred."
+  },
+  "proposed_continuation": {
+    "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one",
+    "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+    "new_tmp": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\tmp",
+    "new_output": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\output",
+    "node_compile_cache": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\runtime-cache\\node",
+    "inherited_home": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\home",
+    "inherited_empty_hooks": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\empty-hooks",
+    "skip_completed": [
+      "fixture-init",
+      "runtime-qualification"
+    ],
+    "outstanding_commands": [
+      {
+        "name": "analysis-and-artifact",
+        "argv": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\analysis-and-artifact.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+          "-PacketRoot",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused",
+          "-OutputDirectory",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\output"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 180
+      },
+      {
+        "name": "converter-persistent",
+        "argv": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\converter-focus.ps1",
+          "-SourceRoot",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+          "-OutputPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\output\\converter.json"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 180
+      },
+      {
+        "name": "setup-reader",
+        "argv": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\setup-focus.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 300
+      },
+      {
+        "name": "selected-ci-helpers",
+        "argv": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "--test",
+          "--test-name-pattern=fixture Git discovery|generator proof preserves|dedicated review setup preserves|actual workflows cover",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture\\.github\\workflows\\Test-CiHelpers.test.mjs"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 600
+      },
+      {
+        "name": "patched-dependency",
+        "argv": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\dependency-focus.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\output\\patched-dependency.json",
+          "patched",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\old-dependency-controls.json"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 180
+      },
+      {
+        "name": "powershell-blank-lines",
+        "argv": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture\\.github\\workflows\\Test-BlankLineExamples.ps1"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\fixture",
+        "timeout_seconds": 120
+      }
+    ],
+    "probe": {
+      "argv": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "--version"
+      ],
+      "timeout_seconds": 60,
+      "assertions": [
+        "Native exit zero and npm version 11.16.0",
+        "Owned job becomes empty with no cleanup fault",
+        "New tmp is empty",
+        "Compile-cache files are regular and inside the explicit owned runtime-cache/node path"
+      ]
+    },
+    "changes": [
+      "New separate runner and result; keep original packet and failed result byte-identical",
+      "Reuse verified initialized fixture; no recopy, init, install, or repeated full runtime qualification",
+      "Set NODE_COMPILE_CACHE to the new absolute owned cache path and TEMP/TMP/TMPDIR to new empty tmp",
+      "Redirect output argv entries only; preserve fixture cwd, runtime paths, controls, timeouts, job worker mechanics, assertions and guards",
+      "Preserve first failure and old cache catalogue; report reused setup, relocation probe and six product groups separately"
+    ],
+    "acceptance_unchanged": [
+      "No nonempty tmp exception",
+      "No cache disabling or security bypass",
+      "No product or shared Git mutation",
+      "Source/dependency/runtime/packet and product Git guards remain required",
+      "Late failure and cleanup failures remain separate",
+      "New cache is retained as a bounded runtime artifact and catalogued; no recursive deletion"
+    ]
+  },
+  "report_sha256": "6bd4412439ea204d150faffc0ba3bc1ae13fbf2f63d327f3b07a0643cbf41937"
+}

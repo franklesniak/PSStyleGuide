@@ -1,0 +1,341 @@
+{
+  "schema": 1,
+  "status": "local_product_validation_passed_commit_pending",
+  "released_at": "2026-10-06T18:45:47.224991+00:00",
+  "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
+  "repository": "franklesniak/PSStyleGuide",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "branch": "codex/tf68-compareback",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "source": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "source_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "scope": [
+    ".github/workflows/package.json",
+    ".github/workflows/package-lock.json",
+    "docs/dependency-maintenance.md",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/copilot-code-review.yml"
+  ],
+  "apply_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\apply-manifest.json",
+  "apply_manifest_sha256": "e78676dbfba2aa924b15f171e6eb58dac033ca34cc68bea280515cf8448106ef",
+  "preparation_root_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation-root-verification.json",
+  "source_landed_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-source-acceptance.json",
+  "source_landed_acceptance_sha256": "d79d27bf32114b5db73849d69dc776d8ff5d8164e12f3f50d86f46004a2be9f5",
+  "native_refs_before": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    }
+  },
+  "transfers_before": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5
+  },
+  "transfers": {
+    "A06": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 6,
+      "cap": 12
+    },
+    "A07": {
+      "used": 6,
+      "cap": 12
+    }
+  },
+  "source_review_history": {
+    "pr": 68,
+    "rounds_used": 7,
+    "first_request_at": "2026-10-05T23:47:31+00:00",
+    "deadline": "2026-10-13T23:47:31+00:00"
+  },
+  "previous_PS_source_history": {
+    "pr": 234,
+    "rounds_used": 3,
+    "first_request_at": "2026-10-05T20:12:24.969231+00:00",
+    "deadline": "2026-10-13T20:12:24.969231+00:00",
+    "accepted_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+  },
+  "rounds_used": 0,
+  "first_request_at": null,
+  "deadline": null,
+  "pr": null,
+  "pending_native_operations": [],
+  "local_operation": "No test, container or Git write active. H94.1 qualification54controls, Node600assertions, Linux11hooks and Windows6groups rootverified.",
+  "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
+  "next_action": "Normal ten-path product commit; actual B/H endpoint/finalization checks and current two-root audit; final independent quality, PR and native reviews/CI.",
+  "restrictions": [
+    "No Git reset/force/main writes or held A07 changes",
+    "No direct writes to protected guides or generated outputs",
+    "No failed/cancelled-CI merge; retries at most hourly",
+    "No dummy service trigger or closed-PR review",
+    "No acceptance of S1/task/affected pair before legitimate service activation proof"
+  ],
+  "applied_at": "2026-10-06T18:45:48.069788+00:00",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "postimages": [
+    {
+      "path": ".github/workflows/package.json",
+      "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+      "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "blob": "0dfff820ae8a7243a163d8e81924ba3788884753"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1"
+    }
+  ],
+  "dependency_install": {
+    "status": "passed",
+    "started_at": "2026-10-06T18:46:25.747324+00:00",
+    "node": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+    "command": [
+      "node",
+      ".github/workflows/NpmTools.mjs",
+      "install"
+    ],
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\locked-install.log",
+    "exit": 0,
+    "finished_at": "2026-10-06T18:46:37.525674+00:00",
+    "log_sha256": "745726b13e37b4c51c0aaf39db2077bc18a5658784d1043d6f7fff2320114fbf"
+  },
+  "dependency_qualification": {
+    "status": "passed",
+    "qualified_at": "2026-10-06T18:50:25.988518+00:00",
+    "install": {
+      "status": "passed",
+      "started_at": "2026-10-06T18:46:25.747324+00:00",
+      "node": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "command": [
+        "node",
+        ".github/workflows/NpmTools.mjs",
+        "install"
+      ],
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\locked-install.log",
+      "exit": 0,
+      "finished_at": "2026-10-06T18:46:37.525674+00:00",
+      "log_sha256": "745726b13e37b4c51c0aaf39db2077bc18a5658784d1043d6f7fff2320114fbf"
+    },
+    "graphs": [
+      {
+        "label": "root",
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\installed-graph-root.json",
+        "sha256": "003d4abfc8e5808a1e52675441e5ce65c6dc31e6685cdc9ad13f93e37421fb78"
+      },
+      {
+        "label": "workflows",
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\installed-graph-workflows.json",
+        "sha256": "acf9906f5c49a093ccae8218e815ec83627b4e5a43beb4628f1ba750db02a2e0"
+      }
+    ],
+    "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+    "catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+    "files": 1914,
+    "TF_catalog_differences": [
+      "node_modules/.package-lock.json",
+      ".github/workflows/node_modules/.package-lock.json"
+    ],
+    "TF_catalog_missing_paths": [],
+    "limit": "Fresh actual PS installation and installed graphs qualified. Differences from TF remain explicit; common-code test reuse must bind relevant inputs.",
+    "TF_difference_disposition": "Root inspected both actual diffs: only generated package-lock top-level repository names differ; all other1912 dependency files equal TF."
+  },
+  "source_catalog": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+    "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+    "files": 78
+  },
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "staged_at": "2026-10-06T18:53:41.394481+00:00",
+  "validation_preparation": {
+    "windows": {
+      "owner": "a06_ps_carryback_writer",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused",
+      "status": "failed_cache_residue_before_product_tests",
+      "execution_released": true,
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\manifest.json",
+      "manifest_sha256": "ad890893b6f9d127eb30700827a7450849248db14bdba9d050bacee956b75f5c",
+      "release": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-RELEASE.json",
+      "session_id": 93695,
+      "session_terminal_exit": 1,
+      "product_groups": "not_started"
+    },
+    "linux": {
+      "owner": "a06_conversion_cold_packet",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation",
+      "status": "failed_cleanup_after_Node600pass",
+      "execution_released": true,
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\manifest.authorized.json",
+      "manifest_sha256": "8795485a2a5767d50bc09f46fc0fdf888197f7adc735a9c6b566f7d8fc59c0af",
+      "root_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\ROOT-READINESS.json",
+      "session_id": 35235,
+      "run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one",
+      "started_at": "2026-10-06T19:05:34.939240+00:00",
+      "session_terminal_exit": 1,
+      "aggregate": "not_started"
+    },
+    "independent_quality": {
+      "status": "source_preparation_passed_final_binding_pending",
+      "owner": "a06_conversion_quality",
+      "note": "Third followup accepted; running state reconciled by agent inventory.",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\PREPARATION.md",
+      "report_sha256": "612a640ad7a012bdcb319310ef91a4e807ed00b5fcb83a421f66bcb2b3f35612",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\evidence-preparation.json"
+    },
+    "aggregate": {
+      "status": "passed_root_verified",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\manifest.authorized.json",
+      "manifest_sha256": "d8bec40be133de42ce5c9242968750463b7c6f6496ee5724e1a7925e44a08d11",
+      "scope": "One missing11-hook aggregate, unchanged strict D93; no Node reexecution or acceptance.",
+      "session_id": 95169,
+      "session_terminal_exit": 0,
+      "verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "duration_seconds": 536.589553,
+      "hooks": 11
+    },
+    "windows_continuation": {
+      "status": "failed_UTF8_receipt_after_four_product_groups_passed",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one",
+      "manifest_sha256": "db1d49b5cdea888ef871cd106eec33d5344754d3b6e705d7cd9822c1e7ecaf83",
+      "root_release": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\ROOT-RELEASE.json",
+      "session_id": 62648,
+      "session_terminal_exit": 1
+    },
+    "windows_continuation_two": {
+      "status": "passed_root_verified",
+      "released_at": "2026-10-06T19:32:24.403581+00:00",
+      "manifest_sha256": "6f0945ce8195a4a885629f337750430a7849fda12e427b4660922277c0d86b9e",
+      "runner_sha256": "ed960174b08b59be9424d43ce12b951fada9960d67bf8b494031495a37ac29b5",
+      "original_failures": "both preserved",
+      "six_field_receipt_and12controls_verified": true,
+      "job_and_run_stage_unchanged": true,
+      "commands": [
+        "patched-dependency",
+        "powershell-blank-lines"
+      ],
+      "execution_pending": false,
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two",
+      "session_id": 47986,
+      "session_terminal_exit": 0,
+      "verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json"
+    }
+  },
+  "scratch_corrections": [
+    {
+      "scope": "private installed-graph helper",
+      "finding": "Windows ESM absolute C: path was rejected before import or graph query.",
+      "repair": "Use pathToFileURL for the same exact module; both graph queries then passed once. No product/source/install change or repeat install."
+    },
+    {
+      "scope": "unexecuted Linux validation packet",
+      "finding": "Inherited300s budget belonged to13test subset.",
+      "repair": "Restore prior full seven-file3600s ceiling; whole7200 retains reserve and guards. Original preparation retained; no product timeout change."
+    },
+    {
+      "scope": "private pure Node qualification driver",
+      "finding": "Failed saved command has no cleanup field; exact receipt is in cleanup_receipts.",
+      "repair": "Require unique affected-node receipt there; preserve original failed qualification. New pure qualification54controls passed without product replay."
+    },
+    {
+      "scope": "unexecuted planning publisher",
+      "finding": "Copied selection prefix referenced wrong A14 folder; assertion stopped before Git mutation.",
+      "repair": "Select exact owned PS-TF68-carryback prefix and require only named changed files; preserve all unrelated paths."
+    }
+  ],
+  "local_runner_findings": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\local-runner-findings.json",
+    "sha256": "29afcbd7f11386cd62ce59a85d0f734ee799fe6ce33e047d4bc3d1c43d709e6a"
+  },
+  "Node_cleanup_decision": {
+    "status": "H94.1_IMPLEMENTED_QUALIFIED",
+    "selected_at": "2026-10-06T19:26:53.757478+00:00",
+    "report_sha256": "34679c2e49d09aca3453335603e0cac2ed2cfd52ac306480024031838cd5b26e",
+    "evidence_sha256": "94dc15ffdcb29bd482e2e8de3c0f4f2ba90470fd8296f93ab1986b8986aa6070",
+    "immutable_references_verified": 33,
+    "scores_verified": 14,
+    "raw_private_and_host_guards_equal": true,
+    "displayed_to_owner": "Validation,14options,unique six-criterion rubric,fulltable and controlledsteps before implementation",
+    "selected_option": "H",
+    "score": 94.1,
+    "old_packet": "failed_unchanged",
+    "old_three_causes": "unknown_unchanged",
+    "release": "Selected Node-only judgment qualified against saved evidence; original packet stays failed; strict other stages and collector unchanged.",
+    "qualification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\output\\QUALIFICATION.json",
+    "qualification_sha256": "40fe204b9ac52bb7b11abd9b4eb0044a14e3570664abd65817696be3eaee4352",
+    "pure_controls": 54
+  },
+  "local_validation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+    "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
+    "status": "local_product_validation_passed_with_explicit_evidence_reuse"
+  }
+}

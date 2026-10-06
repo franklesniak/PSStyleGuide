@@ -179,3 +179,51 @@ Independent final native binding and immediate premerge reconciliation remain. E
 [Normal head-matched merge](TF68-round7/merge-acceptance.json) completed once at2026-10-06T18:21:21Z: main`a840f21b03f0dcac0815e2f7f044928667402b42`, tree`e71b81232ba0f197acf5f126e4b14f1e90ee7da2`, parents accepted e21 then reviewed89bf392. Native readback and normal local fetch agree. No failed-CI waiver, administrator override, CI relaunch or ambiguous operation.
 
 Six landed-main workflows started; their full acceptance remains pending. Current service success used coding setup. Dedicated selection and successful completion must be proved on the next legitimate authorized service input; no dummy change. S1/task and affected paired acceptance remain incomplete. Preserve round7/originaldeadline/transfers1/3/5/5 and conditional ten-path PS repair. Stop further merges/affected delivery and report any postlanding CI failure or service fallback.
+
+## 2026-10-06 landed TF source accepted; PS carryback started
+
+[All six actual merged-main workflows](TF68-round7/landed-source-acceptance.json) pass ona840f21/treee71b812. The behavior run passes600tests with zero failures/cancellations/skips/todos, actual mutation SelfTest and B=e21/H=a840 proposed-policy checks. Full setup passes11hooks in1086seconds and its final guard. Three generator platforms each pass156assertions twice; actual main-authority dependency audit is CLEAN. Source acceptance retains unproved dedicated Copilot selection and paired completion.
+
+[Sequencing reconciliation](TF68-round7/postlanding-sequence/REPORT.md) confirms B93.5 places dedicated proof at S1/task/paired acceptance, not as a new destination-write gate. The next legitimate TF review may be real compareback feedback, or the normal counterpart of separately selected B99/R5 work. No dummy change or closed-PR request.
+
+[PS preparation](PS-TF68-carryback/preparation/REPORT.md) binds all77PS/80TF raw paths,30reference/harness hashes and exactly10drafts with finite exceptions. Root independently verified these bindings and accepted-policy version rules; source1.20/1.11 are valid increases and stay synchronized. Root refreshed both native mains and recorded transfersA06/A03/A21/A07=2/4/6/6of12 before normal local branch creation and exact ten-path application. PS codex/tf68-compareback now starts at accepted9817762; changes remain unstaged. [Current PS state](PS-TF68-carryback/execution-state.json) owns installation and later validation. All prior review clocks/history remain; no new PR/request clock has started. Held A07 work is preserved.
+
+Scratch evidence-reader correction: the first local acceptance assertion expected a singular SelfTest success phrase. Actual log says Agent-instruction mutation self-tests passed. Root checked the raw result and successful step, changed the assertion to that exact line and added the actual B/H policy-result binding. No source/test/native operation repeated; no acceptance state had been written by the stopped assertion.
+
+## 2026-10-06 PS dependencies qualified; final validation running
+
+The exact ten-path PS candidate is staged at tree`a716a1f8ff7e4f385e089b0f056adbcde9c973cb`, over accepted main9817762. One ordinary locked installation and both installed dependency graphs passed. All78source and1,914dependency files are frozen. Only two generated lockfile names differ from the accepted TF installation; all other1,912dependency files match.
+
+Root read the complete [Linux packet](PS-TF68-carryback/linux-validation/PREPARATION.md), verified source/dependencies/current native mains, reused the unchanged qualified ownership controls and compiled only the two adapted runner files. One offline Linux run now executes staged preflight, the full seven-file600-test suite and all11hooks. The original unexecuted preparation mistakenly inherited the300-second thirteen-test allowance; the corrected packet uses the prior full-suite3,600-second ceiling and7,200-second overall bound. Product limits are unchanged. Original preparation remains preserved.
+
+Focused Windows preparation and independent source-quality preparation continue. They do not claim completed destination validation. All Git refs stay frozen during the runner source guards. Normal commit, actual B/H endpoints, current audit, final quality, reviews/CI, landing and legitimate dedicated-service activation remain pending. Counters and original review deadlines are unchanged.
+
+## 2026-10-06 local runner findings retained
+
+[Current local evidence](PS-TF68-carryback/local-runner-findings.json) records two terminal runner failures. Linux staged preflight passed; all600Node assertions passed with zero failures/cancellations/skips/todos in204.033seconds and native exit0. The ownership guard collected82already-exited descendants;79returned0, one shell and one Git returned128, and one MainThread receivedSIGKILL. The guard correctly refuses their still-unattributed statuses. It sent no signals, verified emptiness/source equality/container absence, and never started the11-hook aggregate. The complete runner stays failed; the Node assertion results alone do not accept the packet.
+
+Windows private fixture creation and runtime qualification passed with empty owned jobs. The wrapper then stopped on retained tmp/node-compile-cache, before all six product groups. Source/dependency/Git guards match. No current product defect is established by either result. Read-only Linux attribution/decision and Windows cache-source correction preparation are active. No rerun, product edit, CI relaunch, merge or test process remains active.
+
+Independent PS source preparation found no material finding. Root read the report, verified27immutable references and all10source postimages; the mutable execution-state hash was explicitly superseded by root progress updates with unchanged source/base/tree/scope. Final quality remains pending actual destination validation, commit/endpoints/audit and native reviews/CI.
+
+## 2026-10-06 selected Node result contract H94.1
+
+Root verified [the finding proposal](PS-TF68-carryback/linux-node-cleanup-finding/REPORT.md),33boundartifacts, all14scores and raw private/host guard equality. Root displayed options, unique30/25/20/15/7/3rubric, table and controlled steps before selection. H94.1 assigns assertion success to the exact600-test Node owner while retaining independent exact ownership, consistent terminal waits, no live residue/signals/collection errors/input drift. The existing strict exit-zero filter remains for other stages; the collector is unchanged. Original failed packets and three unknown historical causes remain unchanged. Small judgment/pure-control preparation is released; qualification remains pending.
+
+The still-missing11-hook Linux aggregate runs independently under the existing strict filter. The factual Windows cache correction gives npm an explicit owned cache directory; original failed evidence/cache is preserved. One continuation reuses verified fixture/setup, checks cache relocation and runs only six unfinished product groups. No product, guide, dependency or Git edit, counter reset, CI retry or merge occurred.
+
+## 2026-10-06 PS aggregate and Windows groups verified
+
+The [missing Linux aggregate](PS-TF68-carryback/linux-final-aggregate/REPORT.md) passed all11hooks with zero skips in536.590seconds. It includes complete destination SelfTest. The unchanged strict D93 judgment collected67exact exit-zero adopted waits without signals or residue; private/host source/dependency/Git guards match and the container is absent.
+
+[All six Windows product groups](PS-TF68-carryback/windows-focused/RESULT.md) now pass with precise prior-result reuse. Three-file parser/PSSA has zero findings; artifact negatives, persistent converter/setup controls, four CI tests, patched dependency callers and PS semantics pass. The original cache-placement failure and later Unicode summary-reader failure remain failed. Explicit owned cache placement and UTF-8/ASCII-escape receipt correction allowed only missing groups to continue;12meaningful receipt negatives reject. No passed native group was rerun.
+
+H94.1 pure judgment qualification remains pending for the separately preserved600-test Node evidence. There is no active test/Git write. The candidate remains ten staged paths/treea716 overB981; commit/endpoints/current audit/final quality/native reviews and CI remain pending. No product change or counter reset occurred during runner corrections.
+
+## 2026-10-06 PS local validation complete with explicit reuse
+
+[Combined local validation](PS-TF68-carryback/LOCAL-VALIDATION.json) binds600Node assertions,11Linux hooks and6Windows product groups. H94.1 Node-only judgment passed54pure positive/negative controls on qualified Linux Python3.12.3 in the pinned offline image. All82saved adopted observations meet exact ownership/terminal collection rules; the three historical causes remain unknown. The collector and other-stage strict policy are unchanged. Every original failed packet remains failed; this is named evidence reuse, not an invented uninterrupted passing run. No product tests were replayed for the pure qualification.
+
+The first pure check stopped before judgment because the failed command has no cleanup field. The private driver now requires one exact affected-node entry from the saved cleanup_receipts; the next check passed. Both qualification records are retained and both containers are absent. No product or source change resulted.
+
+The ten-path candidate/treea716 is ready for normal commit. Actual committed B/H endpoint/finalization checks, current audit, final independent quality, PR reviews/CI, normal landing and dedicated service proof remain. Counters and original clocks remain unchanged.

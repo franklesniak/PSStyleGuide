@@ -114,3 +114,7 @@ Next action: retain PS155 as an open maintainer-owned risk and recheck the named
 ## 2026-10-06 TF68 round7 candidate rebind
 
 The [current assessment](TF68-round7-readiness/REPORT.md) retains D92/D93 with no new material filesystem finding for89bf392/treee71b812. Root read the report and verified15 raw Git object/mode bindings, including both changed converter files and nine unchanged callers/primitives. The ten-path prospective PS repair remains conditional; no new language exception or filesystem safety guarantee is asserted. TF acceptance/current CI and actual landed/currentPS rebind remain pending. A14 stays0/8.
+
+## 2026-10-06 accepted TF source and staged PS rebind
+
+[Root rebind](TF68-landed-rebind.json) confirms accepted TFa840f21 has exactly the independently assessed89bf392 treee71b812. Actual PS stageda716 preserves the common validator and finite P1/identity exceptions already independently verified. The prior A14 assessment remains applicable; no new filesystem authority, publication primitive or supported race repair is established. PS candidate validation/acceptance, dedicated service proof, PS155 residual and later R5/recovery/A18/A19 rechecks remain open. No tests or counter changes; A14 remains0/8.

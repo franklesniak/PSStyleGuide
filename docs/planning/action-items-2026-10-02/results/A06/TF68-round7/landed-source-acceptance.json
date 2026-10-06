@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "status": "LANDED_SOURCE_CI_ACCEPTED_DEDICATED_ACTIVATION_PENDING",
+  "accepted_at": "2026-10-06T18:45:37.522193+00:00",
+  "merge_commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "reviewed_head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-observation-6.json",
+  "snapshot_sha256": "6f1ebf23f086b3532771d14adc1dc15f8148f7a69d75256d41a9b58705900657",
+  "runs": [
+    {
+      "id": 37510671438,
+      "name": "Copilot code review preparation",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510671438\\attempt-1\\log.txt",
+      "log_sha256": "f00094ce9779d82ccf1c916449c094ccd34f1a45cf718a355e69c510db00f4e8",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510671438\\attempt-1\\jobs.json",
+      "jobs_sha256": "36a187f15e70a6f2f4f6d673df9290d18f828c07b27bb32403b2b0645e706176"
+    },
+    {
+      "id": 37510670368,
+      "name": "Markdown Lint",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670368\\attempt-1\\log.txt",
+      "log_sha256": "729aaf2e1e56a334c35985e46c7cb5f653cb09e90996b3379fbd86ce784c15fa",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670368\\attempt-1\\jobs.json",
+      "jobs_sha256": "fbf61f487743757fc5e15057f536d2eb74df442687c433de9e9b9b3aaa52c614"
+    },
+    {
+      "id": 37510670204,
+      "name": "Dev container boundary",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670204\\attempt-1\\log.txt",
+      "log_sha256": "cc2ce991d7148066286e5c391a28691fa0f8e628af7ead4e4fac9bc69b77e068",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670204\\attempt-1\\jobs.json",
+      "jobs_sha256": "c72f6099d827f2d5a2d42014f424bc36194bf2d133aa5b392595056d2742a413"
+    },
+    {
+      "id": 37510670150,
+      "name": "Build Style Guide Artifacts",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670150\\attempt-1\\log.txt",
+      "log_sha256": "8b2ecb00933d914d201584b00aa0ae7b8f0c8cbe641c6e9525d78e1bd1760238",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670150\\attempt-1\\jobs.json",
+      "jobs_sha256": "5e6e3fd11fbded74ac52c0c50b133eb9a8e4104da6e332f589d317a422845626"
+    },
+    {
+      "id": 37510670091,
+      "name": "Copilot setup steps",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670091\\attempt-1\\log.txt",
+      "log_sha256": "2968185ead1d6fdbc024b6f27658810209befb74bf16a54fd88e0cde13ad4cb8",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670091\\attempt-1\\jobs.json",
+      "jobs_sha256": "1ecbc2a043fa54a1d7a7cacf04c622ad22956bd27ea991f4857a6f5fc547c79a"
+    },
+    {
+      "id": 37510670217,
+      "name": "Agent instruction validation",
+      "attempt": 1,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670217\\attempt-1\\log.txt",
+      "log_sha256": "9aa1a71aa64f51a1759c2eec6fd5f1d1d7739d90d38866545713db485eb67e78",
+      "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670217\\attempt-1\\jobs.json",
+      "jobs_sha256": "46208ec452ee8a684ed1cdfa6e56da4bb941e47c582f36bc00cfc8ee7e3612c1"
+    }
+  ],
+  "all_landed_workflows_successful": 6,
+  "behavior": {
+    "tests": 600,
+    "pass": 600,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "setup_passed_hooks": [
+    "check json...............................................................Passed",
+    "check yaml...............................................................Passed",
+    "fix end of files.........................................................Passed",
+    "trim trailing whitespace.................................................Passed",
+    "yamllint.................................................................Passed",
+    "Lint GitHub Actions workflow files.......................................Passed",
+    "Validate Dependabot Config (v2)..........................................Passed",
+    "Validate GitHub Workflows................................................Passed",
+    "staged Markdown..........................................................Passed",
+    "workflow policy contract.................................................Passed",
+    "agent instruction contract and mutation tests............................Passed"
+  ],
+  "setup_aggregate_seconds": 1086.0,
+  "final_immutable_guard": "success",
+  "generator_platform_results": [
+    "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+    "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+    "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+    "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+    "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+    "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+  ],
+  "current_audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "authoritySource": "event-main",
+    "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+    "installedGraphRoots": [
+      ".github/workflows"
+    ],
+    "findings": [],
+    "applicable": true
+  },
+  "dedicated_service_activation_proved": false,
+  "paired_convergence_proved": false,
+  "limits": "Ordinary dedicated preparation is green, but is not native Copilot service selection. B93.5 allows serial actual PS repair; S1/task and affected paired acceptance remain incomplete until legitimate dedicated-service success. Preserve failed history and all counters/deadlines."
+}

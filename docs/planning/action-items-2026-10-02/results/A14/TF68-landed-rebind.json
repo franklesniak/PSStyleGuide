@@ -1,0 +1,32 @@
+{
+  "status": "A14_PRIOR_ASSESSMENT_REBOUND_TO_ACCEPTED_TF_AND_STAGED_PS",
+  "verified_at": "2026-10-06T19:29:54.638891+00:00",
+  "TF_reviewed_head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "TF_accepted_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "identical_reviewed_and_landed_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "PS_accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "PS_staged_candidate": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "source_readiness": {
+    "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\TF68-round7-readiness\\REPORT.md",
+    "sha256": "d72bb17800c5b3bdcfb70905eeeab2f4e47510d65847ae60d726582ba691c60b",
+    "evidence_sha256": "74820afb4b6a19bb886de6b86a4676669e78b444dc20f9dbf8e62ed6da415617"
+  },
+  "TF_landed_acceptance": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-source-acceptance.json",
+    "sha256": "d79d27bf32114b5db73849d69dc776d8ff5d8164e12f3f50d86f46004a2be9f5"
+  },
+  "PS_exact_projection_verification": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation-root-verification.json",
+    "sha256": "1485dfe54f32f55341bec6571fcd0cffcc32fde25b5e26e8920917d7f119a3a0"
+  },
+  "disposition": "Prior no-new-material-filesystem-finding result remains applicable. Accepted TF tree equals independently reviewed tree. Current PS port retains common converter and exactly one P1 literal; finite ten-path projection verified. No new filesystem authority or publication primitive introduced.",
+  "limits": [
+    "PS candidate not yet validated or accepted",
+    "Dedicated service activation and paired acceptance pending",
+    "PS155 residual remains open; no hostile concurrent-writer or same-process authentication proof",
+    "Recheck changed R5/recovery callers and final A18/A19 inputs"
+  ],
+  "A14_transfers_used": 0,
+  "A14_transfer_cap": 8,
+  "tests_rerun": 0
+}

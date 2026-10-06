@@ -1,0 +1,74 @@
+{
+  "state": "passed",
+  "scope": "Saved-log parser only; no native test rerun",
+  "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\output\\selected-ci-helpers\\log.txt",
+  "log_sha256": "88285800174e784474bb9fe0bad810ccc117bf19de15c295efe0bc63bc399dde",
+  "actual_marker_codepoints": [
+    "U+2139"
+  ],
+  "old_regex_marker_codepoints": [
+    "U+00E2",
+    "U+201E",
+    "U+00B9"
+  ],
+  "fixed_regex_ascii_escape": "\\u2139",
+  "positive_existing_log": true,
+  "negative_controls": [
+    {
+      "name": "missing-tests",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-tests",
+      "rejected": true
+    },
+    {
+      "name": "missing-pass",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-pass",
+      "rejected": true
+    },
+    {
+      "name": "missing-fail",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-fail",
+      "rejected": true
+    },
+    {
+      "name": "missing-cancelled",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-cancelled",
+      "rejected": true
+    },
+    {
+      "name": "missing-skipped",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-skipped",
+      "rejected": true
+    },
+    {
+      "name": "missing-todo",
+      "rejected": true
+    },
+    {
+      "name": "wrong-count-todo",
+      "rejected": true
+    }
+  ],
+  "exact_counts": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "status": "READY_NOT_EXECUTED",
+  "manifest_sha256": "ad890893b6f9d127eb30700827a7450849248db14bdba9d050bacee956b75f5c",
+  "runner_sha256": "3ada5b1943cd0d8bbc755ffd11ad60ae2f219b4a032f7b8678460942beb20ed0",
+  "report_sha256": "639b370556a71a4970dbfbd87d7910d6b296089784618e5baef113ae06a64f08",
+  "preparation_sha256": "54ff7f4849f6584bb8849b49ed148739cd9ae2465d21157e3fbc7876c1203fe6",
+  "reuse_table_sha256": "f7c76527eb0a9720e0adfdf1dd299c253b7204fcf9dba10257fb3d3835af4101",
+  "source_files": 78,
+  "dependency_files": 1914,
+  "git_guard_equal": true,
+  "private_run_absent": true,
+  "product_tests_executed": false,
+  "new_windows_hosting_executed": false
+}

@@ -1,0 +1,104 @@
+{
+  "recorded_at": "2026-10-06T19:12:46.880587+00:00",
+  "status": "LOCAL_RUNNERS_FAILED_DIAGNOSIS_ACTIVE",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "linux": {
+    "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one",
+    "session": 35235,
+    "session_terminal_exit": 1,
+    "preflight": "passed",
+    "Node_native_exit": 0,
+    "Node_TAP": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "Node_duration_seconds": 204.032958677,
+    "overall": "failed",
+    "failure": "Unsuccessful adopted exit",
+    "adopted_waits": 82,
+    "unusual_waits": [
+      {
+        "pid": 2229,
+        "name": "sh\n",
+        "group": 645,
+        "start_ticks": 2040,
+        "exit": 128,
+        "signal": null
+      },
+      {
+        "pid": 18141,
+        "name": "git\n",
+        "group": 645,
+        "start_ticks": 19007,
+        "exit": 128,
+        "signal": null
+      },
+      {
+        "pid": 21565,
+        "name": "MainThread\n",
+        "group": 21530,
+        "start_ticks": 22139,
+        "exit": null,
+        "signal": 9
+      }
+    ],
+    "signals_sent_by_cleanup": [],
+    "empty_after": true,
+    "aggregate": "not_started",
+    "container_absent": true,
+    "source_after_equal": true,
+    "historical_unusual_exit_causes": "not_yet_attributed"
+  },
+  "windows": {
+    "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one",
+    "session": 93695,
+    "session_terminal_exit": 1,
+    "passed_native_stages": [
+      "fixture-init",
+      "runtime-qualification"
+    ],
+    "overall": "failed",
+    "failure": "Stage left private temporary data: runtime-qualification",
+    "residue": [
+      "tmp\\node-compile-cache"
+    ],
+    "product_groups": "all_six_not_started",
+    "jobs_empty": true,
+    "source_after_equal": true
+  },
+  "raw_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\status.json",
+      "sha256": "f1a675c932f2ce65311aa4a6d1f3da9b0dee161f4d44564082b8040d0ce3ea7a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\result.json",
+      "sha256": "dfd051d69ad125801940b5004f40ce055bf1239340391f0eb33304f81cf94ecc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node.log",
+      "sha256": "ad39e4118754675075c14b90d9ee1b321ca9be91238dbdcf3080ab66a9070922"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node-cleanup.json",
+      "sha256": "ff586828dba87887f914dbb3435931a8f8ac7c6efc41fcdfdf138a3ee92fb196"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\result.json",
+      "sha256": "409d34c2bc5b39d9b7dca445b3fd5659f1a1f83cd2f73a50790c01c64bb1a01e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\product-before.json",
+      "sha256": "4bb18b170b7855c330b699df6d89680cbef82f517fc640984e0aa3ec83585106"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\product-after.json",
+      "sha256": "4bb18b170b7855c330b699df6d89680cbef82f517fc640984e0aa3ec83585106"
+    }
+  ],
+  "next": "Read-only findings/proposals; preserve failed runs and valid partial results. No retry or weakened acceptance before root selection. No task-owned test/Git write remains active."
+}

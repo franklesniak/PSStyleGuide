@@ -1,0 +1,22 @@
+{
+  "status": "RELEASE_MISSING_AGGREGATE_ONLY",
+  "released_at": "2026-10-06T19:20:17.683600+00:00",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "original_manifest_sha256": "8795485a2a5767d50bc09f46fc0fdf888197f7adc735a9c6b566f7d8fc59c0af",
+  "failed_run_status_sha256": "f1a675c932f2ce65311aa4a6d1f3da9b0dee161f4d44564082b8040d0ce3ea7a",
+  "original_root_readiness_sha256": "7c59009a69cfe6b0fc51fc29a6eaaeab94fba20e2ef152fc0da28cb8dad91f24",
+  "removed_commands": [
+    "    run('staged-preflight',['pwsh','-NoLogo','-NoProfile','-NonInteractive','-File','.github/workflows/Test-AgentInstructions.ps1','-RequireStagedInputMatch'],m['preflight_timeout_seconds'],before)\n",
+    "    # Full current seven-file PS workflow suite; classifier is included exactly once.\n",
+    "    run('affected-node',['node', '--test', '--test-reporter=tap', '.github/workflows/Classify-InstructionMaintenance.test.mjs', '.github/workflows/Validate-WorkflowPolicy.test.mjs', '.github/workflows/Test-CiHelpers.test.mjs', '.github/workflows/NpmTools.test.mjs', '.github/workflows/Check-NpmAudit.test.mjs', '.github/workflows/Test-LocalValidation.test.mjs', '.github/workflows/lint-markdown.test.mjs'],m['node_timeout_seconds'],before)\n"
+  ],
+  "compiled_only": [
+    "inside.py",
+    "launch.py"
+  ],
+  "source_files": 78,
+  "dependency_files": 1914,
+  "ownership_filter_changed": false,
+  "no_Node_acceptance_granted": true,
+  "execution_pending": true
+}

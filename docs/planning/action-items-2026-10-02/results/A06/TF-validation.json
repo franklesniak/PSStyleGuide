@@ -1,5 +1,5 @@
 {
-  "status": "TF68_merged_landed_validation_pending",
+  "status": "PS_TF68_carryback_released",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -63,19 +63,19 @@
   },
   "transfers": {
     "A06": {
-      "used": 1,
+      "used": 2,
       "cap": 12
     },
     "A03": {
-      "used": 3,
+      "used": 4,
       "cap": 12
     },
     "A21": {
-      "used": 5,
+      "used": 6,
       "cap": 12
     },
     "A07": {
-      "used": 5,
+      "used": 6,
       "cap": 12
     }
   },
@@ -94,7 +94,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Bind actual landed main/tree and collect landed CI. Verify dedicated service selection only on next legitimate input; no dummy change. Keep S1/task/pair acceptance incomplete. Stop/report any post-landing CI failure or service fallback under B93.5.",
+  "next_action": "Verify exact application and qualify destination locked dependencies before focused validation.",
   "checkout_exit": 0,
   "candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
   "implementation": {
@@ -439,7 +439,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-READINESS.json",
     "sha256": "cc70a9ab7870c4c487004c2c1365cecfa4880a960160aefbab53103ace9a00b7"
   },
-  "planning_checkpoint": "61b6079d59c1b3de9b29de6ec573d5680543c2db",
+  "planning_checkpoint": "65b306e1e24042619f4661dcdf48d808311d7117",
   "commit": {
     "status": "committed",
     "expected_parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
@@ -10257,6 +10257,49 @@
         "published_sha256": "f2950e97f1b0658d701fa489683d773de5722052c8aadd83ee936d96603386fe",
         "reason": "Normal Git CRLF-to-LF storage; original TEMP evidence remains byte-identical. Parsed JSON equal."
       }
+    },
+    {
+      "status": "published",
+      "expected_parent": "61b6079d59c1b3de9b29de6ec573d5680543c2db",
+      "files": [
+        "docs/planning/action-items-2026-10-02/STATUS.md",
+        "docs/planning/action-items-2026-10-02/results/A06/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A06/TF-validation.json",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/PREPARATION.md",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/REPORT.md",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/evidence.json",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/merge-acceptance.json",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-current-ci-acceptance.json",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-dynamic-success.json",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-ordinary-setup-evidence.json"
+      ],
+      "file_sha256": {
+        "docs/planning/action-items-2026-10-02/STATUS.md": "b70ec688c8e6f9595ba8f4d69f3996d86cf4fcf5fd74e99aab34fcdbb7fbd19d",
+        "docs/planning/action-items-2026-10-02/results/A06/RESULT.md": "1fd3131fa7ef2cdc3b694276fdfd53005b89cd595578e6212403ad966db36672",
+        "docs/planning/action-items-2026-10-02/results/A06/TF-validation.json": "7f41f3053c0cb586c8932ce1918c10d47760e37e8b7fc71f00fccd8a0909bf74",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/PREPARATION.md": "cca30388eeeaa0aa9adec4bfd5e90c28bd70826cd9fdac8219923b6870f5ce00",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/REPORT.md": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/evidence.json": "f9c6104ed7971edac8f8d82be859e82b6e1a3e732167bd03e7fa8ac6bad53485",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/merge-acceptance.json": "28a615ed821d5948e797b05328ab8c93a7f25d5ab363f61d5a2dad6f8cc7267a",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-current-ci-acceptance.json": "cbd447f2cd4bc3a6b5a56099a2bc825b28ae45677558d8bc36d385390a532ac8",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-dynamic-success.json": "f17c1d3b64cd6f24ed0d6a77b07e6a9bfc0873769a4a5c6acf8d73598746ef06",
+        "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/round7-ordinary-setup-evidence.json": "d026ef4f7b8e0f6750f37be6b101fa4cf3a0e5092c261caa755c80ca30ad634f"
+      },
+      "preserved_other_files": 2693,
+      "requested_at": "2026-10-06T18:23:38.697401+00:00",
+      "expected_tree": "27bc40e4d7f6cca86cc2142eb73e9ef8d622f4d1",
+      "commit_exit": 0,
+      "observed_head": "65b306e1e24042619f4661dcdf48d808311d7117",
+      "head": "65b306e1e24042619f4661dcdf48d808311d7117",
+      "push_exit": 0,
+      "observed_remote": "65b306e1e24042619f4661dcdf48d808311d7117",
+      "published_at": "2026-10-06T18:23:44.831498+00:00",
+      "normalization": {
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round7/final-quality/evidence.json",
+        "raw_sha256": "f9c6104ed7971edac8f8d82be859e82b6e1a3e732167bd03e7fa8ac6bad53485",
+        "published_sha256": "fbb3dc56ad16963f8e301cb8929dd7d8c741f3061be8aee32975dd829078aabb",
+        "reason": "Normal Git CRLF-to-LF storage. Original TEMP evidence immutable; parsed JSON equal."
+      }
     }
   ],
   "round6_setup_activation": {
@@ -11379,56 +11422,187 @@
     "verified_at": "2026-10-06T18:21:25.351098+00:00"
   },
   "round7_landed_validation": {
-    "status": "pending",
+    "schema": 1,
+    "status": "LANDED_SOURCE_CI_ACCEPTED_DEDICATED_ACTIVATION_PENDING",
+    "accepted_at": "2026-10-06T18:45:37.522193+00:00",
     "merge_commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
     "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
-    "first_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-first.json",
-    "first_observation_sha256": "8ab745de2cde0b1ab1c122105f88df3db79769788bff25bc13dfc915a967eae2",
-    "observed_runs": [
+    "reviewed_head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+    "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-observation-6.json",
+    "snapshot_sha256": "6f1ebf23f086b3532771d14adc1dc15f8148f7a69d75256d41a9b58705900657",
+    "runs": [
       {
         "id": 37510671438,
         "name": "Copilot code review preparation",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success"
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510671438\\attempt-1\\log.txt",
+        "log_sha256": "f00094ce9779d82ccf1c916449c094ccd34f1a45cf718a355e69c510db00f4e8",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510671438\\attempt-1\\jobs.json",
+        "jobs_sha256": "36a187f15e70a6f2f4f6d673df9290d18f828c07b27bb32403b2b0645e706176"
       },
       {
         "id": 37510670368,
         "name": "Markdown Lint",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success"
-      },
-      {
-        "id": 37510670217,
-        "name": "Agent instruction validation",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37510670091,
-        "name": "Copilot setup steps",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37510670150,
-        "name": "Build Style Guide Artifacts",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670368\\attempt-1\\log.txt",
+        "log_sha256": "729aaf2e1e56a334c35985e46c7cb5f653cb09e90996b3379fbd86ce784c15fa",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670368\\attempt-1\\jobs.json",
+        "jobs_sha256": "fbf61f487743757fc5e15057f536d2eb74df442687c433de9e9b9b3aaa52c614"
       },
       {
         "id": 37510670204,
         "name": "Dev container boundary",
-        "event": "push",
-        "status": "queued",
-        "conclusion": null
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670204\\attempt-1\\log.txt",
+        "log_sha256": "cc2ce991d7148066286e5c391a28691fa0f8e628af7ead4e4fac9bc69b77e068",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670204\\attempt-1\\jobs.json",
+        "jobs_sha256": "c72f6099d827f2d5a2d42014f424bc36194bf2d133aa5b392595056d2742a413"
+      },
+      {
+        "id": 37510670150,
+        "name": "Build Style Guide Artifacts",
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670150\\attempt-1\\log.txt",
+        "log_sha256": "8b2ecb00933d914d201584b00aa0ae7b8f0c8cbe641c6e9525d78e1bd1760238",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670150\\attempt-1\\jobs.json",
+        "jobs_sha256": "5e6e3fd11fbded74ac52c0c50b133eb9a8e4104da6e332f589d317a422845626"
+      },
+      {
+        "id": 37510670091,
+        "name": "Copilot setup steps",
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670091\\attempt-1\\log.txt",
+        "log_sha256": "2968185ead1d6fdbc024b6f27658810209befb74bf16a54fd88e0cde13ad4cb8",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670091\\attempt-1\\jobs.json",
+        "jobs_sha256": "1ecbc2a043fa54a1d7a7cacf04c622ad22956bd27ea991f4857a6f5fc547c79a"
+      },
+      {
+        "id": 37510670217,
+        "name": "Agent instruction validation",
+        "attempt": 1,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670217\\attempt-1\\log.txt",
+        "log_sha256": "9aa1a71aa64f51a1759c2eec6fd5f1d1d7739d90d38866545713db485eb67e78",
+        "jobs": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-a840f21\\37510670217\\attempt-1\\jobs.json",
+        "jobs_sha256": "46208ec452ee8a684ed1cdfa6e56da4bb941e47c582f36bc00cfc8ee7e3612c1"
       }
     ],
-    "local_origin_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
-    "limits": "No landed CI acceptance, dedicated activation or paired convergence claimed."
+    "all_landed_workflows_successful": 6,
+    "behavior": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "setup_passed_hooks": [
+      "check json...............................................................Passed",
+      "check yaml...............................................................Passed",
+      "fix end of files.........................................................Passed",
+      "trim trailing whitespace.................................................Passed",
+      "yamllint.................................................................Passed",
+      "Lint GitHub Actions workflow files.......................................Passed",
+      "Validate Dependabot Config (v2)..........................................Passed",
+      "Validate GitHub Workflows................................................Passed",
+      "staged Markdown..........................................................Passed",
+      "workflow policy contract.................................................Passed",
+      "agent instruction contract and mutation tests............................Passed"
+    ],
+    "setup_aggregate_seconds": 1086.0,
+    "final_immutable_guard": "success",
+    "generator_platform_results": [
+      "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+      "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+      "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+      "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+      "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+      "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+    ],
+    "current_audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "authoritySource": "event-main",
+      "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+      "installedGraphRoots": [
+        ".github/workflows"
+      ],
+      "findings": [],
+      "applicable": true
+    },
+    "dedicated_service_activation_proved": false,
+    "paired_convergence_proved": false,
+    "limits": "Ordinary dedicated preparation is green, but is not native Copilot service selection. B93.5 allows serial actual PS repair; S1/task and affected paired acceptance remain incomplete until legitimate dedicated-service success. Preserve failed history and all counters/deadlines."
+  },
+  "round7_postlanding_sequence": {
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-postlanding-sequence\\REPORT.md",
+    "report_sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-postlanding-sequence\\evidence.json",
+    "evidence_sha256": "9bc016e80df2c6ad84a696cdcd39d1fecb1ba2384fbf59a81958a58e4c2b83d2",
+    "root_verified_at": "2026-10-06T18:32:55.061292+00:00",
+    "source_bindings_verified": 13,
+    "interpretation": "B93.5 retains dedicated activation as S1/task/affected paired acceptance, not a new destination implementation gate. Actual landed-source CI acceptance and current-ref/metadata rebind precede useful ten-path PS repair; no dummy or unrelated B99 delta in that batch."
+  },
+  "ps_carryback_preparation": {
+    "status": "root_verified_ready_pending_landed_source_CI",
+    "worker": "a06_ps_carryback_writer",
+    "directory": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/preparation",
+    "product_writes_released": false,
+    "prospective_worktree": "C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide",
+    "prospective_branch": "codex/tf68-compareback",
+    "destination_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "source_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "restrictions": "No product/dependency/Git/native changes or tests by preparation worker. Root waits for landed-source CI before product release.",
+    "apply_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\apply-manifest.json",
+    "apply_manifest_sha256": "e78676dbfba2aa924b15f171e6eb58dac033ca34cc68bea280515cf8448106ef",
+    "root_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation-root-verification.json",
+    "verified_at": "2026-10-06T18:40:28.343422+00:00",
+    "metadata": "ActualOct6; retain valid source1.20/1.11 and projected bytes. No exactly-next-minor rule; preserve touched-file equality."
+  },
+  "ps_carryback_release": {
+    "state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\execution-state.json",
+    "released_at": "2026-10-06T18:45:47.224991+00:00",
+    "scope": [
+      ".github/workflows/package.json",
+      ".github/workflows/package-lock.json",
+      "docs/dependency-maintenance.md",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml"
+    ],
+    "transfers_before": {
+      "A06": 1,
+      "A03": 3,
+      "A21": 5,
+      "A07": 5
+    },
+    "transfers_after": {
+      "A06": {
+        "used": 2,
+        "cap": 12
+      },
+      "A03": {
+        "used": 4,
+        "cap": 12
+      },
+      "A21": {
+        "used": 6,
+        "cap": 12
+      },
+      "A07": {
+        "used": 6,
+        "cap": 12
+      }
+    },
+    "status": "applied_unstaged_validation_pending",
+    "applied_at": "2026-10-06T18:45:48.069788+00:00"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "status": "ROOT_SOURCE_REVIEWED_RELEASE_FOR_ONE_ACTUAL_RUN",
+  "released_at": "2026-10-06T19:09:33.236679+00:00",
+  "manifest_sha256": "ad890893b6f9d127eb30700827a7450849248db14bdba9d050bacee956b75f5c",
+  "runner_sha256": "3ada5b1943cd0d8bbc755ffd11ad60ae2f219b4a032f7b8678460942beb20ed0",
+  "scope": "Eight exact commands: private fixture and runtime identity plus six destination-focused groups. Existing source tests reused only at exact bindings. New Windows Job hosting source inspected; no previous qualification claimed. Native stages and empty-job cleanup must actually pass.",
+  "prepared_source_count": 78,
+  "prepared_dependency_count": 1914,
+  "product_runtime": "Python3.12.10 PowerShell7.6.5 Node24.18.1 npm11.16.0",
+  "actual_run_result_pending": true
+}

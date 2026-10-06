@@ -1,0 +1,177 @@
+{
+  "status": "DRAFT_ONLY_ROOT_RELEASE_REQUIRED",
+  "genuine_preparation_utc_date": "2026-10-06",
+  "baseline": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "source": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "source_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "rows": [
+    {
+      "path": ".github/workflows/package.json",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+        "bytes": 844
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\package.json",
+      "postimage_sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "postimage_blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+      "bytes": 936
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196",
+        "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+        "bytes": 38822
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\package-lock.json",
+      "postimage_sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "postimage_blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+      "bytes": 38820
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+        "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+        "bytes": 9867
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\docs\\dependency-maintenance.md",
+      "postimage_sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+      "postimage_blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+      "bytes": 10446
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "postimage_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "postimage_blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+      "bytes": 285244
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "bytes": 13541
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\scripts-README.md",
+      "postimage_sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "postimage_blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+      "bytes": 13541
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "bytes": 36090
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\Test-StyleGuideArtifacts.ps1",
+      "postimage_sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "postimage_blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+      "bytes": 36084
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "postimage_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "postimage_blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "bytes": 510470
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "bytes": 123582
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\Test-CiHelpers.test.mjs",
+      "postimage_sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "postimage_blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+      "bytes": 130003
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "operation": "replace",
+      "mode": "100644",
+      "preimage": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+        "bytes": 12837
+      },
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\agent-instructions.yml",
+      "postimage_sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "postimage_blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+      "bytes": 12865
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "operation": "add",
+      "mode": "100644",
+      "preimage": null,
+      "draft_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections\\.github\\workflows\\copilot-code-review.yml",
+      "postimage_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "postimage_blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+      "bytes": 44995
+    }
+  ],
+  "instructions": [
+    "Root must accept landed-source CI, refresh native refs, select clean destination branch from baseline, and record2/4/6/6 before actual destination writes.",
+    "Recheck UTC day and all preimages. If same day and same inputs, apply exactly these ten files with100644 modes; otherwise rebind date/version fields and dependent hashes before writing.",
+    "Preserve PS README body: only Last Updated changes. No source guide/generated output/classifier/contract/root package changes.",
+    "Stage, validate, commit and finalize only under root release; current drafts carry no execution or acceptance claim."
+  ],
+  "metadata": {
+    "validator_script": "1.20.20261006.0",
+    "selftest_script": "1.11.20261006.0",
+    "artifact_script_and_ConvertFrom_NulPathRecordStream": "2.0.20261006.0",
+    "governed_documents_Last_Updated": "2026-10-06",
+    "reason": "Source minor versions validly increase accepted PS baselines; no exact-next-minor requirement. Changed tuple/date requires revision0. Retain source metadata equality under D07.",
+    "withdrawn_assumption": "Initial suggestion1.19/1.9 was withdrawn after accepted-source inspection; no draft or product had been changed to those versions."
+  }
+}

@@ -1,0 +1,1171 @@
+{
+  "state": "qualified_pure_Node_stage_judgment_and_saved_evidence_interpretation",
+  "manifest_sha256": "b7fd46e36c19e26b4cc64bb4f397d4a382de50a8e3ca6183194730c9ef14196b",
+  "cases": [
+    {
+      "case": "saved600-and82-owned-terminal-observations",
+      "expected_accepted": true,
+      "observed_accepted": true,
+      "refusal": null
+    },
+    {
+      "case": "empty-owned-set",
+      "expected_accepted": true,
+      "observed_accepted": true,
+      "refusal": null
+    },
+    {
+      "case": "normal-nonzero-not-a128-allowlist",
+      "expected_accepted": true,
+      "observed_accepted": true,
+      "refusal": null
+    },
+    {
+      "case": "terminal-signal-not-aSIGKILL-allowlist",
+      "expected_accepted": true,
+      "observed_accepted": true,
+      "refusal": null
+    },
+    {
+      "case": "terminal-signal-with-core-bit",
+      "expected_accepted": true,
+      "observed_accepted": true,
+      "refusal": null
+    },
+    {
+      "case": "direct-Node-nonzero-even-with-no-residue",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Direct Node failed"
+    },
+    {
+      "case": "direct-Node-signaled",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Direct Node failed"
+    },
+    {
+      "case": "unrelated-primary-failure",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unrelated primary failure"
+    },
+    {
+      "case": "primary-type-not-hidden-by-same-message",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "A direct primary failure was recorded"
+    },
+    {
+      "case": "direct_cleanup_failure",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "direct_cleanup_failure"
+    },
+    {
+      "case": "stream_cleanup_failure",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "stream_cleanup_failure"
+    },
+    {
+      "case": "terminal_receipt_failure",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "terminal_receipt_failure"
+    },
+    {
+      "case": "wrong-stage",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "wrong-seven-file-argv",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "missing-TAP-header",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "missing-TAP-summary",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Missing or ambiguous TAP summary: tests"
+    },
+    {
+      "case": "duplicate-TAP-summary",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Missing or ambiguous TAP summary: tests"
+    },
+    {
+      "case": "wrong-test-count",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "TAP-fail",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "TAP-cancelled",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "TAP-skipped",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "TAP-todo",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "private-input-drift",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "host-input-drift",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "unqualified-observer",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unqualified isolated observer"
+    },
+    {
+      "case": "unknown-isolated-phase",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "nonempty-earlier-boundary",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Earlier ownership boundary is not empty"
+    },
+    {
+      "case": "terminal-collection-error",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "foreign-owner",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "foreign-earlier-owner",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Earlier owner boundary changed"
+    },
+    {
+      "case": "live-before-eventual-empty",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Live or unknown adopted ownership"
+    },
+    {
+      "case": "unknown-before-state",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Live or unknown adopted ownership"
+    },
+    {
+      "case": "identity-born-before-Node",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Identity outside Node phase"
+    },
+    {
+      "case": "raw-process-identity-mismatch",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Raw process identity mismatch"
+    },
+    {
+      "case": "missing-wait",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Missing adopted wait"
+    },
+    {
+      "case": "duplicate-wait",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Duplicate wait identity or PID"
+    },
+    {
+      "case": "duplicate-member",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Duplicate adopted identity or PID"
+    },
+    {
+      "case": "simultaneous-same-PID-different-birth",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Duplicate adopted identity or PID"
+    },
+    {
+      "case": "mismatched-wait-identity",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unknown or mismatched adopted wait"
+    },
+    {
+      "case": "foreign-adopted-parent",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unknown or mismatched adopted wait"
+    },
+    {
+      "case": "observer-signal-before-eventual-empty",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unsafe cleanup lifecycle"
+    },
+    {
+      "case": "collection-error",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "empty-after-unconfirmed",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "residue",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Unsafe cleanup lifecycle"
+    },
+    {
+      "case": "negative-raw-status",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Invalid integer receipt"
+    },
+    {
+      "case": "stopped-not-terminal",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Not a terminal wait status"
+    },
+    {
+      "case": "continued-not-terminal",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Not a terminal wait status"
+    },
+    {
+      "case": "wrong-decoded-exit",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": ""
+    },
+    {
+      "case": "wrong-decoded-terminal-kind",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Decoded terminal kind mismatch"
+    },
+    {
+      "case": "normal-exit-with-signal",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Normal exit has a signal"
+    },
+    {
+      "case": "wrong-decoded-signal",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Decoded terminal signal mismatch"
+    },
+    {
+      "case": "signal-with-impossible-upper-exit-byte",
+      "expected_accepted": false,
+      "observed_accepted": false,
+      "refusal": "Signaled status has an exit byte"
+    },
+    {
+      "case": "strict-still-refuses-owned-nonzero",
+      "expected_accepted": false,
+      "observed_accepted": false
+    },
+    {
+      "case": "strict-still-refuses-owned-signal",
+      "expected_accepted": false,
+      "observed_accepted": false
+    }
+  ],
+  "composite_Node_interpretation": {
+    "interpretation": "Node assertions and owned terminal collection satisfy the selected stage contract",
+    "TAP": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "adopted_observations": [
+      {
+        "pid": 738,
+        "start_ticks": 1878,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 744,
+        "start_ticks": 1879,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 771,
+        "start_ticks": 1881,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 827,
+        "start_ticks": 1886,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 970,
+        "start_ticks": 1903,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 981,
+        "start_ticks": 1904,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 992,
+        "start_ticks": 1905,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 998,
+        "start_ticks": 1906,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1046,
+        "start_ticks": 1910,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1084,
+        "start_ticks": 1915,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1131,
+        "start_ticks": 1920,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1180,
+        "start_ticks": 1925,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1238,
+        "start_ticks": 1930,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1287,
+        "start_ticks": 1935,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1330,
+        "start_ticks": 1940,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1373,
+        "start_ticks": 1944,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1402,
+        "start_ticks": 1948,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1408,
+        "start_ticks": 1948,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1424,
+        "start_ticks": 1949,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1461,
+        "start_ticks": 1953,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1477,
+        "start_ticks": 1953,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1521,
+        "start_ticks": 1958,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1859,
+        "start_ticks": 2000,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1869,
+        "start_ticks": 2001,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1880,
+        "start_ticks": 2001,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1891,
+        "start_ticks": 2002,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1951,
+        "start_ticks": 2008,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1963,
+        "start_ticks": 2009,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 1997,
+        "start_ticks": 2014,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2082,
+        "start_ticks": 2023,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2125,
+        "start_ticks": 2029,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2168,
+        "start_ticks": 2034,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2219,
+        "start_ticks": 2040,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2229,
+        "start_ticks": 2040,
+        "raw_status": 32768,
+        "exited": true,
+        "exit": 128,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2291,
+        "start_ticks": 2050,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2301,
+        "start_ticks": 2051,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2311,
+        "start_ticks": 2052,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2316,
+        "start_ticks": 2052,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2334,
+        "start_ticks": 2055,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2358,
+        "start_ticks": 2058,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2376,
+        "start_ticks": 2060,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2409,
+        "start_ticks": 2064,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2503,
+        "start_ticks": 2075,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2547,
+        "start_ticks": 2078,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2568,
+        "start_ticks": 2082,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2611,
+        "start_ticks": 2086,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2640,
+        "start_ticks": 2090,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2647,
+        "start_ticks": 2091,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2656,
+        "start_ticks": 2092,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2666,
+        "start_ticks": 2093,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2685,
+        "start_ticks": 2095,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2697,
+        "start_ticks": 2096,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2730,
+        "start_ticks": 2099,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2758,
+        "start_ticks": 2102,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2774,
+        "start_ticks": 2103,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2810,
+        "start_ticks": 2106,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2824,
+        "start_ticks": 2109,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2835,
+        "start_ticks": 2111,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2858,
+        "start_ticks": 2115,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2885,
+        "start_ticks": 2119,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2895,
+        "start_ticks": 2120,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2902,
+        "start_ticks": 2121,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 2910,
+        "start_ticks": 2122,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 3058,
+        "start_ticks": 2148,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 3170,
+        "start_ticks": 2176,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 4314,
+        "start_ticks": 2519,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6229,
+        "start_ticks": 3681,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6234,
+        "start_ticks": 3682,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6239,
+        "start_ticks": 3683,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6268,
+        "start_ticks": 3686,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6277,
+        "start_ticks": 3686,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6291,
+        "start_ticks": 3688,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6305,
+        "start_ticks": 3690,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6319,
+        "start_ticks": 3692,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6336,
+        "start_ticks": 3693,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6353,
+        "start_ticks": 3695,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6371,
+        "start_ticks": 3697,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6385,
+        "start_ticks": 3698,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6400,
+        "start_ticks": 3700,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 6414,
+        "start_ticks": 3702,
+        "raw_status": 0,
+        "exited": true,
+        "exit": 0,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 18141,
+        "start_ticks": 19007,
+        "raw_status": 32768,
+        "exited": true,
+        "exit": 128,
+        "signaled": false,
+        "signal": null,
+        "original_test_cause": "unclassified"
+      },
+      {
+        "pid": 21565,
+        "start_ticks": 22139,
+        "raw_status": 9,
+        "exited": false,
+        "exit": null,
+        "signaled": true,
+        "signal": 9,
+        "original_test_cause": "unclassified"
+      }
+    ],
+    "old_packet_status": "failed_unchanged",
+    "per_test_historical_causes_proved": false
+  },
+  "original_packet_status": "failed_unchanged",
+  "historical_per_test_causes": "unknown",
+  "missing_aggregate": "independent_root_evidence_required",
+  "product_tests": 0,
+  "child_processes": 0,
+  "OS_wait_calls": 0,
+  "input_files_unchanged": true,
+  "Linux_Python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]"
+}

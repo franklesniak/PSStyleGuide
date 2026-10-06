@@ -1,0 +1,60 @@
+{
+  "status": "REUSE_BINDINGS_PREPARED_NOT_TEST_RESULTS",
+  "validator_exact_equal": true,
+  "selftest_exact_counted_P1_projection": true,
+  "clock_helper_sha256": "895f1878b51d7b0183746960183633ebd73ab9d81ff09e7df25d8c99c7b6f117",
+  "clock_historical_source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\source-final.ps1",
+  "clock_historical_source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+  "rows": [
+    {
+      "area": "C88.5 external conversion negatives",
+      "reuse": "Twelve caller/path controls, seven killed mutants, two compilation/type-identity controls, frozen original decoder/native/legacy discrimination; Windows7.6.5 qualified runtime.",
+      "binding": "Entire current validator equal TF; SelfTest equal after exactly one unrelated P1 literal;1912 actual dependency bytes equal (two generated name-only lockfiles excepted).",
+      "fresh": "Persistent strict/type/reuse controls in destination fixture and final three-file analysis.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\ROOT-FOCUSED-VERIFICATION.json"
+    },
+    {
+      "area": "R1/R5 clock and primary failure",
+      "reuse": "Literal path/decoy matrix, primary-error plus clock-cleanup preservation, existing actual ordinary production-clock proof. The historical Windows next-day actualcaller took31m18s; root explicitly accepted omission of its redundant replay.",
+      "binding": "Clock helper bytes equal historical tested R5 source-final.ps1; runtime7.6.5/exe hash unchanged.",
+      "fresh": "Actual destination next-day author/P1 fixture, prior-day capacity and complete validator/SelfTest are allocated to root Linux final packet. This Windows packet does not rerun or claim them.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\implementation-evidence.json",
+      "historical_actualcaller": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R5/windows-next-day-focus.json"
+    },
+    {
+      "area": "R2 vulnerability/dependency",
+      "reuse": "Old vulnerable package inherited-trust behavior and old public-import/math-token/outer/nested expected output.",
+      "binding": "Retained old-controls.json plus actual fresh PS locked install/graphs and1914-file catalog.",
+      "fresh": "Patched actual PS installed package CJS/ESM/public imports, inherited-trust and outer/nested behavior comparison. Staged lint remains root full suite.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\old-controls.json"
+    },
+    {
+      "area": "R8 artifact contracts",
+      "reuse": "Selected annotation repair and original control body.",
+      "binding": "Actual PS baseline original byte stream; current PS artifact source includes correct language descriptor.",
+      "fresh": "One three-file parser/PSSA pass; exact empty/one/multiple/newline/nonASCII/malformed-no-partial-output contract; original broad annotation rejected.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-probe.ps1"
+    },
+    {
+      "area": "S1/R11 setup and Git",
+      "reuse": "Unchanged strict optional reader/default/native/size/UTF8/error/link/omission mutants; prior real Linux alternate spaced Git failure73/fixed-selector discriminator.",
+      "binding": "Entire validator identical, production CI helper source identical except8requiredPSidentities, complete declared deps match.",
+      "fresh": "Actual PS current/staged/revision setup regression and four selected Windows Git/workflow/proof tests. Root Linux full suite covers real POSIX/link/body cells.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\evidence.json"
+    },
+    {
+      "area": "PS language",
+      "reuse": "Unchanged guide/helper source identity is bound, without substituting TF recovery semantics.",
+      "binding": "Actual PS source catalog.",
+      "fresh": "PS blank-line semantic positive and its meaningful mutation controls. Full artifact wrapper/generator Windows5.1/7/Linux platform evidence remains root/hosted.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json"
+    },
+    {
+      "area": "D93 cleanup",
+      "reuse": "Original failed cold packet stays failed; successful source observation and Linux ownership sentinel retain their actual limits.",
+      "binding": "Existing source evidence only; do not claim Linux process controls qualify new Windows Job API hosting.",
+      "fresh": "New Windows wrapper assigns gated worker before command, records native exits and job counts, cleans only owned descendants and preserves primary plus separate cleanup failures. No packet execution yet.",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\REPORT.md"
+    }
+  ]
+}

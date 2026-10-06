@@ -1,0 +1,14 @@
+{
+  "status": "PASS_PROVISIONAL_SOURCE_BINDING",
+  "references_verified": 27,
+  "ten_source_postimages_verified": true,
+  "mutable_references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\execution-state.json",
+      "old_sha256": "b612caed997bb52efaf2a6103399205d5a4b8b42538a34f1f6e4958dfa8b80ff",
+      "current_sha256": "74b464f2b6a848f0c7fd4645a37ad567b692dbd3965757e841c4efbfd074826d",
+      "disposition": "Expected root progress updates after independent inspection. Base/source/tree/scope unchanged; no test completion inherited."
+    }
+  ],
+  "limit": "Actual validation, commit/endpoints/audit/body and native reviews/CI still pending."
+}

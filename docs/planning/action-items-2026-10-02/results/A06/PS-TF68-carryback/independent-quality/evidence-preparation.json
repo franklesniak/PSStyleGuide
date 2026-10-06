@@ -1,0 +1,275 @@
+{
+  "status": "PREPARATION_NO_MATERIAL_FINDINGS",
+  "reviewer": "independent a06_conversion_quality",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head_is_uncommitted_candidate": false,
+  "candidate_is_staged": true,
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "accepted_TF_commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "accepted_TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "material_findings": [],
+  "binding": {
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "branch": "codex/tf68-compareback",
+    "candidate_tree_computed_in_memory": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "status": "M  .github/workflows/Test-AgentInstructions.SelfTest.ps1\nM  .github/workflows/Test-AgentInstructions.ps1\nM  .github/workflows/Test-CiHelpers.test.mjs\nM  .github/workflows/Test-StyleGuideArtifacts.ps1\nM  .github/workflows/agent-instructions.yml\nA  .github/workflows/copilot-code-review.yml\nM  .github/workflows/package-lock.json\nM  .github/workflows/package.json\nM  .github/workflows/scripts-README.md\nM  docs/dependency-maintenance.md\n",
+    "unstaged_diff_bytes": 0,
+    "source_count": 78,
+    "dependency_count": 1914,
+    "coupled_count": 10,
+    "errors": [],
+    "paths": [
+      {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+        "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        "accepted_TF_blob": "670083e767627cfed90a61f788021dba88de1091",
+        "accepted_TF_sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "exception_count": 6
+      },
+      {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+        "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        "accepted_TF_blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "accepted_TF_sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "exception_count": 2
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+        "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+        "accepted_TF_blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "accepted_TF_sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "exception_count": 1
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+        "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+        "accepted_TF_blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "accepted_TF_sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "exception_count": 1
+      },
+      {
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+        "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        "accepted_TF_blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+        "accepted_TF_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        "exception_count": 4
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+        "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        "accepted_TF_blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "accepted_TF_sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        "exception_count": 1
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "accepted_TF_blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "accepted_TF_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "exception_count": 0
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        "accepted_TF_blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+        "accepted_TF_sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        "exception_count": 8
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+        "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        "accepted_TF_blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "accepted_TF_sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        "exception_count": 4
+      },
+      {
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "accepted_TF_blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "accepted_TF_sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "exception_count": 3
+      }
+    ],
+    "references": [
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\peer-readiness\\REPORT.md",
+        "sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\peer-readiness\\evidence.json",
+        "sha256": "e5fe76b2c285124d32f5eef581e90c52dccb2ff1ac76f01d4c479ca02f82117e"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\REPORT.md",
+        "sha256": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\evidence.json",
+        "sha256": "f237d0e817445e5da9857cebae78808bbd41fbaa983024fd33d012dc911cfbc5"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+        "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\root-decision.json",
+        "sha256": "ca8b95eae308778501a049b1399658af9dad89ac03bc0e72359cd3309298863a"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\merge-acceptance.json",
+        "sha256": "28a615ed821d5948e797b05328ab8c93a7f25d5ab363f61d5a2dad6f8cc7267a"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\final-quality\\REPORT.md",
+        "sha256": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+        "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c"
+      }
+    ]
+  },
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\execution-state.json",
+      "sha256": "b612caed997bb52efaf2a6103399205d5a4b8b42538a34f1f6e4958dfa8b80ff",
+      "bytes": 10927
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\REPORT.md",
+      "sha256": "53805dffb1fa3c4ea389df8abcab57ff60298f5028905ba8b53f9c95a9b4c43f",
+      "bytes": 13793
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\evidence.json",
+      "sha256": "88151812a524665d94f0b5da06068c5a0ffc476dcd405b4f8428f0b6aa083a28",
+      "bytes": 41504
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\apply-manifest.json",
+      "sha256": "e78676dbfba2aa924b15f171e6eb58dac033ca34cc68bea280515cf8448106ef",
+      "bytes": 8978
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\source-projections.diff",
+      "sha256": "f055141d24e1573aa962b71cfbf0449424342cf4a8afc6b4f3710aae14ea8703",
+      "bytes": 282691
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation-root-verification.json",
+      "sha256": "1485dfe54f32f55341bec6571fcd0cffcc32fde25b5e26e8920917d7f119a3a0",
+      "bytes": 899
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "bytes": 18558
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "bytes": 400393
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\locked-install.log",
+      "sha256": "745726b13e37b4c51c0aaf39db2077bc18a5658784d1043d6f7fff2320114fbf",
+      "bytes": 86
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\installed-graph-root.json",
+      "sha256": "003d4abfc8e5808a1e52675441e5ce65c6dc31e6685cdc9ad13f93e37421fb78",
+      "bytes": 1460
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\installed-graph-workflows.json",
+      "sha256": "acf9906f5c49a093ccae8218e815ec83627b4e5a43beb4628f1ba750db02a2e0",
+      "bytes": 23447
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-postlanding-sequence\\REPORT.md",
+      "sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2",
+      "bytes": 8654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-source-acceptance.json",
+      "sha256": "d79d27bf32114b5db73849d69dc776d8ff5d8164e12f3f50d86f46004a2be9f5",
+      "bytes": 7263
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\REPORT.md",
+      "sha256": "e38f69da4f4e3a3c271cdc00954fb02cbacb9139bed7993973748ab138f566ff",
+      "bytes": 9755
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\evidence.json",
+      "sha256": "dfecce49d3b4830445ecdd7538faa8296ca078694461c3d872f7fabcdce07398",
+      "bytes": 9143
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-binding\\REPORT.md",
+      "sha256": "9559bdf4e9959196e170368dd2757f384a7ca9b5de521c8a812f44fcd5229dbd",
+      "bytes": 6638
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-binding\\evidence.json",
+      "sha256": "797c56fa54b2e3d321af60aa33a85f63641a0d435411f58bb5809628d753ca11",
+      "bytes": 10726
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\round7-native\\REPORT.md",
+      "sha256": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a",
+      "bytes": 6211
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\round7-native\\evidence.json",
+      "sha256": "f9c6104ed7971edac8f8d82be859e82b6e1a3e732167bd03e7fa8ac6bad53485",
+      "bytes": 17139
+    }
+  ],
+  "reused_review": "Exact unchanged C88.5 common functions and earlier accepted TF quality; this is not a new broad whole-source review.",
+  "remaining": [
+    "Destination focused Windows/Linux results and explicit evidence applicability",
+    "Final classifier, full SelfTest and all-files aggregate",
+    "Actual committed B/H metadata endpoints, two-root audit and normal clean commit",
+    "Final PR body, current reviews and current CI",
+    "Dedicated-service selection/completion under B93.5 and accepted-main paired compareback"
+  ],
+  "operations": {
+    "tests": 0,
+    "installs": 0,
+    "git_writes": 0,
+    "native_operations": 0,
+    "product_edits": 0,
+    "planning_or_state_edits": 0,
+    "counter_changes": 0,
+    "descendants": 0
+  },
+  "limitations": [
+    "No final local or native PASS claimed",
+    "No current remote status queried",
+    "Historical cold packet remains failed",
+    "No empirical all-PowerShell-7.x claim",
+    "Held A07 work not touched"
+  ]
+}

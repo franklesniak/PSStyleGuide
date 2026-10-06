@@ -1,0 +1,99 @@
+{
+  "status": "PASS_SIX_WINDOWS_PRODUCT_GROUPS_WITH_EXPLICIT_REUSE",
+  "verified_at": "2026-10-06T19:35:42.256859+00:00",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "runtimes": {
+    "npm": "11.16.0",
+    "pwsh": "7.6.5",
+    "python": {
+      "version": [
+        3,
+        12,
+        10
+      ],
+      "executable": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe"
+    },
+    "git": "git version 2.55.0.windows.5",
+    "resolved": {
+      "pwsh": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "python": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+      "git": "C:\\Program Files\\Git\\cmd\\git.exe",
+      "node": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe"
+    },
+    "node": "v24.18.1"
+  },
+  "first_run": "failed_preserved_npm_cache_location",
+  "first_continuation": "failed_preserved_UTF8_receipt",
+  "second_continuation": "passed_two_missing_groups_and_verified_prior_receipts",
+  "parser_PSSA_files": 3,
+  "parser_PSSA_findings": 0,
+  "artifact_valid_cases": 4,
+  "artifact_negative_cases": 3,
+  "original_annotation_negative_rejected": true,
+  "persistent_converter_checks": [
+    {
+      "state": "passed",
+      "name": "Assert-ParserJsonConversionSelfTest",
+      "seconds": 0.5372211
+    },
+    {
+      "state": "passed",
+      "name": "Assert-MarkdownParseReuseSelfTest",
+      "seconds": 5.4891635
+    }
+  ],
+  "CI_tests": {
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "receipt_negative_controls": 12,
+  "dependency_version": "0.18.2",
+  "dependency_caller_cases": 4,
+  "blank_line_semantics": "passed_with_mutations",
+  "all_owned_jobs_empty": true,
+  "product_and_dependency_and_Git_guards_equal": true,
+  "source_scope": "78frozen files and1914dependencies",
+  "raw_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\run-one\\result.json",
+      "sha256": "409d34c2bc5b39d9b7dca445b3fd5659f1a1f83cd2f73a50790c01c64bb1a01e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\result.json",
+      "sha256": "776229cef1a1b168582970f623b415cbfc416237da4fbc3f0a0823fe690743c3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\execution-run\\result.json",
+      "sha256": "faa0c2472fcc2f4e23725acf1fb7da6df509f620f41440e2aad516cd31518d15"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\output\\analysis.json",
+      "sha256": "b3052a2fe313e30ba84ed374d013986653fae8c18497275a18407f4b13f9c6a7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\output\\artifact-contract.json",
+      "sha256": "ca64531962394fe8a0438690ec9050e6cc6fa3d8b6a23b49a815861d53995418"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-one\\execution-run\\output\\converter.json",
+      "sha256": "1d0660059171040a539f8c7862e2753ad5431539151e71b1fa4a1ffa5d166f8b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\execution-run\\output\\patched-dependency.json",
+      "sha256": "72aad87f4c575ee29183b0f02845ed9d530df8dd730587dafd37977f4b647a6a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\execution-run\\output\\powershell-blank-lines\\log.txt",
+      "sha256": "b1368977e9247e19f7dcf4bc906a0847ad7c308e76cd2fab5e1796d672e92e5b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\continuation-two\\receipt-validation.json",
+      "sha256": "806a8902dbc6887fab858f2c6f301d0d74a4ff27804733639b51473675c3ee74"
+    }
+  ],
+  "limits": "Truthful composite of named completed native groups, not one uninterrupted run. Historical failures stay failed. No current Windows author/capacity replay; actual destination completeSelfTest supplied by Linux aggregate. Generator platform cells and current native lifecycle remain pending."
+}

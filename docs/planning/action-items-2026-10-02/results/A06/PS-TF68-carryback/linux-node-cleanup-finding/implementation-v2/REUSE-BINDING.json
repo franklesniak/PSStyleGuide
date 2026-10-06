@@ -1,0 +1,128 @@
+{
+  "role": "unchanged qualification and historical evidence reuse",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\REPORT.md",
+      "sha256": "34679c2e49d09aca3453335603e0cac2ed2cfd52ac306480024031838cd5b26e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\evidence.json",
+      "sha256": "94dc15ffdcb29bd482e2e8de3c0f4f2ba90470fd8296f93ab1986b8986aa6070"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\RECEIPT-POLICY-CHECKS.json",
+      "sha256": "4d0b3d5724f46dd3435b11f5887620080a64f707c46cd7e7ddc48639dcce563a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "c02b8b68f7cf900cbe1f621ab425a257dba42ce05b3faa8516498f59fb14db76"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\inside.py",
+      "sha256": "fab36fc8daf64a1c57580c571705e0f681d8c2388707b9d7fb4692f7e5c71516"
+    }
+  ],
+  "real_controls_reused": 4,
+  "strict_pure_controls_reused": 10,
+  "rerun_unchanged_controls": false,
+  "input_copies": [
+    {
+      "name": "saved-manifest.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\manifest.authorized.json",
+      "sha256": "8795485a2a5767d50bc09f46fc0fdf888197f7adc735a9c6b566f7d8fc59c0af",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-result.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\result.json",
+      "sha256": "dfd051d69ad125801940b5004f40ce055bf1239340391f0eb33304f81cf94ecc",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-status.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\status.json",
+      "sha256": "f1a675c932f2ce65311aa4a6d1f3da9b0dee161f4d44564082b8040d0ce3ea7a",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-inside.py",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\inside.py",
+      "sha256": "fab36fc8daf64a1c57580c571705e0f681d8c2388707b9d7fb4692f7e5c71516",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-source-catalog.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\source-catalog.json",
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-dependency-catalog.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-runtime.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\runtime.json",
+      "sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-private-before.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\before.json",
+      "sha256": "6645ec02888241d2799fba4e1b2260d23ee942f45b889385d5d27f916487766d",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-private-terminal.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\terminal-after.json",
+      "sha256": "6645ec02888241d2799fba4e1b2260d23ee942f45b889385d5d27f916487766d",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-host-before.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\inputs\\source-before.json",
+      "sha256": "509a713fc3f03714b94c57bf235c847db2b126d1d3ee92b96690534a52764f6d",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-host-after.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\host-source-after.json",
+      "sha256": "509a713fc3f03714b94c57bf235c847db2b126d1d3ee92b96690534a52764f6d",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-preflight-after.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\staged-preflight-after.json",
+      "sha256": "6645ec02888241d2799fba4e1b2260d23ee942f45b889385d5d27f916487766d",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-node-cleanup.json",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node-cleanup.json",
+      "sha256": "ff586828dba87887f914dbb3435931a8f8ac7c6efc41fcdfdf138a3ee92fb196",
+      "copy_equal": true
+    },
+    {
+      "name": "saved-node.log",
+      "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\runs\\ps-carryback-20261006-linux-final-validation-one\\output\\affected-node.log",
+      "sha256": "ad39e4118754675075c14b90d9ee1b321ca9be91238dbdcf3080ab66a9070922",
+      "copy_equal": true
+    }
+  ],
+  "ownership_unchanged": true,
+  "strict_policy_unchanged": true
+}

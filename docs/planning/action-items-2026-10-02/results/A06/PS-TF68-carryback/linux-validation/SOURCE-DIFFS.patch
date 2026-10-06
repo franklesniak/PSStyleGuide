@@ -1,0 +1,248 @@
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-TF-peer-20261005\writer\TF68-round6-timeout-remedy\implementation\final-validation\inside.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\linux-final-validation\inside.py
+@@ -7,7 +7,7 @@
+ inputs=pathlib.Path('/input');output=pathlib.Path('/output')
+ record={'state':'preparing','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'commands':[],'cleanup_receipts':[]}
+ save(output/'result.json',record)
+-overall_deadline=time.monotonic()+3870;active_direct=[];primary=None;m={}
++overall_deadline=time.monotonic()+7170;active_direct=[];primary=None;m={}
+ def date_guard():assert datetime.datetime.now(datetime.timezone.utc).date().isoformat()==m['finalization_utc_date'],'Actual UTC date changed; reconcile finalization without a clock override.'
+ def unpack(name,rows):
+     expected={row['path']:row for row in rows};seen=set()
+@@ -149,7 +149,7 @@
+     os.environ.clear();os.environ.update(PATH=RUNTIME_PATH,HOME=str(workspace/'home'),USER='root',LOGNAME='root',LANG='C.UTF-8',LC_ALL='C.UTF-8',TZ='UTC',TMPDIR=str(workspace/'tmp'),TEMP=str(workspace/'tmp'),TMP=str(workspace/'tmp'),PRE_COMMIT_HOME='/opt/psstyleguide-runtime/pre-commit-cache',GOTOOLCHAIN='local',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_NOSYSTEM='1',GIT_TERMINAL_PROMPT='0',PYTHONNOUSERSITE='1',PIP_CONFIG_FILE='/dev/null',PIP_DISABLE_PIP_VERSION_CHECK='1',NPM_CONFIG_UPDATE_NOTIFIER='false',npm_config_cache=str(workspace/'npm-cache'))
+     record.update(role=m['policy_role'],accepted_base=m['accepted_base'],candidate_tree=m['candidate_tree'],workspace=str(workspace))
+     save(output/'result.json',record)
+-    assert (m['whole_container_timeout_seconds'],m['preflight_timeout_seconds'],m['node_timeout_seconds'],m['aggregate_timeout_seconds'])==(3900,300,300,3000)
++    assert (m['whole_container_timeout_seconds'],m['preflight_timeout_seconds'],m['node_timeout_seconds'],m['aggregate_timeout_seconds'])==(7200,300,3600,3000)
+     date_guard()
+     git(repo,'init','--quiet');git(repo,'config','core.autocrlf','false');git(repo,'config','core.filemode','true')
+     git(repo,'bundle','verify',str(inputs/'history.bundle'))
+@@ -161,7 +161,7 @@
+     assert (repo/'.git').is_dir() and value(repo,'rev-parse','--is-shallow-repository')=='false'
+     assert not (repo/'.git/objects/info/alternates').exists()
+     git(repo,'fsck','--full','--no-reflogs')
+-    # The repair is staged over its real parent H. Accepted B stays origin/main.
++    # The PS repair is staged over actual accepted B981. B stays origin/main.
+     # Changed PowerShell scripts carry genuine edit-day metadata. Whole-PR B/H finalization
+     # is also mandatory after the normal commit; parent H never replaces B there.
+     # Only this disposable repository is changed. Candidate bytes come from the approved catalog.
+@@ -174,7 +174,13 @@
+     # This runtime profile only qualifies these unchanged Python/hook definitions.
+     for name in ['requirements-dev.txt','.github/workflows/Invoke-LockedPythonHook.ps1']:
+         assert (repo/name).read_bytes()==(pathlib.Path('/opt/psstyleguide-runtime/inputs')/pathlib.Path(name).name).read_bytes(),name
+-    assert (repo/'.pre-commit-config.yaml').read_bytes()==pathlib.Path('/opt/psstyleguide-runtime/inputs/.pre-commit-config.yaml').read_bytes()
++    profile_hooks=pathlib.Path('/opt/psstyleguide-runtime/inputs/.pre-commit-config.yaml').read_bytes()
++    assert sha(profile_hooks)==m['runtime_profile_hook_sha256'],'Pinned hook profile changed'
++    old_header=b'# Pre-commit configuration for TerraformStyleGuide.'
++    new_header=b'# Pre-commit configuration for PSStyleGuide.'
++    assert profile_hooks.count(old_header)==1
++    assert (repo/'.pre-commit-config.yaml').read_bytes()==profile_hooks.replace(old_header,new_header,1),'Only the approved first comment may differ; all hook bodies must match'
++    save(output/'hook-profile-identity.json',{'profile_sha256':sha(profile_hooks),'candidate_sha256':sha((repo/'.pre-commit-config.yaml').read_bytes()),'old_header':old_header.decode(),'new_header':new_header.decode(),'exactly_one_comment_replacement':True})
+     package=json.loads((repo/'package.json').read_bytes())
+     assert package['engines']=={'node':'24.18.1','npm':'11.16.0'} and package['packageManager']=='npm@11.16.0','Runtime profile requires renewed qualification.'
+     versions={}
+@@ -195,11 +201,8 @@
+     record['setup_cleanup']=settle('setup')
+     output_guard()
+     run('staged-preflight',['pwsh','-NoLogo','-NoProfile','-NonInteractive','-File','.github/workflows/Test-AgentInstructions.ps1','-RequireStagedInputMatch'],m['preflight_timeout_seconds'],before)
+-    # Changed validator/SelfTest entrypoints retain their maintenance classification,
+-    # invocation and failure propagation contracts. Other Node suites and
+-    # their exact inputs are unchanged; retain the prior complete 600-test evidence.
+-    run('affected-node',['node','--test','--test-reporter=tap',
+-        '.github/workflows/Classify-InstructionMaintenance.test.mjs'],m['node_timeout_seconds'],before)
++    # Full current seven-file PS workflow suite; classifier is included exactly once.
++    run('affected-node',['node', '--test', '--test-reporter=tap', '.github/workflows/Classify-InstructionMaintenance.test.mjs', '.github/workflows/Validate-WorkflowPolicy.test.mjs', '.github/workflows/Test-CiHelpers.test.mjs', '.github/workflows/NpmTools.test.mjs', '.github/workflows/Check-NpmAudit.test.mjs', '.github/workflows/Test-LocalValidation.test.mjs', '.github/workflows/lint-markdown.test.mjs'],m['node_timeout_seconds'],before)
+     run('aggregate',['/opt/psstyleguide-runtime/venv/bin/python','-m','pre_commit','run','--all-files'],m['aggregate_timeout_seconds'],before)
+     date_guard();record['state']='passed'
+ except BaseException as error:
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-TF-peer-20261005\writer\TF68-round6-timeout-remedy\implementation\final-validation\launch.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\linux-final-validation\launch.py
+@@ -1,4 +1,4 @@
+-"""One separately root-approved offline diagnostic; never acceptance evidence."""
++"""One separately root-approved offline PS candidate validation; no action is authorized by preparation."""
+ import argparse,datetime,hashlib,io,json,os,pathlib,queue,re,shutil,subprocess,tarfile,threading,time
+ from common import IMAGE,dependency_catalog,entries,git,index_rows,save,sha,value,worktree_catalog
+ parser=argparse.ArgumentParser();parser.add_argument('--execute-root-approved',action='store_true');parser.add_argument('--manifest',type=pathlib.Path,required=True);parser.add_argument('--approved-manifest-sha256',required=True)
+@@ -7,13 +7,14 @@
+ raw=args.manifest.read_bytes();assert sha(raw)==args.approved_manifest_sha256
+ m=json.loads(raw);assert m['schema']==1 and m['execution_authorized'] is True and m['authorizing_coordinator']=='root' and m['replaces_current_run'] is False
+ assert m['policy_role']=='proposed-staged-candidate-against-accepted-base'
++assert m['prepared'] is True,'Root has not qualified the packet'
+ evidence=pathlib.Path(m['root_readiness_evidence']);assert sha(evidence.read_bytes())==m['root_readiness_evidence_sha256']
+ assert m['root_confirmed_current_accepted_base'] is True and m['root_confirmed_candidate_policy_and_dependency_compatibility'] is True
+ assert re.fullmatch('[a-z0-9][a-z0-9-]{0,63}',m['run_id'])
+ for key in ['accepted_base','source_head','candidate_tree']:assert re.fullmatch('[0-9a-f]{40}',m[key])
+ assert m['image']==IMAGE
+-assert (m['whole_container_timeout_seconds'],m['preflight_timeout_seconds'],m['node_timeout_seconds'],m['aggregate_timeout_seconds'],m['expected_hook_count'],m['expected_node_tests'])==(3900,300,300,3000,11,13)
+-assert set(m['changed_paths'])=={'.github/workflows/Test-AgentInstructions.ps1','.github/workflows/Test-AgentInstructions.SelfTest.ps1'}
++assert (m['whole_container_timeout_seconds'],m['preflight_timeout_seconds'],m['node_timeout_seconds'],m['aggregate_timeout_seconds'],m['expected_hook_count'],m['expected_node_tests'])==(7200,300,3600,3000,11,600)
++assert set(m['changed_paths'])=={'.github/workflows/Test-StyleGuideArtifacts.ps1', '.github/workflows/Test-CiHelpers.test.mjs', '.github/workflows/agent-instructions.yml', '.github/workflows/copilot-code-review.yml', '.github/workflows/package.json', '.github/workflows/scripts-README.md', 'docs/dependency-maintenance.md', '.github/workflows/package-lock.json', '.github/workflows/Test-AgentInstructions.ps1', '.github/workflows/Test-AgentInstructions.SelfTest.ps1'}
+ assert m['maximum_output_bytes']==67108864 and m['maximum_stream_bytes']==8388608
+ assert m['finalization_utc_date']==datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+ assert re.fullmatch(r'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\.git',m['origin_url'])
+@@ -25,6 +26,8 @@
+ assert source!=here and source not in here.parents and dep_root not in here.parents
+ def source_guard():
+     assert value(source,'rev-parse','HEAD')==m['source_head']
++    assert value(source,'rev-parse','--abbrev-ref','HEAD')==m['source_branch']
++    assert not git(source,'diff','--name-only'),'Unstaged source change'
+     assert value(source,'rev-parse','refs/remotes/origin/main')==m['accepted_base']
+     assert value(source,'remote','get-url','origin')==m['origin_url']
+     assert value(source,'rev-parse','--is-shallow-repository')=='false'
+@@ -34,10 +37,13 @@
+     for suffix in ['info/grafts','objects/info/alternates']:
+         p=pathlib.Path(value(source,'rev-parse','--git-path',suffix));p=p if p.is_absolute() else source/p;assert not p.exists(),suffix
+     git(source,'merge-base','--is-ancestor',m['accepted_base'],m['source_head'])
+-    baseline=entries(source,m['source_tree']);assert index_rows(source)==baseline
++    baseline=entries(source,m['source_tree']);candidate=entries(source,m['candidate_tree'])
++    assert index_rows(source)==candidate,'Staged candidate index drift'
+     catalog=here/'source-catalog.json';assert sha(catalog.read_bytes())==m['source_catalog_sha256']
+-    rows=json.loads(catalog.read_bytes());assert [r['path'] for r in rows]==[r['path'] for r in baseline]
+-    assert {r['path'] for r,b in zip(rows,baseline) if r['blob']!=b['blob']}==set(m['changed_paths'])
++    rows=json.loads(catalog.read_bytes());assert len(rows)==m['source_count']==78
++    assert [{key:row[key] for key in ['path','mode','blob']} for row in rows]==candidate
++    old={row['path']:(row['mode'],row['blob']) for row in baseline};new={row['path']:(row['mode'],row['blob']) for row in candidate}
++    assert {path for path in old.keys()|new.keys() if old.get(path)!=new.get(path)}==set(m['changed_paths']),'Accepted-base/candidate changed-path union drift'
+     assert not git(source,'ls-files','--others','--exclude-standard')
+     files=worktree_catalog(source,rows);deps=dependency_catalog(dep_root,approved)
+     metadata={}
+@@ -50,7 +56,7 @@
+ before=source_guard()
+ image=json.loads(subprocess.check_output(['docker','image','inspect',IMAGE],timeout=10))[0];assert image['Id']==IMAGE and image['Os']=='linux' and image['Architecture']=='amd64'
+ run=here/'runs'/m['run_id'];run.mkdir(parents=True,exist_ok=False);inputs=run/'inputs';outputs=run/'output';inputs.mkdir();outputs.mkdir()
+-container_name='tf68-final-validation-'+m['run_id'];label=sha(raw);primary=None
++container_name='ps-carryback-final-validation-'+m['run_id'];label=sha(raw);primary=None
+ record={'state':'preparing','manifest_sha256':sha(raw),'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'run_id':m['run_id'],'image':IMAGE,'role':m['policy_role']};save(run/'status.json',record);save(inputs/'manifest.json',m);save(inputs/'source-before.json',before)
+ try:
+     # Only output files are written; no ref, index, config or worktree operation targets source.
+@@ -69,7 +75,7 @@
+     for name in ['common.py', 'inside.py', 'ownership.py', 'settlement.py']:shutil.copyfile(here/name,inputs/name)
+     save(inputs/'payload-hashes.json',{name:sha((inputs/name).read_bytes()) for name in ['common.py', 'inside.py', 'ownership.py', 'settlement.py', 'history.bundle', 'candidate.tar', 'dependencies.tar', 'manifest.json', 'source-before.json']})
+     assert source_guard()==before
+-    container_name='tf68-final-validation-'+m['run_id'];label=sha(raw)
++    container_name='ps-carryback-final-validation-'+m['run_id'];label=sha(raw)
+     command=['docker','run','--rm','--pull','never','--name',container_name,'--label','psstyleguide.validation-manifest='+label,'--network','none','--mount',f'type=bind,source={inputs},target=/input,readonly','--mount',f'type=bind,source={outputs},target=/output','--entrypoint','python',IMAGE,'/input/inside.py']
+     record.update(state='running',command=command);save(run/'status.json',record)
+     try:
+@@ -83,10 +89,10 @@
+                         chunks.put(data)
+                         if not data:return
+                 except BaseException as error:chunks.put(error)
+-            reader=threading.Thread(target=drain,daemon=True);reader.start();deadline=time.monotonic()+3900;total=0
++            reader=threading.Thread(target=drain,daemon=True);reader.start();deadline=time.monotonic()+7200;total=0
+             try:
+                 while True:
+-                    if time.monotonic()>deadline:raise subprocess.TimeoutExpired(command,3900)
++                    if time.monotonic()>deadline:raise subprocess.TimeoutExpired(command,7200)
+                     try:data=chunks.get(timeout=.1)
+                     except queue.Empty:continue
+                     if isinstance(data,BaseException):raise data
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-TF-peer-20261005\writer\TF68-round6-timeout-remedy\implementation\final-validation\manifest.prepared.json
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\linux-final-validation\manifest.prepared.json
+@@ -4,50 +4,78 @@
+   "authorizing_coordinator": "root",
+   "replaces_current_run": false,
+   "policy_role": "proposed-staged-candidate-against-accepted-base",
+-  "run_id": "tf68-ed9-native-converter-final-validation-one",
+-  "source_repository": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+-  "source_head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+-  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+-  "candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+-  "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
++  "run_id": "ps-carryback-20261006-linux-final-validation-one",
++  "source_repository": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
++  "source_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
++  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
++  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
++  "origin_url": "https://github.com/franklesniak/PSStyleGuide.git",
+   "finalization_utc_date": "2026-10-06",
+-  "dependency_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+-  "dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+-  "dependency_catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
++  "dependency_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
++  "dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
++  "dependency_catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+   "dependency_count": 1914,
+   "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+-  "whole_container_timeout_seconds": 3900,
++  "whole_container_timeout_seconds": 7200,
+   "prepared_files": {
+-    "check-receipt-policy.py": "0dc2c6ec680a7dd4e4465ccaf44697724570e57f2c408df7f569b0aa3a11d2ff",
+-    "check-syntax.py": "a1107955c5c1c84fcf8ea9758d97f73acf79e7629e53600c52ce478e8e8c6b98",
+     "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+-    "inside.py": "45f9f4b1807894b0439f73c6bd7466a31a8d3fb53a93756e212683302dd2d482",
+-    "launch.py": "8890b17ee2a9ea8f43897e52c7de8f7aeb9f442512a9652f044fcd8db1059746",
++    "inside.py": "17717a099cd0433e0755d1d7e2f0cb6244254d11e2af1ba8fab1d1c8bc20e194",
++    "launch.py": "280aef361dc85d3276c8f8443aae6c4ffc2ce60ce0429a2a336bae4957b9040a",
+     "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+-    "PREPARATION.md": "0802d8306ade1755ba3f0bf7b7d4c69b305fb635a1960983cf6e7ed968e20391",
+-    "prepare.py": "b9a111e40385fee5f7fafe5ddb666ff990f9a8de21554dc24aec5593ae503db5",
+-    "run-fragment.py.txt": "1af20693441a3da0eb635c66e065aab53013f2caad719d3c0caa715a3761f3f9",
++    "PREPARATION.md": "df500d342fd8498c41f5118493bc425d9c037d1e7bc1deb517e97f9404755a4f",
+     "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+-    "source-catalog.json": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+-    "SOURCE-DIFFS.patch": "1334fd7b3434bc4b284120225ef2e56c75d3c6055cd670cd3b6b756dfdb36279"
++    "source-catalog.json": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
++    "SOURCE-DIFFS.patch": "496f51ca6a2f21c50b91253d991c732ff7f96527d02c7eba0dc279a8cf16be9d"
+   },
+-  "source_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+-  "source_catalog_sha256": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
++  "source_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
++  "source_catalog_sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+   "changed_paths": [
+     ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+-    ".github/workflows/Test-AgentInstructions.ps1"
++    ".github/workflows/Test-AgentInstructions.ps1",
++    ".github/workflows/Test-CiHelpers.test.mjs",
++    ".github/workflows/Test-StyleGuideArtifacts.ps1",
++    ".github/workflows/agent-instructions.yml",
++    ".github/workflows/copilot-code-review.yml",
++    ".github/workflows/package-lock.json",
++    ".github/workflows/package.json",
++    ".github/workflows/scripts-README.md",
++    "docs/dependency-maintenance.md"
+   ],
+-  "root_readiness_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-READINESS.json",
++  "root_readiness_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\ROOT-READINESS.json",
+   "root_readiness_evidence_sha256": null,
+   "root_confirmed_current_accepted_base": false,
+   "root_confirmed_candidate_policy_and_dependency_compatibility": false,
+   "expected_hook_count": 11,
+-  "local_parent_revision": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
++  "local_parent_revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+   "preflight_timeout_seconds": 300,
+-  "node_timeout_seconds": 300,
++  "node_timeout_seconds": 3600,
+   "aggregate_timeout_seconds": 3000,
+-  "expected_node_tests": 13,
++  "expected_node_tests": 600,
+   "maximum_stream_bytes": 8388608,
+   "maximum_output_bytes": 67108864,
+-  "cleanup_reserve_seconds": 30
++  "cleanup_reserve_seconds": 30,
++  "prepared": false,
++  "source_branch": "codex/tf68-compareback",
++  "source_index_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
++  "source_count": 78,
++  "node_command": [
++    "node",
++    "--test",
++    "--test-reporter=tap",
++    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
++    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
++    ".github/workflows/Test-CiHelpers.test.mjs",
++    ".github/workflows/NpmTools.test.mjs",
++    ".github/workflows/Check-NpmAudit.test.mjs",
++    ".github/workflows/Test-LocalValidation.test.mjs",
++    ".github/workflows/lint-markdown.test.mjs"
++  ],
++  "runtime_profile_hook_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
++  "candidate_hook_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
++  "accepted_source_TF_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
++  "accepted_source_TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
++  "dependency_generated_identity_exceptions": [
++    "node_modules/.package-lock.json",
++    ".github/workflows/node_modules/.package-lock.json"
++  ]
+ }

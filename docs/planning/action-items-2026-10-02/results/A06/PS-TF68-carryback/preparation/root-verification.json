@@ -1,0 +1,18 @@
+{
+  "status": "PASS_READ_ONLY_PACKET_BINDING",
+  "verified_at": "2026-10-06T18:37:54.406000+00:00",
+  "source": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "baseline": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "apply_manifest_sha256": "e78676dbfba2aa924b15f171e6eb58dac033ca34cc68bea280515cf8448106ef",
+  "report_sha256": "53805dffb1fa3c4ea389df8abcab57ff60298f5028905ba8b53f9c95a9b4c43f",
+  "evidence_sha256": "88151812a524665d94f0b5da06068c5a0ffc476dcd405b4f8428f0b6aa083a28",
+  "catalog_rows_verified": {
+    "PS": 77,
+    "TF": 80
+  },
+  "reference_and_harness_hashes_verified": 30,
+  "postimages_and_exact_exceptions_verified": 10,
+  "metadata": "Root read accepted guide1025-1038 and validator6646-6704: no exactly-one minor step; source1.20/1.11 valid monotonic increases. GenuineOct6 retained.",
+  "product_writes_released": false,
+  "landed_source_CI_required_before_release": true
+}

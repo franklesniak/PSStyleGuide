@@ -1,0 +1,14 @@
+{
+  "status": "ROOT_RELEASED_TWO_MISSING_GROUPS",
+  "released_at": "2026-10-06T19:32:24.403581+00:00",
+  "manifest_sha256": "6f0945ce8195a4a885629f337750430a7849fda12e427b4660922277c0d86b9e",
+  "runner_sha256": "ed960174b08b59be9424d43ce12b951fada9960d67bf8b494031495a37ac29b5",
+  "original_failures": "both preserved",
+  "six_field_receipt_and12controls_verified": true,
+  "job_and_run_stage_unchanged": true,
+  "commands": [
+    "patched-dependency",
+    "powershell-blank-lines"
+  ],
+  "execution_pending": true
+}

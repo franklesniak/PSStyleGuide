@@ -1,0 +1,68 @@
+{
+  "status": "local_product_validation_passed_with_explicit_evidence_reuse",
+  "verified_at": "2026-10-06T19:46:30.725581+00:00",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "Node": {
+    "assertions": 600,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0,
+    "direct_exit": 0,
+    "seconds": 204.032958677,
+    "judgment": "H94.1",
+    "pure_controls": 54,
+    "adopted_terminal_observations": 82,
+    "historical_child_causes": "unknown",
+    "old_packet_status": "failed_unchanged"
+  },
+  "Linux_aggregate": {
+    "hooks": 11,
+    "skips": 0,
+    "seconds": 536.589553,
+    "strict_terminal_exit_zero_observations": 67
+  },
+  "Windows": {
+    "product_groups_passed": 6,
+    "receipt_negative_controls": 12,
+    "historical_wrappers": "original and continuation-one stay failed; final continuation-two passed with explicit result reuse"
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\STATUS.json",
+      "sha256": "059f6341cf2856cd88ba73dd26342a33a6de90e9481ab4dfb68546364bd547e7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\output\\QUALIFICATION.json",
+      "sha256": "40fe204b9ac52bb7b11abd9b4eb0044a14e3570664abd65817696be3eaee4352"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\release\\manifest.authorized.json",
+      "sha256": "b7fd46e36c19e26b4cc64bb4f397d4a382de50a8e3ca6183194730c9ef14196b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\manifest.prepared.json",
+      "sha256": "9908a985d8dd077bc4473ed5ae04a8eb7e9b0ee3a92f51cca6026c288d8117a6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\evidence.json",
+      "sha256": "7fdec65d846d17c75e30ae0cf97af2c0e71c80e13b589a98bfa615c01ee63833"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json",
+      "sha256": "979427dc7d769a8ddd0c624f839c8b7d57b10c58892b9ece1a9ca18f92125993"
+    }
+  ],
+  "limits": [
+    "Combined named evidence, not one uninterrupted passing packet",
+    "Actual commit/base-head finalization/current audit/final independent quality/native reviews and CI remain",
+    "Dedicated service selection and paired acceptance remain open"
+  ],
+  "private_qualification_correction": "First pure check failed on absent command.cleanup field before judgment. Driver now reads unique affected-node entry from actual cleanup_receipts. Original preserved; unchanged Node judgment and54controls passed.",
+  "active_test_or_container": false
+}

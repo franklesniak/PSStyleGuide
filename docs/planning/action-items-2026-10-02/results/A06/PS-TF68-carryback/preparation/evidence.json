@@ -1,0 +1,767 @@
+{
+  "status": "READ_ONLY_PREPARATION",
+  "prepared_utc": "2026-10-06T18:30:52.590588+00:00",
+  "PS_baseline": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "PS_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "TF_source": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "rows": [
+    {
+      "path": ".github/workflows/package.json",
+      "PS_preimage": {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+        "bytes": 844
+      },
+      "TF_source": {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      "exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "https://github.com/franklesniak/TerraformStyleGuide",
+          "ps": "https://github.com/franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "\"terraform\"",
+          "ps": "\"powershell\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "\"author\": \"Frank Lesniak, Blake Cherry, and Danny Stutz\"",
+          "ps": "\"author\": \"Frank Lesniak\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "projected_sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "projected_bytes": 936
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "PS_preimage": {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196",
+        "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+        "bytes": 38822
+      },
+      "TF_source": {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      "exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 2,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "projected_sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "projected_bytes": 38820
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "PS_preimage": {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+        "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+        "bytes": 9867
+      },
+      "TF_source": {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "exceptions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "projected_sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+      "projected_bytes": 10446
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "PS_preimage": {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      "TF_source": {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "exceptions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository."
+        }
+      ],
+      "projected_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "projected_bytes": 285244
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "PS_preimage": {
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "bytes": 13541
+      },
+      "TF_source": {
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+        "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        "bytes": 13470
+      },
+      "exceptions": [
+        {
+          "tf": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "ps": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "| `Test-StyleGuideArtifacts.ps1` | Runs the recovery-example child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "ps": "| `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "| `Test-StateRecoveryExamples.mjs` | Checks the published Terraform state-recovery examples. | `node .github/workflows/Test-StateRecoveryExamples.mjs` |\n",
+          "ps": "| `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "ps": "The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        }
+      ],
+      "projected_sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "projected_bytes": 13541
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "PS_preimage": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "bytes": 36090
+      },
+      "TF_source": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        "bytes": 36081
+      },
+      "exceptions": [
+        {
+          "tf": "    ScopedId = 'terraform-instructions'\n    ScopedPath = 'terraform.instructions.md'\n    SemanticRole = 'TerraformRecovery'",
+          "ps": "    ScopedId = 'powershell-instructions'\n    ScopedPath = 'powershell.instructions.md'\n    SemanticRole = 'PowerShellExamples'",
+          "occurrences": 1,
+          "need": "Scoped artifact destination and semantic role select the actual repository language. Both semantic branches remain common code; PS must run its blank-line child and TF its state-recovery child."
+        }
+      ],
+      "projected_sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "projected_bytes": 36084
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "PS_preimage": {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      "TF_source": {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "exceptions": [],
+      "projected_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "projected_bytes": 510470
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "PS_preimage": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "bytes": 123582
+      },
+      "TF_source": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+        "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        "bytes": 130059
+      },
+      "exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 8,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "projected_sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "projected_bytes": 130003
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PS_preimage": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+        "bytes": 12837
+      },
+      "TF_source": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        "bytes": 12893
+      },
+      "exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 4,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "projected_sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "projected_bytes": 12865
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "PS_preimage": null,
+      "TF_source": {
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "bytes": 45016
+      },
+      "exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "projected_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "projected_bytes": 44995
+    }
+  ],
+  "guards_before": {
+    "PS": {
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "refs_sha256": "19df97656b3271495822a5a6762f33e5ecbc4653a1dbaf5a0eee0434a73ef413",
+      "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+      "index": "afd03ca8e17f7360099508048edb11ebc79aee1bd708e8907d125c6587c5c0b8",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "TF": {
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "refs_sha256": "7f1239de171a6269bf5b22cb9e2ba2cf36d43cf25cb707263f871df514fa2a48",
+      "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+      "index": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+      "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+      "config.worktree": null
+    }
+  },
+  "guards_after": {
+    "PS": {
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "refs_sha256": "19df97656b3271495822a5a6762f33e5ecbc4653a1dbaf5a0eee0434a73ef413",
+      "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+      "index": "afd03ca8e17f7360099508048edb11ebc79aee1bd708e8907d125c6587c5c0b8",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "TF": {
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "refs_sha256": "7f1239de171a6269bf5b22cb9e2ba2cf36d43cf25cb707263f871df514fa2a48",
+      "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+      "index": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+      "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+      "config.worktree": null
+    }
+  },
+  "catalog_counts": {
+    "PS": 77,
+    "TF": 80
+  },
+  "guards_equal": true,
+  "coupled_inputs": [
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS": {
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        "bytes": 51809
+      },
+      "TF": {
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+        "bytes": 51830
+      },
+      "raw_equal": false,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "PS": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "TF": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "raw_equal": true,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "PS": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "TF": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "raw_equal": true,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "PS": {
+        "path": ".github/workflows/NpmTools.mjs",
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "TF": {
+        "path": ".github/workflows/NpmTools.mjs",
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "raw_equal": true,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "PS": {
+        "path": ".github/workflows/ci-toolchain.json",
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "TF": {
+        "path": ".github/workflows/ci-toolchain.json",
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "raw_equal": true,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": "package.json",
+      "PS": {
+        "path": "package.json",
+        "mode": "100644",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+        "bytes": 816
+      },
+      "TF": {
+        "path": "package.json",
+        "mode": "100644",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+        "bytes": 837
+      },
+      "raw_equal": false,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "PS": {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398
+      },
+      "TF": {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        "bytes": 5405
+      },
+      "raw_equal": false,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".husky/pre-commit",
+      "PS": {
+        "path": ".husky/pre-commit",
+        "mode": "100644",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "TF": {
+        "path": ".husky/pre-commit",
+        "mode": "100644",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "raw_equal": true,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "PS": {
+        "path": ".github/document-metadata-classification.json",
+        "mode": "100644",
+        "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        "bytes": 388
+      },
+      "TF": {
+        "path": ".github/document-metadata-classification.json",
+        "mode": "100644",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        "bytes": 387
+      },
+      "raw_equal": false,
+      "unchanged_from_canonical": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "PS": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        "bytes": 1517
+      },
+      "TF": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        "bytes": 1496
+      },
+      "raw_equal": false,
+      "unchanged_from_canonical": true
+    }
+  ],
+  "language_targets_rebound": [
+    {
+      "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+      "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "bytes": 57610
+    },
+    {
+      "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "mode": "100644",
+      "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+      "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+      "bytes": 65689
+    },
+    {
+      "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "mode": "100644",
+      "blob": "068c7139a9e6a9276073211f48eca88464204362",
+      "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      "bytes": 15201
+    },
+    {
+      "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "mode": "100644",
+      "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+      "bytes": 22102
+    }
+  ],
+  "readme_exact_metadata_only": true,
+  "accepted_metadata_policy": {
+    "STYLE_GUIDE.md": {
+      "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "versioning_excerpt": "### Function and Script Versioning\n\nAll distributable functions and scripts **MUST** include a version number in the `.NOTES` section of their comment-based help. This version number provides critical change tracking and **MUST** follow a strict, `[System.Version]`-compatible format: `Major.Minor.Build.Revision`.\n\nFor this section, the **previously published version** means the most recent `.NOTES` version published for the same distributable function or script before this change. In repository work, this is the version already on the branch the change lands on, not an in-progress value produced earlier in the same change. For a brand-new function or script, there is no previously published version.\n\n- **`Major`**: Increment the **Major** version (e.g., `1.0.20251103.0` to `2.0.20251230.0`) **any time a breaking change is introduced**. Breaking changes include:\n  - Removing or renaming a function, parameter, or public interface\n  - Changing parameter types in incompatible ways\n  - Altering return types or output formats that break existing consumers\n  - Any modification that requires users to update their code\n- **`Minor`**: Increment the **Minor** version (e.g., `1.0.20251103.0` to `1.1.20251230.0`) **any time a feature or function change is introduced that is non-breaking**. This includes:\n  - Adding new functions or capabilities\n  - Adding new optional parameters\n  - Enhancing existing functionality without changing interfaces\n  - Performance improvements that don't affect behavior\n- **`Build`**: This component **MUST** be an integer in the format **`YYYYMMDD`**, representing the date the code was last modified. This date **MUST** be updated to the **current date** for *any* modification, however minor.\n- **`Revision`**: This component is typically `0` for the first published version of a given distributable function or script at a given `Major.Minor.Build`. It counts same-day published updates of the same function or script relative to the previously published version, not work-in-progress iterations or commits. When a `.NOTES` version is assigned or updated, after applying the required `Major`, `Minor`, and `Build` values above, `Revision` **MUST** be `0` if the resulting `Major.Minor.Build` differs from the previously published version's `Major.Minor.Build` or if there is no previously published version. If the previously published version already records the same `Major.Minor.Build` at revision `N`, `Revision` **MUST** be `N + 1`. Same-day updates at the same `Major.Minor.Build` that increment `Revision` can include, but are not limited to:\n  - Trivial edits, such as typos, formatting, or comment fixes\n  - Bug fixes that do not require a `Major` or `Minor` version bump\n  - Documentation-only updates\n\n| Case | Previously published version | This change | Reason |\n| --- | --- | --- | --- |\n| Same-day update | `1.2.20260619.0` | `1.2.20260619.1` | Same `Major.Minor.Build`, so `N + 1`. |"
+    },
+    "CONTRIBUTING.md": {
+      "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+      "sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+    },
+    "AGENTS.md": {
+      "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d"
+    },
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "monotonic_document_version_excerpt": "\n    $intVersionDateComparison = [string]::CompareOrdinal(\n        $strCurrentVersionDate,\n        $strParentVersionDate\n    )\n    $intMajorMinorComparison = if ($intCurrentMajor -ne $intParentMajor) {\n        $intCurrentMajor.CompareTo($intParentMajor)\n    } elseif ($intCurrentMinor -ne $intParentMinor) {\n        $intCurrentMinor.CompareTo($intParentMinor)\n    } else {\n        0\n    }\n    $strCurrentComparison = ConvertTo-MetadataComparisonText `\n        -Content $CurrentContent -MetadataContext $objCurrentMetadata\n    $strParentComparison = ConvertTo-MetadataComparisonText `\n        -Content $ParentContent -MetadataContext $objParentMetadata\n    $boolRenderedContentChanged = $strCurrentComparison -cne $strParentComparison\n    if ($intVersionDateComparison -lt 0) {\n        Write-Output (\n            \"$Name Version date must not move backward from $strParentVersionDate to \" +\n            \"$strCurrentVersionDate.\"\n        )\n        return\n    }\n    if ($intMajorMinorComparison -lt 0) {\n        Write-Output (\n            \"$Name Version major and minor tuple must not move backward from \" +\n            \"$intParentMajor.$intParentMinor to $intCurrentMajor.$intCurrentMinor.\"\n        )\n        return\n    }\n    $boolSameVersionTuple = $intMajorMinorComparison -eq 0 -and\n        $intVersionDateComparison -eq 0\n    if ($boolSameVersionTuple -and $intCurrentRevision -lt $intParentRevision) {\n        Write-Output (\n            \"$Name Version revision must not decrease from $intParentRevision to \" +\n            \"$intCurrentRevision.\"\n        )\n        return\n    }\n\n    $boolRevisionChanged = $intCurrentRevision -ne $intParentRevision\n    if ($boolSameVersionTuple -and\n        ($boolRenderedContentChanged -or $boolRevisionChanged)) {\n        if ($intParentRevision -eq [int64]::MaxValue) {\n            Write-Output (\n                \"The published baseline $Name Version revision cannot be incremented safely.\"\n            )\n            return\n        }\n        $intExpectedRevision = $intParentRevision + 1\n        if ($intCurrentRevision -ne $intExpectedRevision) {\n            Write-Output (\n                \"$Name Version revision must be exactly $intExpectedRevision after a \" +\n                'published change with an unchanged published-baseline major, minor, ' +\n                'and date tuple.'\n            )\n        }\n    } elseif (-not $boolSameVersionTuple -and $intCurrentRevision -ne 0) {\n        Write-Output (\n            \"$Name Version revision must be exactly 0 when a published-baseline \" +\n            'major, minor, or date segment changes.'\n        )\n    }\n\n    if (-not $boolRenderedContentChanged) {"
+    }
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\peer-readiness\\REPORT.md",
+      "sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\peer-readiness\\evidence.json",
+      "sha256": "e5fe76b2c285124d32f5eef581e90c52dccb2ff1ac76f01d4c479ca02f82117e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\REPORT.md",
+      "sha256": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\evidence.json",
+      "sha256": "f237d0e817445e5da9857cebae78808bbd41fbaa983024fd33d012dc911cfbc5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\root-decision.json",
+      "sha256": "ca8b95eae308778501a049b1399658af9dad89ac03bc0e72359cd3309298863a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\merge-acceptance.json",
+      "sha256": "28a615ed821d5948e797b05328ab8c93a7f25d5ab363f61d5a2dad6f8cc7267a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\final-quality\\REPORT.md",
+      "sha256": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c"
+    }
+  ],
+  "reusable_harnesses": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-focus-next-day.ps1",
+      "sha256": "37c33f7d5579953538fceb355c86b49a114232a45639fa8d76be37e81e450cca",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-matrix.ps1",
+      "sha256": "40ff01a6a522288263db8e039c1e73d96b0afff92fe61aeeabac185dca86704f",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\persistent-controls.ps1",
+      "sha256": "b7c054a02a543cdf83667a453652a99ee82aebadeb9bcd4bffd309aa1efd9665",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\checker-template.ps1",
+      "sha256": "e86141c3cf73e8d86e166fe3b5c83823574dda5ecd936a20d04e1797d9ac86cd",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-actual-clock.ps1",
+      "sha256": "8eef7af44d578d14ad18d92f47047168b2b4900245f2460145ec939166396417",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-controls.ps1",
+      "sha256": "88a94184fb1a82ece1f39fac21c2eb6570fe1dcdce92671543a411a1e9827c09",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-native.ps1",
+      "sha256": "a32f888143c2d268b11ef088227850018a19c89b8637b13d9cc039e96330d805",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-check.ps1",
+      "sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\focus.mjs",
+      "sha256": "2070c2245311e5c973e3e3f6e9592b6bad227d5f60b2748c0f8b24c45d1a6f61",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round3\\final-contract-probe.ps1",
+      "sha256": "a5c3f182f53221c94b5d31fa40bb3493e3d091d7c571447a3da5ac3e52e0279c",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+      "sha256": "10d80e92aef1bb98195392e82e9ed6cb891102289551fe2d24973c029169f57b",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\metadata-controls.ps1",
+      "sha256": "e021baee3678586f47fd817b8a885f4b3b1c24fb6c08ca52b64c6182f2be5f02",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\extra-reader-controls.ps1",
+      "sha256": "b36c55a842be781e9687531470f0ecee715b57abb8b09ea7b04fdf8080db40ef",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\discovery-controls.mjs",
+      "sha256": "1f19d756b71fe62f3a099baea1d4d033fa670fbd0c3361eefaef57d7322819ce",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-focus.py",
+      "sha256": "b7ecebf4eb5f9c643d2045c1af45730c5525d959723cb0d6d588d726570308b1",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\focus.ps1",
+      "sha256": "e1f773a0bd570eda9241618e49feb97ed5e99fd6bf26ccffa2a0772193c179d3",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\controls.ps1",
+      "sha256": "b105310bda583403dbfa116f3127359a6e2388d284f11d845fc754606cb02a65",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\initialization-controls.ps1",
+      "sha256": "bc4c2ebe159776ff64d79d97d01ab1832cc13b34a74256a7bbf1856584a7e474",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\load-functions.ps1",
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\original-Test-AgentInstructions.ps1",
+      "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "executed_here": false
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\quality.ps1",
+      "sha256": "265ce786b1789b7199224572ef9c7fc06090c8ddd6a16ada7203d39b1ddb0439",
+      "executed_here": false
+    }
+  ],
+  "tests_executed": false,
+  "product_edits": false,
+  "git_writes": false,
+  "native_operations": false,
+  "counter_changes": false,
+  "new_material_findings": [],
+  "apply_manifest_sha256": "e78676dbfba2aa924b15f171e6eb58dac033ca34cc68bea280515cf8448106ef",
+  "raw_catalogs_sha256": "02c688e0111e8b1f1a2369ebc13ca0e9f9bd6d9cd2dafbee1cfaf2060ff6be0a",
+  "projection_diff_sha256": "f055141d24e1573aa962b71cfbf0449424342cf4a8afc6b4f3710aae14ea8703",
+  "completed_utc": "2026-10-06T18:34:19.583896+00:00",
+  "TF_generated_outputs_unchanged": [
+    {
+      "path": "copilot-instructions.md",
+      "unchanged_mode_and_blob": "100644 blob f872e52ee5b7ded737157dcf745cb93013005a2b\tcopilot-instructions.md"
+    },
+    {
+      "path": "terraform.instructions.md",
+      "unchanged_mode_and_blob": "100644 blob 59eeedcfe4cab11ebf87d439d5117f7203b0ea98\tterraform.instructions.md"
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "unchanged_mode_and_blob": "100644 blob a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8\tSTYLE_GUIDE_CHAT.md"
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "unchanged_mode_and_blob": "100644 blob faaf49ee2bcde0d23da2acd397a73511fe2b6f00\tSTYLE_GUIDE_FULL.md"
+    }
+  ],
+  "report_sha256": "53805dffb1fa3c4ea389df8abcab57ff60298f5028905ba8b53f9c95a9b4c43f",
+  "final_private_packet_check_utc": "2026-10-06T18:36:32.654819+00:00",
+  "packet_postimages_verified": 10
+}

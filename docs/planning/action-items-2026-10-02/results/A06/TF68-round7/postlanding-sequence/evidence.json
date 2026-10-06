@@ -1,0 +1,376 @@
+{
+  "schema": "TF68.PostlandingSequence.v1",
+  "prepared_at_utc": "2026-10-06T18:31:10.459140+00:00",
+  "scope": "Read-only sequencing; only these two new scratch outputs",
+  "execution_authorized": false,
+  "source_landing_is_task_acceptance": false,
+  "selected_procedure": "B93.5",
+  "decision": {
+    "destination_implementation": "After root landed-source CI acceptance and fresh refs/dates, existing ten-path PS carryback may begin with TF dedicated activation pending. No new permission gate inferred from older private worker restrictions.",
+    "task_and_affected_paired_acceptance": "Incomplete until actual dedicated selection and successful terminal service on legitimate TF input.",
+    "material_circular_dependency_established": false,
+    "new_options_rubric_required": false,
+    "immediate_TF_service_target": null,
+    "legitimate_future_inputs": [
+      "Necessary real TF common correction discovered by actual PS carryback, if one exists",
+      "Already selected independent B99 PS-first source and useful accepted TF counterpart",
+      "Already selected independently usable R5/B1 foundation with its existing scope/gates"
+    ],
+    "no_op_counterpart_allowed": false
+  },
+  "native_read_facts": {
+    "TF_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "TF_merge_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+    "TF_merge_parents": [
+      "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "89bf3920fb8008752c7f179e7c69c4c2979750d8"
+    ],
+    "PS_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TF_open_PR_inventory": [],
+    "method": "Single read-only gh main-ref/commit/open-PR inventory during preparation; no polling, no fetch or write; rebind before root action",
+    "merge_timestamp_from_root": "2026-10-06T18:21:21Z",
+    "landed_CI_from_root_only": {
+      "as_of_utc": "2026-10-06T18:25:00Z",
+      "successful": 4,
+      "pending": 2,
+      "accepted_by_this_worker": false
+    }
+  },
+  "unchanged_limits": {
+    "TF_round": 7,
+    "TF_deadline_utc": "2026-10-13T23:47:31Z",
+    "current_transfers_A06_A03_A21_A07": [
+      1,
+      3,
+      5,
+      5
+    ],
+    "prospective_actual_PS_repair_transfers": [
+      2,
+      4,
+      6,
+      6
+    ],
+    "counter_changed": false
+  },
+  "B99": {
+    "paths": [
+      ".pre-commit-config.yaml",
+      ".gitignore",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "selected_pattern": "(?i)(^|/)__pycache__/|\\.py[cod]$",
+    "selected_language": "fail",
+    "selected_ignores": [
+      "__pycache__/",
+      "*.py[cod]"
+    ],
+    "absent_in_current_and_held_four_paths": true,
+    "held_index_four_entries_equal_c68": true,
+    "held_index_four_entries": "100644 41a955fc4ef68f47b3391417babbcb91824a2726 0\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\n100644 bf2b013289afc7d5bc1f760de49e7abcc7cfdda2 0\t.github/workflows/Test-AgentInstructions.ps1\n100644 7429fc67b0c38c8ad6b57211c88797b5e8f13140 0\t.gitignore\n100644 0688b48f0065acf8a57181c0eb13816d6f363796 0\t.pre-commit-config.yaml\n",
+    "raw_blob_rows": [
+      {
+        "repository": "PS",
+        "commit_or_held_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": [
+          "check-json",
+          "check-yaml",
+          "end-of-file-fixer",
+          "trailing-whitespace",
+          "yamllint",
+          "actionlint",
+          "check-dependabot",
+          "check-github-workflows",
+          "staged-markdown",
+          "workflow-policy-contract",
+          "agent-instruction-contract"
+        ]
+      },
+      {
+        "repository": "PS",
+        "commit_or_held_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        "bytes": 289,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "PS",
+        "commit_or_held_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "PS",
+        "commit_or_held_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "TF",
+        "commit_or_held_tree": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        "bytes": 5405,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": [
+          "check-json",
+          "check-yaml",
+          "end-of-file-fixer",
+          "trailing-whitespace",
+          "yamllint",
+          "actionlint",
+          "check-dependabot",
+          "check-github-workflows",
+          "staged-markdown",
+          "workflow-policy-contract",
+          "agent-instruction-contract"
+        ]
+      },
+      {
+        "repository": "TF",
+        "commit_or_held_tree": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        "bytes": 289,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "TF",
+        "commit_or_held_tree": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "TF",
+        "commit_or_held_tree": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "held_A07",
+        "commit_or_held_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0688b48f0065acf8a57181c0eb13816d6f363796",
+        "sha256": "a3c8998aabe4f78f1b29267ece80c727fa10f01bbce3d63cdb3d4f471c40180e",
+        "bytes": 5373,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": [
+          "check-json",
+          "check-yaml",
+          "end-of-file-fixer",
+          "trailing-whitespace",
+          "yamllint",
+          "actionlint",
+          "check-dependabot",
+          "check-github-workflows",
+          "staged-markdown",
+          "workflow-policy-contract",
+          "agent-instruction-contract"
+        ]
+      },
+      {
+        "repository": "held_A07",
+        "commit_or_held_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+        "path": ".gitignore",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+        "sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad",
+        "bytes": 250,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "held_A07",
+        "commit_or_held_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+        "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5",
+        "bytes": 378451,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      },
+      {
+        "repository": "held_A07",
+        "commit_or_held_tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+        "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba",
+        "bytes": 19602,
+        "contains_pycache_literal": false,
+        "contains_pycod_literal": false,
+        "hook_ids": null
+      }
+    ],
+    "limits": "Four-path raw inspection only, not broad held-tree acceptance. Completed filename controls support unchanged matching behavior only; future 12-hook finite contract and actual callers need normal validation."
+  },
+  "PS_completed_setup": {
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "run_id": 37385523615,
+    "job_id": 112017722346,
+    "conclusion": "success",
+    "started_at": "2026-10-05T22:55:57Z",
+    "completed_at": "2026-10-05T23:15:41Z",
+    "whole_job_seconds_from_job_api": 1184,
+    "aggregate_step": {
+      "name": "Run complete repository validation",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 15,
+      "started_at": "2026-10-05T22:56:22Z",
+      "completed_at": "2026-10-05T23:15:37Z"
+    },
+    "aggregate_seconds_from_job_api": 1155,
+    "final_guard": {
+      "name": "Verify final immutable setup inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 16,
+      "started_at": "2026-10-05T23:15:37Z",
+      "completed_at": "2026-10-05T23:15:37Z"
+    },
+    "passed_hook_count": 11,
+    "node_tests": {
+      "passed": 567,
+      "failed": 0,
+      "skipped": 0
+    },
+    "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523615\\log.txt",
+    "log_sha256": "5dd2009221dc465961f8231e1aedf834eb222aeeb42f35d4a3e3a35da56b70fb",
+    "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523615\\jobs.json",
+    "jobs_sha256": "8f3f51a5fc2d77a1c31a723f9d39150b28956505dcc1971495018d5c99b869cd",
+    "limit": "Completed ordinary landed push setup for PS981. Not future-candidate, dedicated-service selection, stable runtime or new timeout evidence."
+  },
+  "source_hashes": [
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/STATUS.md",
+      "sha256": "d1cdffb04009f48233179f5c93c12842a72b2377fdfcdc902553af831afdabfa",
+      "bytes": 11150
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/tasks/A06.md",
+      "sha256": "332e538613bd227564932a2ec10889f797959495f7580c343324b85509c1f1e7",
+      "bytes": 4632
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/tasks/A07.md",
+      "sha256": "63cb7d51f26adc12072ed82d63b3bc82c0b722a2d1a8dd817fc4afbc65538af9",
+      "bytes": 4529
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A06/TF68-round5-activation/REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def",
+      "bytes": 16997
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A06/TF68-round5-activation/root-decision.json",
+      "sha256": "ca8b95eae308778501a049b1399658af9dad89ac03bc0e72359cd3309298863a",
+      "bytes": 1626
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A06/TF-validation.json",
+      "sha256": "088361b16c68452a3cb450c218fc1815bd736324a2f9c3a085638be9d3092d7d",
+      "bytes": 636145
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A03/foundation-dependency-decision.md",
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4",
+      "bytes": 10441
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A07/research-hook-applicability.md",
+      "sha256": "7bc9167bd59641e32d5f52b3f02834204ab51e49157f5898efde2b3f4a5cec2c",
+      "bytes": 17883
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A07/recovery-runtime/SELECTION.md",
+      "sha256": "94c2ed9e8bd6f1377b4bef159fb6010f451cf501e6b47873de2f471e6c1bbe00",
+      "bytes": 2896
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A06/PS234-landed-acceptance.json",
+      "sha256": "8302c6faca4fd2dc2648509ed324f17a9b3dd22839df01f1c3bcb7597a0cca2e",
+      "bytes": 11579
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/round7-peer-readiness/REPORT.md",
+      "sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef",
+      "bytes": 6444
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/round7-peer-readiness/evidence.json",
+      "sha256": "e5fe76b2c285124d32f5eef581e90c52dccb2ff1ac76f01d4c479ca02f82117e",
+      "bytes": 65442
+    }
+  ],
+  "report_sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2",
+  "prohibited_actions_performed": [],
+  "root_next_action": "Complete landed source acceptance; rebind native main/source tree/finalization UTC; finish existing ten-path PS metadata/apply/validation preparation and use one source writer. Dedicated activation stays pending until a genuine TF current input."
+}

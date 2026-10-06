@@ -1,0 +1,336 @@
+[
+  {
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "changed_textual_blocks": [
+      {
+        "name": "SCRIPT",
+        "PS": {
+          "name": "SCRIPT",
+          "version": "1.8.20261005.0",
+          "block_without_version_sha256": "6f5722b53e52a34903c3ebeedb5ed57f68f9c17f9ba354710dac8f966453f35d"
+        },
+        "TF": {
+          "name": "SCRIPT",
+          "version": "1.11.20261006.0",
+          "block_without_version_sha256": "6f5722b53e52a34903c3ebeedb5ed57f68f9c17f9ba354710dac8f966453f35d"
+        }
+      },
+      {
+        "name": "Assert-ParserJsonConversionSelfTest",
+        "PS": null,
+        "TF": {
+          "name": "Assert-ParserJsonConversionSelfTest",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "4fc0f864d12e11dd7e9da983fa5035533702b7336fb65c5858fd3a4dbb0deaaa"
+        }
+      },
+      {
+        "name": "Assert-MarkdownParseReuseSelfTest",
+        "PS": null,
+        "TF": {
+          "name": "Assert-MarkdownParseReuseSelfTest",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "d4ceb2f53b5f55e2889f58bf930ce373d37a5f1743b051219ca0df8013b8a1c5"
+        }
+      },
+      {
+        "name": "Invoke-AgentInstructionFixtureClock",
+        "PS": null,
+        "TF": {
+          "name": "Invoke-AgentInstructionFixtureClock",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "ba41f13cb819aea56d2de3844c314864a62baca1a2da98ae5987d98c99f7ae68"
+        }
+      },
+      {
+        "name": "Get-AgentFinalizationDateMutant",
+        "PS": null,
+        "TF": {
+          "name": "Get-AgentFinalizationDateMutant",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "48a805ead65e2144673714be94984ecfaa43bacbe019138e0375badd37f27e68"
+        }
+      },
+      {
+        "name": "Assert-AgentFinalizationDateMutationSelfTest",
+        "PS": null,
+        "TF": {
+          "name": "Assert-AgentFinalizationDateMutationSelfTest",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "278c2d0f028ddf87448c9192871e2ffa825202158cd8a9232ce9e21b4d867fd1"
+        }
+      },
+      {
+        "name": "Assert-AuthorFinalizationGitFixture",
+        "PS": {
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "1a28adb7cbab9cc56e1c67ee9e432903e36de42f641cf02a7edb22bb0bc3a095"
+        },
+        "TF": {
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "9d109c86390b712de6107d3b435753f4f110d8e00a7488607b9581b972dc71a8"
+        }
+      },
+      {
+        "name": "Assert-PublishedBaselineCapacitySelfTest",
+        "PS": {
+          "name": "Assert-PublishedBaselineCapacitySelfTest",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "4a94ec7ab56e3c3f00b0da7eec0f724587333e35f7915e2c706b30b0c90d1ff9"
+        },
+        "TF": {
+          "name": "Assert-PublishedBaselineCapacitySelfTest",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "db9efed2c5c02ffea1df40cbd1c9770a15a747644be9b1a504670926bdb256fd"
+        }
+      },
+      {
+        "name": "Assert-AgentSetupSelfTest",
+        "PS": {
+          "name": "Assert-AgentSetupSelfTest",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "f77d2d3728f95f1a6580c403990c69329fee45f5907a297ac6f0a6c752f51de3"
+        },
+        "TF": {
+          "name": "Assert-AgentSetupSelfTest",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "d4192f9bc07b64f57a6f05e76af2766333034b0617a1a6c56a25128f325bcc2e"
+        }
+      },
+      {
+        "name": "Assert-ApplicationRuntimeSelfTest",
+        "PS": {
+          "name": "Assert-ApplicationRuntimeSelfTest",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "49b11537e6fc237fc6f68d31cb2102c25569c7d7302cb79f46511fe37d5d3d91"
+        },
+        "TF": {
+          "name": "Assert-ApplicationRuntimeSelfTest",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "fbf22d48a1afd9b60da12af7eefdd7e658b1d0e34a9622944f363aeb83caa88e"
+        }
+      }
+    ]
+  },
+  {
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "changed_textual_blocks": [
+      {
+        "name": "SCRIPT",
+        "PS": {
+          "name": "SCRIPT",
+          "version": "2.0.20261005.0",
+          "block_without_version_sha256": "41caf148d2da624a6f093e93dd4f12ecdc3ba54146124d6dec66d3851bd67c80"
+        },
+        "TF": {
+          "name": "SCRIPT",
+          "version": "2.0.20261006.0",
+          "block_without_version_sha256": "41caf148d2da624a6f093e93dd4f12ecdc3ba54146124d6dec66d3851bd67c80"
+        }
+      },
+      {
+        "name": "ConvertFrom-NulPathRecordStream",
+        "PS": {
+          "name": "ConvertFrom-NulPathRecordStream",
+          "version": "2.0.20261005.0",
+          "block_without_version_sha256": "c2f2c80b466672dc3836b66813c505e3308f9c2a8cb4a2d5c024c79f4b84dd2a"
+        },
+        "TF": {
+          "name": "ConvertFrom-NulPathRecordStream",
+          "version": "2.0.20261006.0",
+          "block_without_version_sha256": "dbc2cd65086cb51b6cb20c8c1c3b98ccbf4c162f47dd959ff9e1f55060cdf3a3"
+        }
+      }
+    ]
+  },
+  {
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "changed_textual_blocks": [
+      {
+        "name": "SCRIPT",
+        "PS": {
+          "name": "SCRIPT",
+          "version": "1.18.20261005.0",
+          "block_without_version_sha256": "126cbbb31d0a716db96f95687a311afd299e2751bc1f4d0c10cac6f428ac25bc"
+        },
+        "TF": {
+          "name": "SCRIPT",
+          "version": "1.20.20261006.0",
+          "block_without_version_sha256": "d317280d79c660b8975e48d062c243e4a4513605a5e1fb89db1f3ce9870fc0ac"
+        }
+      },
+      {
+        "name": "ConvertFrom-ParserJsonContext",
+        "PS": {
+          "name": "ConvertFrom-ParserJsonContext",
+          "version": "1.0.20261002.0",
+          "block_without_version_sha256": "b534a8a601995c3fb93531ff0c3d6167923eefcee36715b5ba7590b4f02809eb"
+        },
+        "TF": {
+          "name": "ConvertFrom-ParserJsonContext",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "cd7fd8e9dcbc4a8bbab6a3f83b2a98e4951e6cef3557dc32c25c10c9d216eefa"
+        }
+      },
+      {
+        "name": "Get-AgentSetupInputSpec",
+        "PS": {
+          "name": "Get-AgentSetupInputSpec",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "75dcb2a1d03dcd50387c56985ffddb5f31e910c8ab6e246194b56b060cac0a97"
+        },
+        "TF": {
+          "name": "Get-AgentSetupInputSpec",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "dbd6be1ed5956a9c6a338523edc5b5015cd4efb1f793f85b13a2913700d9e1d1"
+        }
+      },
+      {
+        "name": "Read-AgentSetupInputContent",
+        "PS": {
+          "name": "Read-AgentSetupInputContent",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "f2e0e1d5879b6c7316b0d2330e872bbfb7a65d507cc4b32cef847fc20c0ce107"
+        },
+        "TF": {
+          "name": "Read-AgentSetupInputContent",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "9804d95877c26e96573e3619dcf847a5a8b01a8ec22f5ae55784dff7d16db882"
+        }
+      },
+      {
+        "name": "Get-AgentSetupContractFailure",
+        "PS": {
+          "name": "Get-AgentSetupContractFailure",
+          "version": "1.0.20261003.1",
+          "block_without_version_sha256": "d81c498a3f89c36d46adbba56c71f2f76cab959df5316dad02af61d599276f32"
+        },
+        "TF": {
+          "name": "Get-AgentSetupContractFailure",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "78f3c9f82096328a6fc1a16477dc263585f5689063834389117b1691e3b353e2"
+        }
+      },
+      {
+        "name": "Get-GitRegularFileBlobId",
+        "PS": {
+          "name": "Get-GitRegularFileBlobId",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "5baa9b474cb2c2f3ebb85be909f98c47b10e33ecb1265bffd46f863a116f8d06"
+        },
+        "TF": {
+          "name": "Get-GitRegularFileBlobId",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "8a8c8858bffee7e32620a82ed7bf3c25ca243f97584664dd62ab61174b017fe3"
+        }
+      },
+      {
+        "name": "Get-MarkdownParseReuseSlot",
+        "PS": null,
+        "TF": {
+          "name": "Get-MarkdownParseReuseSlot",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "8d28cc8e613260969456d15b9c84ab2e1b14e33d8bd8d46993af1b9e064dcd8b"
+        }
+      },
+      {
+        "name": "Clear-MarkdownParseReuseSlot",
+        "PS": null,
+        "TF": {
+          "name": "Clear-MarkdownParseReuseSlot",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "55df0dcaeb6e932e34722cab6ab4ab8e311de7e649802e23ae041e402a77a455"
+        }
+      },
+      {
+        "name": "Copy-MarkdownParseReuseContext",
+        "PS": null,
+        "TF": {
+          "name": "Copy-MarkdownParseReuseContext",
+          "version": "1.0.20261006.0",
+          "block_without_version_sha256": "408bfc3fba4a83bbf33975a4311f3e6f7bb18b2359a02af76a3d9f18c9b99c22"
+        }
+      },
+      {
+        "name": "Get-MarkdownParseContext",
+        "PS": {
+          "name": "Get-MarkdownParseContext",
+          "version": "1.1.20261003.0",
+          "block_without_version_sha256": "ccd834f8a51368d8910f790821426afe69a2067405d47bd464a45afc257a1369"
+        },
+        "TF": {
+          "name": "Get-MarkdownParseContext",
+          "version": "1.2.20261006.0",
+          "block_without_version_sha256": "856e16786dc95b203fc32fe66597ed8d3fe7ad6c7ca7c4c9b64114f0e5a0314f"
+        }
+      },
+      {
+        "name": "Get-PublishedEndpointLastUpdatedFailure",
+        "PS": {
+          "name": "Get-PublishedEndpointLastUpdatedFailure",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "84c51b6eab8b0075546e8907b44ccfdec548d05371402f2d976d1f4b5573cab8"
+        },
+        "TF": {
+          "name": "Get-PublishedEndpointLastUpdatedFailure",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "a39c70767eb97dc90e9ada0f4d5b710ebfb367e9a7097acb7e2afe3d861fb67a"
+        }
+      },
+      {
+        "name": "Test-DocumentMetadataHeaderIntent",
+        "PS": {
+          "name": "Test-DocumentMetadataHeaderIntent",
+          "version": "1.0.20261003.0",
+          "block_without_version_sha256": "3ff84c2e56ae33ff1065f58263bfefa42ed59fc4d672bed016828b844a7714af"
+        },
+        "TF": {
+          "name": "Test-DocumentMetadataHeaderIntent",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "bbefcd23c111d284d34eff5994e2b7f623d99db34d41b9f8ee353b37a760d919"
+        }
+      },
+      {
+        "name": "Get-DocumentMetadataContext",
+        "PS": {
+          "name": "Get-DocumentMetadataContext",
+          "version": "1.7.20261005.1",
+          "block_without_version_sha256": "4b4ef403bd8b0b616bae920b7fd2489d9d92a54ac3b568c84873f8f2151441bf"
+        },
+        "TF": {
+          "name": "Get-DocumentMetadataContext",
+          "version": "1.8.20261006.0",
+          "block_without_version_sha256": "375012f3660fb4a4464e7a924ba94350fd0443f1f13a19e4c612ff5d472238bf"
+        }
+      },
+      {
+        "name": "Get-PublishedEndpointMetadataFailure",
+        "PS": {
+          "name": "Get-PublishedEndpointMetadataFailure",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "0cd5e8e5e089b5cddd53f8278117192596c5decdd3d6f3935029c199e6113311"
+        },
+        "TF": {
+          "name": "Get-PublishedEndpointMetadataFailure",
+          "version": "1.1.20261006.0",
+          "block_without_version_sha256": "b39c25636426ee75c06437e585c5c28a742cca5d7555ab36483c3e0c542a15d7"
+        }
+      },
+      {
+        "name": "Assert-FixtureAccepted",
+        "PS": {
+          "name": "Assert-FixtureAccepted",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "d1c258c725b02007240bc157e7ef45e400b34a007aa702924a27ad4788d15577"
+        },
+        "TF": {
+          "name": "Assert-FixtureAccepted",
+          "version": "1.0.20261005.0",
+          "block_without_version_sha256": "5fc91100e1e1b69ef318c99f52d608f555a67e88bfa2a36be2415e10f3f06cf2"
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,15 @@
+{
+  "status": "H94.1_SELECTED_PREPARATION_RELEASED",
+  "selected_at": "2026-10-06T19:26:53.757478+00:00",
+  "report_sha256": "34679c2e49d09aca3453335603e0cac2ed2cfd52ac306480024031838cd5b26e",
+  "evidence_sha256": "94dc15ffdcb29bd482e2e8de3c0f4f2ba90470fd8296f93ab1986b8986aa6070",
+  "immutable_references_verified": 33,
+  "scores_verified": 14,
+  "raw_private_and_host_guards_equal": true,
+  "displayed_to_owner": "Validation,14options,unique six-criterion rubric,fulltable and controlledsteps before implementation",
+  "selected_option": "H",
+  "score": 94.1,
+  "old_packet": "failed_unchanged",
+  "old_three_causes": "unknown_unchanged",
+  "release": "Small Node-only judgment and pure-control preparation; execution not released. Strict other stages/collector unchanged."
+}

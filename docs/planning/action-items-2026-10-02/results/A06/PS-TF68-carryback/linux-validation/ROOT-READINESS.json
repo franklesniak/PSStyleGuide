@@ -1,0 +1,258 @@
+{
+  "schema": 1,
+  "status": "PASS_COMPILE_AND_CURRENT_INPUT_BINDING",
+  "verified_at": "2026-10-06T19:05:25.128487+00:00",
+  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "source_count": 78,
+  "dependency_count": 1914,
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    }
+  },
+  "compile_only": [
+    {
+      "path": "inside.py",
+      "sha256": "fab36fc8daf64a1c57580c571705e0f681d8c2388707b9d7fb4692f7e5c71516",
+      "operation": "compile only; no import or execution"
+    },
+    {
+      "path": "launch.py",
+      "sha256": "eb901f4dc633a53e766f1f6d0b851817ae6e9089378414493dd144396320df75",
+      "operation": "compile only; no import or execution"
+    }
+  ],
+  "controls_reused": {
+    "PREPARATION-CHECKS.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\PREPARATION-CHECKS.json",
+      "sha256": "a808e74111586596b0bcddc983a4d784344f803301cfc90faa3843f26910e65a",
+      "result": {
+        "state": "passed_preparation_only",
+        "started_at": "2026-10-06T17:22:17.292616+00:00",
+        "manifest_sha256_before": "eba876875fa89694e2ee195ed8eb1e742336f6c7c84b94414616622f692618be",
+        "payload_imports": 0,
+        "product_tests": 0,
+        "containers": 0,
+        "manifest_sha256_after": "eba876875fa89694e2ee195ed8eb1e742336f6c7c84b94414616622f692618be",
+        "payload_hashes": {
+          "check-receipt-policy.py": "0dc2c6ec680a7dd4e4465ccaf44697724570e57f2c408df7f569b0aa3a11d2ff",
+          "check-syntax.py": "a1107955c5c1c84fcf8ea9758d97f73acf79e7629e53600c52ce478e8e8c6b98",
+          "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+          "inside.py": "45f9f4b1807894b0439f73c6bd7466a31a8d3fb53a93756e212683302dd2d482",
+          "launch.py": "8890b17ee2a9ea8f43897e52c7de8f7aeb9f442512a9652f044fcd8db1059746",
+          "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+          "PREPARATION.md": "0802d8306ade1755ba3f0bf7b7d4c69b305fb635a1960983cf6e7ed968e20391",
+          "prepare.py": "b9a111e40385fee5f7fafe5ddb666ff990f9a8de21554dc24aec5593ae503db5",
+          "run-fragment.py.txt": "1af20693441a3da0eb635c66e065aab53013f2caad719d3c0caa715a3761f3f9",
+          "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+          "source-catalog.json": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff",
+          "SOURCE-DIFFS.patch": "1334fd7b3434bc4b284120225ef2e56c75d3c6055cd670cd3b6b756dfdb36279"
+        },
+        "finished_at": "2026-10-06T17:22:17.305696+00:00"
+      }
+    },
+    "RECEIPT-POLICY-CHECKS.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\RECEIPT-POLICY-CHECKS.json",
+      "sha256": "4d0b3d5724f46dd3435b11f5887620080a64f707c46cd7e7ddc48639dcce563a",
+      "result": {
+        "state": "passed_pure_receipt_controls",
+        "cases": [
+          {
+            "case": "exited-zero",
+            "expected_accepted": true,
+            "observed_accepted": true,
+            "refusal": null
+          },
+          {
+            "case": "empty-owned-set",
+            "expected_accepted": true,
+            "observed_accepted": true,
+            "refusal": null
+          },
+          {
+            "case": "exited-nonzero",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Unsuccessful adopted exit"
+          },
+          {
+            "case": "signaled-exit",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Unsuccessful adopted exit"
+          },
+          {
+            "case": "live-before-eventual-empty",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Live or unknown owned descendant existed before cleanup"
+          },
+          {
+            "case": "signals-before-eventual-empty",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Live owned descendants required signals"
+          },
+          {
+            "case": "missing-exact-wait",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Missing or ambiguous owned exit receipt"
+          },
+          {
+            "case": "unknown-wait-owner",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Unknown adopted wait ownership/state"
+          },
+          {
+            "case": "cleanup-collection-error",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Ownership collection or cleanup failed"
+          },
+          {
+            "case": "residue-after",
+            "expected_accepted": false,
+            "observed_accepted": false,
+            "refusal": "Owned descendants remain"
+          }
+        ],
+        "product_tests": 0,
+        "processes": 0,
+        "containers": 0
+      }
+    },
+    "ROOT-RESULT-VERIFICATION.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f",
+      "result": {
+        "status": "PASS_FINAL_CANDIDATE_VALIDATION",
+        "verified_at": "2026-10-06T17:36:12.827461+00:00",
+        "candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+        "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "result_sha256": "8661d8555148bce8a846311fc3e75d34c4bcd0d81741e53198b8a67fde732bc6",
+        "manifest_sha256": "775e0aa4d786f27a1e46baf0945f3f435e4b1710684ed7121e4f86c33b7410e4",
+        "commands": [
+          {
+            "name": "staged-preflight",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-RequireStagedInputMatch"
+            ],
+            "exit": 0,
+            "started_at": "2026-10-06T17:25:43.433231+00:00",
+            "finished_at": "2026-10-06T17:25:51.168773+00:00",
+            "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+            "elapsed_seconds": 7.735542
+          },
+          {
+            "name": "affected-node",
+            "command": [
+              "node",
+              "--test",
+              "--test-reporter=tap",
+              ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+            ],
+            "exit": 0,
+            "started_at": "2026-10-06T17:25:51.372409+00:00",
+            "finished_at": "2026-10-06T17:26:09.622360+00:00",
+            "log_sha256": "14156e598abeaf22c2f0f4b5b9d43176e5b7d468616fdc1ccbdd285876c047b4",
+            "elapsed_seconds": 18.249951
+          },
+          {
+            "name": "aggregate",
+            "command": [
+              "/opt/psstyleguide-runtime/venv/bin/python",
+              "-m",
+              "pre_commit",
+              "run",
+              "--all-files"
+            ],
+            "exit": 0,
+            "started_at": "2026-10-06T17:26:09.830679+00:00",
+            "finished_at": "2026-10-06T17:35:45.792584+00:00",
+            "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+            "elapsed_seconds": 575.961905
+          }
+        ],
+        "node_summary": {
+          "tests": 13,
+          "pass": 13,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "passed_hooks": 11,
+        "skipped_hooks": 0,
+        "source_files": 80,
+        "dependencies": 1914,
+        "source_git_dependency_guards_unchanged": true,
+        "cleanup_receipts": 5,
+        "successful_adopted_exits_collected": 81,
+        "no_live_or_unsuccessful_descendants": true,
+        "container_absent_verified": true,
+        "old_cold_packet_status": "failed_unchanged",
+        "limits": "One final-byte local aggregate. Actual committed B/H checks, current audit, final review-input binding, new-input reviews, current hosted checks, normal landing and paired convergence remain. No hosted timeout margin is inferred.",
+        "artifacts": {
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\affected-node-after.json": "e6b88d20a08446558ad484f3b3fd347b48199bf3877cc4c37e6f572be5c6719e",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\affected-node-cleanup.json": "e95c7ea9e6c07b3655dbcb748de6f90cfaf6ae28cead85a7d80f6d9207c6d811",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\affected-node.log": "14156e598abeaf22c2f0f4b5b9d43176e5b7d468616fdc1ccbdd285876c047b4",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\aggregate-after.json": "e6b88d20a08446558ad484f3b3fd347b48199bf3877cc4c37e6f572be5c6719e",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\aggregate-cleanup.json": "ab0d4c408092e0fcba49bb0c4c7f5e59606accf9530864f0df27216fad15b395",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\aggregate.log": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\before.json": "e6b88d20a08446558ad484f3b3fd347b48199bf3877cc4c37e6f572be5c6719e",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\fixture-adaptation.json": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\host-source-after.json": "d4429225f5afd07798f014c30693de705e5d0fb9a7de04e2cef6eec8d0cea89f",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\result.json": "8661d8555148bce8a846311fc3e75d34c4bcd0d81741e53198b8a67fde732bc6",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\runtime.json": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\setup-cleanup.json": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\staged-preflight-after.json": "e6b88d20a08446558ad484f3b3fd347b48199bf3877cc4c37e6f572be5c6719e",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\staged-preflight-cleanup.json": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\staged-preflight.log": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\output\\terminal-cleanup.json": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\status.json": "01e14a9b8955f78089fe4153848f71685aabca3496ae9a0c743d94112bfe2cee",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\container.log": "4766b18e475d80c9af5d98cb008d0ec72bbfffbcecae148de58b5a5c910242e8",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\inputs\\payload-hashes.json": "6fee3ebaf51057526c1b1aaaf753ef4008adf964e327ba166b496406e70a844c",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\inputs\\source-before.json": "d4429225f5afd07798f014c30693de705e5d0fb9a7de04e2cef6eec8d0cea89f",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\runs\\tf68-ed9-native-converter-final-validation-one\\inputs\\manifest.json": "775e0aa4d786f27a1e46baf0945f3f435e4b1710684ed7121e4f86c33b7410e4"
+        }
+      }
+    }
+  },
+  "runner_evidence_sha256": "23e46c50c0dcb9d8d5b62941ba7ef90c2bf0a1d39e371b8c9f6fc31ac7edf7d6",
+  "scope": "One final staged preflight, full seven-file600-test suite, all11hooks. Product/source/dependencies immutable. Accepted policy/locked dependencies retained; endpoint and current audit follow actual commit.",
+  "budget_correction": {
+    "original_preserved": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\preparation-v1",
+    "prior_full_suite_runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\inside.py",
+    "sha256": "0a2e13ab591aedcaa015a72944b63c9b1954d644bf2a28ba3147d9835da9482e",
+    "node_seconds": 3600,
+    "whole_seconds": 7200,
+    "product_limits_changed": false
+  },
+  "no_tests_or_containers_run_by_qualification": true
+}
