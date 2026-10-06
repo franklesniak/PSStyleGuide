@@ -1,0 +1,494 @@
+{
+  "status": "SCOPED_QUALITY_PASS_NO_MATERIAL_FINDINGS_CI_HOLD",
+  "recorded_at": "2026-10-06T22:52:47.190207+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "body_sha256": "ed04460a0027db720ccebadf9c610c69d277ab701d1438c27303871edfd3dfd5",
+  "scope": "Independent R2/R3 merits/native supplement; reuse prior source/tests/R1 quality; exclude certification of own P95 proposal or diagnostic",
+  "source_hashes_reverified": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470,
+      "mode_blob": "100644 blob 67e0c1ce95ff6b99c76f1959b5c284e208b450dd\t.github/workflows/Test-AgentInstructions.ps1",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "base_mode_blob": "100644 blob 7ee712e048ab512aa751cf77c530d985d458bf7f\t.github/workflows/Test-AgentInstructions.ps1",
+      "base_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "base_absent": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244,
+      "mode_blob": "100644 blob 43e08f56376b1b67b8e797b06649ab04fce12aed\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "base_mode_blob": "100644 blob 9918aaae6d0658c0e9ab4d8bf16de9716d52ac87\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "base_sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+      "base_absent": false
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995,
+      "mode_blob": "100644 blob bfad820fa092e7ff743e9ea90e782f61336df0d1\t.github/workflows/copilot-code-review.yml",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "base_mode_blob": "",
+      "base_sha256": null,
+      "base_absent": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "bytes": 130003,
+      "mode_blob": "100644 blob 0eb1362df2fad5f6c3a04054c8a575d0981cbf39\t.github/workflows/Test-CiHelpers.test.mjs",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "base_mode_blob": "100644 blob 2145cb90a7a5a2d292aac7375092dd6b33ea984e\t.github/workflows/Test-CiHelpers.test.mjs",
+      "base_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "base_absent": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176,
+      "mode_blob": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "base_mode_blob": "100644 blob b68aa229ae32dae8ad62886e93e161f887f67a26\t.github/workflows/Validate-WorkflowPolicy.mjs",
+      "base_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "base_absent": false
+    }
+  ],
+  "score_checks": [
+    {
+      "finding": "R2",
+      "option": "A",
+      "total": 92.7
+    },
+    {
+      "finding": "R2",
+      "option": "B",
+      "total": 79.2
+    },
+    {
+      "finding": "R2",
+      "option": "C",
+      "total": 79.8
+    },
+    {
+      "finding": "R2",
+      "option": "D",
+      "total": 82.2
+    },
+    {
+      "finding": "R2",
+      "option": "E",
+      "total": 82.9
+    },
+    {
+      "finding": "R2",
+      "option": "F",
+      "total": 81.4
+    },
+    {
+      "finding": "R2",
+      "option": "G",
+      "total": 75.5
+    },
+    {
+      "finding": "R2",
+      "option": "H",
+      "total": 72.5
+    },
+    {
+      "finding": "R2",
+      "option": "I",
+      "total": 69.6
+    },
+    {
+      "finding": "R2",
+      "option": "J",
+      "total": 87.5
+    },
+    {
+      "finding": "R2",
+      "option": "K",
+      "total": 33.1
+    },
+    {
+      "finding": "R2",
+      "option": "L",
+      "total": 35.1
+    },
+    {
+      "finding": "R2",
+      "option": "M",
+      "total": 85.1
+    },
+    {
+      "finding": "R3",
+      "option": "A",
+      "total": 96.1
+    },
+    {
+      "finding": "R3",
+      "option": "B",
+      "total": 94.7
+    },
+    {
+      "finding": "R3",
+      "option": "C",
+      "total": 79.1
+    },
+    {
+      "finding": "R3",
+      "option": "D",
+      "total": 85.5
+    },
+    {
+      "finding": "R3",
+      "option": "E",
+      "total": 85.8
+    },
+    {
+      "finding": "R3",
+      "option": "F",
+      "total": 84.7
+    },
+    {
+      "finding": "R3",
+      "option": "G",
+      "total": 62.6
+    },
+    {
+      "finding": "R3",
+      "option": "H",
+      "total": 59.1
+    },
+    {
+      "finding": "R3",
+      "option": "I",
+      "total": 83.3
+    },
+    {
+      "finding": "R3",
+      "option": "J",
+      "total": 68.7
+    },
+    {
+      "finding": "R3",
+      "option": "K",
+      "total": 62.6
+    },
+    {
+      "finding": "R3",
+      "option": "L",
+      "total": 77.2
+    },
+    {
+      "finding": "R3",
+      "option": "M",
+      "total": 45.8
+    }
+  ],
+  "publication_derivatives_table_padding_only": true,
+  "worker_stable_references_verified": 24,
+  "historical_metadata_references": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "historical_sha256": "7aa2b5356500333c7f7e6edc8894f3563a054391869ab908c9c263fc5e2ed2a4",
+      "current_sha256": "df952f8e2b412ca69b27711af9780fcce4bd47823ea4dfa004617f829f4b105d",
+      "disposition": "Expected root-owned progress update after root verified original worker preimage; not reused as current product evidence."
+    }
+  ],
+  "reply_bindings": [
+    {
+      "finding": "PS235-R2",
+      "original_comment": 4201048162,
+      "reply": 4201155049,
+      "thread": "PRRT_kwDOQkjdhM6prmeI",
+      "resolved": true
+    },
+    {
+      "finding": "PS235-R3",
+      "original_comment": 4201048196,
+      "reply": 4201155565,
+      "thread": "PRRT_kwDOQkjdhM6prmei",
+      "resolved": true
+    }
+  ],
+  "native_snapshot_at": "2026-10-06T22:48:43.172089+00:00",
+  "ordinary_successful_runs": [
+    37542843870,
+    37529312195,
+    37524154208,
+    37524154909,
+    37524154355,
+    37524154327,
+    37524154479,
+    37524154494,
+    37524154228,
+    37524110707,
+    37524110671,
+    37524110807,
+    37524110612,
+    37524110641,
+    37524110694
+  ],
+  "cancelled_dynamic_runs": [
+    37538942393,
+    37524396256
+  ],
+  "unresolved_threads": 0,
+  "live_runs": 0,
+  "copilot_review": {
+    "id": 5435249947,
+    "effort": "Lite",
+    "disposition": "merits-resolved; no new clean review"
+  },
+  "codex_result": 6024708462,
+  "body_policy_run": {
+    "id": 37542843870,
+    "result": "MAINTENANCE_REQUIRED",
+    "behavior": "intentionally skipped"
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-observation-2230.json",
+      "sha256": "b286eb0353102e38482cb9fbb938dd8964f1230da3de11aebeda3a96a8cc76db",
+      "bytes": 698776
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
+      "bytes": 3357
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\repair-proposal\\REPORT.md",
+      "sha256": "14fa2885104e0961329a9c98e927ae668c8a19de6d67604526635858dfa9562b",
+      "bytes": 25615
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\repair-proposal\\evidence.json",
+      "sha256": "ccb2b1ea9696552294db60010c4dd3749d2c4b3178a892b14e01455fde8da5ed",
+      "bytes": 21180
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\ROOT-FOCUSED-VERIFICATION.json",
+      "sha256": "0d38b68e5ead4c6ab05ab01f9d34e26731ed8ab9dc20ad9ad87739d8b7d58d12",
+      "bytes": 23608
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\initialization-controls.ps1",
+      "sha256": "bc4c2ebe159776ff64d79d97d01ab1832cc13b34a74256a7bbf1856584a7e474",
+      "bytes": 2250
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\load-functions.ps1",
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+      "bytes": 1920
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\controls.ps1",
+      "sha256": "b105310bda583403dbfa116f3127359a6e2388d284f11d845fc754606cb02a65",
+      "bytes": 7347
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\REPORT.md",
+      "sha256": "b784e9254b382e661e539d3fd81062ea6b2392adb38293e6f40c4377f4ff07d2",
+      "bytes": 2886
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "e30f7f2c776b8cace81d509b353d59e48ce2766f6a1e30650e5b8da127922480",
+      "bytes": 10138
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R9-workflow-duplication.md",
+      "sha256": "5aa4c427ed8148c856b1b26ef49b6d956e0270ba354aab37922daf58147526ce",
+      "bytes": 6570
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round2\\R11-inline-workflow.md",
+      "sha256": "6736fa7450ea3d2cba046abe6f0555d1cc4fc306bd0d34c49ae3492801480deb",
+      "bytes": 8354
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-security-scope.md",
+      "sha256": "8f04e055b9403ed3d11427b2f8ae00462f0430c9f46db61ff801cbe58034d28b",
+      "bytes": 11343
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\windows-focused\\REPORT.md",
+      "sha256": "d040a9004a0cfa1719b3eb2a6616cc4d5952addb9fd7f524aaaecc2d02b92d8b",
+      "bytes": 8976
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\STATUS.json",
+      "sha256": "059f6341cf2856cd88ba73dd26342a33a6de90e9481ab4dfb68546364bd547e7",
+      "bytes": 1908
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\output\\QUALIFICATION.json",
+      "sha256": "40fe204b9ac52bb7b11abd9b4eb0044a14e3570664abd65817696be3eaee4352",
+      "bytes": 28450
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\root-qualification-two\\release\\manifest.authorized.json",
+      "sha256": "b7fd46e36c19e26b4cc64bb4f397d4a382de50a8e3ca6183194730c9ef14196b",
+      "bytes": 3668
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\manifest.prepared.json",
+      "sha256": "9908a985d8dd077bc4473ed5ae04a8eb7e9b0ee3a92f51cca6026c288d8117a6",
+      "bytes": 3612
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-node-cleanup-finding\\implementation-v2\\evidence.json",
+      "sha256": "7fdec65d846d17c75e30ae0cf97af2c0e71c80e13b589a98bfa615c01ee63833",
+      "bytes": 5727
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe",
+      "bytes": 1883
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\ROOT-FINAL-VERIFICATION.json",
+      "sha256": "979427dc7d769a8ddd0c624f839c8b7d57b10c58892b9ece1a9ca18f92125993",
+      "bytes": 4761
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-terminal-disposition.json",
+      "sha256": "a0cf4f33772433ab4d923eabae47ff6c28d2fc2b5b5ff9630e24aa776f563000",
+      "bytes": 6053
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\evidence.json",
+      "sha256": "24e7b42b4f694d266c5dee50a3da5374945f653c15f56d407042e4452cc7cd25",
+      "bytes": 29184
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R2-converter-metadata-cache.md",
+      "sha256": "8dad90140bdb010bd19c2c65a8e75a2199aa805cf00674c4dc4189683831226f",
+      "bytes": 12959
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\R3-npm-environment-duplication.md",
+      "sha256": "c89f83e0a44fce755c87188e74114f98c5d5db86ffa1ffec533b65b3e5b2c1a0",
+      "bytes": 12315
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\round1-recovery-findings\\R2-converter-metadata-cache.md",
+      "sha256": "ec4d1e70725f99eeb85b91d8246785b5b77c2789b16ade2dd2d105c55681b73a",
+      "bytes": 13166
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PS-TF68-carryback\\round1-recovery-findings\\R3-npm-environment-duplication.md",
+      "sha256": "5958a262bbcfe68585a4a3956743f428a22b3e12baea783564d018728075a8eb",
+      "bytes": 12522
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\copilot-code-review.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-CiHelpers.test.mjs",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "bytes": 130003
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Validate-WorkflowPolicy.mjs",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-pre-disposition.json",
+      "sha256": "872391d0fcdcc45a65d058b631d352e99289b04b46006ea305f0a71783188696",
+      "bytes": 702694
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\run.json",
+      "sha256": "f2a1028de4f965aafc4a3dde73981e2062657775a0d131768ee69cb99361fb4e",
+      "bytes": 15073
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\jobs.json",
+      "sha256": "8f8c23e55030768a518b98c4a38463270eac3cb7e292f093d9a8305dfe460036",
+      "bytes": 4188
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\log.txt",
+      "sha256": "6a4562f298649608841e555d2729d7f4364d1d33c305939571e6ba4b418dcf57",
+      "bytes": 23843
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\summary.json",
+      "sha256": "448133cc1b8de36d580ae3ed7f9c3ea9b939f54ee892e1e200a77584c9bd3263",
+      "bytes": 1583
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-findings\\ROOT-DECISION.json",
+      "sha256": "62e52332198093580f099207574965f2d6d2d6d7a9ec6ad6ca625bff7484018a",
+      "bytes": 3114
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-native-disposition.json",
+      "sha256": "b690ce4c414db5d82587f4c7e8b611a07d7bfc2a94b686a999a10a7ac25dc6e0",
+      "bytes": 54353
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-body-update.json",
+      "sha256": "f6607b5383c969772a89eed5215e2465d7eca8e7898bb596075893a14722c0e9",
+      "bytes": 80739
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-post-disposition.json",
+      "sha256": "a0bd4bf8d3e018bcb63264db3afb0b06eb3f9161002d494fdff860dfdf73caa1",
+      "bytes": 784210
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\REPORT.md",
+      "sha256": "8b2bb9c6dd6576292b4dda2f2b07f273d63916722f2505cd61a2ba57f272b0f3",
+      "bytes": 5099
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\evidence.json",
+      "sha256": "a168c19b9b61c08166dacf6eb023599ea9a21cf15a5640ff75c5544570f2138f",
+      "bytes": 23064
+    }
+  ],
+  "report_sha256": "d5c9eb9d526a2eea2da67567e84e5305aec5260e5f1e9ee866cff26e39892c11",
+  "limits": [
+    "No tests executed or new performance claim",
+    "No merge readiness or all-CI-green claim",
+    "Dedicated activation and paired acceptance pending",
+    "No P95 self-certification or diagnostic release",
+    "Saved snapshot only; root owns fresh native reconciliation"
+  ]
+}

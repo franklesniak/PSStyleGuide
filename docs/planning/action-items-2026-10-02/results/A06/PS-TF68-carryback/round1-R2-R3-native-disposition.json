@@ -1,0 +1,314 @@
+{
+  "status": "both_replies_and_resolutions_confirmed",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+  "planning_commit": "33b95c196e5e9176c08572509997d21adf9904c0",
+  "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-pre-disposition.json",
+  "baseline_sha256": "872391d0fcdcc45a65d058b631d352e99289b04b46006ea305f0a71783188696",
+  "items": [
+    {
+      "finding": "PS235-R2",
+      "comment_id": 4201048162,
+      "thread": "PRRT_kwDOQkjdhM6prmeI",
+      "body": "Validated the repeated work; its isolated cost is unmeasured. Retain current per-definition identity and failure checks (A92.7); no speed claim or cache change is justified by current evidence.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R2-converter-metadata-cache.md)",
+      "preimage": {
+        "id": "PRRT_kwDOQkjdhM6prmeI",
+        "isResolved": false,
+        "viewerCanResolve": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048162,
+              "body": "The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call when `-UseNativeStructuralConversion` is set. Since the template is constant, consider caching (at script scope) the computed identity, resolved `[type]`, and any reflected members used for verification/invocation so hot-path Markdown parsing avoids repeated hashing/reflection overhead while preserving the same correctness checks.",
+              "author": {
+                "login": "copilot-pull-request-reviewer"
+              }
+            }
+          ]
+        }
+      },
+      "reply_intent_at": "2026-10-06T22:46:53.022507+00:00",
+      "status": "reply_and_resolution_confirmed",
+      "reply_response": {
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155049",
+        "pull_request_review_id": 5435366937,
+        "id": 4201155049,
+        "node_id": "PRRC_kwDOQkjdhM76aInp",
+        "diff_hunk": "@@ -318,6 +324,137 @@ function ConvertFrom-ParserJsonContext {\n         if ($objDocument.RootElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {\n             throw 'The parser JSON context root must be an object.'\n         }\n+        if ($UseNativeStructuralConversion) {\n+            # Only code is retained by the process. Every graph belongs to this call.\n+            # The payload digest identifies the exact implementation, including on\n+            # repeated script loads; a same-name type is not accepted on name alone.\n+            $strNativeTemplate = @'\n+using System;\n+using System.Collections.Generic;\n+using System.Management.Automation;\n+using System.Text.Json;\n+\n+namespace StyleGuide.AgentJson {\n+    public static class StructuralDecoder_IDENTITY_ {\n+        public const string SourceIdentity = \"_IDENTITY_\";\n+\n+        public sealed class Result {\n+            public readonly int Kind;\n+            public readonly object Value;\n+            public Result(int kind, object value) { Kind = kind; Value = value; }\n+        }\n+\n+        public static Result DecodeRoot(JsonElement root) {\n+            int kind = 0;\n+            object value = Decode(root, ref kind);\n+            return new Result(kind, kind == 0 ? value : null);\n+        }\n+\n+        private static object Decode(JsonElement element, ref int kind) {\n+            switch (element.ValueKind) {\n+                case JsonValueKind.Object:\n+                    var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);\n+                    var result = new PSObject();\n+                    foreach (JsonProperty property in element.EnumerateObject()) {\n+                        string name = property.Name;\n+                        if (String.IsNullOrEmpty(name) || !names.Add(name)) {\n+                            kind = 2;\n+                            return null;\n+                        }\n+                        // Preserve the complete PowerShell cast for these names.\n+                        // Do not approximate PSTypeName or reserved member behavior.\n+                        if (String.Equals(name, \"PSTypeName\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSObject\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSBase\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSAdapted\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSExtended\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSTypeNames\", StringComparison.OrdinalIgnoreCase)) {\n+                            kind = 1;\n+                            return null;\n+                        }\n+                        object value = Decode(property.Value, ref kind);\n+                        if (kind != 0) { return null; }\n+                        result.Properties.Add(new PSNoteProperty(name, value));\n+                    }\n+                    return result;\n+                case JsonValueKind.Array:\n+                    var values = new object[element.GetArrayLength()];\n+                    int index = 0;\n+                    foreach (JsonElement child in element.EnumerateArray()) {\n+                        values[index++] = Decode(child, ref kind);\n+                        if (kind != 0) { return null; }\n+                    }\n+                    return values;\n+                case JsonValueKind.String:\n+                    return element.GetString();\n+                case JsonValueKind.Number:\n+                    long integer;\n+                    if (element.TryGetInt64(out integer)) { return integer; }\n+                    double number = element.GetDouble();\n+                    if (Double.IsNaN(number) || Double.IsInfinity(number)) {\n+                        kind = 3;\n+                        return null;\n+                    }\n+                    return number;\n+                case JsonValueKind.True:\n+                    return true;\n+                case JsonValueKind.False:\n+                    return false;\n+                case JsonValueKind.Null:\n+                    return null;\n+                default:\n+                    kind = 4;\n+                    return null;\n+            }\n+        }\n+    }\n+}\n+'@\n+            $objSourceHash = [Security.Cryptography.SHA256]::Create()\n+            try {\n+                $strSourceIdentity = [BitConverter]::ToString(\n+                    $objSourceHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($strNativeTemplate))\n+                ).Replace('-', '').ToLowerInvariant()\n+            } finally {\n+                $objSourceHash.Dispose()\n+            }\n+            $strNativeTypeName = 'StyleGuide.AgentJson.StructuralDecoder' + $strSourceIdentity\n+            $objNativeType = $strNativeTypeName -as [type]\n+            if ($null -eq $objNativeType) {\n+                $strNativeSource = $strNativeTemplate.Replace('_IDENTITY_', $strSourceIdentity)\n+                $arrCompiledTypes = @(Add-Type -TypeDefinition $strNativeSource -PassThru -ErrorAction Stop)\n+                $objNativeType = $strNativeTypeName -as [type]",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "commit_id": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "original_commit_id": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "user": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "Validated the repeated work; its isolated cost is unmeasured. Retain current per-definition identity and failure checks (A92.7); no speed claim or cache change is justified by current evidence.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R2-converter-metadata-cache.md)",
+        "created_at": "2026-10-06T22:46:53Z",
+        "updated_at": "2026-10-06T22:46:53Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201155049",
+        "pull_request_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155049"
+          },
+          "html": {
+            "href": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201155049"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155049/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": 413,
+        "original_start_line": 413,
+        "start_side": "RIGHT",
+        "line": 426,
+        "original_line": 426,
+        "side": "RIGHT",
+        "in_reply_to_id": 4201048162,
+        "author_association": "OWNER",
+        "original_position": 147,
+        "position": 147,
+        "subject_type": "line"
+      },
+      "reply_id": 4201155049,
+      "reply_confirmed_at": "2026-10-06T22:46:53Z",
+      "resolve_intent_at": "2026-10-06T22:46:55.748676+00:00",
+      "resolve_response": {
+        "resolveReviewThread": {
+          "thread": {
+            "id": "PRRT_kwDOQkjdhM6prmeI",
+            "isResolved": true
+          }
+        }
+      },
+      "resolved_readback": {
+        "id": "PRRT_kwDOQkjdhM6prmeI",
+        "isResolved": true,
+        "viewerCanResolve": false,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048162,
+              "body": "The SHA256 identity computation and subsequent reflection/type-resolution work runs on every call when `-UseNativeStructuralConversion` is set. Since the template is constant, consider caching (at script scope) the computed identity, resolved `[type]`, and any reflected members used for verification/invocation so hot-path Markdown parsing avoids repeated hashing/reflection overhead while preserving the same correctness checks.",
+              "author": {
+                "login": "copilot-pull-request-reviewer"
+              }
+            },
+            {
+              "databaseId": 4201155049,
+              "body": "Validated the repeated work; its isolated cost is unmeasured. Retain current per-definition identity and failure checks (A92.7); no speed claim or cache change is justified by current evidence.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R2-converter-metadata-cache.md)",
+              "author": {
+                "login": "franklesniak"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "finding": "PS235-R3",
+      "comment_id": 4201048196,
+      "thread": "PRRT_kwDOQkjdhM6prmei",
+      "body": "All four blocks are identical and protect six npm calls in separate processes. Retain per-process filtering and independent hostile-environment controls (A96.1); exporting two settings alone does not remove other inherited names.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R3-npm-environment-duplication.md)",
+      "preimage": {
+        "id": "PRRT_kwDOQkjdhM6prmei",
+        "isResolved": false,
+        "viewerCanResolve": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048196,
+              "body": "This npm-environment sanitization block appears multiple times in the workflow (e.g., in the verification, install, and dependency-tree steps). Duplicating this logic increases the chance of future drift (one step updated while others aren\u2019t). Consider moving the sanitization into a single repo-owned helper script (bash) that each step calls, or using a single step that exports the sanitized env values and a reusable command wrapper, so policy changes stay consistent across all npm invocations.",
+              "author": {
+                "login": "copilot-pull-request-reviewer"
+              }
+            }
+          ]
+        }
+      },
+      "reply_intent_at": "2026-10-06T22:46:58.114149+00:00",
+      "status": "reply_and_resolution_confirmed",
+      "reply_response": {
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155565",
+        "pull_request_review_id": 5435367506,
+        "id": 4201155565,
+        "node_id": "PRRC_kwDOQkjdhM76aIvt",
+        "diff_hunk": "@@ -0,0 +1,887 @@\n+name: Copilot code review preparation\n+\n+on:\n+  workflow_dispatch:\n+  push:\n+    branches:\n+      - \"**\"\n+    paths:\n+      - .github/workflows/**\n+      - .husky/**\n+      - requirements-dev.txt\n+      - \"**/*.yml\"\n+      - \"**/*.yaml\"\n+      - .npmrc\n+      - npm-shrinkwrap.json\n+      - package.json\n+      - package-lock.json\n+  pull_request:\n+    paths:\n+      - .github/workflows/**\n+      - .husky/**\n+      - requirements-dev.txt\n+      - \"**/*.yml\"\n+      - \"**/*.yaml\"\n+      - .npmrc\n+      - npm-shrinkwrap.json\n+      - package.json\n+      - package-lock.json\n+\n+# Review setup prepares tools and hooks. Complete validation remains in\n+# ordinary CI and the coding-agent setup; readiness is not acceptance.\n+permissions: {}\n+\n+jobs:\n+  copilot-setup-steps:\n+    name: Prepare locked code review tools and hooks\n+    runs-on: ubuntu-24.04\n+    timeout-minutes: 59\n+    permissions: {}\n+    steps:\n+      - name: Acquire triggering revision without an action\n+        timeout-minutes: 5\n+        id: acquire\n+        shell: pwsh\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+        run: |\n+          $ErrorActionPreference = 'Stop'\n+\n+          # Do not load user/system Git credentials or hooks during anonymous acquisition.\n+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or\n+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {\n+              throw 'credential-policy: external Git command configuration is not allowed'\n+          }\n+          $env:GIT_CONFIG_NOSYSTEM = '1'\n+          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n+          $env:GIT_TERMINAL_PROMPT = '0'\n+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n+              throw 'credential-policy: a token was projected into a code job'\n+          }\n+          # git reports absent state with a non-zero status in places this step\n+          # accepts, so native-command error mapping is disabled the same way\n+          # the other governed steps disable it and each status is classified\n+          # explicitly instead.\n+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n+              $PSNativeCommandUseErrorActionPreference = $false\n+          }\n+\n+          # Every value below is set by the runner before any repository code\n+          # executes, and is read from the environment rather than expanded as\n+          # a workflow expression, because no governed script step in this\n+          # repository contains an expression at all.\n+          $strServerUrl = $env:GITHUB_SERVER_URL\n+          $strRepository = $env:GITHUB_REPOSITORY\n+          $strSha = $env:GITHUB_SHA\n+          if ($strServerUrl -cne 'https://github.com') {\n+              throw 'acquire: the runner named an unexpected server'\n+          }\n+          if ($strRepository -cne 'franklesniak/PSStyleGuide') {\n+              throw 'acquire: the triggering repository is not the expected repository'\n+          }\n+          # A full 40-hex commit is required rather than a ref. A ref would let\n+          # the fetch resolve to whatever the ref points at when the fetch runs,\n+          # which for a push to a busy branch is not necessarily the revision\n+          # that triggered this run.\n+          if ($strSha -cnotmatch '^[0-9a-f]{40}$') {\n+              throw 'acquire: the triggering revision is not a full commit hash'\n+          }\n+\n+          # The workspace is proven empty rather than cleaned. Cleaning would\n+          # decide what to delete from state that is already present, while an\n+          # emptiness assertion has no such input.\n+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {\n+              throw 'acquire: the workspace is not empty'\n+          }\n+\n+          # Resolved from a fixed candidate list rather than by name. Nothing has\n+          # executed in this step yet, so name resolution is not attacker-\n+          # influenced here -- but PowerShell aliases curl and wget to\n+          # Invoke-WebRequest on the Desktop edition, this repository already\n+          # pins the Git executable this way in the verify step, and relying on\n+          # an alias being absent is a property of the host rather than\n+          # something this file asserts. Constant, so nothing later can rebind\n+          # it.\n+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1\n+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'acquire: Git was not resolved as an application' }\n+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant\n+\n+          & $strGitPath -c core.hooksPath=/dev/null init --quiet .\n+          if ($LASTEXITCODE -ne 0) { throw \"acquire: git init exited $LASTEXITCODE\" }\n+          & $strGitPath remote add origin \"$strServerUrl/$strRepository\"\n+          if ($LASTEXITCODE -ne 0) { throw \"acquire: git remote add exited $LASTEXITCODE\" }\n+          # Fetching the commit itself, not a ref that names it. No credential\n+          # is supplied and none is configured, so nothing is persisted for the\n+          # next step to have to clean up.\n+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {\n+              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin $strSha\n+              $intFetchExitCode = $LASTEXITCODE\n+              if ($intFetchExitCode -eq 0) { break }\n+              if ($intAttempt -lt 3) { Start-Sleep -Seconds 2 }\n+          }\n+          if ($intFetchExitCode -ne 0) { throw \"acquire: git fetch exited $intFetchExitCode after three attempts\" }\n+          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD\n+          if ($LASTEXITCODE -ne 0) { throw \"acquire: git checkout exited $LASTEXITCODE\" }\n+          $arrHeadOutput = @(& $strGitPath rev-parse HEAD)\n+          $intHeadExitCode = $LASTEXITCODE\n+          if ($intHeadExitCode -ne 0) {\n+              throw \"acquire: git rev-parse exited $intHeadExitCode\"\n+          }\n+          if ($arrHeadOutput.Count -ne 1) {\n+              throw 'acquire: git rev-parse must return exactly one line'\n+          }\n+          $strHead = $arrHeadOutput[0].Trim()\n+          if ($strHead -cne $strSha) {\n+              throw 'acquire: the checked out revision is not the triggering revision'\n+          }\n+          Write-Information \"acquire: anonymous exact checkout of $strSha\" -InformationAction Continue\n+      - name: Verify checkout credential cleanup\n+        timeout-minutes: 2\n+        id: verify-checkout-credentials\n+        shell: pwsh\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+        run: |\n+          $ErrorActionPreference = 'Stop'\n+\n+          # Do not load user/system Git credentials or hooks during anonymous acquisition.\n+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or\n+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {\n+              throw 'credential-policy: external Git command configuration is not allowed'\n+          }\n+          $env:GIT_CONFIG_NOSYSTEM = '1'\n+          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n+          $env:GIT_TERMINAL_PROMPT = '0'\n+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n+              throw 'credential-policy: a token was projected into a code job'\n+          }\n+          # git config exits 1 when a queried key is absent, which is the secure\n+          # expected state this step asserts. If the runner enables native-command\n+          # error mapping, that accepted status would terminate the step before the\n+          # explicit capture below runs, so it is disabled the same way\n+          # markdownlint.yml disables it.\n+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n+              $PSNativeCommandUseErrorActionPreference = $false\n+          }\n+          # Resolved here too. Constants do not cross step boundaries, and this\n+          # step asserts a credential property, so the executable it asks must\n+          # not be chosen by name resolution either.\n+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1\n+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'credential-policy: Git was not resolved as an application' }\n+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant\n+          $arrRemoteUrls = @(& $strGitPath remote get-url --all origin)\n+          if ($LASTEXITCODE -ne 0 -or $arrRemoteUrls.Count -ne 1) {\n+              throw 'credential-policy: unable to resolve exactly one origin URL'\n+          }\n+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+              throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'\n+          }\n+          $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)\n+          $intHelperExit = $LASTEXITCODE\n+          $global:LASTEXITCODE = 0\n+          if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {\n+              throw 'credential-policy: a local credential helper is configured'\n+          }\n+          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\\..*\\.extraheader$')\n+          $intAuthorizationExit = $LASTEXITCODE\n+          $global:LASTEXITCODE = 0\n+          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {\n+              throw 'credential-policy: persisted HTTP authorization is configured'\n+          }\n+\n+          $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)\n+          $intEffectiveConfigExit = $LASTEXITCODE\n+          if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object { $_ -cmatch '^(system|global)\\s' }).Count -ne 0) {\n+              throw 'credential-policy: external Git configuration was not excluded'\n+          }\n+\n+      - name: Acquire published main reference\n+        timeout-minutes: 5\n+        shell: pwsh\n+        run: |\n+          $ErrorActionPreference = 'Stop'\n+\n+          # Do not load user/system Git credentials or hooks during anonymous acquisition.\n+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or\n+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {\n+              throw 'credential-policy: external Git command configuration is not allowed'\n+          }\n+          $env:GIT_CONFIG_NOSYSTEM = '1'\n+          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n+          $env:GIT_TERMINAL_PROMPT = '0'\n+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n+              throw 'credential-policy: a token was projected into a code job'\n+          }\n+          # git reports absent state with a non-zero status in places this step\n+          # accepts, so native-command error mapping is disabled the same way\n+          # the other governed steps disable it and each status is classified\n+          # explicitly instead.\n+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n+              $PSNativeCommandUseErrorActionPreference = $false\n+          }\n+\n+          $strGitPath = @('/usr/bin/git', '/bin/git') | Where-Object {\n+              [IO.File]::Exists($_)\n+          } | Select-Object -First 1\n+          if ([string]::IsNullOrEmpty($strGitPath)) {\n+              throw 'main: fixed Git is unavailable'\n+          }\n+          $arrUrls = @(& $strGitPath remote get-url --all origin)\n+          if ($LASTEXITCODE -ne 0 -or $arrUrls.Count -ne 1 -or\n+              $arrUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+              throw 'main: origin identity is invalid'\n+          }\n+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {\n+              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin refs/heads/main:refs/remotes/origin/main\n+              $intFetchExitCode = $LASTEXITCODE\n+              if ($intFetchExitCode -eq 0) {\n+                  break\n+              }\n+              if ($intAttempt -lt 3) {\n+                  Start-Sleep -Seconds 2\n+              }\n+          }\n+          if ($intFetchExitCode -ne 0) {\n+              throw \"main: git fetch exited $intFetchExitCode after three attempts\"\n+          }\n+          $arrMain = @(& $strGitPath rev-parse --verify refs/remotes/origin/main)\n+          if ($LASTEXITCODE -ne 0 -or $arrMain.Count -ne 1 -or\n+              $arrMain[0] -cnotmatch '^[0-9a-f]{40}$' -or $arrMain[0] -ceq ('0' * 40)) {\n+              throw 'main: expected one nonzero commit identity'\n+          }\n+          $strMain = $arrMain[0]\n+          $arrType = @(& $strGitPath cat-file -t $strMain)\n+          if ($LASTEXITCODE -ne 0 -or $arrType.Count -ne 1 -or $arrType[0] -cne 'commit') {\n+              throw 'main: fetched authority is not a commit'\n+          }\n+          $arrHead = @(& $strGitPath rev-parse HEAD)\n+          if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n+              throw 'main: event checkout changed during authority acquisition'\n+          }\n+          Write-Information \"main: setup-time authority $strMain; event checkout $env:GITHUB_SHA\" -InformationAction Continue\n+\n+      - name: Reject alternate npm install inputs\n+        timeout-minutes: 2\n+        shell: bash\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+        run: |\n+          set -euo pipefail\n+          if [[ -n \"${GITHUB_TOKEN:-}\" || -n \"${GH_TOKEN:-}\" ||\n+            -n \"${ACTIONS_RUNTIME_TOKEN:-}\" || -n \"${GIT_CONFIG_COUNT:-}\" ||\n+            -n \"${GIT_CONFIG_PARAMETERS:-}\" ]]; then\n+            echo '::error::Unexpected credential or Git configuration channel.'\n+            exit 1\n+          fi\n+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0\n+          declare -ar alternate_inputs=(\n+            .npmrc\n+            npm-shrinkwrap.json\n+            .github/workflows/.npmrc\n+            .github/workflows/npm-shrinkwrap.json\n+          )\n+          for alternate_input in \"${alternate_inputs[@]}\"; do\n+            if [[ -e \"${alternate_input}\" || -L \"${alternate_input}\" ]]; then\n+              echo \"::error file=${alternate_input}::Unsupported npm\" \\\n+                'install input.'\n+              exit 1\n+            fi\n+          done\n+\n+      - name: Detect locked validation-tool layout\n+        timeout-minutes: 2\n+        id: toolchain\n+        shell: bash\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+        run: |\n+          set -euo pipefail\n+          if [[ -n \"${GITHUB_TOKEN:-}\" || -n \"${GH_TOKEN:-}\" ||\n+            -n \"${ACTIONS_RUNTIME_TOKEN:-}\" || -n \"${GIT_CONFIG_COUNT:-}\" ||\n+            -n \"${GIT_CONFIG_PARAMETERS:-}\" ]]; then\n+            echo '::error::Unexpected credential or Git configuration channel.'\n+            exit 1\n+          fi\n+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0\n+          workflow_manifest='.github/workflows/package.json'\n+          workflow_lock='.github/workflows/package-lock.json'\n+\n+          for required_file in \"${workflow_manifest}\" \"${workflow_lock}\"; do\n+            if [[ ! -f \"${required_file}\" || -L \"${required_file}\" ]]; then\n+              echo \"::error file=${required_file}::Required locked npm input\" \\\n+                'is missing or is not a regular file.'\n+              exit 1\n+            fi\n+          done\n+\n+          classify_npm_input() {\n+            if [[ -L \"$1\" ]]; then\n+              printf 'symlink'\n+            elif [[ -f \"$1\" ]]; then\n+              printf 'regular-file'\n+            elif [[ -e \"$1\" ]]; then\n+              printf 'non-regular'\n+            else\n+              printf 'absent'\n+            fi\n+          }\n+\n+          root_manifest_state=\"$(classify_npm_input package.json)\"\n+          root_lock_state=\"$(classify_npm_input package-lock.json)\"\n+\n+          if [[ \"${root_manifest_state}\" == regular-file && \\\n+            \"${root_lock_state}\" == regular-file ]]; then\n+            echo 'layout=modern' >> \"${GITHUB_OUTPUT}\"\n+          elif [[ \"${root_manifest_state}\" == absent && \\\n+            \"${root_lock_state}\" == absent ]]; then\n+            echo 'layout=legacy' >> \"${GITHUB_OUTPUT}\"\n+          else\n+            echo '::error::The root npm validation tuple requires both inputs as' \\\n+              'regular files or both inputs absent;' \\\n+              \"package.json=${root_manifest_state};\" \\\n+              \"package-lock.json=${root_lock_state}.\"\n+            exit 1\n+          fi\n+\n+\n+          declaration='.github/workflows/ci-toolchain.json'\n+          declaration_state=\"$(classify_npm_input \"${declaration}\")\"\n+          python_lock_state=\"$(classify_npm_input requirements-dev.txt)\"\n+          launcher_state=\"$(classify_npm_input .github/workflows/Invoke-LockedPythonHook.ps1)\"\n+          capability='full'\n+          version=''\n+          if [[ \"${root_manifest_state}\" == absent ]]; then\n+            if [[ \"${declaration_state}\" != absent || \"${python_lock_state}\" != absent || \"${launcher_state}\" != absent ]]; then\n+              echo '::error::Legacy npm layout has partial current validation inputs.'\n+              exit 1\n+            fi\n+            capability='node-only'\n+          elif [[ \"${declaration_state}\" == absent ]]; then\n+            # PowerShell variables are intentionally literal to Bash.\n+            # shellcheck disable=SC2016\n+            version=\"$(pwsh -NoLogo -NoProfile -NonInteractive -Command '\n+              $ErrorActionPreference = \"Stop\"\n+              $obj = Get-Content -Raw -LiteralPath package.json | ConvertFrom-Json -ErrorAction Stop\n+              if ($obj.engines.npm -cne \"11.16.0\" -or $obj.engines.node -cnotin @(\"24.18.0\", \"24.18.1\")) {\n+                  throw \"Unsupported pre-declaration runtime tuple\"\n+              }\n+              Write-Output $obj.engines.node')\"\n+            if [[ \"${version}\" == 24.18.0 && \"${python_lock_state}\" == absent && \"${launcher_state}\" == absent ]]; then\n+              capability='node-only'\n+            fi\n+          elif [[ \"${declaration_state}\" != regular-file ]]; then\n+            echo '::error::Runtime declaration is not a regular file.'\n+            exit 1\n+          else\n+            # shellcheck disable=SC2016\n+            pwsh -NoLogo -NoProfile -NonInteractive -Command '\n+              $ErrorActionPreference = \"Stop\"\n+              $null = Get-Content -Raw -LiteralPath .github/workflows/ci-toolchain.json | ConvertFrom-Json -ErrorAction Stop'\n+          fi\n+          if [[ \"${capability}\" == full ]]; then\n+            installer_state=\"$(classify_npm_input .github/workflows/install-husky.mjs)\"\n+            if [[ \"${declaration_state}\" == absent && \"${version}\" == 24.18.1 && \"${installer_state}\" == absent ]]; then\n+              # Retain the evidenced historical command, not an arbitrary missing-input fallback.\n+              # shellcheck disable=SC2016\n+              pwsh -NoLogo -NoProfile -NonInteractive -Command '\n+                $ErrorActionPreference = \"Stop\"\n+                $obj = Get-Content -Raw -LiteralPath .github/workflows/package.json | ConvertFrom-Json -ErrorAction Stop\n+                if ($obj.scripts.prepare -isnot [string] -or $obj.scripts.prepare -cne \"cd ../.. && husky\") {\n+                    throw \"Historical full setup requires the exact retained prepare command\"\n+                }'\n+              echo 'Retained historical Husky prepare command selected.'\n+            elif [[ \"${installer_state}\" != regular-file ]]; then\n+              echo '::error::Full validation requires a regular current Husky installer.'\n+              exit 1\n+            fi\n+            for required_file in requirements-dev.txt .github/workflows/Invoke-LockedPythonHook.ps1 \\\n+              .pre-commit-config.yaml .husky/pre-commit \\\n+              .github/workflows/lint-staged-markdown.mjs; do\n+              if [[ \"$(classify_npm_input \"${required_file}\")\" != regular-file ]]; then\n+                echo \"::error file=${required_file}::Full validation requires a regular input.\"\n+                exit 1\n+              fi\n+            done\n+            echo 'Full Node/Python/hook preparation selected.'\n+          else\n+            echo 'Historical Node-only preparation selected; Python and full validation are unavailable for this tree.'\n+          fi\n+          printf 'validation=%s\\n' \"${capability}\" >> \"${GITHUB_OUTPUT}\"\n+\n+\n+      - name: Verify acquired immutable setup inputs\n+        timeout-minutes: 2\n+        shell: bash\n+        run: |\n+          set -euo pipefail\n+          if [[ -n \"${GITHUB_TOKEN:-}\" || -n \"${GH_TOKEN:-}\" ||\n+            -n \"${ACTIONS_RUNTIME_TOKEN:-}\" || -n \"${GIT_CONFIG_COUNT:-}\" ||\n+            -n \"${GIT_CONFIG_PARAMETERS:-}\" ]]; then\n+            echo '::error::Unexpected credential or Git configuration channel.'\n+            exit 1\n+          fi\n+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0\n+          declare -ar setup_inputs=(\n+            package.json package-lock.json .github/workflows/package.json .github/workflows/package-lock.json\n+            .github/workflows/ci-toolchain.json requirements-dev.txt .github/workflows/Invoke-LockedPythonHook.ps1\n+            .pre-commit-config.yaml .github/workflows/install-husky.mjs .husky/pre-commit\n+            .github/workflows/lint-staged-markdown.mjs\n+          )\n+          git diff --cached --exit-code HEAD -- \"${setup_inputs[@]}\"\n+          git diff --exit-code HEAD -- \"${setup_inputs[@]}\"\n+          untracked_inputs=\"$(git ls-files --others -- \"${setup_inputs[@]}\")\"\n+          if [[ -n \"${untracked_inputs}\" ]]; then\n+            printf '::error::Untracked setup inputs changed: %s\\n' \"${untracked_inputs}\"\n+            exit 1\n+          fi\n+\n+      - name: Set up verified official Node.js runtime\n+        timeout-minutes: 8\n+        shell: pwsh\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}\n+        run: |\n+          $ErrorActionPreference = 'Stop'\n+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n+              $PSNativeCommandUseErrorActionPreference = $false\n+          }\n+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n+              throw 'credential-policy: a token was projected into a code job'\n+          }\n+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or\n+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {\n+              throw 'credential-policy: external Git command configuration is not allowed'\n+          }\n+          $env:GIT_CONFIG_NOSYSTEM = '1'\n+          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n+          $env:GIT_TERMINAL_PROMPT = '0'\n+          $strDigestSource = 'copilot-setup-steps.yml retained runtime digest'\n+          if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {\n+              $strVersion = '20.20.2'\n+              $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'\n+          } elseif ($env:TOOLCHAIN_LAYOUT -ceq 'modern') {\n+              if (Test-Path -LiteralPath '.github/workflows/ci-toolchain.json') {\n+                  $objRuntimePin = Get-Content -Raw -LiteralPath '.github/workflows/ci-toolchain.json' | ConvertFrom-Json -ErrorAction Stop\n+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop\n+                  $strVersion = $objPackage.engines.node\n+                  $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()\n+                  $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'\n+              } else {\n+                  # Preserve service setup for published branches from before the shared declaration.\n+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop\n+                  $strVersion = $objPackage.engines.node\n+                  if ($objPackage.engines.npm -cne '11.16.0') {\n+                      throw 'toolchain: unsupported pre-declaration npm version'\n+                  }\n+                  switch -CaseSensitive ($strVersion) {\n+                      '24.18.0' {\n+                          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'\n+                      }\n+                      '24.18.1' {\n+                          $strReviewedSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'\n+                      }\n+                      default {\n+                          throw 'toolchain: a current runtime declaration is required'\n+                      }\n+                  }\n+              }\n+              if ($strVersion -cnotmatch '^24\\.[0-9]+\\.[0-9]+$' -or\n+                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {\n+                  throw 'toolchain: the reviewed runtime declaration is invalid'\n+              }\n+          } else {\n+              throw 'toolchain: unsupported validation-tool layout'\n+          }\n+          $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')\n+          $strArchive = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node.tar.xz')\n+          if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {\n+              throw 'toolchain: runtime staging destination already exists'\n+          }\n+          $strCurlPath = @('/usr/bin/curl', '/bin/curl') |\n+              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1\n+          $strTarPath = @('/usr/bin/tar', '/bin/tar') |\n+              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1\n+          if ([string]::IsNullOrEmpty($strCurlPath) -or [string]::IsNullOrEmpty($strTarPath)) {\n+              throw 'toolchain: fixed download/extraction tools are unavailable'\n+          }\n+          $strUrl = \"https://nodejs.org/dist/v$strVersion/node-v$strVersion-linux-x64.tar.xz\"\n+          & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl\n+          if ($LASTEXITCODE -ne 0) { throw \"toolchain: download exited $LASTEXITCODE\" }\n+          if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {\n+              throw \"toolchain: official Node archive does not match the reviewed digest for $strUrl. Check $strDigestSource. Verify the official release checksum before changing the declaration.\"\n+          }\n+          [void][IO.Directory]::CreateDirectory($strNodeRoot)\n+          & $strTarPath -xJf $strArchive -C $strNodeRoot --strip-components=1\n+          if ($LASTEXITCODE -ne 0) { throw \"toolchain: extraction exited $LASTEXITCODE\" }\n+          $strNodePath = [IO.Path]::Combine($strNodeRoot, 'bin', 'node')\n+          $strNpmPath = [IO.Path]::Combine($strNodeRoot, 'bin', 'npm')\n+          if (-not [IO.File]::Exists($strNodePath) -or -not [IO.File]::Exists($strNpmPath)) {\n+              throw 'toolchain: verified runtime executables are missing'\n+          }\n+          $arrVersionOutput = @(& $strNodePath --version)\n+          $intVersionExitCode = $LASTEXITCODE\n+          if ($intVersionExitCode -ne 0) {\n+              throw \"toolchain: runtime version command exited $intVersionExitCode\"\n+          }\n+          if ($arrVersionOutput.Count -ne 1) {\n+              throw 'toolchain: runtime version command must return exactly one line'\n+          }\n+          $strObservedVersion = $arrVersionOutput[0].Trim()\n+          if ($strObservedVersion -cne \"v$strVersion\") {\n+              throw 'toolchain: verified runtime executable identity is wrong'\n+          }\n+          [IO.File]::AppendAllText($env:GITHUB_PATH,\n+              [IO.Path]::Combine($strNodeRoot, 'bin') + \"`n\", [Text.UTF8Encoding]::new($false))\n+\n+      - name: Verify selected Node.js runtime\n+        timeout-minutes: 2\n+        shell: bash\n+        env:\n+          GIT_CONFIG_NOSYSTEM: \"1\"\n+          GIT_CONFIG_GLOBAL: /dev/null\n+          GIT_TERMINAL_PROMPT: \"0\"\n+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}\n+        run: |\n+          set -euo pipefail\n+          if [[ -n \"${GITHUB_TOKEN:-}\" || -n \"${GH_TOKEN:-}\" ||\n+            -n \"${ACTIONS_RUNTIME_TOKEN:-}\" || -n \"${GIT_CONFIG_COUNT:-}\" ||\n+            -n \"${GIT_CONFIG_PARAMETERS:-}\" ]]; then\n+            echo '::error::Unexpected credential or Git configuration channel.'\n+            exit 1\n+          fi\n+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0\n+          # env includes inherited names that are not valid Bash identifiers.\n+          npm_environment=(/usr/bin/env)\n+          while IFS= read -r -d '' entry; do\n+            variable=${entry%%=*}\n+            if [[ \"${variable,,}\" == npm_config_* ]]; then\n+              npm_environment+=(-u \"${variable}\")\n+            fi\n+          done < <(/usr/bin/env -0)\n+          # Wait for this process substitution before running any other child.\n+          if ! wait \"$!\"; then\n+            echo '::error::Unable to read the package-manager environment.'\n+            exit 1\n+          fi\n+          export npm_config_userconfig=/dev/null\n+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy\n+          npm_environment+=(-- \"npm_config_userconfig=${npm_config_userconfig}\"\n+            \"npm_config_globalconfig=${npm_config_globalconfig}\")\n+          if [[ ! -c \"${npm_config_userconfig}\" || -s \"${npm_config_userconfig}\" ||\n+            -e \"${npm_config_globalconfig}\" || -L \"${npm_config_globalconfig}\" ]]; then\n+            echo '::error::Unexpected package-manager configuration source.'\n+            exit 1\n+          fi\n+          printf '%s\\n' 'npm_config_userconfig=/dev/null' \\\n+            'npm_config_globalconfig=/etc/npmrc-absent-by-policy' >> \"${GITHUB_ENV}\"\n+          if [[ \"${TOOLCHAIN_LAYOUT}\" == modern ]]; then\n+            expected_node=\"$(node -p 'require(\"./package.json\").engines.node')\"\n+            expected_npm=\"$(node -p 'require(\"./package.json\").engines.npm')\"\n+            test \"$(node --version)\" = \"v${expected_node}\"\n+            test \"$(\"${npm_environment[@]}\" npm --version)\" = \"${expected_npm}\"",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "commit_id": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "original_commit_id": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "user": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "body": "All four blocks are identical and protect six npm calls in separate processes. Retain per-process filtering and independent hostile-environment controls (A96.1); exporting two settings alone does not remove other inherited names.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R3-npm-environment-duplication.md)",
+        "created_at": "2026-10-06T22:46:58Z",
+        "updated_at": "2026-10-06T22:46:58Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201155565",
+        "pull_request_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235",
+        "_links": {
+          "self": {
+            "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155565"
+          },
+          "html": {
+            "href": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4201155565"
+          },
+          "pull_request": {
+            "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235"
+          }
+        },
+        "reactions": {
+          "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4201155565/reactions",
+          "total_count": 0,
+          "+1": 0,
+          "-1": 0,
+          "laugh": 0,
+          "hooray": 0,
+          "confused": 0,
+          "heart": 0,
+          "rocket": 0,
+          "eyes": 0
+        },
+        "start_line": 572,
+        "original_start_line": 572,
+        "start_side": "RIGHT",
+        "line": 600,
+        "original_line": 600,
+        "side": "RIGHT",
+        "in_reply_to_id": 4201048196,
+        "author_association": "OWNER",
+        "original_position": 600,
+        "position": 600,
+        "subject_type": "line"
+      },
+      "reply_id": 4201155565,
+      "reply_confirmed_at": "2026-10-06T22:46:58Z",
+      "resolve_intent_at": "2026-10-06T22:47:00.721596+00:00",
+      "resolve_response": {
+        "resolveReviewThread": {
+          "thread": {
+            "id": "PRRT_kwDOQkjdhM6prmei",
+            "isResolved": true
+          }
+        }
+      },
+      "resolved_readback": {
+        "id": "PRRT_kwDOQkjdhM6prmei",
+        "isResolved": true,
+        "viewerCanResolve": false,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048196,
+              "body": "This npm-environment sanitization block appears multiple times in the workflow (e.g., in the verification, install, and dependency-tree steps). Duplicating this logic increases the chance of future drift (one step updated while others aren\u2019t). Consider moving the sanitization into a single repo-owned helper script (bash) that each step calls, or using a single step that exports the sanitized env values and a reusable command wrapper, so policy changes stay consistent across all npm invocations.",
+              "author": {
+                "login": "copilot-pull-request-reviewer"
+              }
+            },
+            {
+              "databaseId": 4201155565,
+              "body": "All four blocks are identical and protect six npm calls in separate processes. Retain per-process filtering and independent hostile-environment controls (A96.1); exporting two settings alone does not remove other inherited names.\n[Decision](https://github.com/franklesniak/PSStyleGuide/blob/33b95c196e5e9176c08572509997d21adf9904c0/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round1-recovery-findings/R3-npm-environment-duplication.md)",
+              "author": {
+                "login": "franklesniak"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "rule": "One reply per thread in current round; no retry of ambiguous writes.",
+  "completed_at": "2026-10-06T22:47:02.033310+00:00",
+  "post_body_native_confirmation": {
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-post-disposition.json",
+    "snapshot_sha256": "a0bd4bf8d3e018bcb63264db3afb0b06eb3f9161002d494fdff860dfdf73caa1",
+    "captured_at": "2026-10-06T22:48:43.172089+00:00",
+    "unresolved_threads": 0,
+    "ordinary_successes": 15,
+    "automatic_body_policy_run": 37542843870,
+    "policy_result": "success; MAINTENANCE_REQUIRED retained, behavior job intentionally skipped for pull_request_target",
+    "not_a_manual_CI_relaunch": true,
+    "evidence": [
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\run.json",
+        "sha256": "f2a1028de4f965aafc4a3dde73981e2062657775a0d131768ee69cb99361fb4e"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\jobs.json",
+        "sha256": "8f8c23e55030768a518b98c4a38463270eac3cb7e292f093d9a8305dfe460036"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\log.txt",
+        "sha256": "6a4562f298649608841e555d2729d7f4364d1d33c305939571e6ba4b418dcf57"
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-504cd76\\37542843870\\attempt-1\\summary.json",
+        "sha256": "448133cc1b8de36d580ae3ed7f9c3ea9b939f54ee892e1e200a77584c9bd3263"
+      }
+    ],
+    "remaining_cancelled_dynamic_runs": [
+      37524396256,
+      37538942393
+    ],
+    "merge_allowed": false
+  }
+}
