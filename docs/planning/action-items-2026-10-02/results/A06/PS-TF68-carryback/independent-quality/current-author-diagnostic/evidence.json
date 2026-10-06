@@ -1,0 +1,563 @@
+{
+  "status": "PASS_WITH_SCOPED_LIMITS",
+  "at": "2026-10-06T23:16:52.109766+00:00",
+  "run_id": "ps235-h504-current-author-pair-one",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "source_archive_hashes_verified": 78,
+  "dependency_archive_hashes_verified": 1914,
+  "prepared_files_verified": 28,
+  "exact_control_recovery": true,
+  "exact_author_recovery": true,
+  "same_argv_cwd_clock_endpoints": true,
+  "stdout_sha256": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+  "nonmarker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "counts": {
+    "generic": 4,
+    "parser-call": 52,
+    "structural": 44,
+    "reuse": 8
+  },
+  "event_counts": {
+    "control": 161,
+    "profile": 1309
+  },
+  "span_count": 574,
+  "phase_totals": {
+    "schema-tables": {
+      "calls": 44,
+      "seconds": 0.592413292
+    },
+    "schema-prose": {
+      "calls": 44,
+      "seconds": 1.91473515
+    },
+    "schema-blocks": {
+      "calls": 44,
+      "seconds": 0.171507407
+    },
+    "schema-level-two": {
+      "calls": 44,
+      "seconds": 0.012677812
+    },
+    "schema-lists": {
+      "calls": 44,
+      "seconds": 0.753772639
+    },
+    "snapshot-hit-copy": {
+      "calls": 8,
+      "seconds": 0.10735363
+    },
+    "schema-headings": {
+      "calls": 44,
+      "seconds": 0.039173963
+    },
+    "snapshot-store-copy": {
+      "calls": 22,
+      "seconds": 0.329947958
+    },
+    "caller": {
+      "calls": 52,
+      "seconds": 8.013397106
+    },
+    "native-parser": {
+      "calls": 52,
+      "seconds": 3.31306279
+    },
+    "construction": {
+      "calls": 44,
+      "seconds": 0.005909414
+    },
+    "schema-ranges": {
+      "calls": 44,
+      "seconds": 0.010500871
+    },
+    "conversion-cold-inclusive": {
+      "calls": 44,
+      "seconds": 0.46850307799999996
+    },
+    "schema-envelope": {
+      "calls": 44,
+      "seconds": 0.006190838
+    }
+  },
+  "caller_remainder": 0.28764826399999954,
+  "outside_caller": 3.9607673410000004,
+  "whole_seconds": 76.173774,
+  "control_seconds": 11.629018591000005,
+  "timing_seconds": 11.974164447,
+  "cleanup": [
+    {
+      "scope": "setup",
+      "waited_successful_adopted_children": 0,
+      "empty_after": true,
+      "signals": 0
+    },
+    {
+      "scope": "driver",
+      "waited_successful_adopted_children": 2,
+      "empty_after": true,
+      "signals": 0
+    },
+    {
+      "scope": "terminal",
+      "waited_successful_adopted_children": 0,
+      "empty_after": true,
+      "signals": 0
+    },
+    {
+      "scope": "control",
+      "waited_successful_adopted_children": 0,
+      "empty_after": true,
+      "signals": 0
+    },
+    {
+      "scope": "profile",
+      "waited_successful_adopted_children": 0,
+      "empty_after": true,
+      "signals": 0
+    }
+  ],
+  "output_bytes": 676110,
+  "fixture_case": {
+    "Role": "current PS235 first actual author-finalization case",
+    "Baseline": "8f2e35b15c1562fea1d1c5335b56b52fa1169f03",
+    "Candidate": "63cfb48f28b714a502a1c240897ca764ff89fb75",
+    "Clock": "2026-10-06T23:11:29.2903544+00:00",
+    "ExpectedDate": "2026-10-06",
+    "ExpectedExit": 0,
+    "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=8f2e35b15c1562fea1d1c5335b56b52fa1169f03 H=63cfb48f28b714a502a1c240897ca764ff89fb75",
+    "PriorEphemeralIdentityReplayed": false
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\manifest.authorized.json",
+      "sha256": "daa7c5c001d29ca8aacaf2dbc1dea4178946afe11ade292e84347cfd5558228b",
+      "bytes": 6381
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-READINESS.json",
+      "sha256": "0fc1409723fe00ffde85bfacec7f8edede9b54b69c2fbb313fb7209204831d6a",
+      "bytes": 1980
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\status.json",
+      "sha256": "85e6e8dbd715e6e3f78cc638782013486740c4e755871caa16bf8515551091d4",
+      "bytes": 1457
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\result.json",
+      "sha256": "89eabc84f67b26856a460b6b44bc372634bad55a6c52d72a031e4b2843c3bbd8",
+      "bytes": 14442
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\pair-judgment.json",
+      "sha256": "8ab18f4e6c52378f1312dbb56988fd9220b216103e47bc67731b591209ff5948",
+      "bytes": 120227
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\before.json",
+      "sha256": "0a43f6b14d101f3678dda6c48613de04d707473d8af38ee4a4ac9bd870f192b8",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\host-source-after.json",
+      "sha256": "0f5dc300047b775b0c8ff0afb5785343837a9b2ac85ffb73cb6b96e833abf664",
+      "bytes": 181
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair-after.json",
+      "sha256": "5fa53e10d0984282b09981238534def53ea0ab846926e6ab75306e634be85183",
+      "bytes": 164
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\source-before.json",
+      "sha256": "04b5b7049b01d3dd859554e30d10caadbe95eede9bede15360439d4e043b44ff",
+      "bytes": 401646
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-child.json",
+      "sha256": "249ff7f3813fcf0141fac9ab574bb212d01847a900a051b85b19eb030b6b8c3e",
+      "bytes": 20105
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stdout.txt",
+      "sha256": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+      "bytes": 225
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stderr.txt",
+      "sha256": "347a6e420435c03582223fe0e0c8230059ae2f47a02e00655d893baebf20d1d6",
+      "bytes": 3386
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-child.json",
+      "sha256": "3283eae16519ad7ea9e9be5aadca41ecac5ca27db62fc5c3d2f13014c2dfed0f",
+      "bytes": 20101
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stdout.txt",
+      "sha256": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+      "bytes": 225
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stderr.txt",
+      "sha256": "5b86ad3bce407308b7739cae3cf321195929e026ce97c746087c3c5f7b065f93",
+      "bytes": 61740
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "83b7981748cc7364b13fab3c701ac43ecf0baa68357dc003b5d503998e0f7ee7",
+      "bytes": 6683
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\evidence.json",
+      "sha256": "270f0f244330c8eabe25803d8d366e1a003c4f505b1da0e9b64c3f3caa613178",
+      "bytes": 17621
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\manifest.prepared.json",
+      "sha256": "683090b4303735731c695c2c55722d62b2cbaf55d0b236e1a4a316fb3d1d0797",
+      "bytes": 6323
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\author-one-case.ps1",
+      "sha256": "10adfb58399907a432101055ec47c00dfb9c6cf1a6a7bbd4905d37a761ca3a84",
+      "bytes": 38892
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\author-source-original.ps1",
+      "sha256": "1647d5f873d94104168f78d0647cb1f01a76d270f5f03ef31b7c7b7ece1386d9",
+      "bytes": 66198
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\build-transport.py",
+      "sha256": "850abf6eae501f607866de804eb35fb0f08005fc3ed63e5063a198b4e4e69641",
+      "bytes": 8222
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\common.py",
+      "sha256": "d3b16b57999bbb9ac5a87f7725687e4c8c14519fdebda0c561a46ab1398d9709",
+      "bytes": 3693
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\control.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\current-SelfTest.ps1",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\final-wrapper-correction.py",
+      "sha256": "e761a86948f5e15179b4c989dff842627e5ebc131a7f3f4da39a9d96a9e5d8e7",
+      "bytes": 5021
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\freeze.py",
+      "sha256": "35cd415571ddd8c8e631890c654d8f6e786d768ff929053d90e2fa0ae58ba8af",
+      "bytes": 6713
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\inside.py",
+      "sha256": "14365ca93468fb132bf5d942143f57c8468d7a4e6619bd0eea979bba8776102a",
+      "bytes": 17052
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\launch.py",
+      "sha256": "364028e9b5c2e1d966f29a03e2523f426181fd96806dff0d0e2e127c5dadfff8",
+      "bytes": 13702
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\load-functions.ps1",
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+      "bytes": 1920
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\observer-catalog.json",
+      "sha256": "e5c66f19a93dd3386fec70ddb5fc22633d0ec66ab6b8363ea5f23a31941cc554",
+      "bytes": 1333
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\observers.ps1",
+      "sha256": "e0907fc10945fb4bf2b940fbebc4c32d85046b4dae066b5e64cba5bb14a71c01",
+      "bytes": 1450
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\pair-driver.ps1",
+      "sha256": "ccf264cf4f25f4893973039c0bc08c7312ae9b86f7b0723c31a7c672dddd266e",
+      "bytes": 939
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\preparation-source-binding.json",
+      "sha256": "1709f652560cac1955ee16923b614c79110408b9fbf64c018bbdfa758f28e938",
+      "bytes": 10222
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\PREPARATION.md",
+      "sha256": "e1fe37bf690e9d1cd4dd0bae2133b5cf1d0019b5c15f6f6ad9c8c6cc6699cc87",
+      "bytes": 10403
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\prepare.py",
+      "sha256": "50c2ada80cb25852feef0c6bf28a7611f08ba2711238ac104359b33bf32580cf",
+      "bytes": 15975
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\profile-catalog.json",
+      "sha256": "a2f4618f339ca4176c025558f49cc3747ea64b67f742d2dc3a39a666220bcad1",
+      "bytes": 360
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\recovery-proof.json",
+      "sha256": "cbd7080292bcb22dedf73723d97a4ff532d3fa90b4884e7ca006e55c2968b25e",
+      "bytes": 49417
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\reuse-binding.json",
+      "sha256": "cec2bc88c50b7a3f7bd711447b7c3aa55665e71f912dfac31a3967c282fa3633",
+      "bytes": 2951
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\run-child.py",
+      "sha256": "81b7f22d8d91a96619e32dcddbc1d0a699013697396555069779d3ed1a917b07",
+      "bytes": 5320
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\seal.py",
+      "sha256": "387856b787504f07703e2d04543ada8429f4a0cd895584de39543ad036cac8f9",
+      "bytes": 5149
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\source-catalog.json",
+      "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
+      "bytes": 18558
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\timing.ps1",
+      "sha256": "a8a270de1df84aca2216f45c07e981315b5f45b78a6930fcdf95636f7d27b5a9",
+      "bytes": 513364
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\TRANSPORT-DIFF.patch",
+      "sha256": "9ff1dc22a5eddf5d09c05a5c589ce20064764b1fdff0995ff1c5a0fa918e548f",
+      "bytes": 18599
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\validate-pair.py",
+      "sha256": "0da8e439e109ade5bdcfeffc51ea7c9d2437c20aaacc5560730f8ef92086c889",
+      "bytes": 6529
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\common.py",
+      "sha256": "d3b16b57999bbb9ac5a87f7725687e4c8c14519fdebda0c561a46ab1398d9709",
+      "bytes": 3693
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\inside.py",
+      "sha256": "14365ca93468fb132bf5d942143f57c8468d7a4e6619bd0eea979bba8776102a",
+      "bytes": 17052
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\control.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\timing.ps1",
+      "sha256": "a8a270de1df84aca2216f45c07e981315b5f45b78a6930fcdf95636f7d27b5a9",
+      "bytes": 513364
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\current-SelfTest.ps1",
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\load-functions.ps1",
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+      "bytes": 1920
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\author-one-case.ps1",
+      "sha256": "10adfb58399907a432101055ec47c00dfb9c6cf1a6a7bbd4905d37a761ca3a84",
+      "bytes": 38892
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\pair-driver.ps1",
+      "sha256": "ccf264cf4f25f4893973039c0bc08c7312ae9b86f7b0723c31a7c672dddd266e",
+      "bytes": 939
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\observers.ps1",
+      "sha256": "e0907fc10945fb4bf2b940fbebc4c32d85046b4dae066b5e64cba5bb14a71c01",
+      "bytes": 1450
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\observer-catalog.json",
+      "sha256": "e5c66f19a93dd3386fec70ddb5fc22633d0ec66ab6b8363ea5f23a31941cc554",
+      "bytes": 1333
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\profile-catalog.json",
+      "sha256": "a2f4618f339ca4176c025558f49cc3747ea64b67f742d2dc3a39a666220bcad1",
+      "bytes": 360
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\run-child.py",
+      "sha256": "81b7f22d8d91a96619e32dcddbc1d0a699013697396555069779d3ed1a917b07",
+      "bytes": 5320
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\validate-pair.py",
+      "sha256": "0da8e439e109ade5bdcfeffc51ea7c9d2437c20aaacc5560730f8ef92086c889",
+      "bytes": 6529
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\history.bundle",
+      "sha256": "8498c2efd3d97cf66c9720aea792931da7bf6c20ee64c8f7c1e7971f2512eb1f",
+      "bytes": 4159684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\candidate.tar",
+      "sha256": "8814c60f8f279a8a08b8f41797ee55b5188551a1c5b168c047de114fe2067226",
+      "bytes": 3768320
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\dependencies.tar",
+      "sha256": "c09f273178c5d18b1da93878f6c7badf2fca9f7deaca503dff395da1d1badd8b",
+      "bytes": 20316160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\manifest.json",
+      "sha256": "daa7c5c001d29ca8aacaf2dbc1dea4178946afe11ade292e84347cfd5558228b",
+      "bytes": 6381
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "c02b8b68f7cf900cbe1f621ab425a257dba42ce05b3faa8516498f59fb14db76",
+      "bytes": 21951
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\runs\\tf68-ed9-cleanup-observation-one\\output\\result.json",
+      "sha256": "d0de67ad727e8592622ac89a8bfc86c806a8bb6402bdddd0f19d85d34cd12008",
+      "bytes": 97636
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\RECEIPT-POLICY-CHECKS.json",
+      "sha256": "4d0b3d5724f46dd3435b11f5887620080a64f707c46cd7e7ddc48639dcce563a",
+      "bytes": 1842
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\check-receipt-policy.py",
+      "sha256": "0dc2c6ec680a7dd4e4465ccaf44697724570e57f2c408df7f569b0aa3a11d2ff",
+      "bytes": 2029
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\runs\\ps-carryback-20261006-aggregate-one\\status.json",
+      "sha256": "0d7247bf426cc48fcac469d5d166f2e45d833be94245896aa2b8ed37a5b95f81",
+      "bytes": 1410
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\runs\\ps-carryback-20261006-aggregate-one\\output\\result.json",
+      "sha256": "416624a76e18d349e329288af3728a1f228e60ff10be07f4966e349d5662ce7d",
+      "bytes": 215007
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\case.json",
+      "sha256": "a04ac04f3ee99d54c3175c386793861b3e5e9b96e7a60b82aa60c0f3537f9cce",
+      "bytes": 489
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control.spec.json",
+      "sha256": "25b7b724b72c53a994e2af4dcf4bc71c3ceeb5766d7b65885dccc10cf91876df",
+      "bytes": 8586
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair-cleanup.json",
+      "sha256": "f1a7f04620e9a3caf2d9ee2e433c3901e396342b8312392f2a183bd867886c5a",
+      "bytes": 2820
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair.log",
+      "sha256": "50858ceb3614421d57f78ad00280c635a58cdf034ae0d30e126dc44e5a2600d4",
+      "bytes": 66
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\fixture-adaptation.json",
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "bytes": 328
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\hook-profile-identity.json",
+      "sha256": "0fc64532ec97b8a329b4dcbd73939990a345faf7f894e7057d617361a22c88fc",
+      "bytes": 359
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile.spec.json",
+      "sha256": "8816dab984360ef26361e542d2457561dd4ba2d4830e64b7d9e64dd2eeca2e36",
+      "bytes": 8586
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\runtime.json",
+      "sha256": "5aaf20faa1c73703268348e6c894d63b3111475dd210f0f422c5801a7f43792d",
+      "bytes": 461
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\setup-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\terminal-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\container.log",
+      "sha256": "4766b18e475d80c9af5d98cb008d0ec72bbfffbcecae148de58b5a5c910242e8",
+      "bytes": 30
+    }
+  ],
+  "report_sha256": "34b4b985160bd351bbd7095a300dc2553248c45db5621fec1c5327b35415675d",
+  "limits": [
+    "Shared debugger observations; no observer-free baseline",
+    "Single case and ordered pair; no stable benchmark/full-suite extrapolation/service margin",
+    "No optimization or P95 certification",
+    "Saved container-absence evidence only; no live observation",
+    "Cancelled CI and3/3 allowance/B99 freeze retained"
+  ]
+}

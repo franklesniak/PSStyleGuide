@@ -1,0 +1,54 @@
+[
+  {
+    "variant": "control",
+    "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+    "lines": [
+      {
+        "kind": "parser-call",
+        "line": 3151,
+        "anchor": "    $listAttemptEvidence = "
+      },
+      {
+        "kind": "structural",
+        "line": 327,
+        "anchor": "        if ($UseNativeStructuralConversion) {"
+      },
+      {
+        "kind": "reuse",
+        "line": 3775,
+        "anchor": "                if ($null -ne $objCopy) { return $objCopy.Context }"
+      },
+      {
+        "kind": "native-exit",
+        "line": 3310,
+        "anchor": "        if ($intExitCode -ne 0) {"
+      }
+    ]
+  },
+  {
+    "variant": "profile",
+    "sha256": "a8a270de1df84aca2216f45c07e981315b5f45b78a6930fcdf95636f7d27b5a9",
+    "lines": [
+      {
+        "kind": "parser-call",
+        "line": 3159,
+        "anchor": "    $listAttemptEvidence = "
+      },
+      {
+        "kind": "structural",
+        "line": 335,
+        "anchor": "        if ($UseNativeStructuralConversion) {"
+      },
+      {
+        "kind": "reuse",
+        "line": 3789,
+        "anchor": "                if ($null -ne $objCopy) { return $objCopy.Context }"
+      },
+      {
+        "kind": "native-exit",
+        "line": 3318,
+        "anchor": "        if ($intExitCode -ne 0) {"
+      }
+    ]
+  }
+]

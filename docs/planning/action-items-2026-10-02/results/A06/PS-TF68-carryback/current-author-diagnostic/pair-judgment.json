@@ -1,0 +1,5360 @@
+{
+  "state": "passed_one_current_case",
+  "case": {
+    "Role": "current PS235 first actual author-finalization case",
+    "Baseline": "8f2e35b15c1562fea1d1c5335b56b52fa1169f03",
+    "Candidate": "63cfb48f28b714a502a1c240897ca764ff89fb75",
+    "Clock": "2026-10-06T23:11:29.2903544+00:00",
+    "ExpectedDate": "2026-10-06",
+    "ExpectedExit": 0,
+    "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=8f2e35b15c1562fea1d1c5335b56b52fa1169f03 H=63cfb48f28b714a502a1c240897ca764ff89fb75",
+    "PriorEphemeralIdentityReplayed": false
+  },
+  "counts": {
+    "generic": 4,
+    "parser-call": 52,
+    "structural": 44,
+    "reuse": 8
+  },
+  "native_exits": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "control_whole_child_seconds": 11.629018591000005,
+  "timing_whole_child_seconds": 11.974164447,
+  "phase_totals": {
+    "caller": {
+      "calls": 52,
+      "seconds": 8.013397106
+    },
+    "construction": {
+      "calls": 44,
+      "seconds": 0.005909414
+    },
+    "conversion-cold-inclusive": {
+      "calls": 44,
+      "seconds": 0.46850307799999996
+    },
+    "native-parser": {
+      "calls": 52,
+      "seconds": 3.31306279
+    },
+    "schema-blocks": {
+      "calls": 44,
+      "seconds": 0.171507407
+    },
+    "schema-envelope": {
+      "calls": 44,
+      "seconds": 0.006190838
+    },
+    "schema-headings": {
+      "calls": 44,
+      "seconds": 0.039173963
+    },
+    "schema-level-two": {
+      "calls": 44,
+      "seconds": 0.012677812
+    },
+    "schema-lists": {
+      "calls": 44,
+      "seconds": 0.753772639
+    },
+    "schema-prose": {
+      "calls": 44,
+      "seconds": 1.91473515
+    },
+    "schema-ranges": {
+      "calls": 44,
+      "seconds": 0.010500871
+    },
+    "schema-tables": {
+      "calls": 44,
+      "seconds": 0.592413292
+    },
+    "snapshot-hit-copy": {
+      "calls": 8,
+      "seconds": 0.10735363
+    },
+    "snapshot-store-copy": {
+      "calls": 22,
+      "seconds": 0.329947958
+    }
+  },
+  "caller_remainder_seconds": 0.28764826400000004,
+  "timing_child_outside_caller_seconds": 3.9607673410000004,
+  "spans": [
+    {
+      "call": 1,
+      "phase": "native-parser",
+      "start": 54491956959,
+      "end": 54620403597,
+      "seconds": 0.128446638,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "conversion-cold-inclusive",
+      "start": 54621045984,
+      "end": 54935876656,
+      "seconds": 0.314830672,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-envelope",
+      "start": 54936172570,
+      "end": 54939533654,
+      "seconds": 0.003361084,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-ranges",
+      "start": 54939610203,
+      "end": 54939987485,
+      "seconds": 0.000377282,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-prose",
+      "start": 54940315361,
+      "end": 54994077659,
+      "seconds": 0.053762298,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-tables",
+      "start": 54994162353,
+      "end": 54994227800,
+      "seconds": 6.5447e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-blocks",
+      "start": 54994269080,
+      "end": 54996829881,
+      "seconds": 0.002560801,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-lists",
+      "start": 54996887643,
+      "end": 54998975004,
+      "seconds": 0.002087361,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-headings",
+      "start": 54999022947,
+      "end": 54999278754,
+      "seconds": 0.000255807,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "schema-level-two",
+      "start": 54999333670,
+      "end": 54999383898,
+      "seconds": 5.0228e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "construction",
+      "start": 54999417934,
+      "end": 55001587009,
+      "seconds": 0.002169075,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "snapshot-store-copy",
+      "start": 55002109047,
+      "end": 55035421722,
+      "seconds": 0.033312675,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 1,
+      "phase": "caller",
+      "start": 54341125612,
+      "end": 55044387990,
+      "seconds": 0.703262378,
+      "input_bytes": 2517,
+      "input_lines": 26,
+      "remainder_seconds": 0.16198301000000004
+    },
+    {
+      "call": 2,
+      "phase": "native-parser",
+      "start": 55122909654,
+      "end": 55181525918,
+      "seconds": 0.058616264,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "conversion-cold-inclusive",
+      "start": 55181657924,
+      "end": 55182982509,
+      "seconds": 0.001324585,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-envelope",
+      "start": 55183050962,
+      "end": 55183152218,
+      "seconds": 0.000101256,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-ranges",
+      "start": 55183265839,
+      "end": 55183443614,
+      "seconds": 0.000177775,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-prose",
+      "start": 55183480726,
+      "end": 55185913999,
+      "seconds": 0.002433273,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-tables",
+      "start": 55186039913,
+      "end": 55186166389,
+      "seconds": 0.000126476,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-blocks",
+      "start": 55186355626,
+      "end": 55186886416,
+      "seconds": 0.00053079,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-lists",
+      "start": 55186944760,
+      "end": 55189822325,
+      "seconds": 0.002877565,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-headings",
+      "start": 55189943270,
+      "end": 55190152085,
+      "seconds": 0.000208815,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "schema-level-two",
+      "start": 55190200249,
+      "end": 55190302036,
+      "seconds": 0.000101787,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "construction",
+      "start": 55190335772,
+      "end": 55190389255,
+      "seconds": 5.3483e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "snapshot-store-copy",
+      "start": 55190425856,
+      "end": 55195891391,
+      "seconds": 0.005465535,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 2,
+      "phase": "caller",
+      "start": 55121605182,
+      "end": 55198459770,
+      "seconds": 0.076854588,
+      "input_bytes": 2179,
+      "input_lines": 39,
+      "remainder_seconds": 0.0048369840000000025
+    },
+    {
+      "call": 3,
+      "phase": "native-parser",
+      "start": 55282936023,
+      "end": 55413806010,
+      "seconds": 0.130869987,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "conversion-cold-inclusive",
+      "start": 55413871276,
+      "end": 55422806971,
+      "seconds": 0.008935695,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-envelope",
+      "start": 55422868861,
+      "end": 55422921623,
+      "seconds": 5.2762e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-ranges",
+      "start": 55422954968,
+      "end": 55423785480,
+      "seconds": 0.000830512,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-prose",
+      "start": 55423846067,
+      "end": 55585519753,
+      "seconds": 0.161673686,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-tables",
+      "start": 55585718318,
+      "end": 55659614921,
+      "seconds": 0.073896603,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-blocks",
+      "start": 55659769281,
+      "end": 55683872786,
+      "seconds": 0.024103505,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-lists",
+      "start": 55683965075,
+      "end": 55734262045,
+      "seconds": 0.05029697,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-headings",
+      "start": 55734417667,
+      "end": 55742443415,
+      "seconds": 0.008025748,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "schema-level-two",
+      "start": 55742510746,
+      "end": 55743845411,
+      "seconds": 0.001334665,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "construction",
+      "start": 55744297248,
+      "end": 55744455315,
+      "seconds": 0.000158067,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "snapshot-store-copy",
+      "start": 55744509520,
+      "end": 55756881900,
+      "seconds": 0.01237238,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 3,
+      "phase": "caller",
+      "start": 55280621701,
+      "end": 55756950213,
+      "seconds": 0.476328512,
+      "input_bytes": 135295,
+      "input_lines": 1889,
+      "remainder_seconds": 0.003777931999999984
+    },
+    {
+      "call": 4,
+      "phase": "native-parser",
+      "start": 55783084504,
+      "end": 55850842120,
+      "seconds": 0.067757616,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "conversion-cold-inclusive",
+      "start": 55850914150,
+      "end": 55851795120,
+      "seconds": 0.00088097,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-envelope",
+      "start": 55851844125,
+      "end": 55851897498,
+      "seconds": 5.3373e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-ranges",
+      "start": 55851931865,
+      "end": 55852100472,
+      "seconds": 0.000168607,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-prose",
+      "start": 55852144859,
+      "end": 55854209877,
+      "seconds": 0.002065018,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-tables",
+      "start": 55854259072,
+      "end": 55854310542,
+      "seconds": 5.147e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-blocks",
+      "start": 55854344889,
+      "end": 55854831553,
+      "seconds": 0.000486664,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-lists",
+      "start": 55854882372,
+      "end": 55858816649,
+      "seconds": 0.003934277,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-headings",
+      "start": 55858881274,
+      "end": 55859082084,
+      "seconds": 0.00020081,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "schema-level-two",
+      "start": 55859118805,
+      "end": 55859279938,
+      "seconds": 0.000161133,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "construction",
+      "start": 55859315838,
+      "end": 55859379421,
+      "seconds": 6.3583e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "snapshot-store-copy",
+      "start": 55859422585,
+      "end": 55862746086,
+      "seconds": 0.003323501,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 4,
+      "phase": "caller",
+      "start": 55782243191,
+      "end": 55862920705,
+      "seconds": 0.080677514,
+      "input_bytes": 3017,
+      "input_lines": 36,
+      "remainder_seconds": 0.0015304919999999944
+    },
+    {
+      "call": 5,
+      "phase": "native-parser",
+      "start": 55900632343,
+      "end": 55973782245,
+      "seconds": 0.073149902,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "conversion-cold-inclusive",
+      "start": 55973865887,
+      "end": 55977498097,
+      "seconds": 0.00363221,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-envelope",
+      "start": 55977555349,
+      "end": 55977615555,
+      "seconds": 6.0206e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-ranges",
+      "start": 55977654541,
+      "end": 55977833549,
+      "seconds": 0.000179008,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-prose",
+      "start": 55977874548,
+      "end": 55984167182,
+      "seconds": 0.006292634,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-tables",
+      "start": 55984224043,
+      "end": 56004524436,
+      "seconds": 0.020300393,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-blocks",
+      "start": 56004594061,
+      "end": 56005742981,
+      "seconds": 0.00114892,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-lists",
+      "start": 56006519408,
+      "end": 56020701836,
+      "seconds": 0.014182428,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-headings",
+      "start": 56020848821,
+      "end": 56021326428,
+      "seconds": 0.000477607,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "schema-level-two",
+      "start": 56021388509,
+      "end": 56021558278,
+      "seconds": 0.000169769,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "construction",
+      "start": 56021601362,
+      "end": 56021675345,
+      "seconds": 7.3983e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "snapshot-store-copy",
+      "start": 56021727216,
+      "end": 56049933123,
+      "seconds": 0.028205907,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 5,
+      "phase": "caller",
+      "start": 55897401782,
+      "end": 56050310646,
+      "seconds": 0.152908864,
+      "input_bytes": 13541,
+      "input_lines": 137,
+      "remainder_seconds": 0.005035897000000011
+    },
+    {
+      "call": 6,
+      "phase": "native-parser",
+      "start": 56085786424,
+      "end": 56146544084,
+      "seconds": 0.06075766,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "conversion-cold-inclusive",
+      "start": 56146628858,
+      "end": 56148673487,
+      "seconds": 0.002044629,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-envelope",
+      "start": 56148746709,
+      "end": 56148808118,
+      "seconds": 6.1409e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-ranges",
+      "start": 56148847645,
+      "end": 56148917510,
+      "seconds": 6.9865e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-prose",
+      "start": 56148960985,
+      "end": 56164842236,
+      "seconds": 0.015881251,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-tables",
+      "start": 56164946288,
+      "end": 56193686813,
+      "seconds": 0.028740525,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-blocks",
+      "start": 56193768111,
+      "end": 56195113031,
+      "seconds": 0.00134492,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-lists",
+      "start": 56195162377,
+      "end": 56202853540,
+      "seconds": 0.007691163,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-headings",
+      "start": 56202983051,
+      "end": 56203425089,
+      "seconds": 0.000442038,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "schema-level-two",
+      "start": 56203469746,
+      "end": 56203733638,
+      "seconds": 0.000263892,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "construction",
+      "start": 56203775880,
+      "end": 56203847389,
+      "seconds": 7.1509e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "snapshot-store-copy",
+      "start": 56203898238,
+      "end": 56245332566,
+      "seconds": 0.041434328,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 6,
+      "phase": "caller",
+      "start": 56084752698,
+      "end": 56245654581,
+      "seconds": 0.160901883,
+      "input_bytes": 12177,
+      "input_lines": 216,
+      "remainder_seconds": 0.002098694000000012
+    },
+    {
+      "call": 7,
+      "phase": "native-parser",
+      "start": 56274205128,
+      "end": 56333246731,
+      "seconds": 0.059041603,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "conversion-cold-inclusive",
+      "start": 56333311998,
+      "end": 56334718268,
+      "seconds": 0.00140627,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-envelope",
+      "start": 56334771631,
+      "end": 56334828461,
+      "seconds": 5.683e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-ranges",
+      "start": 56334867978,
+      "end": 56334983132,
+      "seconds": 0.000115154,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-prose",
+      "start": 56335022498,
+      "end": 56343990890,
+      "seconds": 0.008968392,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-tables",
+      "start": 56344128888,
+      "end": 56347376953,
+      "seconds": 0.003248065,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-blocks",
+      "start": 56347430226,
+      "end": 56348618352,
+      "seconds": 0.001188126,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-lists",
+      "start": 56348677998,
+      "end": 56350214420,
+      "seconds": 0.001536422,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-headings",
+      "start": 56350266120,
+      "end": 56350637992,
+      "seconds": 0.000371872,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "schema-level-two",
+      "start": 56350680284,
+      "end": 56350946571,
+      "seconds": 0.000266287,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "construction",
+      "start": 56350989164,
+      "end": 56351057506,
+      "seconds": 6.8342e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "snapshot-store-copy",
+      "start": 56351107333,
+      "end": 56363915023,
+      "seconds": 0.01280769,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 7,
+      "phase": "caller",
+      "start": 56273120202,
+      "end": 56364386448,
+      "seconds": 0.091266246,
+      "input_bytes": 8744,
+      "input_lines": 131,
+      "remainder_seconds": 0.002191192999999994
+    },
+    {
+      "call": 8,
+      "phase": "native-parser",
+      "start": 56498937133,
+      "end": 56558082110,
+      "seconds": 0.059144977,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "conversion-cold-inclusive",
+      "start": 56558345991,
+      "end": 56560524185,
+      "seconds": 0.002178194,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-envelope",
+      "start": 56560662351,
+      "end": 56560734059,
+      "seconds": 7.1708e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-ranges",
+      "start": 56560776024,
+      "end": 56560835540,
+      "seconds": 5.9516e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-prose",
+      "start": 56560877926,
+      "end": 56564436167,
+      "seconds": 0.003558241,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-tables",
+      "start": 56564550821,
+      "end": 56564682126,
+      "seconds": 0.000131305,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-blocks",
+      "start": 56564736222,
+      "end": 56565214256,
+      "seconds": 0.000478034,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-lists",
+      "start": 56565256261,
+      "end": 56567226668,
+      "seconds": 0.001970407,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-headings",
+      "start": 56567278991,
+      "end": 56567488816,
+      "seconds": 0.000209825,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "schema-level-two",
+      "start": 56567529929,
+      "end": 56567661975,
+      "seconds": 0.000132046,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "construction",
+      "start": 56567701004,
+      "end": 56567859918,
+      "seconds": 0.000158914,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "snapshot-store-copy",
+      "start": 56567924834,
+      "end": 56574914150,
+      "seconds": 0.006989316,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 8,
+      "phase": "caller",
+      "start": 56496326070,
+      "end": 56575324803,
+      "seconds": 0.078998733,
+      "input_bytes": 4249,
+      "input_lines": 54,
+      "remainder_seconds": 0.003916249999999996
+    },
+    {
+      "call": 9,
+      "phase": "native-parser",
+      "start": 56599413613,
+      "end": 56650782852,
+      "seconds": 0.051369239,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "conversion-cold-inclusive",
+      "start": 56650859338,
+      "end": 56652464994,
+      "seconds": 0.001605656,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-envelope",
+      "start": 56652519752,
+      "end": 56652583345,
+      "seconds": 6.3593e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-ranges",
+      "start": 56652632153,
+      "end": 56652793180,
+      "seconds": 0.000161027,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-prose",
+      "start": 56652981436,
+      "end": 56659024562,
+      "seconds": 0.006043126,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-tables",
+      "start": 56659094988,
+      "end": 56663883094,
+      "seconds": 0.004788106,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-blocks",
+      "start": 56663950324,
+      "end": 56664977307,
+      "seconds": 0.001026983,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-lists",
+      "start": 56665048354,
+      "end": 56666344303,
+      "seconds": 0.001295949,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-headings",
+      "start": 56666530836,
+      "end": 56666759254,
+      "seconds": 0.000228418,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "schema-level-two",
+      "start": 56666831783,
+      "end": 56666952789,
+      "seconds": 0.000121006,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "construction",
+      "start": 56667024527,
+      "end": 56667141697,
+      "seconds": 0.00011717,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "snapshot-store-copy",
+      "start": 56667218854,
+      "end": 56682355626,
+      "seconds": 0.015136772,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 9,
+      "phase": "caller",
+      "start": 56598077714,
+      "end": 56682717652,
+      "seconds": 0.084639938,
+      "input_bytes": 10446,
+      "input_lines": 71,
+      "remainder_seconds": 0.0026828930000000056
+    },
+    {
+      "call": 10,
+      "phase": "native-parser",
+      "start": 56760666834,
+      "end": 56849525022,
+      "seconds": 0.088858188,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "conversion-cold-inclusive",
+      "start": 56849594917,
+      "end": 56851932589,
+      "seconds": 0.002337672,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-envelope",
+      "start": 56851993398,
+      "end": 56852068712,
+      "seconds": 7.5314e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-ranges",
+      "start": 56852110617,
+      "end": 56852286831,
+      "seconds": 0.000176214,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-prose",
+      "start": 56852328826,
+      "end": 56860902620,
+      "seconds": 0.008573794,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-tables",
+      "start": 56860972725,
+      "end": 56924084554,
+      "seconds": 0.063111829,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-blocks",
+      "start": 56924374882,
+      "end": 56925869520,
+      "seconds": 0.001494638,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-lists",
+      "start": 56925937952,
+      "end": 56926976005,
+      "seconds": 0.001038053,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-headings",
+      "start": 56927036884,
+      "end": 56927429705,
+      "seconds": 0.000392821,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "schema-level-two",
+      "start": 56927483952,
+      "end": 56927769572,
+      "seconds": 0.00028562,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "construction",
+      "start": 56927833225,
+      "end": 56927923226,
+      "seconds": 9.0001e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "snapshot-store-copy",
+      "start": 56927975840,
+      "end": 56963774371,
+      "seconds": 0.035798531,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 10,
+      "phase": "caller",
+      "start": 56759396877,
+      "end": 56964174535,
+      "seconds": 0.204777658,
+      "input_bytes": 57610,
+      "input_lines": 356,
+      "remainder_seconds": 0.0025449830000000007
+    },
+    {
+      "call": 11,
+      "phase": "native-parser",
+      "start": 56986258807,
+      "end": 57032553936,
+      "seconds": 0.046295129,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "conversion-cold-inclusive",
+      "start": 57032653964,
+      "end": 57034039838,
+      "seconds": 0.001385874,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-envelope",
+      "start": 57034127194,
+      "end": 57034201867,
+      "seconds": 7.4673e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-ranges",
+      "start": 57034243852,
+      "end": 57034309790,
+      "seconds": 6.5938e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-prose",
+      "start": 57034353889,
+      "end": 57052094163,
+      "seconds": 0.017740274,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-tables",
+      "start": 57052205622,
+      "end": 57052281357,
+      "seconds": 7.5735e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-blocks",
+      "start": 57052328261,
+      "end": 57053032207,
+      "seconds": 0.000703946,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-lists",
+      "start": 57053089640,
+      "end": 57054585920,
+      "seconds": 0.00149628,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-headings",
+      "start": 57054639907,
+      "end": 57054868054,
+      "seconds": 0.000228147,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "schema-level-two",
+      "start": 57054910770,
+      "end": 57055065887,
+      "seconds": 0.000155117,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "construction",
+      "start": 57055108754,
+      "end": 57055183607,
+      "seconds": 7.4853e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 11,
+      "phase": "caller",
+      "start": 56985273469,
+      "end": 57055245528,
+      "seconds": 0.069972059,
+      "input_bytes": 2543,
+      "input_lines": 48,
+      "remainder_seconds": 0.0016760930000000035
+    },
+    {
+      "call": 12,
+      "phase": "native-parser",
+      "start": 57077686292,
+      "end": 57132710045,
+      "seconds": 0.055023753,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "conversion-cold-inclusive",
+      "start": 57132813309,
+      "end": 57135015730,
+      "seconds": 0.002202421,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-envelope",
+      "start": 57135104157,
+      "end": 57135172940,
+      "seconds": 6.8783e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-ranges",
+      "start": 57135215216,
+      "end": 57135476392,
+      "seconds": 0.000261176,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-prose",
+      "start": 57135543131,
+      "end": 57143787202,
+      "seconds": 0.008244071,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-tables",
+      "start": 57143866994,
+      "end": 57144940590,
+      "seconds": 0.001073596,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-blocks",
+      "start": 57145000207,
+      "end": 57149651519,
+      "seconds": 0.004651312,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-lists",
+      "start": 57149876891,
+      "end": 57155858623,
+      "seconds": 0.005981732,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-headings",
+      "start": 57155923949,
+      "end": 57156381185,
+      "seconds": 0.000457236,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "schema-level-two",
+      "start": 57156456390,
+      "end": 57156764449,
+      "seconds": 0.000308059,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "construction",
+      "start": 57156836879,
+      "end": 57156921169,
+      "seconds": 8.429e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 12,
+      "phase": "caller",
+      "start": 57076431198,
+      "end": 57156985384,
+      "seconds": 0.080554186,
+      "input_bytes": 9114,
+      "input_lines": 115,
+      "remainder_seconds": 0.0021977569999999946
+    },
+    {
+      "call": 13,
+      "phase": "native-parser",
+      "start": 57196638070,
+      "end": 57243637477,
+      "seconds": 0.046999407,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "conversion-cold-inclusive",
+      "start": 57243714705,
+      "end": 57244909097,
+      "seconds": 0.001194392,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-envelope",
+      "start": 57245035002,
+      "end": 57245109836,
+      "seconds": 7.4834e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-ranges",
+      "start": 57245229229,
+      "end": 57245302950,
+      "seconds": 7.3721e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-prose",
+      "start": 57245418256,
+      "end": 57251494552,
+      "seconds": 0.006076296,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-tables",
+      "start": 57251556062,
+      "end": 57251618754,
+      "seconds": 6.2692e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-blocks",
+      "start": 57251659186,
+      "end": 57252359516,
+      "seconds": 0.00070033,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-lists",
+      "start": 57252411870,
+      "end": 57263974865,
+      "seconds": 0.011562995,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-headings",
+      "start": 57264139138,
+      "end": 57264476791,
+      "seconds": 0.000337653,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "schema-level-two",
+      "start": 57264525397,
+      "end": 57264708895,
+      "seconds": 0.000183498,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "construction",
+      "start": 57264752893,
+      "end": 57264829069,
+      "seconds": 7.6176e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 13,
+      "phase": "caller",
+      "start": 57195329104,
+      "end": 57264891310,
+      "seconds": 0.069562206,
+      "input_bytes": 4720,
+      "input_lines": 64,
+      "remainder_seconds": 0.002220211999999999
+    },
+    {
+      "call": 14,
+      "phase": "native-parser",
+      "start": 57290052395,
+      "end": 57334600008,
+      "seconds": 0.044547613,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "conversion-cold-inclusive",
+      "start": 57334664043,
+      "end": 57336176512,
+      "seconds": 0.001512469,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-envelope",
+      "start": 57336236680,
+      "end": 57336299873,
+      "seconds": 6.3193e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-ranges",
+      "start": 57336342549,
+      "end": 57336652211,
+      "seconds": 0.000309662,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-prose",
+      "start": 57336711878,
+      "end": 57338651910,
+      "seconds": 0.001940032,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-tables",
+      "start": 57338702901,
+      "end": 57338760674,
+      "seconds": 5.7773e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-blocks",
+      "start": 57338804994,
+      "end": 57339299987,
+      "seconds": 0.000494993,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-lists",
+      "start": 57339349585,
+      "end": 57339495436,
+      "seconds": 0.000145851,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-headings",
+      "start": 57339577262,
+      "end": 57339836064,
+      "seconds": 0.000258802,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "schema-level-two",
+      "start": 57339881685,
+      "end": 57340132022,
+      "seconds": 0.000250337,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "construction",
+      "start": 57340189044,
+      "end": 57340350462,
+      "seconds": 0.000161418,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 14,
+      "phase": "caller",
+      "start": 57289134878,
+      "end": 57340423773,
+      "seconds": 0.051288895,
+      "input_bytes": 1086,
+      "input_lines": 72,
+      "remainder_seconds": 0.0015467519999999985
+    },
+    {
+      "call": 15,
+      "phase": "native-parser",
+      "start": 57366204249,
+      "end": 57427348611,
+      "seconds": 0.061144362,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "conversion-cold-inclusive",
+      "start": 57427422212,
+      "end": 57428382076,
+      "seconds": 0.000959864,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-envelope",
+      "start": 57428440119,
+      "end": 57428526974,
+      "seconds": 8.6855e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-ranges",
+      "start": 57428609171,
+      "end": 57428887958,
+      "seconds": 0.000278787,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-prose",
+      "start": 57428955439,
+      "end": 57430500637,
+      "seconds": 0.001545198,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-tables",
+      "start": 57430563359,
+      "end": 57430629627,
+      "seconds": 6.6268e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-blocks",
+      "start": 57430673195,
+      "end": 57431097843,
+      "seconds": 0.000424648,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-lists",
+      "start": 57431139708,
+      "end": 57431194255,
+      "seconds": 5.4547e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-headings",
+      "start": 57431238785,
+      "end": 57431445974,
+      "seconds": 0.000207189,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "schema-level-two",
+      "start": 57431487819,
+      "end": 57431623782,
+      "seconds": 0.000135963,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "construction",
+      "start": 57431666769,
+      "end": 57431738296,
+      "seconds": 7.1527e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 15,
+      "phase": "caller",
+      "start": 57365208672,
+      "end": 57431803863,
+      "seconds": 0.066595191,
+      "input_bytes": 1322,
+      "input_lines": 100,
+      "remainder_seconds": 0.0016199829999999915
+    },
+    {
+      "call": 16,
+      "phase": "native-parser",
+      "start": 57515992025,
+      "end": 57581016243,
+      "seconds": 0.065024218,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "conversion-cold-inclusive",
+      "start": 57581090154,
+      "end": 57582648776,
+      "seconds": 0.001558622,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-envelope",
+      "start": 57582707471,
+      "end": 57582771876,
+      "seconds": 6.4405e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-ranges",
+      "start": 57582891339,
+      "end": 57583097737,
+      "seconds": 0.000206398,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-prose",
+      "start": 57583145393,
+      "end": 57599679619,
+      "seconds": 0.016534226,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-tables",
+      "start": 57599753531,
+      "end": 57622113462,
+      "seconds": 0.022359931,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-blocks",
+      "start": 57622209554,
+      "end": 57623450679,
+      "seconds": 0.001241125,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-lists",
+      "start": 57623518931,
+      "end": 57626496786,
+      "seconds": 0.002977855,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-headings",
+      "start": 57626556903,
+      "end": 57626874961,
+      "seconds": 0.000318058,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "schema-level-two",
+      "start": 57626920482,
+      "end": 57627078895,
+      "seconds": 0.000158413,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "construction",
+      "start": 57627121461,
+      "end": 57627199099,
+      "seconds": 7.7638e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 16,
+      "phase": "caller",
+      "start": 57515065621,
+      "end": 57627261390,
+      "seconds": 0.112195769,
+      "input_bytes": 13506,
+      "input_lines": 137,
+      "remainder_seconds": 0.0016748800000000036
+    },
+    {
+      "call": 17,
+      "phase": "native-parser",
+      "start": 57810192464,
+      "end": 57904930543,
+      "seconds": 0.094738079,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "conversion-cold-inclusive",
+      "start": 57904999907,
+      "end": 57907397336,
+      "seconds": 0.002397429,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-envelope",
+      "start": 57907458876,
+      "end": 57907525585,
+      "seconds": 6.6709e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-ranges",
+      "start": 57907573681,
+      "end": 57907641412,
+      "seconds": 6.7731e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-prose",
+      "start": 57907686412,
+      "end": 57957701629,
+      "seconds": 0.050015217,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-tables",
+      "start": 57957773718,
+      "end": 57970519508,
+      "seconds": 0.01274579,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-blocks",
+      "start": 57970596726,
+      "end": 57972359262,
+      "seconds": 0.001762536,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-lists",
+      "start": 57972422755,
+      "end": 58007863628,
+      "seconds": 0.035440873,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-headings",
+      "start": 58008044821,
+      "end": 58008700171,
+      "seconds": 0.00065535,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "schema-level-two",
+      "start": 58008764275,
+      "end": 58009054824,
+      "seconds": 0.000290549,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "construction",
+      "start": 58009105434,
+      "end": 58009184696,
+      "seconds": 7.9262e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 17,
+      "phase": "caller",
+      "start": 57807228830,
+      "end": 58009243531,
+      "seconds": 0.202014701,
+      "input_bytes": 32515,
+      "input_lines": 249,
+      "remainder_seconds": 0.003755175999999999
+    },
+    {
+      "call": 18,
+      "phase": "native-parser",
+      "start": 58012438784,
+      "end": 58118420731,
+      "seconds": 0.105981947,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "conversion-cold-inclusive",
+      "start": 58118550503,
+      "end": 58121924676,
+      "seconds": 0.003374173,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-envelope",
+      "start": 58121984382,
+      "end": 58122048867,
+      "seconds": 6.4485e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-ranges",
+      "start": 58122092535,
+      "end": 58122153334,
+      "seconds": 6.0799e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-prose",
+      "start": 58122195930,
+      "end": 58217633316,
+      "seconds": 0.095437386,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-tables",
+      "start": 58217826420,
+      "end": 58217911362,
+      "seconds": 8.4942e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-blocks",
+      "start": 58217956122,
+      "end": 58220642567,
+      "seconds": 0.002686445,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-lists",
+      "start": 58220704427,
+      "end": 58257204306,
+      "seconds": 0.036499879,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-headings",
+      "start": 58257275343,
+      "end": 58257940430,
+      "seconds": 0.000665087,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "schema-level-two",
+      "start": 58258011306,
+      "end": 58258404198,
+      "seconds": 0.000392892,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "construction",
+      "start": 58258463283,
+      "end": 58258558653,
+      "seconds": 9.537e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 18,
+      "phase": "caller",
+      "start": 58011472379,
+      "end": 58258619843,
+      "seconds": 0.247147464,
+      "input_bytes": 83177,
+      "input_lines": 445,
+      "remainder_seconds": 0.0018040589999999967
+    },
+    {
+      "call": 19,
+      "phase": "native-parser",
+      "start": 58440808798,
+      "end": 58507586343,
+      "seconds": 0.066777545,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "conversion-cold-inclusive",
+      "start": 58507702631,
+      "end": 58510108896,
+      "seconds": 0.002406265,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-envelope",
+      "start": 58510177569,
+      "end": 58510244358,
+      "seconds": 6.6789e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-ranges",
+      "start": 58510289378,
+      "end": 58510357059,
+      "seconds": 6.7681e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-prose",
+      "start": 58510400396,
+      "end": 58555600765,
+      "seconds": 0.045200369,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-tables",
+      "start": 58555671781,
+      "end": 58567597848,
+      "seconds": 0.011926067,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-blocks",
+      "start": 58567750862,
+      "end": 58569656092,
+      "seconds": 0.00190523,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-lists",
+      "start": 58569718914,
+      "end": 58591580655,
+      "seconds": 0.021861741,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-headings",
+      "start": 58591654176,
+      "end": 58592190674,
+      "seconds": 0.000536498,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "schema-level-two",
+      "start": 58592242496,
+      "end": 58592612377,
+      "seconds": 0.000369881,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "construction",
+      "start": 58592669048,
+      "end": 58592750433,
+      "seconds": 8.1385e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 19,
+      "phase": "caller",
+      "start": 58439217648,
+      "end": 58592810009,
+      "seconds": 0.153592361,
+      "input_bytes": 32654,
+      "input_lines": 249,
+      "remainder_seconds": 0.002392910000000026
+    },
+    {
+      "call": 20,
+      "phase": "native-parser",
+      "start": 58650070584,
+      "end": 58716651424,
+      "seconds": 0.06658084,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "conversion-cold-inclusive",
+      "start": 58716723373,
+      "end": 58720224101,
+      "seconds": 0.003500728,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-envelope",
+      "start": 58720281915,
+      "end": 58720346690,
+      "seconds": 6.4775e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-ranges",
+      "start": 58720424118,
+      "end": 58720533504,
+      "seconds": 0.000109386,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-prose",
+      "start": 58720579596,
+      "end": 58791651438,
+      "seconds": 0.071071842,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-tables",
+      "start": 58792620327,
+      "end": 58792842644,
+      "seconds": 0.000222317,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-blocks",
+      "start": 58792902842,
+      "end": 58795519662,
+      "seconds": 0.00261682,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-lists",
+      "start": 58795580310,
+      "end": 58835362662,
+      "seconds": 0.039782352,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-headings",
+      "start": 58835477026,
+      "end": 58836324469,
+      "seconds": 0.000847443,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "schema-level-two",
+      "start": 58836384646,
+      "end": 58836674133,
+      "seconds": 0.000289487,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "construction",
+      "start": 58836721026,
+      "end": 58836802522,
+      "seconds": 8.1496e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 20,
+      "phase": "caller",
+      "start": 58649028704,
+      "end": 58836863751,
+      "seconds": 0.187835047,
+      "input_bytes": 83316,
+      "input_lines": 445,
+      "remainder_seconds": 0.0026675610000000127
+    },
+    {
+      "call": 21,
+      "phase": "native-parser",
+      "start": 59001058357,
+      "end": 59074646496,
+      "seconds": 0.073588139,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "conversion-cold-inclusive",
+      "start": 59074711212,
+      "end": 59078078392,
+      "seconds": 0.00336718,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-envelope",
+      "start": 59078132900,
+      "end": 59078190322,
+      "seconds": 5.7422e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-ranges",
+      "start": 59078232107,
+      "end": 59078438195,
+      "seconds": 0.000206088,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-prose",
+      "start": 59078482584,
+      "end": 59143720687,
+      "seconds": 0.065238103,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-tables",
+      "start": 59143866638,
+      "end": 59143942293,
+      "seconds": 7.5655e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-blocks",
+      "start": 59143985951,
+      "end": 59147165296,
+      "seconds": 0.003179345,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-lists",
+      "start": 59147224341,
+      "end": 59186927006,
+      "seconds": 0.039702665,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-headings",
+      "start": 59186992253,
+      "end": 59187901306,
+      "seconds": 0.000909053,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "schema-level-two",
+      "start": 59187959459,
+      "end": 59188382945,
+      "seconds": 0.000423486,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "construction",
+      "start": 59188438975,
+      "end": 59188518537,
+      "seconds": 7.9562e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 21,
+      "phase": "caller",
+      "start": 58999413252,
+      "end": 59188577542,
+      "seconds": 0.18916429,
+      "input_bytes": 45796,
+      "input_lines": 438,
+      "remainder_seconds": 0.0023375919999999994
+    },
+    {
+      "call": 22,
+      "phase": "native-parser",
+      "start": 59210181043,
+      "end": 59260430813,
+      "seconds": 0.05024977,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "conversion-cold-inclusive",
+      "start": 59260495769,
+      "end": 59262692660,
+      "seconds": 0.002196891,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-envelope",
+      "start": 59262812424,
+      "end": 59262884603,
+      "seconds": 7.2179e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-ranges",
+      "start": 59262936496,
+      "end": 59263085071,
+      "seconds": 0.000148575,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-prose",
+      "start": 59263139718,
+      "end": 59281249293,
+      "seconds": 0.018109575,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-tables",
+      "start": 59281305753,
+      "end": 59308878969,
+      "seconds": 0.027573216,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-blocks",
+      "start": 59308950035,
+      "end": 59310488816,
+      "seconds": 0.001538781,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-lists",
+      "start": 59310651446,
+      "end": 59315835886,
+      "seconds": 0.00518444,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-headings",
+      "start": 59315892627,
+      "end": 59316429005,
+      "seconds": 0.000536378,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "schema-level-two",
+      "start": 59316486497,
+      "end": 59316789067,
+      "seconds": 0.00030257,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "construction",
+      "start": 59316837925,
+      "end": 59316916695,
+      "seconds": 7.877e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 22,
+      "phase": "caller",
+      "start": 59209225186,
+      "end": 59316983895,
+      "seconds": 0.107758709,
+      "input_bytes": 12177,
+      "input_lines": 216,
+      "remainder_seconds": 0.0017675639999999992
+    },
+    {
+      "call": 23,
+      "phase": "native-parser",
+      "start": 59328685259,
+      "end": 59370907557,
+      "seconds": 0.042222298,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "conversion-cold-inclusive",
+      "start": 59371084303,
+      "end": 59372767437,
+      "seconds": 0.001683134,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-envelope",
+      "start": 59375516114,
+      "end": 59375593111,
+      "seconds": 7.6997e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-ranges",
+      "start": 59375637390,
+      "end": 59375778382,
+      "seconds": 0.000140992,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-prose",
+      "start": 59375878270,
+      "end": 59382030546,
+      "seconds": 0.006152276,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-tables",
+      "start": 59382090934,
+      "end": 59385554912,
+      "seconds": 0.003463978,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-blocks",
+      "start": 59385702966,
+      "end": 59386921511,
+      "seconds": 0.001218545,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-lists",
+      "start": 59386979685,
+      "end": 59391308077,
+      "seconds": 0.004328392,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-headings",
+      "start": 59391408516,
+      "end": 59391850815,
+      "seconds": 0.000442299,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "schema-level-two",
+      "start": 59391906906,
+      "end": 59392324351,
+      "seconds": 0.000417445,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "construction",
+      "start": 59392442602,
+      "end": 59392576551,
+      "seconds": 0.000133949,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 23,
+      "phase": "caller",
+      "start": 59326467833,
+      "end": 59392648259,
+      "seconds": 0.066180426,
+      "input_bytes": 8709,
+      "input_lines": 131,
+      "remainder_seconds": 0.005900121000000001
+    },
+    {
+      "call": 24,
+      "phase": "native-parser",
+      "start": 59411397839,
+      "end": 59462216289,
+      "seconds": 0.05081845,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "conversion-cold-inclusive",
+      "start": 59462297674,
+      "end": 59464625269,
+      "seconds": 0.002327595,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-envelope",
+      "start": 59464754079,
+      "end": 59464824194,
+      "seconds": 7.0115e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-ranges",
+      "start": 59464867361,
+      "end": 59464929542,
+      "seconds": 6.2181e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-prose",
+      "start": 59464971647,
+      "end": 59501214349,
+      "seconds": 0.036242702,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-tables",
+      "start": 59501329985,
+      "end": 59504868831,
+      "seconds": 0.003538846,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-blocks",
+      "start": 59505163217,
+      "end": 59507061405,
+      "seconds": 0.001898188,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-lists",
+      "start": 59507129316,
+      "end": 59530651856,
+      "seconds": 0.02352254,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-headings",
+      "start": 59530726579,
+      "end": 59531327451,
+      "seconds": 0.000600872,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "schema-level-two",
+      "start": 59531388060,
+      "end": 59531758361,
+      "seconds": 0.000370301,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "construction",
+      "start": 59531815072,
+      "end": 59531908599,
+      "seconds": 9.3527e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 24,
+      "phase": "caller",
+      "start": 59410047388,
+      "end": 59531979786,
+      "seconds": 0.121932398,
+      "input_bytes": 32654,
+      "input_lines": 249,
+      "remainder_seconds": 0.0023870809999999992
+    },
+    {
+      "call": 25,
+      "phase": "native-parser",
+      "start": 59545384261,
+      "end": 59602973388,
+      "seconds": 0.057589127,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "conversion-cold-inclusive",
+      "start": 59603044164,
+      "end": 59605396924,
+      "seconds": 0.00235276,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-envelope",
+      "start": 59605467971,
+      "end": 59605573209,
+      "seconds": 0.000105238,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-ranges",
+      "start": 59605621054,
+      "end": 59605685199,
+      "seconds": 6.4145e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-prose",
+      "start": 59605727995,
+      "end": 59637555023,
+      "seconds": 0.031827028,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-tables",
+      "start": 59637613838,
+      "end": 59647148415,
+      "seconds": 0.009534577,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-blocks",
+      "start": 59647203724,
+      "end": 59649063804,
+      "seconds": 0.00186008,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-lists",
+      "start": 59649125554,
+      "end": 59668348360,
+      "seconds": 0.019222806,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-headings",
+      "start": 59668544350,
+      "end": 59669081890,
+      "seconds": 0.00053754,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "schema-level-two",
+      "start": 59669131769,
+      "end": 59669415655,
+      "seconds": 0.000283886,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "construction",
+      "start": 59669464543,
+      "end": 59669550206,
+      "seconds": 8.5663e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 25,
+      "phase": "caller",
+      "start": 59543987749,
+      "end": 59669612657,
+      "seconds": 0.125624908,
+      "input_bytes": 32654,
+      "input_lines": 249,
+      "remainder_seconds": 0.0021620580000000084
+    },
+    {
+      "call": 26,
+      "phase": "native-parser",
+      "start": 59695918911,
+      "end": 59752055645,
+      "seconds": 0.056136734,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "conversion-cold-inclusive",
+      "start": 59752169739,
+      "end": 59755804111,
+      "seconds": 0.003634372,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-envelope",
+      "start": 59755881789,
+      "end": 59755947567,
+      "seconds": 6.5778e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-ranges",
+      "start": 59755999239,
+      "end": 59756172749,
+      "seconds": 0.00017351,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-prose",
+      "start": 59756223680,
+      "end": 59817858241,
+      "seconds": 0.061634561,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-tables",
+      "start": 59818019178,
+      "end": 59818178623,
+      "seconds": 0.000159445,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-blocks",
+      "start": 59818238049,
+      "end": 59820809454,
+      "seconds": 0.002571405,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-lists",
+      "start": 59820877435,
+      "end": 59843130966,
+      "seconds": 0.022253531,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-headings",
+      "start": 59843199077,
+      "end": 59843984339,
+      "seconds": 0.000785262,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "schema-level-two",
+      "start": 59844112788,
+      "end": 59844514105,
+      "seconds": 0.000401317,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "construction",
+      "start": 59844573180,
+      "end": 59844656409,
+      "seconds": 8.3229e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 26,
+      "phase": "caller",
+      "start": 59694765292,
+      "end": 59844721174,
+      "seconds": 0.149955882,
+      "input_bytes": 83316,
+      "input_lines": 445,
+      "remainder_seconds": 0.0020567380000000024
+    },
+    {
+      "call": 27,
+      "phase": "native-parser",
+      "start": 59863607048,
+      "end": 59924534778,
+      "seconds": 0.06092773,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "conversion-cold-inclusive",
+      "start": 59924626111,
+      "end": 59928209227,
+      "seconds": 0.003583116,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-envelope",
+      "start": 59928272620,
+      "end": 59928336424,
+      "seconds": 6.3804e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-ranges",
+      "start": 59928379681,
+      "end": 59928440580,
+      "seconds": 6.0899e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-prose",
+      "start": 59928489377,
+      "end": 60006681887,
+      "seconds": 0.07819251,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-tables",
+      "start": 60006859564,
+      "end": 60006972706,
+      "seconds": 0.000113142,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-blocks",
+      "start": 60007054752,
+      "end": 60013120220,
+      "seconds": 0.006065468,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-lists",
+      "start": 60013181149,
+      "end": 60038275099,
+      "seconds": 0.02509395,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-headings",
+      "start": 60038366272,
+      "end": 60039053068,
+      "seconds": 0.000686796,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "schema-level-two",
+      "start": 60039102606,
+      "end": 60039407190,
+      "seconds": 0.000304584,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "construction",
+      "start": 60039453382,
+      "end": 60039532183,
+      "seconds": 7.8801e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 27,
+      "phase": "caller",
+      "start": 59862345406,
+      "end": 60039627673,
+      "seconds": 0.177282267,
+      "input_bytes": 83316,
+      "input_lines": 445,
+      "remainder_seconds": 0.002111466999999978
+    },
+    {
+      "call": 28,
+      "phase": "native-parser",
+      "start": 60089493228,
+      "end": 60151177409,
+      "seconds": 0.061684181,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "conversion-cold-inclusive",
+      "start": 60151251110,
+      "end": 60155144073,
+      "seconds": 0.003892963,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-envelope",
+      "start": 60155217574,
+      "end": 60155287749,
+      "seconds": 7.0175e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-ranges",
+      "start": 60155331948,
+      "end": 60155668028,
+      "seconds": 0.00033608,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-prose",
+      "start": 60155764100,
+      "end": 60222367681,
+      "seconds": 0.066603581,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-tables",
+      "start": 60222524230,
+      "end": 60222616164,
+      "seconds": 9.1934e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-blocks",
+      "start": 60222701827,
+      "end": 60226281617,
+      "seconds": 0.00357979,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-lists",
+      "start": 60226341674,
+      "end": 60258379759,
+      "seconds": 0.032038085,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-headings",
+      "start": 60258451637,
+      "end": 60259385274,
+      "seconds": 0.000933637,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "schema-level-two",
+      "start": 60259442917,
+      "end": 60259788624,
+      "seconds": 0.000345707,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "construction",
+      "start": 60259834245,
+      "end": 60259912855,
+      "seconds": 7.861e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 28,
+      "phase": "caller",
+      "start": 60087191360,
+      "end": 60259975437,
+      "seconds": 0.172784077,
+      "input_bytes": 46104,
+      "input_lines": 438,
+      "remainder_seconds": 0.0031293340000000114
+    },
+    {
+      "call": 29,
+      "phase": "native-parser",
+      "start": 60277259582,
+      "end": 60329499306,
+      "seconds": 0.052239724,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "conversion-cold-inclusive",
+      "start": 60329591330,
+      "end": 60333409329,
+      "seconds": 0.003817999,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-envelope",
+      "start": 60333481368,
+      "end": 60333548558,
+      "seconds": 6.719e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-ranges",
+      "start": 60333594289,
+      "end": 60333870292,
+      "seconds": 0.000276003,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-prose",
+      "start": 60333940347,
+      "end": 60402960796,
+      "seconds": 0.069020449,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-tables",
+      "start": 60403089395,
+      "end": 60403167154,
+      "seconds": 7.7759e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-blocks",
+      "start": 60403210441,
+      "end": 60407236448,
+      "seconds": 0.004026007,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-lists",
+      "start": 60407306513,
+      "end": 60451363011,
+      "seconds": 0.044056498,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-headings",
+      "start": 60451427887,
+      "end": 60452369187,
+      "seconds": 0.0009413,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "schema-level-two",
+      "start": 60452453908,
+      "end": 60452854774,
+      "seconds": 0.000400866,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "construction",
+      "start": 60452903070,
+      "end": 60452985307,
+      "seconds": 8.2237e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 29,
+      "phase": "caller",
+      "start": 60276181037,
+      "end": 60453080036,
+      "seconds": 0.176898999,
+      "input_bytes": 46104,
+      "input_lines": 438,
+      "remainder_seconds": 0.0018929669999999954
+    },
+    {
+      "call": 30,
+      "phase": "native-parser",
+      "start": 60478875869,
+      "end": 60560528946,
+      "seconds": 0.081653077,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "conversion-cold-inclusive",
+      "start": 60560601876,
+      "end": 60564517074,
+      "seconds": 0.003915198,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-envelope",
+      "start": 60564577512,
+      "end": 60564642508,
+      "seconds": 6.4996e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-ranges",
+      "start": 60564685835,
+      "end": 60565079427,
+      "seconds": 0.000393592,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-prose",
+      "start": 60565129086,
+      "end": 60658683161,
+      "seconds": 0.093554075,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-tables",
+      "start": 60658859326,
+      "end": 60658938667,
+      "seconds": 7.9341e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-blocks",
+      "start": 60658996320,
+      "end": 60663652371,
+      "seconds": 0.004656051,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-lists",
+      "start": 60663718439,
+      "end": 60699910904,
+      "seconds": 0.036192465,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-headings",
+      "start": 60699982381,
+      "end": 60700612696,
+      "seconds": 0.000630315,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "schema-level-two",
+      "start": 60700659219,
+      "end": 60701127275,
+      "seconds": 0.000468056,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "construction",
+      "start": 60701171875,
+      "end": 60701253951,
+      "seconds": 8.2076e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 30,
+      "phase": "caller",
+      "start": 60477816177,
+      "end": 60701317605,
+      "seconds": 0.223501428,
+      "input_bytes": 54521,
+      "input_lines": 660,
+      "remainder_seconds": 0.0018121859999999934
+    },
+    {
+      "call": 31,
+      "phase": "native-parser",
+      "start": 60720924511,
+      "end": 60807301023,
+      "seconds": 0.086376512,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "conversion-cold-inclusive",
+      "start": 60807365339,
+      "end": 60811012462,
+      "seconds": 0.003647123,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-envelope",
+      "start": 60811075645,
+      "end": 60811142526,
+      "seconds": 6.6881e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-ranges",
+      "start": 60811189227,
+      "end": 60811583786,
+      "seconds": 0.000394559,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-prose",
+      "start": 60811630618,
+      "end": 60878740078,
+      "seconds": 0.06710946,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-tables",
+      "start": 60878904198,
+      "end": 60879079120,
+      "seconds": 0.000174922,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-blocks",
+      "start": 60879137944,
+      "end": 60883877029,
+      "seconds": 0.004739085,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-lists",
+      "start": 60883936274,
+      "end": 60909333189,
+      "seconds": 0.025396915,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-headings",
+      "start": 60909402214,
+      "end": 60910098121,
+      "seconds": 0.000695907,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "schema-level-two",
+      "start": 60910157858,
+      "end": 60910639076,
+      "seconds": 0.000481218,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "construction",
+      "start": 60910685857,
+      "end": 60910768809,
+      "seconds": 8.2952e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 31,
+      "phase": "caller",
+      "start": 60719898790,
+      "end": 60910833475,
+      "seconds": 0.190934685,
+      "input_bytes": 54521,
+      "input_lines": 660,
+      "remainder_seconds": 0.0017691509999999966
+    },
+    {
+      "call": 32,
+      "phase": "native-parser",
+      "start": 60941296273,
+      "end": 60984796293,
+      "seconds": 0.04350002,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "conversion-cold-inclusive",
+      "start": 60984865548,
+      "end": 60985705737,
+      "seconds": 0.000840189,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-envelope",
+      "start": 60985761796,
+      "end": 60985825881,
+      "seconds": 6.4085e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-ranges",
+      "start": 60985868845,
+      "end": 60986005301,
+      "seconds": 0.000136456,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-prose",
+      "start": 60986049828,
+      "end": 60987883194,
+      "seconds": 0.001833366,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-tables",
+      "start": 60987936588,
+      "end": 60987996916,
+      "seconds": 6.0328e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-blocks",
+      "start": 60988108904,
+      "end": 60988450070,
+      "seconds": 0.000341166,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-lists",
+      "start": 60988495078,
+      "end": 60997242719,
+      "seconds": 0.008747641,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-headings",
+      "start": 60997427730,
+      "end": 60997900552,
+      "seconds": 0.000472822,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "schema-level-two",
+      "start": 60998049994,
+      "end": 60998462448,
+      "seconds": 0.000412454,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "construction",
+      "start": 60998661426,
+      "end": 60998927475,
+      "seconds": 0.000266049,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 32,
+      "phase": "caller",
+      "start": 60940285962,
+      "end": 60999096034,
+      "seconds": 0.058810072,
+      "input_bytes": 2179,
+      "input_lines": 39,
+      "remainder_seconds": 0.0021354960000000006
+    },
+    {
+      "call": 33,
+      "phase": "native-parser",
+      "start": 61002707348,
+      "end": 61061110152,
+      "seconds": 0.058402804,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 33,
+      "phase": "snapshot-hit-copy",
+      "start": 61065118891,
+      "end": 61077079068,
+      "seconds": 0.011960177,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 33,
+      "phase": "caller",
+      "start": 61001772735,
+      "end": 61077781228,
+      "seconds": 0.076008493,
+      "input_bytes": 2179,
+      "input_lines": 39,
+      "remainder_seconds": 0.005645511999999991
+    },
+    {
+      "call": 34,
+      "phase": "native-parser",
+      "start": 61088710821,
+      "end": 61213362466,
+      "seconds": 0.124651645,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "conversion-cold-inclusive",
+      "start": 61213435689,
+      "end": 61223914236,
+      "seconds": 0.010478547,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-envelope",
+      "start": 61223982720,
+      "end": 61224067676,
+      "seconds": 8.4956e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-ranges",
+      "start": 61224112523,
+      "end": 61224855643,
+      "seconds": 0.00074312,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-prose",
+      "start": 61224938985,
+      "end": 61471311189,
+      "seconds": 0.246372204,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-tables",
+      "start": 61471454608,
+      "end": 61541975453,
+      "seconds": 0.070520845,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-blocks",
+      "start": 61542115766,
+      "end": 61568901726,
+      "seconds": 0.02678596,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-lists",
+      "start": 61568982203,
+      "end": 61620934906,
+      "seconds": 0.051952703,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-headings",
+      "start": 61621088726,
+      "end": 61625939297,
+      "seconds": 0.004850571,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "schema-level-two",
+      "start": 61626009684,
+      "end": 61626464551,
+      "seconds": 0.000454867,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "construction",
+      "start": 61626524588,
+      "end": 61626611458,
+      "seconds": 8.687e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "snapshot-store-copy",
+      "start": 61626702195,
+      "end": 61641238392,
+      "seconds": 0.014536197,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 34,
+      "phase": "caller",
+      "start": 61087551123,
+      "end": 61641345481,
+      "seconds": 0.553794358,
+      "input_bytes": 135295,
+      "input_lines": 1889,
+      "remainder_seconds": 0.002275872999999984
+    },
+    {
+      "call": 35,
+      "phase": "native-parser",
+      "start": 61679703142,
+      "end": 61771300620,
+      "seconds": 0.091597478,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "conversion-cold-inclusive",
+      "start": 61771392710,
+      "end": 61790249529,
+      "seconds": 0.018856819,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-envelope",
+      "start": 61790362279,
+      "end": 61790488144,
+      "seconds": 0.000125865,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-ranges",
+      "start": 61790536539,
+      "end": 61791472224,
+      "seconds": 0.000935685,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-prose",
+      "start": 61791547871,
+      "end": 61962561545,
+      "seconds": 0.171013674,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-tables",
+      "start": 61962706478,
+      "end": 62009703114,
+      "seconds": 0.046996636,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-blocks",
+      "start": 62009821625,
+      "end": 62031691606,
+      "seconds": 0.021869981,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-lists",
+      "start": 62031814336,
+      "end": 62085335467,
+      "seconds": 0.053521131,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-headings",
+      "start": 62085464379,
+      "end": 62088900201,
+      "seconds": 0.003435822,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "schema-level-two",
+      "start": 62088963494,
+      "end": 62089581795,
+      "seconds": 0.000618301,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "construction",
+      "start": 62089694415,
+      "end": 62089820110,
+      "seconds": 0.000125695,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "snapshot-store-copy",
+      "start": 62089879606,
+      "end": 62100833261,
+      "seconds": 0.010953655,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 35,
+      "phase": "caller",
+      "start": 61678459321,
+      "end": 62100908758,
+      "seconds": 0.422449437,
+      "input_bytes": 135295,
+      "input_lines": 1889,
+      "remainder_seconds": 0.0023986950000000062
+    },
+    {
+      "call": 36,
+      "phase": "native-parser",
+      "start": 62150456194,
+      "end": 62192016601,
+      "seconds": 0.041560407,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "conversion-cold-inclusive",
+      "start": 62192075176,
+      "end": 62192738760,
+      "seconds": 0.000663584,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-envelope",
+      "start": 62192792475,
+      "end": 62192845538,
+      "seconds": 5.3063e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-ranges",
+      "start": 62192884494,
+      "end": 62192976684,
+      "seconds": 9.219e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-prose",
+      "start": 62193015229,
+      "end": 62195583288,
+      "seconds": 0.002568059,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-tables",
+      "start": 62195630019,
+      "end": 62195683774,
+      "seconds": 5.3755e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-blocks",
+      "start": 62195722129,
+      "end": 62196241863,
+      "seconds": 0.000519734,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-lists",
+      "start": 62196291920,
+      "end": 62197104024,
+      "seconds": 0.000812104,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-headings",
+      "start": 62197164162,
+      "end": 62197347930,
+      "seconds": 0.000183768,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "schema-level-two",
+      "start": 62197389351,
+      "end": 62197510647,
+      "seconds": 0.000121296,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "construction",
+      "start": 62197548591,
+      "end": 62197612306,
+      "seconds": 6.3715e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "snapshot-store-copy",
+      "start": 62197658506,
+      "end": 62200789292,
+      "seconds": 0.003130786,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 36,
+      "phase": "caller",
+      "start": 62149564985,
+      "end": 62201404006,
+      "seconds": 0.051839021,
+      "input_bytes": 3017,
+      "input_lines": 36,
+      "remainder_seconds": 0.0020165600000000006
+    },
+    {
+      "call": 37,
+      "phase": "native-parser",
+      "start": 62204061786,
+      "end": 62245437091,
+      "seconds": 0.041375305,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 37,
+      "phase": "snapshot-hit-copy",
+      "start": 62245715895,
+      "end": 62248914935,
+      "seconds": 0.00319904,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 37,
+      "phase": "caller",
+      "start": 62203367091,
+      "end": 62249006653,
+      "seconds": 0.045639562,
+      "input_bytes": 3017,
+      "input_lines": 36,
+      "remainder_seconds": 0.0010652170000000002
+    },
+    {
+      "call": 38,
+      "phase": "native-parser",
+      "start": 62254064999,
+      "end": 62295304166,
+      "seconds": 0.041239167,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "conversion-cold-inclusive",
+      "start": 62295362830,
+      "end": 62297163663,
+      "seconds": 0.001800833,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-envelope",
+      "start": 62297212398,
+      "end": 62297267425,
+      "seconds": 5.5027e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-ranges",
+      "start": 62297306371,
+      "end": 62297463888,
+      "seconds": 0.000157517,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-prose",
+      "start": 62297502323,
+      "end": 62306075154,
+      "seconds": 0.008572831,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-tables",
+      "start": 62306125803,
+      "end": 62316994141,
+      "seconds": 0.010868338,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-blocks",
+      "start": 62317051934,
+      "end": 62318156869,
+      "seconds": 0.001104935,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-lists",
+      "start": 62318208489,
+      "end": 62320837277,
+      "seconds": 0.002628788,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-headings",
+      "start": 62320886202,
+      "end": 62321160788,
+      "seconds": 0.000274586,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "schema-level-two",
+      "start": 62321199984,
+      "end": 62321409012,
+      "seconds": 0.000209028,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "construction",
+      "start": 62321458839,
+      "end": 62321530730,
+      "seconds": 7.1891e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "snapshot-store-copy",
+      "start": 62321578924,
+      "end": 62335914961,
+      "seconds": 0.014336037,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 38,
+      "phase": "caller",
+      "start": 62253372769,
+      "end": 62336133527,
+      "seconds": 0.082760758,
+      "input_bytes": 13541,
+      "input_lines": 137,
+      "remainder_seconds": 0.0014417800000000036
+    },
+    {
+      "call": 39,
+      "phase": "native-parser",
+      "start": 62339798706,
+      "end": 62387623398,
+      "seconds": 0.047824692,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 39,
+      "phase": "snapshot-hit-copy",
+      "start": 62387938713,
+      "end": 62400312487,
+      "seconds": 0.012373774,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 39,
+      "phase": "caller",
+      "start": 62339033053,
+      "end": 62400396090,
+      "seconds": 0.061363037,
+      "input_bytes": 13541,
+      "input_lines": 137,
+      "remainder_seconds": 0.0011645709999999962
+    },
+    {
+      "call": 40,
+      "phase": "native-parser",
+      "start": 62408868239,
+      "end": 62464702823,
+      "seconds": 0.055834584,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "conversion-cold-inclusive",
+      "start": 62464758832,
+      "end": 62466763503,
+      "seconds": 0.002004671,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-envelope",
+      "start": 62466807519,
+      "end": 62466878628,
+      "seconds": 7.1109e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-ranges",
+      "start": 62466946229,
+      "end": 62467000706,
+      "seconds": 5.4477e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-prose",
+      "start": 62467034462,
+      "end": 62487304387,
+      "seconds": 0.020269925,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-tables",
+      "start": 62487357541,
+      "end": 62524441051,
+      "seconds": 0.03708351,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-blocks",
+      "start": 62524563189,
+      "end": 62525595393,
+      "seconds": 0.001032204,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-lists",
+      "start": 62525638998,
+      "end": 62529626406,
+      "seconds": 0.003987408,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-headings",
+      "start": 62529672065,
+      "end": 62530055002,
+      "seconds": 0.000382937,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "schema-level-two",
+      "start": 62530101212,
+      "end": 62530305230,
+      "seconds": 0.000204018,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "construction",
+      "start": 62530339186,
+      "end": 62530404884,
+      "seconds": 6.5698e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "snapshot-store-copy",
+      "start": 62530447297,
+      "end": 62570582810,
+      "seconds": 0.040135513,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 40,
+      "phase": "caller",
+      "start": 62408154477,
+      "end": 62570792429,
+      "seconds": 0.162637952,
+      "input_bytes": 12177,
+      "input_lines": 216,
+      "remainder_seconds": 0.0015118980000000115
+    },
+    {
+      "call": 41,
+      "phase": "native-parser",
+      "start": 62574934167,
+      "end": 62633876903,
+      "seconds": 0.058942736,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 41,
+      "phase": "snapshot-hit-copy",
+      "start": 62634230513,
+      "end": 62672230967,
+      "seconds": 0.038000454,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 41,
+      "phase": "caller",
+      "start": 62574245063,
+      "end": 62672342615,
+      "seconds": 0.098097552,
+      "input_bytes": 12177,
+      "input_lines": 216,
+      "remainder_seconds": 0.0011543619999999921
+    },
+    {
+      "call": 42,
+      "phase": "native-parser",
+      "start": 62698196136,
+      "end": 62742677556,
+      "seconds": 0.04448142,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "conversion-cold-inclusive",
+      "start": 62742739817,
+      "end": 62744056456,
+      "seconds": 0.001316639,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-envelope",
+      "start": 62744157743,
+      "end": 62744238471,
+      "seconds": 8.0728e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-ranges",
+      "start": 62744274811,
+      "end": 62744372362,
+      "seconds": 9.7551e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-prose",
+      "start": 62744406749,
+      "end": 62750272219,
+      "seconds": 0.00586547,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-tables",
+      "start": 62750319161,
+      "end": 62753454816,
+      "seconds": 0.003135655,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-blocks",
+      "start": 62753502479,
+      "end": 62754397225,
+      "seconds": 0.000894746,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-lists",
+      "start": 62754443224,
+      "end": 62764960068,
+      "seconds": 0.010516844,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-headings",
+      "start": 62765012670,
+      "end": 62765384906,
+      "seconds": 0.000372236,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "schema-level-two",
+      "start": 62765430245,
+      "end": 62765626928,
+      "seconds": 0.000196683,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "construction",
+      "start": 62765661917,
+      "end": 62765724910,
+      "seconds": 6.2993e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "snapshot-store-copy",
+      "start": 62765766531,
+      "end": 62783237432,
+      "seconds": 0.017470901,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 42,
+      "phase": "caller",
+      "start": 62697397468,
+      "end": 62783468583,
+      "seconds": 0.086071115,
+      "input_bytes": 8744,
+      "input_lines": 131,
+      "remainder_seconds": 0.0015792490000000048
+    },
+    {
+      "call": 43,
+      "phase": "native-parser",
+      "start": 62786258184,
+      "end": 62833415869,
+      "seconds": 0.047157685,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 43,
+      "phase": "snapshot-hit-copy",
+      "start": 62833660596,
+      "end": 62850563865,
+      "seconds": 0.016903269,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 43,
+      "phase": "caller",
+      "start": 62785652583,
+      "end": 62850801188,
+      "seconds": 0.065148605,
+      "input_bytes": 8744,
+      "input_lines": 131,
+      "remainder_seconds": 0.001087650999999995
+    },
+    {
+      "call": 44,
+      "phase": "native-parser",
+      "start": 62859528606,
+      "end": 62961654284,
+      "seconds": 0.102125678,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "conversion-cold-inclusive",
+      "start": 62969807718,
+      "end": 62984457171,
+      "seconds": 0.014649453,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-envelope",
+      "start": 62984507930,
+      "end": 62984556545,
+      "seconds": 4.8615e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-ranges",
+      "start": 62984587956,
+      "end": 62985585041,
+      "seconds": 0.000997085,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-prose",
+      "start": 62985622003,
+      "end": 63102620782,
+      "seconds": 0.116998779,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-tables",
+      "start": 63102722841,
+      "end": 63153466459,
+      "seconds": 0.050743618,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-blocks",
+      "start": 63153508281,
+      "end": 63165942152,
+      "seconds": 0.012433871,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-lists",
+      "start": 63165989745,
+      "end": 63211385880,
+      "seconds": 0.045396135,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-headings",
+      "start": 63211529385,
+      "end": 63213963272,
+      "seconds": 0.002433887,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "schema-level-two",
+      "start": 63214007839,
+      "end": 63214286693,
+      "seconds": 0.000278854,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "construction",
+      "start": 63214348804,
+      "end": 63214438770,
+      "seconds": 8.9966e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "snapshot-store-copy",
+      "start": 63214479229,
+      "end": 63218604850,
+      "seconds": 0.004125621,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 44,
+      "phase": "caller",
+      "start": 62858817159,
+      "end": 63218666681,
+      "seconds": 0.359849522,
+      "input_bytes": 148759,
+      "input_lines": 2821,
+      "remainder_seconds": 0.009527960000000002
+    },
+    {
+      "call": 45,
+      "phase": "native-parser",
+      "start": 63236209403,
+      "end": 63305740356,
+      "seconds": 0.069530953,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "conversion-cold-inclusive",
+      "start": 63305782007,
+      "end": 63323144132,
+      "seconds": 0.017362125,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-envelope",
+      "start": 63323225330,
+      "end": 63323281640,
+      "seconds": 5.631e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-ranges",
+      "start": 63323307971,
+      "end": 63324229178,
+      "seconds": 0.000921207,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-prose",
+      "start": 63324259497,
+      "end": 63480956807,
+      "seconds": 0.15669731,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-tables",
+      "start": 63481060459,
+      "end": 63549404727,
+      "seconds": 0.068344268,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-blocks",
+      "start": 63549502628,
+      "end": 63567557604,
+      "seconds": 0.018054976,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-lists",
+      "start": 63567635636,
+      "end": 63622326550,
+      "seconds": 0.054690914,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-headings",
+      "start": 63622488205,
+      "end": 63625686684,
+      "seconds": 0.003198479,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "schema-level-two",
+      "start": 63625725189,
+      "end": 63625914508,
+      "seconds": 0.000189319,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "construction",
+      "start": 63625936020,
+      "end": 63625981579,
+      "seconds": 4.5559e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "snapshot-store-copy",
+      "start": 63626012119,
+      "end": 63629712837,
+      "seconds": 0.003700718,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 45,
+      "phase": "caller",
+      "start": 63234819396,
+      "end": 63629756662,
+      "seconds": 0.394937266,
+      "input_bytes": 148759,
+      "input_lines": 2821,
+      "remainder_seconds": 0.002145127999999996
+    },
+    {
+      "call": 46,
+      "phase": "native-parser",
+      "start": 63677572967,
+      "end": 63731938485,
+      "seconds": 0.054365518,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "conversion-cold-inclusive",
+      "start": 63731975417,
+      "end": 63732714930,
+      "seconds": 0.000739513,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-envelope",
+      "start": 63732741431,
+      "end": 63732771470,
+      "seconds": 3.0039e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-ranges",
+      "start": 63732791319,
+      "end": 63732825135,
+      "seconds": 3.3816e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-prose",
+      "start": 63732843711,
+      "end": 63734604024,
+      "seconds": 0.001760313,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-tables",
+      "start": 63734633482,
+      "end": 63734666987,
+      "seconds": 3.3505e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-blocks",
+      "start": 63734687738,
+      "end": 63735023282,
+      "seconds": 0.000335544,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-lists",
+      "start": 63735054343,
+      "end": 63735915603,
+      "seconds": 0.00086126,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-headings",
+      "start": 63735943216,
+      "end": 63736139509,
+      "seconds": 0.000196293,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "schema-level-two",
+      "start": 63736169688,
+      "end": 63736305693,
+      "seconds": 0.000136005,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "construction",
+      "start": 63736335151,
+      "end": 63736377764,
+      "seconds": 4.2613e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "snapshot-store-copy",
+      "start": 63736404256,
+      "end": 63738887389,
+      "seconds": 0.002483133,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 46,
+      "phase": "caller",
+      "start": 63670782342,
+      "end": 63739089894,
+      "seconds": 0.068307552,
+      "input_bytes": 4249,
+      "input_lines": 54,
+      "remainder_seconds": 0.007289999999999991
+    },
+    {
+      "call": 47,
+      "phase": "native-parser",
+      "start": 63741215520,
+      "end": 63782854600,
+      "seconds": 0.04163908,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 47,
+      "phase": "snapshot-hit-copy",
+      "start": 63783199578,
+      "end": 63786652328,
+      "seconds": 0.00345275,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 47,
+      "phase": "caller",
+      "start": 63740646430,
+      "end": 63786767813,
+      "seconds": 0.046121383,
+      "input_bytes": 4249,
+      "input_lines": 54,
+      "remainder_seconds": 0.0010295530000000025
+    },
+    {
+      "call": 48,
+      "phase": "native-parser",
+      "start": 63793871314,
+      "end": 63838700858,
+      "seconds": 0.044829544,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "conversion-cold-inclusive",
+      "start": 63838738261,
+      "end": 63839445099,
+      "seconds": 0.000706838,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-envelope",
+      "start": 63839468104,
+      "end": 63839495107,
+      "seconds": 2.7003e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-ranges",
+      "start": 63839513553,
+      "end": 63839595262,
+      "seconds": 8.1709e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-prose",
+      "start": 63839663395,
+      "end": 63841492162,
+      "seconds": 0.001828767,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-tables",
+      "start": 63841519085,
+      "end": 63842921430,
+      "seconds": 0.001402345,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-blocks",
+      "start": 63842948042,
+      "end": 63843362660,
+      "seconds": 0.000414618,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-lists",
+      "start": 63843392208,
+      "end": 63843683476,
+      "seconds": 0.000291268,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-headings",
+      "start": 63843703746,
+      "end": 63843775586,
+      "seconds": 7.184e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "schema-level-two",
+      "start": 63843795284,
+      "end": 63843837006,
+      "seconds": 4.1722e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "construction",
+      "start": 63843855502,
+      "end": 63843891833,
+      "seconds": 3.6331e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "snapshot-store-copy",
+      "start": 63843916020,
+      "end": 63849271801,
+      "seconds": 0.005355781,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 48,
+      "phase": "caller",
+      "start": 63793294188,
+      "end": 63849503248,
+      "seconds": 0.05620906,
+      "input_bytes": 10446,
+      "input_lines": 71,
+      "remainder_seconds": 0.0011212940000000018
+    },
+    {
+      "call": 49,
+      "phase": "native-parser",
+      "start": 63851611855,
+      "end": 63905134243,
+      "seconds": 0.053522388,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 49,
+      "phase": "snapshot-hit-copy",
+      "start": 63905336738,
+      "end": 63909217778,
+      "seconds": 0.00388104,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 49,
+      "phase": "caller",
+      "start": 63851053853,
+      "end": 63909273988,
+      "seconds": 0.058220135,
+      "input_bytes": 10446,
+      "input_lines": 71,
+      "remainder_seconds": 0.0008167069999999998
+    },
+    {
+      "call": 50,
+      "phase": "native-parser",
+      "start": 63912834262,
+      "end": 63951136240,
+      "seconds": 0.038301978,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "conversion-cold-inclusive",
+      "start": 63951167611,
+      "end": 63951823891,
+      "seconds": 0.00065628,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-envelope",
+      "start": 63951851706,
+      "end": 63951879760,
+      "seconds": 2.8054e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-ranges",
+      "start": 63951897976,
+      "end": 63951927303,
+      "seconds": 2.9327e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-prose",
+      "start": 63951945048,
+      "end": 63952508917,
+      "seconds": 0.000563869,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-tables",
+      "start": 63952529488,
+      "end": 63952556390,
+      "seconds": 2.6902e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-blocks",
+      "start": 63952574746,
+      "end": 63952677136,
+      "seconds": 0.00010239,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-lists",
+      "start": 63952695872,
+      "end": 63952971760,
+      "seconds": 0.000275888,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-headings",
+      "start": 63952990827,
+      "end": 63953072757,
+      "seconds": 8.193e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "schema-level-two",
+      "start": 63953091123,
+      "end": 63953141351,
+      "seconds": 5.0228e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "construction",
+      "start": 63953159356,
+      "end": 63953194805,
+      "seconds": 3.5449e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "snapshot-store-copy",
+      "start": 63953219303,
+      "end": 63954277517,
+      "seconds": 0.001058214,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 50,
+      "phase": "caller",
+      "start": 63912304559,
+      "end": 63954393974,
+      "seconds": 0.042089415,
+      "input_bytes": 207,
+      "input_lines": 13,
+      "remainder_seconds": 0.0008789059999999987
+    },
+    {
+      "call": 51,
+      "phase": "native-parser",
+      "start": 63958162525,
+      "end": 64017308788,
+      "seconds": 0.059146263,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "conversion-cold-inclusive",
+      "start": 64017370328,
+      "end": 64021710794,
+      "seconds": 0.004340466,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-envelope",
+      "start": 64021739911,
+      "end": 64021772084,
+      "seconds": 3.2173e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-ranges",
+      "start": 64021791211,
+      "end": 64021939079,
+      "seconds": 0.000147868,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-prose",
+      "start": 64021969078,
+      "end": 64025618717,
+      "seconds": 0.003649639,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-tables",
+      "start": 64025650669,
+      "end": 64040776111,
+      "seconds": 0.015125442,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-blocks",
+      "start": 64040805097,
+      "end": 64041538868,
+      "seconds": 0.000733771,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-lists",
+      "start": 64041569047,
+      "end": 64041952615,
+      "seconds": 0.000383568,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-headings",
+      "start": 64041972644,
+      "end": 64042166853,
+      "seconds": 0.000194209,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "schema-level-two",
+      "start": 64042185470,
+      "end": 64042330442,
+      "seconds": 0.000144972,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "construction",
+      "start": 64042359659,
+      "end": 64042409326,
+      "seconds": 4.9667e-05,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "snapshot-store-copy",
+      "start": 64042435347,
+      "end": 64060250114,
+      "seconds": 0.017814767,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 51,
+      "phase": "caller",
+      "start": 63957634855,
+      "end": 64060406589,
+      "seconds": 0.102771734,
+      "input_bytes": 57610,
+      "input_lines": 356,
+      "remainder_seconds": 0.0010089290000000056
+    },
+    {
+      "call": 52,
+      "phase": "native-parser",
+      "start": 64062260325,
+      "end": 64110683061,
+      "seconds": 0.048422736,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 52,
+      "phase": "snapshot-hit-copy",
+      "start": 64110986964,
+      "end": 64128570090,
+      "seconds": 0.017583126,
+      "input_bytes": null,
+      "input_lines": null
+    },
+    {
+      "call": 52,
+      "phase": "caller",
+      "start": 64061757845,
+      "end": 64128636660,
+      "seconds": 0.066878815,
+      "input_bytes": 57610,
+      "input_lines": 356,
+      "remainder_seconds": 0.0008729529999999958
+    }
+  ],
+  "stdout_equal": true,
+  "nonmarker_stderr_equal": true,
+  "same_argv_cwd_clock_revisions": true,
+  "scope": "Timing-only diagnostic with shared debugger observer overhead; no performance target or product acceptance.",
+  "old_59_51_8_expected": false
+}

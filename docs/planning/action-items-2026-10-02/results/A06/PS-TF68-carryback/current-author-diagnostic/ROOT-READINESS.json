@@ -1,0 +1,55 @@
+{
+  "status": "ROOT_STATIC_AND_SYNTAX_QUALIFIED_ONE_PAIR_NOT_YET_RUN",
+  "at": "2026-10-06T23:10:26.256455+00:00",
+  "prepared_manifest_sha256": "683090b4303735731c695c2c55722d62b2cbaf55d0b236e1a4a316fb3d1d0797",
+  "worker_evidence_sha256": "270f0f244330c8eabe25803d8d366e1a003c4f505b1da0e9b64c3f3caa613178",
+  "prepared_files_verified": 28,
+  "reference_hashes_verified": 8,
+  "source_files_verified": 78,
+  "dependency_files_verified": 1914,
+  "full_dependency_inventory_equal": true,
+  "exact_control_source_recovery": true,
+  "exact_author_function_recovery": true,
+  "observer_line_bindings_verified": true,
+  "python_compile_only": [
+    "common.py",
+    "inside.py",
+    "launch.py",
+    "ownership.py",
+    "settlement.py",
+    "run-child.py",
+    "validate-pair.py"
+  ],
+  "powershell_parse_only": {
+    "version": "7.6.5",
+    "files": [
+      "control.ps1",
+      "timing.ps1",
+      "current-SelfTest.ps1",
+      "load-functions.ps1",
+      "author-one-case.ps1",
+      "pair-driver.ps1",
+      "observers.ps1"
+    ],
+    "errors": 0
+  },
+  "native_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "native_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "native_body_sha256": "ed04460a0027db720ccebadf9c610c69d277ab701d1438c27303871edfd3dfd5",
+  "image_identity": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "review": {
+    "same_original_clock_args_fixtures_oracle": true,
+    "cold_conversion_included": true,
+    "generic_calls_separate": true,
+    "qualified_ownership_settlement_reused": true,
+    "network": "none",
+    "product_mounts": false,
+    "bounded_one_pair_only": true,
+    "unchanged_CI_hold": true,
+    "B99_not_released": true
+  },
+  "references": [
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-psbreakpoint?view=powershell-7.6",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_debuggers?view=powershell-7.6"
+  ]
+}

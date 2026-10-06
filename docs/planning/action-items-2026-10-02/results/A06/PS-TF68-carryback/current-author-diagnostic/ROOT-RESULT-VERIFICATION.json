@@ -1,0 +1,123 @@
+{
+  "status": "ONE_CURRENT_CASE_VERIFIED_PASS_NOT_PRODUCT_OR_CI_ACCEPTANCE",
+  "verified_at": "2026-10-06T23:14:00.325885+00:00",
+  "run_id": "ps235-h504-current-author-pair-one",
+  "whole_recorded_seconds": 76.173774,
+  "control_seconds": 11.629018591000005,
+  "timing_seconds": 11.974164447,
+  "observed_difference_seconds": 0.3451458559999949,
+  "counts": {
+    "generic": 4,
+    "parser-call": 52,
+    "structural": 44,
+    "reuse": 8
+  },
+  "phase_totals": {
+    "caller": {
+      "calls": 52,
+      "seconds": 8.013397106
+    },
+    "construction": {
+      "calls": 44,
+      "seconds": 0.005909414
+    },
+    "conversion-cold-inclusive": {
+      "calls": 44,
+      "seconds": 0.46850307799999996
+    },
+    "native-parser": {
+      "calls": 52,
+      "seconds": 3.31306279
+    },
+    "schema-blocks": {
+      "calls": 44,
+      "seconds": 0.171507407
+    },
+    "schema-envelope": {
+      "calls": 44,
+      "seconds": 0.006190838
+    },
+    "schema-headings": {
+      "calls": 44,
+      "seconds": 0.039173963
+    },
+    "schema-level-two": {
+      "calls": 44,
+      "seconds": 0.012677812
+    },
+    "schema-lists": {
+      "calls": 44,
+      "seconds": 0.753772639
+    },
+    "schema-prose": {
+      "calls": 44,
+      "seconds": 1.91473515
+    },
+    "schema-ranges": {
+      "calls": 44,
+      "seconds": 0.010500871
+    },
+    "schema-tables": {
+      "calls": 44,
+      "seconds": 0.592413292
+    },
+    "snapshot-hit-copy": {
+      "calls": 8,
+      "seconds": 0.10735363
+    },
+    "snapshot-store-copy": {
+      "calls": 22,
+      "seconds": 0.329947958
+    }
+  },
+  "caller_remainder_seconds": 0.28764826400000004,
+  "outside_caller_seconds": 3.9607673410000004,
+  "source_and_dependencies_unchanged": true,
+  "equal_stdout_nonmarker_stderr_and_native_exits": true,
+  "cleanup": [
+    {
+      "scope": "setup_cleanup",
+      "successful_adopted_children": 0
+    },
+    {
+      "scope": "terminal_cleanup",
+      "successful_adopted_children": 0
+    },
+    {
+      "scope": "driver",
+      "successful_adopted_children": 2
+    },
+    {
+      "scope": "control",
+      "successful_adopted_children": 0
+    },
+    {
+      "scope": "profile",
+      "successful_adopted_children": 0
+    }
+  ],
+  "container_absence_freshly_verified": true,
+  "output_bytes": 676110,
+  "references": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\manifest.authorized.json": "daa7c5c001d29ca8aacaf2dbc1dea4178946afe11ade292e84347cfd5558228b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-READINESS.json": "0fc1409723fe00ffde85bfacec7f8edede9b54b69c2fbb313fb7209204831d6a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\status.json": "85e6e8dbd715e6e3f78cc638782013486740c4e755871caa16bf8515551091d4",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\result.json": "89eabc84f67b26856a460b6b44bc372634bad55a6c52d72a031e4b2843c3bbd8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\pair-judgment.json": "8ab18f4e6c52378f1312dbb56988fd9220b216103e47bc67731b591209ff5948",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\before.json": "0a43f6b14d101f3678dda6c48613de04d707473d8af38ee4a4ac9bd870f192b8",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\host-source-after.json": "0f5dc300047b775b0c8ff0afb5785343837a9b2ac85ffb73cb6b96e833abf664",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\current-author-pair-after.json": "5fa53e10d0984282b09981238534def53ea0ab846926e6ab75306e634be85183",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\source-before.json": "04b5b7049b01d3dd859554e30d10caadbe95eede9bede15360439d4e043b44ff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-child.json": "249ff7f3813fcf0141fac9ab574bb212d01847a900a051b85b19eb030b6b8c3e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stdout.txt": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\control-stderr.txt": "347a6e420435c03582223fe0e0c8230059ae2f47a02e00655d893baebf20d1d6",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-child.json": "3283eae16519ad7ea9e9be5aadca41ecac5ca27db62fc5c3d2f13014c2dfed0f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stdout.txt": "5eb973991e3b9c787ebbbdc4efda8e499db0534f9ad3e4dbad3c1351ff1cb722",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\output\\profile-stderr.txt": "5b86ad3bce407308b7739cae3cf321195929e026ce97c746087c3c5f7b065f93"
+  },
+  "limits": [
+    "One instrumented pair only; no stable benchmark or full aggregate extrapolation.",
+    "Native main, CI hold, dedicated service requirement and B99 execution hold unchanged.",
+    "No automatic repetition or optimization released."
+  ]
+}

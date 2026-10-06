@@ -1,0 +1,37 @@
+{
+  "qualified_source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate",
+  "unchanged": {
+    "ownership.py": {
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "source_sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad"
+    },
+    "settlement.py": {
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "source_sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b"
+    }
+  },
+  "adapted": {
+    "common.py": {
+      "qualified_sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "prepared_sha256": "d3b16b57999bbb9ac5a87f7725687e4c8c14519fdebda0c561a46ab1398d9709"
+    },
+    "inside.py": {
+      "qualified_sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643",
+      "prepared_sha256": "14365ca93468fb132bf5d942143f57c8468d7a4e6619bd0eea979bba8776102a"
+    },
+    "launch.py": {
+      "qualified_sha256": "eb901f4dc633a53e766f1f6d0b851817ae6e9089378414493dd144396320df75",
+      "prepared_sha256": "364028e9b5c2e1d966f29a03e2523f426181fd96806dff0d0e2e127c5dadfff8"
+    }
+  },
+  "old_failed_cold_pair": "Preserved; only static transport/first-case reference used, not its failed cleanup or timings.",
+  "execution": "not released; no checks or payload executed",
+  "qualified_controls": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\ROOT-RESULT-VERIFICATION.json": "c02b8b68f7cf900cbe1f621ab425a257dba42ce05b3faa8516498f59fb14db76",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cleanup-observation\\runs\\tf68-ed9-cleanup-observation-one\\output\\result.json": "d0de67ad727e8592622ac89a8bfc86c806a8bb6402bdddd0f19d85d34cd12008",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\RECEIPT-POLICY-CHECKS.json": "4d0b3d5724f46dd3435b11f5887620080a64f707c46cd7e7ddc48639dcce563a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\check-receipt-policy.py": "0dc2c6ec680a7dd4e4465ccaf44697724570e57f2c408df7f569b0aa3a11d2ff",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\runs\\ps-carryback-20261006-aggregate-one\\status.json": "0d7247bf426cc48fcac469d5d166f2e45d833be94245896aa2b8ed37a5b95f81",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\runs\\ps-carryback-20261006-aggregate-one\\output\\result.json": "416624a76e18d349e329288af3728a1f228e60ff10be07f4966e349d5662ce7d"
+  }
+}
