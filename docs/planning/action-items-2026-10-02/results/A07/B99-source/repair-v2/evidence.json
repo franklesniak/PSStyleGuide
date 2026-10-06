@@ -1,0 +1,421 @@
+{
+  "status": "constructed_selected_line_boundary_completion_unexecuted_unstaged_frozen",
+  "recorded_at_utc": "2026-10-06T22:20:47.339209+00:00",
+  "worktree": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "base_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "selected": [
+    "P1 C97.0",
+    "P2 D98.4"
+  ],
+  "repair_boundary": "CRLF normalize; refuse remaining CR/NEL/LS/PS before comments/structure; selected C97 completion only",
+  "source": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "candidate_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398,
+      "repair_v1_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "base_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "mode": "100644",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "copy": {
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/frozen-source/.pre-commit-config.yaml",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398
+      }
+    },
+    {
+      "path": ".gitignore",
+      "candidate_sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370,
+      "repair_v1_sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "base_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "mode": "100644",
+      "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+      "copy": {
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/frozen-source/.gitignore",
+        "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+        "bytes": 370
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "candidate_sha256": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+      "bytes": 495899,
+      "repair_v1_sha256": "8564d20595d95698af9ad8c7d116e98893ef980e5cbd422ef5dc82e5667a4da6",
+      "base_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "copy": {
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/frozen-source/.github/workflows/Test-AgentInstructions.ps1",
+        "sha256": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+        "bytes": 495899
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "candidate_sha256": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca",
+      "bytes": 249243,
+      "repair_v1_sha256": "b314360fc43e21c60977e86917ce62a72c6f756b6d64d9e3aade4237f3a05205",
+      "base_sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+      "mode": "100644",
+      "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "copy": {
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/frozen-source/.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "sha256": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca",
+        "bytes": 249243
+      }
+    }
+  ],
+  "actual_changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".gitignore"
+  ],
+  "changed_from_repair_v1": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "permitted_paths": [
+    ".pre-commit-config.yaml",
+    ".gitignore",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "source_preservation": {
+    "baseline_count": 77,
+    "bystanders_count": 73,
+    "bystanders_equal": true,
+    "current_source_sha256": {
+      ".claude/commands/review-loop.md": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+      ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      ".github/copilot-instructions.md": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      ".github/document-metadata-classification.json": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      ".github/instructions/docs.instructions.md": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+      ".github/instructions/yaml.instructions.md": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      ".github/workflows/Check-NpmAudit.mjs": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+      ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+      ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+      ".github/workflows/Initialize-CiToolchain.ps1": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca",
+      ".github/workflows/Test-AgentInstructions.ps1": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+      ".github/workflows/Test-BlankLineExamples.ps1": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      ".github/workflows/Test-CheckoutCredentials.ps1": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      ".github/workflows/Test-CiHelpers.test.mjs": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      ".github/workflows/agent-instructions.yml": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      ".github/workflows/build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      ".github/workflows/copilot-setup-steps.yml": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      ".github/workflows/historical-supply-profile.json": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+      ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      ".github/workflows/markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+      ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      ".github/workflows/package-lock.json": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      ".github/workflows/package.json": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+      ".github/workflows/scripts-README.md": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      ".github/workflows/workflow-policy-contract.json": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      ".vscode/settings.json": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+      "ACKNOWLEDGMENTS.md": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+      "AGENTS.md": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "CLAUDE.md": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+      "CONTRIBUTING.md": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+      "LICENSE": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+      "README.md": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+      "STYLE_GUIDE.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "STYLE_GUIDE_CHAT.md": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "STYLE_GUIDE_FULL.md": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "STYLE_GUIDE_RATIONALE.md": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+      "copilot-instructions.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "docs/P1-SUPPLY-FREEZE-v1.md": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "docs/decisions/0001-accept-in-repository-trust-root.md": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+      "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+      "docs/dependency-maintenance.md": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+      "package-lock.json": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "package.json": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "powershell.instructions.md": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+    }
+  },
+  "index_preservation": {
+    "entries": 77,
+    "all_mode_blob_stage_rows_equal_head": true,
+    "ls_files_stage_z_sha256": "75f9d1df83f84e05deff97269129655e920cb6c753937e1b68740cc549a27454",
+    "ls_tree_r_z_sha256": "a2b1ecaf3d1015c274d257cf5c9adb209a358cec478727487b37644852f5bbc9",
+    "cached_delta_empty": true
+  },
+  "unchanged_helpers": [
+    {
+      "function": "Read-AgentSetupInputContent",
+      "sha256": "af54801cf2b355764ac496f5aef7bd0974a3fac998b9f1a5d075348696964ff5",
+      "bytes": 2472,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Read-BoundedProcessData",
+      "sha256": "cbbd6e10e32d5a81a1bf07217e58fdb5bebf988e5d0240ff3e206f54214ae8dc",
+      "bytes": 4002,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "ConvertFrom-GitPathListData",
+      "sha256": "13b7b8fabd5bf7d1add36d12b8442648be5a533910cba6bb1a2c52f90409b0cc",
+      "bytes": 3035,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Read-GitTrackedPath",
+      "sha256": "b968ae209874826a7aeb6267fbf65c681882f52522618631473b36474ffc1c1d",
+      "bytes": 2513,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Read-GitRevisionText",
+      "sha256": "782cab30fa84b61d6aa2541a4b507d7a5801934a6c5422402d173438992e646b",
+      "bytes": 3151,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Get-GitRegularFileBlobId",
+      "sha256": "1e6ec45d636a1695c6844d418d82c065965716f1ca56f2591c9e9a84eb62c819",
+      "bytes": 3761,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "ConvertFrom-StrictUtf8Data",
+      "sha256": "7384d960a323a5e3ab2418541ced501be7a9fb7d525f51474b937cf015915684",
+      "bytes": 2303,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Get-TrackedCompiledPythonFailure",
+      "sha256": "29f02e5659e3276242bcf2fe454ef27088a3697a6e2f41a4416c2121cb97121e",
+      "bytes": 1569,
+      "raw_equal_repair_v1": true
+    },
+    {
+      "function": "Get-AgentSetupContractFailure",
+      "sha256": "39ebb5b25718c1cf722cce7b1007f410a50cd4f77291735eee7f179a95742562",
+      "bytes": 10111,
+      "raw_equal_repair_v1": true
+    }
+  ],
+  "p2_cli_fixture_raw_equal_repair_v1": true,
+  "other_validator_bytes_equal_repair_v1_except_script_metadata_and_finite_helper": true,
+  "other_selftest_bytes_equal_repair_v1_except_script_metadata_and_setup_test": true,
+  "immutable_repair_v1_files": {
+    "evidence.json": "cd8dd42e62fdfc6005f35d44c1a9577d46b3ec2d7488e6af8c001db5008d2837",
+    "frozen-source/.github/workflows/Test-AgentInstructions.ps1": "8564d20595d95698af9ad8c7d116e98893ef980e5cbd422ef5dc82e5667a4da6",
+    "frozen-source/.github/workflows/Test-AgentInstructions.SelfTest.ps1": "b314360fc43e21c60977e86917ce62a72c6f756b6d64d9e3aade4237f3a05205",
+    "frozen-source/.gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+    "frozen-source/.pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+    "HANDOFF.md": "98212176fa1bd791c244a4e7e798bdbd6844187795a8e882f2db793f54879eb6",
+    "provisional-review/evidence.json": "76473dcf91c5e457f26362eb47c8375da5b9c99b41b17ea0a5f1d070f5568741",
+    "provisional-review/REPORT.md": "547b87406ae0dca3f15b7b65fd4fdad62ddc4243489f7a0059fc82466ff0c5fc",
+    "recovery.patch": "9ddd8c59f4f5a8214fc191f8270fd4d3fc228dec9ad56d811d6739c4222b2b34",
+    "source-release-state.json": "c1a95b6d43a054527eb40aaf962fe3bf979d1465d77c94c0200ad4bac36c03d7"
+  },
+  "references": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/ROOT-DECISION.json",
+      "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961",
+      "bytes": 2588
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/P1-active-hook-structure.md",
+      "sha256": "19479a8682cae822be75237f215546c4b9d1ab74db6ccb2f946955b7422b6514",
+      "bytes": 11060
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/P2-filename-wide-enforcement.md",
+      "sha256": "ab665d9a1774ea9893afadb61233a6d1d43cdcfc6d5b12b4cb87e10389f0efc9",
+      "bytes": 17362
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/evidence.json",
+      "sha256": "ec56ff4e8cf6a0ee44bf0f94bc7ee3354b48ba7235169c4659cd2db6966b5904",
+      "bytes": 11726
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/HANDOFF.md",
+      "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+      "bytes": 4401
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/evidence.json",
+      "sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+      "bytes": 28160
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/source-only.patch",
+      "sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+      "bytes": 17691
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-native-inventory/result.json",
+      "sha256": "e1fa61ca08770b9ff2f07e1264d5ac44ded0206238c85b7c7398633afa886a90",
+      "bytes": 4554
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-native-config/result.json",
+      "sha256": "e49fafcaea9f4f22e90b38e64d56ab0c0778b4e38f35da0f4c269afd11392f38",
+      "bytes": 1481
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-quoted-scalar/result.json",
+      "sha256": "42ea367dedfcf5ba9936d999298f1a140a0158cfffee8d9e28d8c68b9be2aec3",
+      "bytes": 1519
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/STYLE_GUIDE.md",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/powershell.instructions.md",
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/.github/instructions/yaml.instructions.md",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "bytes": 54645
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/HANDOFF.md",
+      "sha256": "98212176fa1bd791c244a4e7e798bdbd6844187795a8e882f2db793f54879eb6",
+      "bytes": 6985
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/evidence.json",
+      "sha256": "cd8dd42e62fdfc6005f35d44c1a9577d46b3ec2d7488e6af8c001db5008d2837",
+      "bytes": 30298
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/recovery.patch",
+      "sha256": "9ddd8c59f4f5a8214fc191f8270fd4d3fc228dec9ad56d811d6739c4222b2b34",
+      "bytes": 42843
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/source-release-state.json",
+      "sha256": "c1a95b6d43a054527eb40aaf962fe3bf979d1465d77c94c0200ad4bac36c03d7",
+      "bytes": 15435
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/provisional-review/REPORT.md",
+      "sha256": "547b87406ae0dca3f15b7b65fd4fdad62ddc4243489f7a0059fc82466ff0c5fc",
+      "bytes": 8083
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/provisional-review/evidence.json",
+      "sha256": "76473dcf91c5e457f26362eb47c8375da5b9c99b41b17ea0a5f1d070f5568741",
+      "bytes": 12902
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-yaml-linebreaks/result.json",
+      "sha256": "ec785be09c7a3beb7a48064dc357b2e1d04346de502b590aca3bfbc060d4254c",
+      "bytes": 2104
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-yaml-linebreaks/bare-CR.yaml",
+      "sha256": "f81ff32378f5b2c3d81804f13a1fcccc93798df47a4e41bb0a7d4132ae7e548d",
+      "bytes": 5404
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-yaml-linebreaks/NEL.yaml",
+      "sha256": "41dc677ebec38a10369f97e774081121f8e0aafab7654441b96c31191c20c854",
+      "bytes": 5405
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-yaml-linebreaks/LS.yaml",
+      "sha256": "8ee4f164777d4d7c786b53b8486d80b5cccdc89ec18e9029389511d4cd0f0407",
+      "bytes": 5406
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-yaml-linebreaks/PS.yaml",
+      "sha256": "569b2a43ff67d468b7ad0dd02bbd0a55c10929068f04a8100443c83c858aa426",
+      "bytes": 5406
+    }
+  ],
+  "recovery_patch": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/recovery.patch",
+    "sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209",
+    "bytes": 44414
+  },
+  "repair_delta": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/repair-v1-to-v2.patch",
+    "sha256": "6963d17d07fd12c566aca56099080b3a7305d6f769b588b63769df534e9b7286",
+    "bytes": 5032
+  },
+  "release_snapshot": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/source-release-state.json",
+    "sha256": "7db5e8a33ac716905c32c7847497b3d2da056aaf3521982c7208cdb2ff799b03",
+    "bytes": 18266
+  },
+  "handoff": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/HANDOFF.md",
+    "sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8",
+    "bytes": 4121
+  },
+  "source_tests_added_unexecuted": [
+    "LF canonical positive",
+    "CRLF canonical positive",
+    "bare CR known-name hidden opener specific line-boundary diagnosis",
+    "NEL known-name hidden opener specific line-boundary diagnosis",
+    "LS known-name hidden opener specific line-boundary diagnosis",
+    "PS known-name hidden opener specific line-boundary diagnosis",
+    "Prior existing name removal fixture assertion"
+  ],
+  "native_feedback_reused_scope": "Root native data-only four line-break maskings; no candidate/hook execution or acceptance",
+  "execution": {
+    "candidate_tests": false,
+    "parser_PSSA": false,
+    "candidate_imports": false,
+    "dependencies_executed": false,
+    "native_profile_bound": false,
+    "staging_commit_publication": false
+  },
+  "pending": "Genuine PS235 acceptance + actual-main semantic integration, all selected final-current execution/qualification/admission/audit/quality/review/CI gates",
+  "transfers_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  }
+}

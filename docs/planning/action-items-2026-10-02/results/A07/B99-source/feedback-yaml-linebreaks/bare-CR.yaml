@@ -1,0 +1,166 @@
+# Pre-commit configuration for PSStyleGuide.
+#
+# Python hooks use one local system environment installed from the hashed lock in
+# requirements-dev.txt. The remote actionlint hook builds its exact Git revision
+# with the checksummed Go module closure. Repository hooks run without resolving
+# an additional dependency environment.
+# Install the lock, then run the Node bootstrap after a fresh clone.
+repos:
+  - repo: local
+    hooks:
+      - id: check-json
+        name: check json
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module pre_commit_hooks.check_json
+        language: system
+        types:
+          - json
+        files: >-
+          (?x)^(
+            package(-lock)?\.json|
+            \.github/workflows/[^/]+\.json|
+            \.github/document-metadata-classification\.json
+          )$
+      - id: check-yaml
+        name: check yaml
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module pre_commit_hooks.check_yaml
+        language: system
+        types:
+          - yaml
+        files: ^.*\.ya?ml$
+      - id: end-of-file-fixer
+        name: fix end of files
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module pre_commit_hooks.end_of_file_fixer
+        language: system
+        types:
+          - text
+        stages:
+          - pre-commit
+          - pre-push
+          - manual
+        minimum_pre_commit_version: "3.2.0"
+        files: >-
+          (?x)^(
+            \.codex/config\.toml|
+            .*\.(md|mdc)|
+            package(-lock)?\.json|
+            \.pre-commit-config\.yaml|
+            \.github/actionlint\.yaml|
+            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|
+            \.github/document-metadata-classification\.json
+          )$
+      - id: trailing-whitespace
+        name: trim trailing whitespace
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module pre_commit_hooks.trailing_whitespace_fixer
+        language: system
+        types:
+          - text
+        stages:
+          - pre-commit
+          - pre-push
+          - manual
+        minimum_pre_commit_version: "3.2.0"
+        args:
+          - --markdown-linebreak-ext=md,mdc
+        files: >-
+          (?x)^(
+            \.codex/config\.toml|
+            .*\.(md|mdc)|
+            package(-lock)?\.json|
+            \.pre-commit-config\.yaml|
+            \.github/actionlint\.yaml|
+            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|
+            \.github/document-metadata-classification\.json
+          )$
+      - id: yamllint
+        name: yamllint
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module yamllint
+        language: system
+        types:
+          - file
+          - yaml
+        args:
+          - --config-data
+          - |
+            extends: default
+            rules:
+              line-length:
+                level: warning
+              truthy:
+                check-keys: false
+        files: ^.*\.ya?ml$
+
+  - repo: https://github.com/rhysd/actionlint
+    # This exact upstream commit fixes the v1.7.12 ShellCheck stdin deadlock.
+    rev: "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"
+    hooks:
+      - id: actionlint
+        files: ^\.github/workflows/.*\.ya?ml$
+
+  - repo: local
+    hooks:
+      - id: check-dependabot
+        name: Validate Dependabot Config (v2)
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module check_jsonschema
+        language: system
+        args:
+          - --builtin-schema
+          - vendor.dependabot
+        types:
+          - yaml
+        files: ^\.github/dependabot\.yml$
+      - id: check-github-workflows
+        name: Validate GitHub Workflows
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Invoke-LockedPythonHook.ps1
+          -Module check_jsonschema
+        language: system
+        args:
+          - --builtin-schema
+          - vendor.github-workflows
+        types:
+          - yaml
+        files: ^\.github/workflows/.*\.ya?ml$
+      - id: staged-markdown
+        name: staged Markdown
+        entry: node .github/workflows/lint-staged-markdown.mjs
+        language: system
+        pass_filenames: false
+        files: ^(\.github/workflows/lint-staged-markdown\.mjs|.*\.(md|mdc))$
+      - id: workflow-policy-contract
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive
+          -WorkingDirectory .github/workflows -Command
+          node Validate-WorkflowPolicy.mjs
+          build.yml markdownlint.yml
+        language: system
+        pass_filenames: false
+        always_run: true
+        # comment        name: "
+      - id: agent-instruction-contract
+        name: agent instruction contract and mutation tests
+        entry: >-
+          pwsh -NoLogo -NoProfile -NonInteractive -File
+          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch
+        language: system
+        pass_filenames: false
+        always_run: true
+        #"

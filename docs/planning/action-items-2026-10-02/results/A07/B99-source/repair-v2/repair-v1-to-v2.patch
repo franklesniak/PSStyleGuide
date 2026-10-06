@@ -1,0 +1,101 @@
+--- repair-v1/.github/workflows/Test-AgentInstructions.ps1
++++ repair-v2/.github/workflows/Test-AgentInstructions.ps1
+@@ -23,7 +23,7 @@
+ #
+ # .NOTES
+ # Positional parameters are not supported.
+-# Version: 1.19.20261006.1
++# Version: 1.19.20261006.2
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([string])]
+@@ -566,6 +566,7 @@
+     # Recognizes the reviewed root, repository groups and hooks sequences only.
+     # Unknown or duplicate envelope fields and alternate YAML forms fail closed.
+     # Hook text in comments or scalar containers cannot become an active hook.
++    # LF and CRLF are admitted; alternate YAML line breaks fail before parsing.
+     # This finite reader is not a general YAML parser.
+     #
+     # .PARAMETER Content
+@@ -587,11 +588,18 @@
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.0.20261006.0
++    # Version: 1.0.20261006.1
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([pscustomobject])]
+     param([Parameter(Mandatory)][string] $Content)
+ 
++    $strNormalizedContent = $Content.Replace("`r`n", "`n")
++    if ([regex]::IsMatch($strNormalizedContent, '[\r\u0085\u2028\u2029]')) {
++        return [pscustomobject]@{
++            Failure = 'Pre-commit accepts only LF or CRLF line endings in the reviewed finite active-hook envelope.'
++            HookBodies = @{}
++        }
++    }
+     $arrRepositoryNames = @('local', 'https://github.com/rhysd/actionlint', 'local')
+     $hashtableHookGroups = @{
+         'check-json' = 0
+@@ -619,7 +627,7 @@
+     $strBodyForm = ''
+     $strBodyField = ''
+     $strFailure = $null
+-    foreach ($strLine in ($Content.Replace("`r`n", "`n") -split "`n")) {
++    foreach ($strLine in ($strNormalizedContent -split "`n")) {
+         if ($strLine.Contains("`t", [StringComparison]::Ordinal)) {
+             $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+             break
+--- repair-v1/.github/workflows/Test-AgentInstructions.SelfTest.ps1
++++ repair-v2/.github/workflows/Test-AgentInstructions.SelfTest.ps1
+@@ -33,7 +33,7 @@
+ # None. The script throws when a self-test fails.
+ #
+ # .NOTES
+-# Version: 1.9.20261006.1
++# Version: 1.9.20261006.2
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([void])]
+@@ -2570,7 +2570,7 @@
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.1.20261006.1
++    # Version: 1.1.20261006.2
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([void])]
+     param([Parameter(Mandatory)][string] $RepositoryRootPath)
+@@ -2643,6 +2643,14 @@
+     & $scriptblockReject 'extra hook group' '.pre-commit-config.yaml' `
+         ($hashtableContent['.pre-commit-config.yaml'] + "`n  - repo: local`n    hooks: []`n") 'two local groups'
+     $strConfig = $hashtableContent['.pre-commit-config.yaml'].Replace("`r`n", "`n")
++    foreach ($strCanonicalConfig in @($strConfig, $strConfig.Replace("`n", "`r`n"))) {
++        $hashtableCanonical = $hashtableContent.Clone()
++        $hashtableCanonical['.pre-commit-config.yaml'] = $strCanonicalConfig
++        $arrCanonicalFailures = @(Get-AgentSetupContractFailure -Content $hashtableCanonical)
++        if ($arrCanonicalFailures.Count -ne 0) {
++            throw "Canonical LF or CRLF configuration was rejected: $($arrCanonicalFailures -join '; ')"
++        }
++    }
+     $objHookContext = Get-AgentPreCommitHookContext -Content $strConfig
+     if ($null -ne $objHookContext.Failure -or $objHookContext.HookBodies.Count -ne 11 -or
+         -not $objHookContext.HookBodies.ContainsKey('agent-instruction-contract')) {
+@@ -2671,6 +2679,17 @@
+     # Move the prior hook's existing name, so duplicate-key rejection cannot
+     # substitute for rejecting a multiline quoted scalar in a known field.
+     $strWithoutPriorName = $strConfig.Replace('        name: workflow policy contract' + "`n", '')
++    if ($strWithoutPriorName -ceq $strConfig) {
++        throw 'Known prior-name mutation fixture did not remove the existing field.'
++    }
++    foreach ($intSeparator in @(0x000D, 0x0085, 0x2028, 0x2029)) {
++        $strSeparator = [string][char]$intSeparator
++        & $scriptblockReject ('hidden known-name opener after YAML line break U+' + $intSeparator.ToString('X4')) `
++            '.pre-commit-config.yaml' `
++            ($strWithoutPriorName.Replace($strInstructionHook, '        # comment' + $strSeparator +
++                    '        name: "' + "`n" + $strInstructionHook + '        #"' + "`n")) `
++            'only LF or CRLF line endings'
++    }
+     foreach ($arrScalarForm in @(
+             ,@('        name: "', '        #"')
+             ,@("        name: '", "        #'")

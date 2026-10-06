@@ -1,0 +1,294 @@
+{
+  "status": "PROVISIONAL_REPAIR_SOURCE_ONE_RESIDUAL_SAME_P1_FINDING_NO_ACCEPTANCE",
+  "recorded_at_utc": "2026-10-06T22:16:24.517896+00:00",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "base_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
+      "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961",
+      "bytes": 2588
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P1-active-hook-structure.md",
+      "sha256": "19479a8682cae822be75237f215546c4b9d1ab74db6ccb2f946955b7422b6514",
+      "bytes": 11060
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P2-filename-wide-enforcement.md",
+      "sha256": "ab665d9a1774ea9893afadb61233a6d1d43cdcfc6d5b12b4cb87e10389f0efc9",
+      "bytes": 17362
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\evidence.json",
+      "sha256": "ec56ff4e8cf6a0ee44bf0f94bc7ee3354b48ba7235169c4659cd2db6966b5904",
+      "bytes": 11726
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\HANDOFF.md",
+      "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+      "bytes": 4401
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\evidence.json",
+      "sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+      "bytes": 28160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-only.patch",
+      "sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+      "bytes": 17691
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-native-inventory\\result.json",
+      "sha256": "e1fa61ca08770b9ff2f07e1264d5ac44ded0206238c85b7c7398633afa886a90",
+      "bytes": 4554
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-native-config\\result.json",
+      "sha256": "e49fafcaea9f4f22e90b38e64d56ab0c0778b4e38f35da0f4c269afd11392f38",
+      "bytes": 1481
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-quoted-scalar\\result.json",
+      "sha256": "42ea367dedfcf5ba9936d999298f1a140a0158cfffee8d9e28d8c68b9be2aec3",
+      "bytes": 1519
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\STYLE_GUIDE.md",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\powershell.instructions.md",
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\.github\\instructions\\yaml.instructions.md",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "bytes": 54645
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\recovery.patch",
+      "sha256": "9ddd8c59f4f5a8214fc191f8270fd4d3fc228dec9ad56d811d6739c4222b2b34",
+      "bytes": 42843
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\source-release-state.json",
+      "sha256": "c1a95b6d43a054527eb40aaf962fe3bf979d1465d77c94c0200ad4bac36c03d7",
+      "bytes": 15435
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\HANDOFF.md",
+      "sha256": "98212176fa1bd791c244a4e7e798bdbd6844187795a8e882f2db793f54879eb6",
+      "bytes": 6985
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\evidence.json",
+      "sha256": "cd8dd42e62fdfc6005f35d44c1a9577d46b3ec2d7488e6af8c001db5008d2837",
+      "bytes": 30298
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\frozen-source\\.pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\frozen-source\\.gitignore",
+      "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\frozen-source\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "8564d20595d95698af9ad8c7d116e98893ef980e5cbd422ef5dc82e5667a4da6",
+      "bytes": 495496
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\frozen-source\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "b314360fc43e21c60977e86917ce62a72c6f756b6d64d9e3aade4237f3a05205",
+      "bytes": 248102
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\result.json",
+      "sha256": "ec785be09c7a3beb7a48064dc357b2e1d04346de502b590aca3bfbc060d4254c",
+      "bytes": 2104
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\bare-CR.yaml",
+      "sha256": "f81ff32378f5b2c3d81804f13a1fcccc93798df47a4e41bb0a7d4132ae7e548d",
+      "bytes": 5404
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\NEL.yaml",
+      "sha256": "41dc677ebec38a10369f97e774081121f8e0aafab7654441b96c31191c20c854",
+      "bytes": 5405
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\LS.yaml",
+      "sha256": "8ee4f164777d4d7c786b53b8486d80b5cccdc89ec18e9029389511d4cd0f0407",
+      "bytes": 5406
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\PS.yaml",
+      "sha256": "569b2a43ff67d468b7ad0dd02bbd0a55c10929068f04a8100443c83c858aa426",
+      "bytes": 5406
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit\\yaml.py",
+      "sha256": "eb5b07b011786463ee8105171a287c2fa6b9813ce0b03fd7f706226c394de7ad",
+      "bytes": 561
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\yaml\\scanner.py",
+      "sha256": "60433788b652690c17710460da5d91e0c753d3318fd85f5e1e42862a71f25906",
+      "bytes": 51279
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\yaml\\reader.py",
+      "sha256": "d1d9b38ab3a20c6e17a38d519ee412ecaf6b918df18c78956ac7c330d4ea08dc",
+      "bytes": 6794
+    }
+  ],
+  "verification": {
+    "source_files": 77,
+    "bystanders_matching_B981": 73,
+    "configuration_raw_equal_B981": true,
+    "actual_changed_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".gitignore"
+    ],
+    "status": " M .github/workflows/Test-AgentInstructions.SelfTest.ps1\n M .github/workflows/Test-AgentInstructions.ps1\n M .gitignore\n",
+    "index_raw_sha256": "20abf18aaf81715036f13a3660ec6ba23c9079cff9a479328e1555bc67b6b020",
+    "all_index_mode_blob_rows_match_B981": true,
+    "frozen_sources_equal_worktree": true,
+    "unchanged_helpers": [
+      {
+        "function": "Read-AgentSetupInputContent",
+        "sha256": "403d9f4e8c5bfe3d4af5045067df7604af7ae9fafa2737482be3d814b7ac3d39",
+        "bytes": 2474,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "Read-BoundedProcessData",
+        "sha256": "b87d1a33d302f0550f6c8fe1ed2f5037ead3d6a6666c66873b39ded91ca33a19",
+        "bytes": 4004,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "ConvertFrom-GitPathListData",
+        "sha256": "4f3265a0626249e9ecf69658882af0fc6da587b8dcc054c71e04f86c552eb018",
+        "bytes": 3037,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "Read-GitTrackedPath",
+        "sha256": "17ed6b45bf9cedd30e0df0768a2ccbd16d1ee2d825dd48b8b68b6dd4eadfb862",
+        "bytes": 2515,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "Read-GitRevisionText",
+        "sha256": "f0ea1d2d5a7a28d1bfe98e7f65f44916a7290135bf6a208644e6c5e1ba32bc10",
+        "bytes": 3153,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "Get-GitRegularFileBlobId",
+        "sha256": "efa2393c2ecd3006ac85d9a0c88198a0d7a62a6f58136aabf07778cd246b6f5a",
+        "bytes": 3763,
+        "raw_equal_to_base": true
+      },
+      {
+        "function": "ConvertFrom-StrictUtf8Data",
+        "sha256": "273f9c65a8225995e6e4479debe45b735b44463f629296e089bff99fd1f6cf08",
+        "raw_equal_to_base": true
+      }
+    ],
+    "all_key_reference_hashes_match": true
+  },
+  "findings": [
+    {
+      "id": "B99-PROVISIONAL-1",
+      "classification": "existing P1 residual; P2 severity",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "line_boundary": 622,
+      "comment_skip_lines": [
+        638,
+        643
+      ],
+      "description": "LF-only finite tokenization permits YAML line breaks inside discarded comments to conceal a multiline quoted known-field opener",
+      "characters": [
+        "U+000D",
+        "U+0085",
+        "U+2028",
+        "U+2029"
+      ],
+      "safe_readers_reject_characters": false,
+      "finite_acceptance_basis": "source tracing only; repaired candidate not executed",
+      "native_data_basis": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\result.json",
+      "native_cases": [
+        {
+          "separator": "bare-CR",
+          "codepoint": "U+000D",
+          "native_schema_accepted": true,
+          "active_hook_count": 10,
+          "guard_is_inactive_text": true,
+          "sha256": "f81ff32378f5b2c3d81804f13a1fcccc93798df47a4e41bb0a7d4132ae7e548d"
+        },
+        {
+          "separator": "NEL",
+          "codepoint": "U+0085",
+          "native_schema_accepted": true,
+          "active_hook_count": 10,
+          "guard_is_inactive_text": true,
+          "sha256": "41dc677ebec38a10369f97e774081121f8e0aafab7654441b96c31191c20c854"
+        },
+        {
+          "separator": "LS",
+          "codepoint": "U+2028",
+          "native_schema_accepted": true,
+          "active_hook_count": 10,
+          "guard_is_inactive_text": true,
+          "sha256": "8ee4f164777d4d7c786b53b8486d80b5cccdc89ec18e9029389511d4cd0f0407"
+        },
+        {
+          "separator": "PS",
+          "codepoint": "U+2029",
+          "native_schema_accepted": true,
+          "active_hook_count": 10,
+          "guard_is_inactive_text": true,
+          "sha256": "569b2a43ff67d468b7ad0dd02bbd0a55c10929068f04a8100443c83c858aa426"
+        }
+      ],
+      "selected_option_revisit": "finish same P1 C97.0 finite-grammar repair; no new scope released"
+    }
+  ],
+  "P2_source_assessment": "complete target inventory guard is correctly placed before classification-only return; no further material source finding; qualification remains unexecuted",
+  "execution": {
+    "candidate": false,
+    "parser": false,
+    "tests": false,
+    "hook": false,
+    "imports": false,
+    "installs": false,
+    "native_polling": false,
+    "git_mutations": false,
+    "native_reproduction_by_this_reader": false
+  },
+  "holds": [
+    "same-P1 repair and relevant qualification",
+    "genuine PS235 acceptance",
+    "semantic actual-main integration",
+    "final input tests/admission/audit/independent quality/reviews/CI",
+    "paired and service acceptance"
+  ],
+  "report_sha256": "547b87406ae0dca3f15b7b65fd4fdad62ddc4243489f7a0059fc82466ff0c5fc"
+}

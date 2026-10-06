@@ -1,0 +1,42 @@
+{
+  "status": "PRIVATE_NATIVE_QUOTED_SCALAR_HIDING_REPRODUCED",
+  "recorded_at": "2026-10-06T22:04:07.411676+00:00",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "pre_commit": "4.6.2",
+  "clientlib_sha256": "074619194fa0b2a7d4d7599f936b19abd8185340747c2d8343070ba8599fb85d",
+  "original_ids": [
+    "check-json",
+    "check-yaml",
+    "end-of-file-fixer",
+    "trailing-whitespace",
+    "yamllint",
+    "actionlint",
+    "check-dependabot",
+    "check-github-workflows",
+    "staged-markdown",
+    "workflow-policy-contract",
+    "agent-instruction-contract"
+  ],
+  "masked_ids": [
+    "check-json",
+    "check-yaml",
+    "end-of-file-fixer",
+    "trailing-whitespace",
+    "yamllint",
+    "actionlint",
+    "check-dependabot",
+    "check-github-workflows",
+    "staged-markdown",
+    "workflow-policy-contract"
+  ],
+  "change": "Eight-space description: opening double quote before agent hook; eight-space comment-looking closing quote line after hook.",
+  "both_pass_native_schema": true,
+  "candidate_validator_executed": false,
+  "hooks_executed": false,
+  "scope": "Native configuration-data characterization only. Same P1 ambiguity class; no candidate acceptance or validation.",
+  "files": {
+    "original.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+    "masked.yaml": "806b63c05761941298a6ea2fad25416f13dabb0fd42e2bffd71b4d865a14b7ec",
+    "probe.py": "72c90ade76f25b817155f58590d56e8e9495d7e0a83c9582249636dffcd697c9"
+  }
+}

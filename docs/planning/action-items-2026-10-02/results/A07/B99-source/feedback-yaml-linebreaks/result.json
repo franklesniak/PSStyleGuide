@@ -1,0 +1,48 @@
+{
+  "status": "PRIVATE_NATIVE_YAML_LINEBREAK_HIDING_REPRODUCED",
+  "recorded_at": "2026-10-06T22:14:06.109992+00:00",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "pre_commit": "4.6.2",
+  "cases": [
+    {
+      "separator": "bare-CR",
+      "codepoint": "U+000D",
+      "native_schema_accepted": true,
+      "active_hook_count": 10,
+      "guard_is_inactive_text": true,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\bare-CR.yaml",
+      "sha256": "f81ff32378f5b2c3d81804f13a1fcccc93798df47a4e41bb0a7d4132ae7e548d"
+    },
+    {
+      "separator": "NEL",
+      "codepoint": "U+0085",
+      "native_schema_accepted": true,
+      "active_hook_count": 10,
+      "guard_is_inactive_text": true,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\NEL.yaml",
+      "sha256": "41dc677ebec38a10369f97e774081121f8e0aafab7654441b96c31191c20c854"
+    },
+    {
+      "separator": "LS",
+      "codepoint": "U+2028",
+      "native_schema_accepted": true,
+      "active_hook_count": 10,
+      "guard_is_inactive_text": true,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\LS.yaml",
+      "sha256": "8ee4f164777d4d7c786b53b8486d80b5cccdc89ec18e9029389511d4cd0f0407"
+    },
+    {
+      "separator": "PS",
+      "codepoint": "U+2029",
+      "native_schema_accepted": true,
+      "active_hook_count": 10,
+      "guard_is_inactive_text": true,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\PS.yaml",
+      "sha256": "569b2a43ff67d468b7ad0dd02bbd0a55c10929068f04a8100443c83c858aa426"
+    }
+  ],
+  "source_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+  "candidate_executed": false,
+  "hooks_executed": false,
+  "scope": "Same P1 finite-reader line-boundary mismatch; native data loader only; no repaired candidate execution or acceptance."
+}

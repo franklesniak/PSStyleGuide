@@ -1,0 +1,47 @@
+{
+  "status": "accepted_current_head_result_pending",
+  "intent_at": "2026-10-06T22:10:54.067571+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+  "round": 1,
+  "first_request_at": "2026-10-06T20:09:39.767792+00:00",
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "channel_attempt": 3,
+  "channel_attempt_limit": 3,
+  "selected_effort": "Balanced",
+  "channel": "GitHub Reviewers Re-request Copilot review",
+  "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-baseline.json",
+  "baseline_sha256": "a66eab4562f3777f03100538d504dee65041ef72be18483b95853ee1bbbac42d",
+  "reason": "Recover terminal cancelled CI after the documented rerun endpoint refused; not to replace Lite alone.",
+  "old_cancelled_run": 37524396256,
+  "old_review": 5434209468,
+  "codex_clean_result_reused": 6024708462,
+  "ui_request_issued": true,
+  "observed_result_effort": null,
+  "next_attempt_not_before": "2026-10-06T23:10:58+00:00",
+  "counter_limit_not_extended": true,
+  "ambiguity_rule": "After clicking once, reconcile full authenticated native surfaces. Never repeat an ambiguous UI action.",
+  "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-Copilot-recovery-three-progress-2215.json",
+  "native_readback_sha256": "fb44474e0d18dcaf38a3869a13f3ef1738745be5868a11723ac8f4580eda24c5",
+  "confirmed_request_events": [
+    {
+      "id": 32641329434,
+      "created_at": "2026-10-06T22:10:58Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472
+    }
+  ],
+  "confirmed_runs": [
+    {
+      "id": 37538942393,
+      "created_at": "2026-10-06T22:11:08Z",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1
+    }
+  ],
+  "accepted": true,
+  "recorded_at": "2026-10-06T22:13:36.982738+00:00",
+  "confirmed_at": "2026-10-06T22:10:58Z"
+}

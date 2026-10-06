@@ -1,0 +1,223 @@
+{
+  "status": "PROVISIONAL_SOURCE_ONLY_PASS_NO_MATERIAL_DELTA_FINDINGS",
+  "recorded_at_utc": "2026-10-06T22:22:38.630219+00:00",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
+      "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961",
+      "bytes": 2588
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P1-active-hook-structure.md",
+      "sha256": "19479a8682cae822be75237f215546c4b9d1ab74db6ccb2f946955b7422b6514",
+      "bytes": 11060
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P2-filename-wide-enforcement.md",
+      "sha256": "ab665d9a1774ea9893afadb61233a6d1d43cdcfc6d5b12b4cb87e10389f0efc9",
+      "bytes": 17362
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\evidence.json",
+      "sha256": "ec56ff4e8cf6a0ee44bf0f94bc7ee3354b48ba7235169c4659cd2db6966b5904",
+      "bytes": 11726
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\HANDOFF.md",
+      "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+      "bytes": 4401
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\evidence.json",
+      "sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+      "bytes": 28160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-only.patch",
+      "sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+      "bytes": 17691
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-native-inventory\\result.json",
+      "sha256": "e1fa61ca08770b9ff2f07e1264d5ac44ded0206238c85b7c7398633afa886a90",
+      "bytes": 4554
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-native-config\\result.json",
+      "sha256": "e49fafcaea9f4f22e90b38e64d56ab0c0778b4e38f35da0f4c269afd11392f38",
+      "bytes": 1481
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-quoted-scalar\\result.json",
+      "sha256": "42ea367dedfcf5ba9936d999298f1a140a0158cfffee8d9e28d8c68b9be2aec3",
+      "bytes": 1519
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\STYLE_GUIDE.md",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\powershell.instructions.md",
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide\\.github\\instructions\\yaml.instructions.md",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "bytes": 54645
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\HANDOFF.md",
+      "sha256": "98212176fa1bd791c244a4e7e798bdbd6844187795a8e882f2db793f54879eb6",
+      "bytes": 6985
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\evidence.json",
+      "sha256": "cd8dd42e62fdfc6005f35d44c1a9577d46b3ec2d7488e6af8c001db5008d2837",
+      "bytes": 30298
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\recovery.patch",
+      "sha256": "9ddd8c59f4f5a8214fc191f8270fd4d3fc228dec9ad56d811d6739c4222b2b34",
+      "bytes": 42843
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\source-release-state.json",
+      "sha256": "c1a95b6d43a054527eb40aaf962fe3bf979d1465d77c94c0200ad4bac36c03d7",
+      "bytes": 15435
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\provisional-review\\REPORT.md",
+      "sha256": "547b87406ae0dca3f15b7b65fd4fdad62ddc4243489f7a0059fc82466ff0c5fc",
+      "bytes": 8083
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\provisional-review\\evidence.json",
+      "sha256": "76473dcf91c5e457f26362eb47c8375da5b9c99b41b17ea0a5f1d070f5568741",
+      "bytes": 12902
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\result.json",
+      "sha256": "ec785be09c7a3beb7a48064dc357b2e1d04346de502b590aca3bfbc060d4254c",
+      "bytes": 2104
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\bare-CR.yaml",
+      "sha256": "f81ff32378f5b2c3d81804f13a1fcccc93798df47a4e41bb0a7d4132ae7e548d",
+      "bytes": 5404
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\NEL.yaml",
+      "sha256": "41dc677ebec38a10369f97e774081121f8e0aafab7654441b96c31191c20c854",
+      "bytes": 5405
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\LS.yaml",
+      "sha256": "8ee4f164777d4d7c786b53b8486d80b5cccdc89ec18e9029389511d4cd0f0407",
+      "bytes": 5406
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\PS.yaml",
+      "sha256": "569b2a43ff67d468b7ad0dd02bbd0a55c10929068f04a8100443c83c858aa426",
+      "bytes": 5406
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\recovery.patch",
+      "sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209",
+      "bytes": 44414
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\repair-v1-to-v2.patch",
+      "sha256": "6963d17d07fd12c566aca56099080b3a7305d6f769b588b63769df534e9b7286",
+      "bytes": 5032
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\source-release-state.json",
+      "sha256": "7db5e8a33ac716905c32c7847497b3d2da056aaf3521982c7208cdb2ff799b03",
+      "bytes": 18266
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\HANDOFF.md",
+      "sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8",
+      "bytes": 4121
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\evidence.json",
+      "sha256": "60ea1f5cac05c40002b8c465c2d6bc56ececb610379a788c5dfc2ace486b7f0b",
+      "bytes": 24303
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\frozen-source\\.pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\frozen-source\\.gitignore",
+      "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\frozen-source\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+      "bytes": 495899
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\frozen-source\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca",
+      "bytes": 249243
+    }
+  ],
+  "findings": [],
+  "prior_finding_disposition": {
+    "P1_line_break_source_gap": "addressed by early explicit refusal in inspected source; executed qualification pending",
+    "P1_other_regions": "reuse hash-bound v1 review of unchanged code",
+    "P2": "raw unchanged from v1; no further source finding; qualification remains pending"
+  },
+  "verification": {
+    "source_hashes_checked": 77,
+    "bystanders_rebound_by_v1_catalog": 73,
+    "frozen_current_pairs": 4,
+    "changed_from_v1": [
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "outside_two_functions_and_script_metadata_equal_v1": true,
+    "P2_predicate_and_CLI_fixture_equal_v1": true,
+    "index_raw_sha256_unchanged": "20abf18aaf81715036f13a3660ec6ba23c9079cff9a479328e1555bc67b6b020",
+    "Git_or_native_commands": false
+  },
+  "source_locations": {
+    "$strNormalizedContent =": 596,
+    "foreach ($strLine in ($strNormalizedContent": 630,
+    "if ($strLine -cmatch": 646,
+    "$arrCompiledPythonFailures =": 7974,
+    "foreach ($strCanonicalConfig": 2646,
+    "if ($strWithoutPriorName -ceq": 2682,
+    "foreach ($intSeparator": 2685
+  },
+  "execution": {
+    "candidate": false,
+    "parser": false,
+    "tests": false,
+    "native_probes": false,
+    "imports": false,
+    "Git": false,
+    "native_polling": false
+  },
+  "holds": [
+    "genuine PS235 acceptance",
+    "actual-main semantic integration",
+    "final current native/candidate qualification",
+    "admission/audit/independent quality/reviews/CI",
+    "paired/service acceptance"
+  ],
+  "report_sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835"
+}

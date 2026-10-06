@@ -1,5 +1,5 @@
 {
-  "status": "repair_v2_provisional_source_pass_integration_and_qualification_held",
+  "status": "selected_two_findings_local_source_repair_released",
   "created_at": "2026-10-06T21:24:16.646475+00:00",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide",
   "branch": "codex/no-tracked-compiled-python",
@@ -27,7 +27,7 @@
     "A07": 6,
     "cap": 12
   },
-  "next_action": "Retain frozen source. After genuine PS235 acceptance, integrate semantically onto actual accepted main; then run final-input qualification, admission, audit and normal review/CI lifecycle.",
+  "next_action": "One author implements P1 C97.0 plus P2 D98.4 in allowed source only; return frozen versioned patch/evidence for root review. No candidate tests, Git staging/commit/publication, dependency execution or accepted-main substitution.",
   "branch_command_exit": 0,
   "observed_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
   "observed_branch": "codex/no-tracked-compiled-python",
@@ -111,24 +111,24 @@
     "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
     "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
   },
-  "updated_at": "2026-10-06T22:27:34.738268+00:00",
-  "source_writer_stopped": true,
+  "updated_at": "2026-10-06T21:55:38.065232+00:00",
+  "source_writer_stopped": false,
   "candidate_sha256": {
-    ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
+    ".github/workflows/Test-AgentInstructions.ps1": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
     ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
-    ".github/workflows/Test-AgentInstructions.ps1": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
-    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca"
+    ".pre-commit-config.yaml": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b"
   },
   "bystanders_unchanged": 73,
   "source_index_unchanged": true,
-  "handoff": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/HANDOFF.md",
-  "handoff_sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8",
-  "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\evidence.json",
-  "evidence_sha256": "60ea1f5cac05c40002b8c465c2d6bc56ececb610379a788c5dfc2ace486b7f0b",
-  "recovery_patch": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/recovery.patch",
-  "recovery_patch_sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209",
-  "recovery_source_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\frozen-source",
-  "release_state_archive": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/source-release-state.json",
+  "handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\HANDOFF.md",
+  "handoff_sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+  "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\evidence.json",
+  "evidence_sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+  "recovery_patch": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-only.patch",
+  "recovery_patch_sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+  "recovery_source_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source",
+  "release_state_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-release-state.json",
   "root_read_all_four_diffs": true,
   "provisional_source_review": {
     "status": "PROVISIONAL_SOURCE_REVIEW_TWO_MATERIAL_CONCERNS_NO_ACCEPTANCE",
@@ -159,7 +159,7 @@
         "text": "    description: |\n",
         "all_existing_B99_lines_unchanged": true
       },
-      "status": "source_repair_independently_reviewed_runtime_qualification_pending",
+      "status": "validated_selected_repair_released_not_implemented",
       "native_probe_executed": true,
       "supplemental_feedback": {
         "same_finding": true,
@@ -169,14 +169,6 @@
         "actual_hooks_after": 10,
         "candidate_executed": false,
         "disposition": "Strengthen already-selected finite grammar to reject ambiguous scalar/flow forms across preceding hook bodies; include exact case and nonduplicate known-field variants."
-      },
-      "linebreak_feedback": {
-        "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-yaml-linebreaks\\result.json",
-        "sha256": "ec785be09c7a3beb7a48064dc357b2e1d04346de502b590aca3bfbc060d4254c",
-        "native_valid_cases": 4,
-        "actual_hooks": 10,
-        "candidate_executed": false,
-        "selected_boundary": "C97 finite supported format LF/CRLF only; no unsupported line separator may bypass comment interpretation."
       }
     },
     {
@@ -203,74 +195,12 @@
         86
       ],
       "D98_inventory_contract_line": 7,
-      "status": "source_repair_independently_reviewed_runtime_qualification_pending",
+      "status": "validated_selected_repair_released_not_implemented",
       "native_probe_executed": true
     }
   ],
   "decision_worker": "a06_conversion_cold_packet",
-  "repair_released": false,
+  "repair_released": true,
   "finding_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
-  "finding_decision_sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961",
-  "source_history": [
-    {
-      "revision": "repair-v1",
-      "handoff": {
-        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/HANDOFF.md",
-        "sha256": "98212176fa1bd791c244a4e7e798bdbd6844187795a8e882f2db793f54879eb6",
-        "bytes": 6985
-      },
-      "evidence": {
-        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\evidence.json",
-        "sha256": "cd8dd42e62fdfc6005f35d44c1a9577d46b3ec2d7488e6af8c001db5008d2837"
-      },
-      "candidate_sha256": {
-        ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
-        ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
-        ".github/workflows/Test-AgentInstructions.ps1": "8564d20595d95698af9ad8c7d116e98893ef980e5cbd422ef5dc82e5667a4da6",
-        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "b314360fc43e21c60977e86917ce62a72c6f756b6d64d9e3aade4237f3a05205"
-      },
-      "recovery_patch": {
-        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v1/recovery.patch",
-        "sha256": "9ddd8c59f4f5a8214fc191f8270fd4d3fc228dec9ad56d811d6739c4222b2b34",
-        "bytes": 42843
-      },
-      "provisional_review": {
-        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\provisional-review\\REPORT.md",
-        "report_sha256": "547b87406ae0dca3f15b7b65fd4fdad62ddc4243489f7a0059fc82466ff0c5fc",
-        "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v1\\provisional-review\\evidence.json",
-        "evidence_sha256": "76473dcf91c5e457f26362eb47c8375da5b9c99b41b17ea0a5f1d070f5568741",
-        "result": "one_residual_same_P1_line_boundary_finding"
-      },
-      "root_read_full_diff_and_report": true,
-      "root_verified_source_files": 77,
-      "root_verified_references": 14,
-      "root_verified_archive_copies": 4,
-      "index_unchanged": true,
-      "D07_note": "Initial patch comparison used abbreviated index labels; corrected to matching --full-index representation. Raw patch then matched; no source change or test rerun."
-    }
-  ],
-  "root_repair_v2_verification": {
-    "full_isolated_delta_read": true,
-    "raw_source_files": 77,
-    "archived_sources": 4,
-    "reference_hashes": 25,
-    "index_unchanged": true,
-    "recovery_patch_equal_actual_full_index_diff": true,
-    "tests_executed": false
-  },
-  "repair_v2_provisional_source_review": {
-    "status": "PROVISIONAL_SOURCE_ONLY_PASS_NO_MATERIAL_DELTA_FINDINGS",
-    "worker": "ps_carryback_final_quality",
-    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\REPORT.md",
-    "report_sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835",
-    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\evidence.json",
-    "evidence_sha256": "2da3b15169682a77aff71a381f6e66636a08be928506a60d8a989783a25ad813",
-    "root_verified_at": "2026-10-06T22:27:34.738268+00:00",
-    "root_read_full_report": true,
-    "root_reference_hashes_checked": 34,
-    "root_live_candidate_hashes_checked": 4,
-    "index_raw_sha256": "20abf18aaf81715036f13a3660ec6ba23c9079cff9a479328e1555bc67b6b020",
-    "candidate_executed": false,
-    "not_final_acceptance": true
-  }
+  "finding_decision_sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961"
 }
