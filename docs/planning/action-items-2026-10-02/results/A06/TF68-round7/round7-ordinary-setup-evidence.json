@@ -1,0 +1,85 @@
+{
+  "status": "both_ordinary_setup_runs_passed",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "results": [
+    {
+      "run": 37506109019,
+      "event": "pull_request",
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "hooks_passed": 11,
+      "hooks_skipped": 0,
+      "aggregate_seconds": 732.0,
+      "aggregate_step": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15,
+        "started_at": "2026-10-06T17:46:37Z",
+        "completed_at": "2026-10-06T17:58:49Z"
+      },
+      "final_guard_step": {
+        "name": "Verify final immutable setup inputs",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 16,
+        "started_at": "2026-10-06T17:58:49Z",
+        "completed_at": "2026-10-06T17:58:49Z"
+      },
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506109019\\attempt-1\\log.txt",
+      "log_sha256": "7c2d009ee4eeb7ec798e4a45cf8cbe174255379415426aee143aae697bc64c64",
+      "actual_pass_lines": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:46:57.3238868Z check json...............................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:46:58.0575252Z check yaml...............................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:46:59.1883801Z fix end of files.........................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:00.2316767Z trim trailing whitespace.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:01.0265283Z yamllint.................................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:01.8776271Z Lint GitHub Actions workflow files.......................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:02.6137986Z Validate Dependabot Config (v2)..........................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:03.4769402Z Validate GitHub Workflows................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:03.5079484Z staged Markdown..........................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:04.1073295Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:58:48.9766046Z agent instruction contract and mutation tests............................Passed"
+      ]
+    },
+    {
+      "run": 37506105152,
+      "event": "push",
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "hooks_passed": 11,
+      "hooks_skipped": 0,
+      "aggregate_seconds": 1080.0,
+      "aggregate_step": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 15,
+        "started_at": "2026-10-06T17:46:43Z",
+        "completed_at": "2026-10-06T18:04:43Z"
+      },
+      "final_guard_step": {
+        "name": "Verify final immutable setup inputs",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 16,
+        "started_at": "2026-10-06T18:04:43Z",
+        "completed_at": "2026-10-06T18:04:43Z"
+      },
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506105152\\attempt-1\\log.txt",
+      "log_sha256": "9ee8d7db4aab645a8675fbf18f43bb4d7dbc417bd319e2af501657b278703b03",
+      "actual_pass_lines": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:06.8511268Z check json...............................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:07.9104335Z check yaml...............................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:09.5500083Z fix end of files.........................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:11.2699337Z trim trailing whitespace.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:12.4301029Z yamllint.................................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:13.4908056Z Lint GitHub Actions workflow files.......................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:14.6824518Z Validate Dependabot Config (v2)..........................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:15.9389734Z Validate GitHub Workflows................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:15.9751539Z staged Markdown..........................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T17:47:16.8037140Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T18:04:43.5210797Z agent instruction contract and mutation tests............................Passed"
+      ]
+    }
+  ],
+  "limit": "Ordinary setup only; separate dynamic run and behavior suites/reviews remain pending."
+}

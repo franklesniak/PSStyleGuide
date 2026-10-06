@@ -1,0 +1,296 @@
+{
+  "status": "ALL_CURRENT_CI_PASSED",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+  "captured_at": "2026-10-06T18:11:57.900716+00:00",
+  "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-observation-1813.json",
+  "snapshot_sha256": "5c74ec5821eb93d18369369bac4350cb1a8e8cda07b877337b81f13b562a53bc",
+  "runs": [
+    {
+      "id": 37506392890,
+      "event": "dynamic",
+      "name": "Running Copilot Code Review",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109162,
+      "event": "pull_request",
+      "name": "Dev container boundary",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109429,
+      "event": "pull_request_target",
+      "name": "Agent instruction validation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109207,
+      "event": "pull_request",
+      "name": "Markdown Lint",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109263,
+      "event": "pull_request",
+      "name": "Copilot code review preparation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109112,
+      "event": "pull_request",
+      "name": "Build Style Guide Artifacts",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109019,
+      "event": "pull_request",
+      "name": "Copilot setup steps",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506109184,
+      "event": "pull_request",
+      "name": "Agent instruction validation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506104922,
+      "event": "push",
+      "name": "Dev container boundary",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506104969,
+      "event": "push",
+      "name": "Markdown Lint",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506105041,
+      "event": "push",
+      "name": "Copilot code review preparation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506104979,
+      "event": "push",
+      "name": "Build Style Guide Artifacts",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506105152,
+      "event": "push",
+      "name": "Copilot setup steps",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    },
+    {
+      "id": 37506105096,
+      "event": "push",
+      "name": "Agent instruction validation",
+      "status": "completed",
+      "conclusion": "success",
+      "attempt": 1
+    }
+  ],
+  "behavior_results": [
+    {
+      "run": 37506109184,
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "event": "pull_request",
+      "job": 112415064903,
+      "counts": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 285309.077251
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-06T17:46:19Z",
+          "completed_at": "2026-10-06T17:46:19Z"
+        },
+        {
+          "name": "Acquire the exact revision without credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-06T17:46:19Z",
+          "completed_at": "2026-10-06T17:46:25Z"
+        },
+        {
+          "name": "Verify checkout credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-06T17:46:25Z",
+          "completed_at": "2026-10-06T17:46:26Z"
+        },
+        {
+          "name": "Install locked test dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-06T17:46:26Z",
+          "completed_at": "2026-10-06T17:46:31Z"
+        },
+        {
+          "name": "Test proposed behavior without publication authority",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-06T17:46:31Z",
+          "completed_at": "2026-10-06T18:09:32Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-06T18:09:32Z",
+          "completed_at": "2026-10-06T18:09:32Z"
+        }
+      ],
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506109184\\attempt-1\\log.txt",
+      "log_sha256": "9745a72915520dddab7834c7567cb685d51de2277fc6cfaa124dd6001409a422"
+    },
+    {
+      "run": 37506105096,
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "event": "push",
+      "job": 112415046725,
+      "counts": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 281546.060706
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-10-06T17:46:16Z",
+          "completed_at": "2026-10-06T17:46:16Z"
+        },
+        {
+          "name": "Acquire the exact revision without credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-10-06T17:46:16Z",
+          "completed_at": "2026-10-06T17:46:22Z"
+        },
+        {
+          "name": "Verify checkout credentials",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-10-06T17:46:22Z",
+          "completed_at": "2026-10-06T17:46:23Z"
+        },
+        {
+          "name": "Install locked test dependencies",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 4,
+          "started_at": "2026-10-06T17:46:23Z",
+          "completed_at": "2026-10-06T17:46:28Z"
+        },
+        {
+          "name": "Test proposed behavior without publication authority",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 5,
+          "started_at": "2026-10-06T17:46:28Z",
+          "completed_at": "2026-10-06T18:08:54Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 6,
+          "started_at": "2026-10-06T18:08:55Z",
+          "completed_at": "2026-10-06T18:08:55Z"
+        }
+      ],
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506105096\\attempt-1\\log.txt",
+      "log_sha256": "934ab982beecabaf7b2c7204e9b61593f73bdc2ebff37997969321b594a08e6a"
+    }
+  ],
+  "platform_proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-platform-evidence.json",
+  "setup_proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-ordinary-setup-evidence.json",
+  "dynamic_proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-dynamic-success.json",
+  "required_checks": [
+    {
+      "id": 112415567247,
+      "name": "verify",
+      "conclusion": "success"
+    },
+    {
+      "id": 112415526553,
+      "name": "verify",
+      "conclusion": "success"
+    },
+    {
+      "id": 112415059387,
+      "name": "policy",
+      "conclusion": "success"
+    },
+    {
+      "id": 112415059057,
+      "name": "markdownlint",
+      "conclusion": "success"
+    },
+    {
+      "id": 112415045776,
+      "name": "policy",
+      "conclusion": "success"
+    },
+    {
+      "id": 112415045505,
+      "name": "markdownlint",
+      "conclusion": "success"
+    }
+  ],
+  "limit": "All current CI at this snapshot. Fresh identity/review/rules/CI preimage and independent final native quality still required before normal merge; dedicated activation and landed/paired acceptance remain later."
+}

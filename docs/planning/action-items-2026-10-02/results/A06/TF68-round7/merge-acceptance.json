@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "recorded_at": "2026-10-06T18:22:46.036309+00:00",
+  "status": "MERGED_REVIEWED_ALL_GREEN_SOURCE_ONLY",
+  "repository": "franklesniak/TerraformStyleGuide",
+  "pr": 68,
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+  "title": "Converge generator validation and make review setup reliable",
+  "merge": {
+    "status": "merged_verified",
+    "requested_at": "2026-10-06T18:21:18.897950+00:00",
+    "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+    "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+    "method": "merge",
+    "admin_override": false,
+    "head_match_required": true,
+    "review_round": 7,
+    "deadline": "2026-10-13T23:47:31+00:00",
+    "snapshot_sha256": "82c5e51dd99f55a5612e14fd9ac7f7c976cb9d52ca4c9519f99576bab4bc92be",
+    "gates_sha256": "dcee4ba8c85a691751b9cef38eb0c2e38d938c858606e572ff4a31380339efef",
+    "final_quality_evidence_sha256": "f9c6104ed7971edac8f8d82be859e82b6e1a3e732167bd03e7fa8ac6bad53485",
+    "sequence": "B93.5 source landing before dedicated-service proof; S1/task/pair acceptance remains incomplete.",
+    "command_exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-normal-merge.log",
+    "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "merged_at": "2026-10-06T18:21:21Z",
+    "merge_commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "verified_at": "2026-10-06T18:21:25.351098+00:00"
+  },
+  "final_quality": {
+    "status": "PASS_CURRENT_INPUT_NATIVE_BINDING",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\round7-native\\REPORT.md",
+    "report_sha256": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\round7-native\\evidence.json",
+    "evidence_sha256": "f9c6104ed7971edac8f8d82be859e82b6e1a3e732167bd03e7fa8ac6bad53485",
+    "root_verified_at": "2026-10-06T18:20:59.108133+00:00",
+    "verified_bindings": 28,
+    "material_findings": []
+  },
+  "sequence": {
+    "status": "all_green_source_landing_selected_activation_pending",
+    "selected_sequence": {
+      "selected": "B93.5",
+      "selected_at": "2026-10-06T18:20:59.108133+00:00",
+      "current_head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "current_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+      "all_current_ci_passed": true,
+      "independent_quality_passed": true,
+      "dedicated_activation_proved": false,
+      "original_decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\root-decision.json",
+      "dedicated_workflow_blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "procedure": "Normal source landing only after immediate fresh gates; bind actual main/tree and landed CI, then use next legitimate exact-input service run to prove dedicated selection, no coding-only sweep, final guard and successful completion. Keep S1/task and affected paired acceptance incomplete. No dummy change or CI waiver. Stop further merges/affected delivery and report any postlanding CI failure or service fallback.",
+      "counters_reset": false,
+      "deadline": "2026-10-13T23:47:31+00:00"
+    }
+  },
+  "review_round": 7,
+  "deadline": "2026-10-13T23:47:31+00:00",
+  "transfer_counts": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5
+  },
+  "evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-premerge-snapshot.json",
+      "sha256": "82c5e51dd99f55a5612e14fd9ac7f7c976cb9d52ca4c9519f99576bab4bc92be"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-premerge-gates.json",
+      "sha256": "dcee4ba8c85a691751b9cef38eb0c2e38d938c858606e572ff4a31380339efef"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-normal-merge.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-native-merge-readback.json",
+      "sha256": "5ec4bb7413ca4965d9a04e5c22681ea45ce56057779c34fb96c2432ab870a242"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-landed-commit.json",
+      "sha256": "5309f95d54e86243a880c81f9913c53803083598bcaed893202b031377a45814"
+    }
+  ],
+  "remaining": [
+    "landed main workflows",
+    "actual dedicated setup selection and service completion on next legitimate input",
+    "accepted TF/current PS comparison and conditional ten-path repair"
+  ]
+}

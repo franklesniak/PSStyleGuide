@@ -1,0 +1,49 @@
+{
+  "status": "dynamic_review_workflow_success",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "run": 37506392890,
+  "job": 112416039528,
+  "aggregate_step": {
+    "name": "Run complete repository validation",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 77,
+    "started_at": "2026-10-06T17:49:15Z",
+    "completed_at": "2026-10-06T18:00:53Z"
+  },
+  "aggregate_seconds": 698.0,
+  "hooks_passed": 11,
+  "actual_hook_lines": [
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:33.6868318Z check json...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:34.3997153Z check yaml...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:35.4350371Z fix end of files.........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:36.5148249Z trim trailing whitespace.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:37.3039505Z yamllint.................................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:38.8730159Z Lint GitHub Actions workflow files.......................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:39.6270897Z Validate Dependabot Config (v2)..........................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:40.5057212Z Validate GitHub Workflows................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:40.5339180Z staged Markdown..........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T17:49:41.1046022Z workflow policy contract.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T18:00:53.6803448Z agent instruction contract and mutation tests............................Passed"
+  ],
+  "final_guard_step": {
+    "name": "Verify final immutable setup inputs",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 82,
+    "started_at": "2026-10-06T18:00:55Z",
+    "completed_at": "2026-10-06T18:00:55Z"
+  },
+  "processing_step": {
+    "name": "Processing Request (Linux)",
+    "status": "completed",
+    "conclusion": "success",
+    "number": 94,
+    "started_at": "2026-10-06T18:00:59Z",
+    "completed_at": "2026-10-06T18:06:49Z"
+  },
+  "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506392890\\attempt-1\\log.txt",
+  "log_sha256": "36ef2e530c89869a30a64c3f9aec44f19c50f1797fb8e98d4bc9660526bb2f21",
+  "limitation": "Current dynamic used full setup; dedicated review-file activation remains distinct after landing.",
+  "scratch_parser_note": "Initial broad log count found22 pass lines and stopped before state write. GitHub repeats the11 pass lines in its Finished User Configured Setup Step wrapper. Restricting to the actual Run complete repository validation step confirms11; both raw copies remain. No product test rerun or native write."
+}

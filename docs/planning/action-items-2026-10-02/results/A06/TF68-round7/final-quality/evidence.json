@@ -1,0 +1,407 @@
+{
+  "schema": 1,
+  "status": "PASS_CURRENT_INPUT_NATIVE_BINDING",
+  "reviewed_at_utc": "2026-10-06T18:16:14.6612877+00:00",
+  "reviewer": "/root/a06_conversion_quality",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "body_sha256": "bc7edc0da383585062c284baefd8c98ff81ac35f1c76140fb251a38e3f60ee01",
+  "title": "Converge generator validation and make review setup reliable",
+  "native_observation_utc": "2026-10-06T18:11:57.900716Z",
+  "native_gates_utc": "2026-10-06T18:12:06.774606Z",
+  "whole_pr_paths": [
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-ExactGitPathSet.ps1",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-StyleGuideGenerator.ps1",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/package-lock.json",
+    ".github/workflows/package.json",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/workflow-policy-cases.json",
+    "docs/dependency-maintenance.md"
+  ],
+  "whole_pr_path_count": 19,
+  "material_findings": [],
+  "source_review_reused_unchanged": true,
+  "local_final_binding_reused_unchanged": true,
+  "preparation_reused_unchanged": true,
+  "evidence_bindings": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\REPORT.md",
+      "sha256": "e38f69da4f4e3a3c271cdc00954fb02cbacb9139bed7993973748ab138f566ff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\independent-quality\\evidence.json",
+      "sha256": "dfecce49d3b4830445ecdd7538faa8296ca078694461c3d872f7fabcdce07398"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-binding\\REPORT.md",
+      "sha256": "9559bdf4e9959196e170368dd2757f384a7ca9b5de521c8a812f44fcd5229dbd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-binding\\evidence.json",
+      "sha256": "797c56fa54b2e3d321af60aa33a85f63641a0d435411f58bb5809628d753ca11"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\round7-native\\PREPARATION.md",
+      "sha256": "cca30388eeeaa0aa9adec4bfd5e90c28bd70826cd9fdac8219923b6870f5ce00"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\conversion-C88-new-head-baseline.json",
+      "sha256": "8bfec1cc0b985e2c083cb412f8ff1b2167c1ad5f1e7f729dc7ceb9682770fb77"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-after-copilot.json",
+      "sha256": "98f9e2c090e9b99a3027eaa3bed2d9319f044189cf3e836217a1fd0803b7704e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-codex-trigger-readback.json",
+      "sha256": "867391c56475a15d8be3e43024b5495618aeb7857a60752e48fb318189f1f7a1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-native-gates-preparation.json",
+      "sha256": "3db06a66cf9eff8a7c38f62a9b0b98d0d2e418b965312a32a4ca486352d7bb8b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-observation-1808.json",
+      "sha256": "45274ea200609d7b0ce420fd1527fe827bfb545930f492a6cc62becd786a1f9b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-native-gates-green.json",
+      "sha256": "dad0148798f8c6d3b47fa6db07997803824a41553ffeb8e7dd740e9308234259"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-observation-1813.json",
+      "sha256": "5c74ec5821eb93d18369369bac4350cb1a8e8cda07b877337b81f13b562a53bc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-current-ci-acceptance.json",
+      "sha256": "cbd447f2cd4bc3a6b5a56099a2bc825b28ae45677558d8bc36d385390a532ac8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-platform-evidence.json",
+      "sha256": "e9201962b28ab88a207e9e446e61e849ffe1582195d595417c4dae3df660488b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-ordinary-setup-evidence.json",
+      "sha256": "d026ef4f7b8e0f6750f37be6b101fa4cf3a0e5092c261caa755c80ca30ad634f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-dynamic-success.json",
+      "sha256": "f17c1d3b64cd6f24ed0d6a77b07e6a9bfc0873769a4a5c6acf8d73598746ef06"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-peer-readiness\\REPORT.md",
+      "sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-peer-readiness\\evidence.json",
+      "sha256": "e5fe76b2c285124d32f5eef581e90c52dccb2ff1ac76f01d4c479ca02f82117e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-a14-readiness\\REPORT.md",
+      "sha256": "d72bb17800c5b3bdcfb70905eeeab2f4e47510d65847ae60d726582ba691c60b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-a14-readiness\\evidence.json",
+      "sha256": "74820afb4b6a19bb886de6b86a4676669e78b444dc20f9dbf8e62ed6da415617"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+    }
+  ],
+  "hosted_log_bindings": [
+    {
+      "run": 37506104979,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506104979\\attempt-1\\log.txt",
+      "sha256": "f611d77783497a969311b1951b8891d784f2d56ab9ba26a7f89bcbab8bee67fe",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506109112,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506109112\\attempt-1\\log.txt",
+      "sha256": "9da41b6fb1708a837b907f1b2f30600e9fac4bd078155b8aa3c4e683867b5ea6",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506109019,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506109019\\attempt-1\\log.txt",
+      "sha256": "7c2d009ee4eeb7ec798e4a45cf8cbe174255379415426aee143aae697bc64c64",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506105152,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506105152\\attempt-1\\log.txt",
+      "sha256": "9ee8d7db4aab645a8675fbf18f43bb4d7dbc417bd319e2af501657b278703b03",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506392890,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506392890\\attempt-1\\log.txt",
+      "sha256": "36ef2e530c89869a30a64c3f9aec44f19c50f1797fb8e98d4bc9660526bb2f21",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506109184,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506109184\\attempt-1\\log.txt",
+      "sha256": "9745a72915520dddab7834c7567cb685d51de2277fc6cfaa124dd6001409a422",
+      "matches_recorded_sha256": true
+    },
+    {
+      "run": 37506105096,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-89bf392\\37506105096\\attempt-1\\log.txt",
+      "sha256": "934ab982beecabaf7b2c7204e9b61593f73bdc2ebff37997969321b594a08e6a",
+      "matches_recorded_sha256": true
+    }
+  ],
+  "reviews": {
+    "copilot": {
+      "review_id": 5432688175,
+      "authenticated_author_id": 175728472,
+      "request_event": 32623890071,
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "observed_effort": "Balanced",
+      "findings": "None",
+      "state": "COMMENTED",
+      "submitted_at": "2026-10-06T18:06:58Z",
+      "risk_label": "Needs a closer look",
+      "risk_disposition": "General security/scope context; no concrete additional defect or missing approval identified; existing gates retained",
+      "coverage_limit": "Generated package-lock omitted by Copilot; separate dependency/audit evidence retained"
+    },
+    "codex": {
+      "result_comment": 6022220890,
+      "authenticated_author_id": 199175422,
+      "trigger_comment": 6022109049,
+      "triggered_at": "2026-10-06T17:48:56Z",
+      "completed_at": "2026-10-06T17:55:06Z",
+      "reviewed_prefix": "89bf3920fb",
+      "manual_completed_summary": 6005735493,
+      "baseline_excluded": true
+    },
+    "complete_review_count": 27,
+    "complete_pr_comment_count": 14,
+    "complete_inline_comment_count": 40,
+    "resolved_thread_count": 20,
+    "unresolved_threads": 0,
+    "requested_reviewers": 0,
+    "new_result_or_inline_items_since_preparation": 0,
+    "changed_review_bodies_since_preparation": 0
+  },
+  "ci": {
+    "current_workflows": 14,
+    "successful_workflows": 14,
+    "completed_checks": 27,
+    "successful_checks": 24,
+    "intentional_event_routing_skips": 3,
+    "pending_workflows": 0,
+    "failed_cancelled_current_workflows": 0,
+    "behavior": [
+      {
+        "run": 37506109184,
+        "event": "pull_request",
+        "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "counts": {
+          "tests": 600,
+          "pass": 600,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "duration_ms": 285309.077251
+        },
+        "log_sha256": "9745a72915520dddab7834c7567cb685d51de2277fc6cfaa124dd6001409a422"
+      },
+      {
+        "run": 37506105096,
+        "event": "push",
+        "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "counts": {
+          "tests": 600,
+          "pass": 600,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0,
+          "duration_ms": 281546.060706
+        },
+        "log_sha256": "934ab982beecabaf7b2c7204e9b61593f73bdc2ebff37997969321b594a08e6a"
+      }
+    ],
+    "generator": [
+      {
+        "run": 37506104979,
+        "event": "push",
+        "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "tested_revision": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "tested_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+        "platform_proofs": [
+          {
+            "platform": "generator_windows_51",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "89bf3920fb8008752c7f179e7c69c4c2979750d8"
+          },
+          {
+            "platform": "generator_windows_7",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "89bf3920fb8008752c7f179e7c69c4c2979750d8"
+          },
+          {
+            "platform": "generator_linux_7",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "89bf3920fb8008752c7f179e7c69c4c2979750d8"
+          }
+        ]
+      },
+      {
+        "run": 37506109112,
+        "event": "pull_request",
+        "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "tested_revision": "38d5f93108f501893395cd3bc857d3c9c77440b0",
+        "tested_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+        "platform_proofs": [
+          {
+            "platform": "generator_windows_51",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "38d5f93108f501893395cd3bc857d3c9c77440b0"
+          },
+          {
+            "platform": "generator_windows_7",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "38d5f93108f501893395cd3bc857d3c9c77440b0"
+          },
+          {
+            "platform": "generator_linux_7",
+            "assertions_per_pass": 156,
+            "passes": 2,
+            "tested_revision": "38d5f93108f501893395cd3bc857d3c9c77440b0"
+          }
+        ]
+      }
+    ],
+    "ordinary_setups": [
+      {
+        "run": 37506109019,
+        "event": "pull_request",
+        "hooks_passed": 11,
+        "hooks_skipped": 0,
+        "aggregate_seconds": 732.0
+      },
+      {
+        "run": 37506105152,
+        "event": "push",
+        "hooks_passed": 11,
+        "hooks_skipped": 0,
+        "aggregate_seconds": 1080.0
+      }
+    ],
+    "dynamic": {
+      "run": 37506392890,
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "hooks_passed": 11,
+      "aggregate_seconds": 698,
+      "final_guard": "success",
+      "reviewer_processing": "success",
+      "selected_setup": "classic full setup",
+      "dedicated_activation_proved": false
+    }
+  },
+  "native_rules": {
+    "id": 20623677,
+    "active": true,
+    "unchanged_since_preparation": true,
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "required_checks": [
+      "markdownlint",
+      "policy",
+      "verify"
+    ],
+    "required_check_integration": 15368,
+    "strict_up_to_date": true,
+    "required_approving_review_count": 0,
+    "required_thread_resolution": true,
+    "extra_approval_for_unattributed_changes": true,
+    "allowed_merge_methods": [
+      "merge",
+      "squash",
+      "rebase"
+    ],
+    "merge_commit_allowed": true,
+    "pr_state": "OPEN",
+    "draft": false,
+    "mergeable": "MERGEABLE",
+    "merge_state": "CLEAN"
+  },
+  "sequencing": {
+    "selected_procedure": "B93.5",
+    "current_input_reapplication": "root to explicitly record after immediate fresh gate check",
+    "normal_green_landing_before_dedicated_activation_allowed": true,
+    "dedicated_activation_pending": true,
+    "post_landing_fallback_or_ci_failure": "Stop further merges/affected delivery, preserve evidence and report owner",
+    "dummy_product_trigger_allowed": false
+  },
+  "pair": {
+    "conditional_ps_scope_paths": 10,
+    "new_converter_language_exception": false,
+    "accepted_main_comparison_pending": true,
+    "destination_write_authority_granted_by_this_report": false,
+    "paired_convergence": false
+  },
+  "remaining": [
+    "root immediate fresh native preimage/gates recheck",
+    "root explicit B93.5 application to green current input and normal merge",
+    "actual landed commit/tree and landed-workflow verification",
+    "legitimate exact-input dedicated-service selection and successful completion under rate limits",
+    "accepted TF/current PS comparison and applicable carryback"
+  ],
+  "limits": [
+    "Snapshot bound quality result, not an irrevocable merge authorization",
+    "No fresh native query by this reviewer; supplied authenticated records inspected",
+    "Existing A14/PS155 filesystem and same-process authority limits retained",
+    "Old cold packet remains failed and historical cancelled runs retain their conclusions",
+    "Generator synthetic PR revision is distinct from H despite equal tree",
+    "Current dynamic success is fullsetup, not dedicated activation"
+  ],
+  "counters": {
+    "round": 7,
+    "round_cap": 80,
+    "deadline_utc": "2026-10-13T23:47:31Z",
+    "transfers": {
+      "A06": 1,
+      "A03": 3,
+      "A21": 5,
+      "A07": 5
+    }
+  },
+  "reviewer_actions": {
+    "tests": 0,
+    "source_review_repeats": 0,
+    "git_writes": 0,
+    "product_edits": 0,
+    "native_operations": 0,
+    "requests": 0,
+    "polling": 0,
+    "planning_state_edits": 0,
+    "descendants": 0
+  },
+  "merge_performed": false,
+  "landed_acceptance": false
+}
