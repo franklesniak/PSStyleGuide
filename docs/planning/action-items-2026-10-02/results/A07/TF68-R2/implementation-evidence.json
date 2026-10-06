@@ -1,0 +1,657 @@
+{
+  "captured_at": "2026-10-06T01:49:16.778299+00:00",
+  "full_packet": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\evidence.json",
+  "full_packet_sha256": "98ccba82efb1070752fa70b07718f3edf96b20fee1b976a7f8cd6e5075489dfc",
+  "implementation": {
+    "frozen": true,
+    "changed_files": [
+      {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      }
+    ],
+    "all_other_tracked_files_preserved": 76,
+    "validation": {
+      "status": "focused implementation passed; root aggregate/current audit/acceptance pending",
+      "source_parent": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "source_catalog_sha256": "40ad27429d2fbca02c067050dc6ca39bfc6e0b3bbc3a2cb6e118cd212e58a4d1",
+      "driver_sha256": "2070c2245311e5c973e3e3f6e9592b6bad227d5f60b2748c0f8b24c45d1a6f61",
+      "product_guard": {
+        "source_equal": true,
+        "index_equal": true,
+        "refs_equal": true,
+        "only_released_three_paths": true,
+        "untracked_files": false,
+        "diff_check_exit": 0
+      },
+      "windows": {
+        "runtime": {
+          "node": "24.18.1",
+          "npm": "11.16.0",
+          "node_executable": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+          "node_sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+        },
+        "commands": [
+          {
+            "name": "lock refresh",
+            "command": [
+              "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\refresh-lock.mjs",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate"
+            ],
+            "native_exit": 0,
+            "outcome": "exactly one locked package, three fields changed"
+          },
+          {
+            "name": "clean two-root install and ls",
+            "command": [
+              "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\install-and-list.mjs",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\windows-install"
+            ],
+            "native_exit": 0,
+            "child_results": [
+              {
+                "label": "root",
+                "kind": "ci",
+                "args": [
+                  "ci",
+                  "--ignore-scripts",
+                  "--no-audit",
+                  "--fund=false",
+                  "--include=dev",
+                  "--package-lock=true"
+                ],
+                "cwd": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R2/candidate",
+                "started": "2026-10-06T01:40:23.770Z",
+                "finished": "2026-10-06T01:40:24.657Z",
+                "native_exit": 0
+              },
+              {
+                "label": "root",
+                "kind": "ls",
+                "args": [
+                  "ls",
+                  "--all",
+                  "--json",
+                  "--include=dev",
+                  "--package-lock=false"
+                ],
+                "cwd": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R2/candidate",
+                "started": "2026-10-06T01:40:24.657Z",
+                "finished": "2026-10-06T01:40:25.297Z",
+                "native_exit": 0
+              },
+              {
+                "label": "workflows",
+                "kind": "ci",
+                "args": [
+                  "ci",
+                  "--ignore-scripts",
+                  "--no-audit",
+                  "--fund=false",
+                  "--include=dev",
+                  "--package-lock=true"
+                ],
+                "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate\\.github\\workflows",
+                "started": "2026-10-06T01:40:25.297Z",
+                "finished": "2026-10-06T01:40:27.201Z",
+                "native_exit": 0
+              },
+              {
+                "label": "workflows",
+                "kind": "ls",
+                "args": [
+                  "ls",
+                  "--all",
+                  "--json",
+                  "--include=dev",
+                  "--package-lock=false"
+                ],
+                "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate\\.github\\workflows",
+                "started": "2026-10-06T01:40:27.201Z",
+                "finished": "2026-10-06T01:40:27.863Z",
+                "native_exit": 0
+              }
+            ],
+            "inputs_equal": true
+          },
+          {
+            "name": "old controls",
+            "command": [
+              "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\focus.mjs",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\old-controls.json",
+              "old"
+            ],
+            "native_exit": 0,
+            "source_role": "H2 before product mutation, existing qualified old dependencies"
+          },
+          {
+            "name": "patched controls",
+            "command": [
+              "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\focus.mjs",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\patched-controls-windows.json",
+              "patched",
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\old-controls.json"
+            ],
+            "native_exit": 0
+          },
+          {
+            "name": "three focused suites",
+            "command": [
+              "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+              "--test",
+              ".github/workflows/lint-markdown.test.mjs",
+              ".github/workflows/NpmTools.test.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.test.mjs"
+            ],
+            "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate",
+            "native_exit": 0,
+            "session_id": 72404,
+            "tests": 244,
+            "pass": 244,
+            "fail": 0,
+            "skip": 0
+          }
+        ]
+      },
+      "linux": {
+        "launcher_command": [
+          "python",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\launch-linux-focus.py"
+        ],
+        "native_exit": 0,
+        "session_id": 15681,
+        "container": [
+          "docker",
+          "run",
+          "--rm",
+          "--pull",
+          "never",
+          "--name",
+          "tf68-r2-focused-20261006",
+          "--network",
+          "none",
+          "--mount",
+          "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\linux-inputs,target=/input,readonly",
+          "--mount",
+          "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\linux-output,target=/output",
+          "--entrypoint",
+          "python",
+          "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+          "/input/inside.py"
+        ],
+        "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "results": [
+          {
+            "name": "old-controls",
+            "command": [
+              "node",
+              "/input/focus.mjs",
+              "/tmp/tf68-r2/old",
+              "/output/old-controls.json",
+              "old"
+            ],
+            "cwd": "/tmp/tf68-r2/patched",
+            "native_exit": 0,
+            "started": "2026-10-06T01:44:32.972708+00:00",
+            "finished": "2026-10-06T01:44:33.189514+00:00",
+            "log_sha256": "95c42c10526c4d6ef51868c015b54364af3baeaa0a7a2ab53a953bd9873a75cc"
+          },
+          {
+            "name": "patched-controls",
+            "command": [
+              "node",
+              "/input/focus.mjs",
+              "/tmp/tf68-r2/patched",
+              "/output/patched-controls.json",
+              "patched",
+              "/output/old-controls.json"
+            ],
+            "cwd": "/tmp/tf68-r2/patched",
+            "native_exit": 0,
+            "started": "2026-10-06T01:44:33.194261+00:00",
+            "finished": "2026-10-06T01:44:33.360454+00:00",
+            "log_sha256": "95c42c10526c4d6ef51868c015b54364af3baeaa0a7a2ab53a953bd9873a75cc"
+          },
+          {
+            "name": "focused-suites",
+            "command": [
+              "node",
+              "--test",
+              ".github/workflows/lint-markdown.test.mjs",
+              ".github/workflows/NpmTools.test.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.test.mjs"
+            ],
+            "cwd": "/tmp/tf68-r2/patched",
+            "native_exit": 0,
+            "started": "2026-10-06T01:44:33.364733+00:00",
+            "finished": "2026-10-06T01:44:40.799190+00:00",
+            "log_sha256": "144efe9b02f066b52ec15c22c4654d4d0c4a0c2a98f907dea4945b9ce6d73eb8"
+          },
+          {
+            "name": "installed-graphs",
+            "command": [
+              "node",
+              "--input-type=module",
+              "-e",
+              "import {withNpmEnvironment} from './.github/workflows/NpmTools.mjs';import path from 'node:path';withNpmEnvironment(({runNpm,root})=>{for(const d of [root,path.join(root,'.github/workflows')]){const r=runNpm(['ls','--all','--json','--include=dev','--package-lock=false'],d);process.stdout.write(r.stdout);process.stderr.write(r.stderr);if(r.status!==0)throw new Error('npm ls '+r.status);}});"
+            ],
+            "cwd": "/tmp/tf68-r2/patched",
+            "native_exit": 0,
+            "started": "2026-10-06T01:44:40.803330+00:00",
+            "finished": "2026-10-06T01:44:41.270637+00:00",
+            "log_sha256": "4a4f4bf3bab4aac455edb2073912e96aa8dbf04fd9eb386e26906f746b023a09"
+          }
+        ],
+        "tests": 244,
+        "pass": 244,
+        "fail": 0,
+        "skip": 0,
+        "source_and_dependencies_equal": true,
+        "host_guard_equal": true,
+        "mode_adaptation": {
+          "path": ".github/workflows/node_modules/husky/bin.js",
+          "from": "0644",
+          "to": "0755",
+          "sha256": "c6965589a83667d43c4dc22f90dccfa91c133f8ed23629b896ce326f0a6c5cc8"
+        },
+        "limitation": "Offline Linux verifies freshly Windows-installed and byte-qualified package transport, actual imports/security/lint and npm ls. It does not claim a networked Linux npm ci."
+      },
+      "initial_scratch_failure": {
+        "command": "initial old-controls invocation",
+        "native_exit": 1,
+        "cause": "probe incorrectly imported private markdownlint.mjs and expected public lint export",
+        "repair": "use resolved public markdownlint/sync export for ESM import",
+        "retained_log": "old-controls-initial-wrong-private-entry.log",
+        "classification": "scratch-only, no product finding; final old and patched controls subsequently passed"
+      },
+      "security_controls": {
+        "old-controls.json": [
+          {
+            "name": "default",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "inherited",
+            "permits_javascript_link": true
+          },
+          {
+            "name": "own-false",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-true",
+            "permits_javascript_link": true
+          }
+        ],
+        "patched-controls-windows.json": [
+          {
+            "name": "default",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "inherited",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-false",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-true",
+            "permits_javascript_link": true
+          }
+        ],
+        "linux-output/old-controls.json": [
+          {
+            "name": "default",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "inherited",
+            "permits_javascript_link": true
+          },
+          {
+            "name": "own-false",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-true",
+            "permits_javascript_link": true
+          }
+        ],
+        "linux-output/patched-controls.json": [
+          {
+            "name": "default",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "inherited",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-false",
+            "permits_javascript_link": false
+          },
+          {
+            "name": "own-true",
+            "permits_javascript_link": true
+          }
+        ]
+      },
+      "behavior_equivalence": true
+    },
+    "archive": {
+      "payload": {
+        "dependencies.tar": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+        "dependency-catalog.json": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+        "focus.mjs": "2070c2245311e5c973e3e3f6e9592b6bad227d5f60b2748c0f8b24c45d1a6f61",
+        "old-dependencies.tar": "ca51b12b42f4d018498160a4c3fe3530eac72b2829328c5d8b2e985df9c55323",
+        "old-dependency-catalog.json": "eaface0cd15ec9aefa20636d7a032b0881e2d31dcbb3bc79879a7fa58459c298",
+        "source-final.json": "40ad27429d2fbca02c067050dc6ca39bfc6e0b3bbc3a2cb6e118cd212e58a4d1",
+        "source.tar": "002e84c95309cd6d2c39c04bae4782aa6caa5035be2f6b15ddeb0834980b3c05"
+      },
+      "dependency_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\candidate",
+      "dependency_count": 1914,
+      "dependency_bytes": 18816897,
+      "dependency_catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "dependency_archive_sha256": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4"
+    },
+    "dependency_delta": {
+      "added": [
+        ".github/workflows/node_modules/katex/contrib/auto-render/auto-render.ts",
+        ".github/workflows/node_modules/katex/contrib/auto-render/splitAtDelimiters.ts",
+        ".github/workflows/node_modules/katex/contrib/auto-render/test/auto-render-spec.ts",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/copy-tex.ts",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/katex2tex.ts",
+        ".github/workflows/node_modules/katex/contrib/render-a11y-string/render-a11y-string.ts",
+        ".github/workflows/node_modules/katex/contrib/render-a11y-string/test/render-a11y-string-spec.ts",
+        ".github/workflows/node_modules/katex/katex.ts",
+        ".github/workflows/node_modules/katex/src/Lexer.ts",
+        ".github/workflows/node_modules/katex/src/MacroExpander.ts",
+        ".github/workflows/node_modules/katex/src/Namespace.ts",
+        ".github/workflows/node_modules/katex/src/Options.ts",
+        ".github/workflows/node_modules/katex/src/ParseError.ts",
+        ".github/workflows/node_modules/katex/src/Parser.ts",
+        ".github/workflows/node_modules/katex/src/Settings.ts",
+        ".github/workflows/node_modules/katex/src/SourceLocation.ts",
+        ".github/workflows/node_modules/katex/src/Style.ts",
+        ".github/workflows/node_modules/katex/src/Token.ts",
+        ".github/workflows/node_modules/katex/src/atoms.ts",
+        ".github/workflows/node_modules/katex/src/buildCommon.ts",
+        ".github/workflows/node_modules/katex/src/buildHTML.ts",
+        ".github/workflows/node_modules/katex/src/buildMathML.ts",
+        ".github/workflows/node_modules/katex/src/buildTree.ts",
+        ".github/workflows/node_modules/katex/src/defineEnvironment.ts",
+        ".github/workflows/node_modules/katex/src/defineFunction.ts",
+        ".github/workflows/node_modules/katex/src/defineMacro.ts",
+        ".github/workflows/node_modules/katex/src/delimiter.ts",
+        ".github/workflows/node_modules/katex/src/domTree.ts",
+        ".github/workflows/node_modules/katex/src/environments.ts",
+        ".github/workflows/node_modules/katex/src/environments/array.ts",
+        ".github/workflows/node_modules/katex/src/environments/cd.ts",
+        ".github/workflows/node_modules/katex/src/fontMetrics.ts",
+        ".github/workflows/node_modules/katex/src/fontMetricsData.d.ts",
+        ".github/workflows/node_modules/katex/src/functions.ts",
+        ".github/workflows/node_modules/katex/src/functions/accent.ts",
+        ".github/workflows/node_modules/katex/src/functions/accentunder.ts",
+        ".github/workflows/node_modules/katex/src/functions/arrow.ts",
+        ".github/workflows/node_modules/katex/src/functions/char.ts",
+        ".github/workflows/node_modules/katex/src/functions/color.ts",
+        ".github/workflows/node_modules/katex/src/functions/cr.ts",
+        ".github/workflows/node_modules/katex/src/functions/def.ts",
+        ".github/workflows/node_modules/katex/src/functions/delimsizing.ts",
+        ".github/workflows/node_modules/katex/src/functions/enclose.ts",
+        ".github/workflows/node_modules/katex/src/functions/environment.ts",
+        ".github/workflows/node_modules/katex/src/functions/font.ts",
+        ".github/workflows/node_modules/katex/src/functions/genfrac.ts",
+        ".github/workflows/node_modules/katex/src/functions/hbox.ts",
+        ".github/workflows/node_modules/katex/src/functions/horizBrace.ts",
+        ".github/workflows/node_modules/katex/src/functions/href.ts",
+        ".github/workflows/node_modules/katex/src/functions/html.ts",
+        ".github/workflows/node_modules/katex/src/functions/htmlmathml.ts",
+        ".github/workflows/node_modules/katex/src/functions/includegraphics.ts",
+        ".github/workflows/node_modules/katex/src/functions/kern.ts",
+        ".github/workflows/node_modules/katex/src/functions/lap.ts",
+        ".github/workflows/node_modules/katex/src/functions/math.ts",
+        ".github/workflows/node_modules/katex/src/functions/mathchoice.ts",
+        ".github/workflows/node_modules/katex/src/functions/mclass.ts",
+        ".github/workflows/node_modules/katex/src/functions/op.ts",
+        ".github/workflows/node_modules/katex/src/functions/operatorname.ts",
+        ".github/workflows/node_modules/katex/src/functions/ordgroup.ts",
+        ".github/workflows/node_modules/katex/src/functions/overline.ts",
+        ".github/workflows/node_modules/katex/src/functions/phantom.ts",
+        ".github/workflows/node_modules/katex/src/functions/pmb.ts",
+        ".github/workflows/node_modules/katex/src/functions/raisebox.ts",
+        ".github/workflows/node_modules/katex/src/functions/relax.ts",
+        ".github/workflows/node_modules/katex/src/functions/rule.ts",
+        ".github/workflows/node_modules/katex/src/functions/sizing.ts",
+        ".github/workflows/node_modules/katex/src/functions/smash.ts",
+        ".github/workflows/node_modules/katex/src/functions/sqrt.ts",
+        ".github/workflows/node_modules/katex/src/functions/styling.ts",
+        ".github/workflows/node_modules/katex/src/functions/supsub.ts",
+        ".github/workflows/node_modules/katex/src/functions/symbolsOp.ts",
+        ".github/workflows/node_modules/katex/src/functions/symbolsOrd.ts",
+        ".github/workflows/node_modules/katex/src/functions/symbolsSpacing.ts",
+        ".github/workflows/node_modules/katex/src/functions/tag.ts",
+        ".github/workflows/node_modules/katex/src/functions/text.ts",
+        ".github/workflows/node_modules/katex/src/functions/underline.ts",
+        ".github/workflows/node_modules/katex/src/functions/utils/assembleSupSub.ts",
+        ".github/workflows/node_modules/katex/src/functions/vcenter.ts",
+        ".github/workflows/node_modules/katex/src/functions/verb.ts",
+        ".github/workflows/node_modules/katex/src/macros.ts",
+        ".github/workflows/node_modules/katex/src/mathMLTree.ts",
+        ".github/workflows/node_modules/katex/src/parseNode.ts",
+        ".github/workflows/node_modules/katex/src/parseTree.ts",
+        ".github/workflows/node_modules/katex/src/spacingData.ts",
+        ".github/workflows/node_modules/katex/src/stretchy.ts",
+        ".github/workflows/node_modules/katex/src/svgGeometry.ts",
+        ".github/workflows/node_modules/katex/src/symbols.ts",
+        ".github/workflows/node_modules/katex/src/tree.ts",
+        ".github/workflows/node_modules/katex/src/types/fonts.ts",
+        ".github/workflows/node_modules/katex/src/types/index.ts",
+        ".github/workflows/node_modules/katex/src/types/nodes.ts",
+        ".github/workflows/node_modules/katex/src/unicodeScripts.ts",
+        ".github/workflows/node_modules/katex/src/unicodeSupOrSub.ts",
+        ".github/workflows/node_modules/katex/src/units.ts",
+        ".github/workflows/node_modules/katex/src/utils.ts",
+        ".github/workflows/node_modules/katex/src/wide-character.ts"
+      ],
+      "removed": [
+        ".github/workflows/node_modules/katex/contrib/auto-render/auto-render.js",
+        ".github/workflows/node_modules/katex/contrib/auto-render/splitAtDelimiters.js",
+        ".github/workflows/node_modules/katex/contrib/auto-render/test/auto-render-spec.js",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/copy-tex.js",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/katex2tex.js",
+        ".github/workflows/node_modules/katex/contrib/render-a11y-string/render-a11y-string.js",
+        ".github/workflows/node_modules/katex/contrib/render-a11y-string/test/render-a11y-string-spec.js",
+        ".github/workflows/node_modules/katex/katex.js",
+        ".github/workflows/node_modules/katex/src/Lexer.js",
+        ".github/workflows/node_modules/katex/src/MacroExpander.js",
+        ".github/workflows/node_modules/katex/src/Namespace.js",
+        ".github/workflows/node_modules/katex/src/Options.js",
+        ".github/workflows/node_modules/katex/src/ParseError.js",
+        ".github/workflows/node_modules/katex/src/Parser.js",
+        ".github/workflows/node_modules/katex/src/Settings.js",
+        ".github/workflows/node_modules/katex/src/SourceLocation.js",
+        ".github/workflows/node_modules/katex/src/Style.js",
+        ".github/workflows/node_modules/katex/src/Token.js",
+        ".github/workflows/node_modules/katex/src/buildCommon.js",
+        ".github/workflows/node_modules/katex/src/buildHTML.js",
+        ".github/workflows/node_modules/katex/src/buildMathML.js",
+        ".github/workflows/node_modules/katex/src/buildTree.js",
+        ".github/workflows/node_modules/katex/src/defineEnvironment.js",
+        ".github/workflows/node_modules/katex/src/defineFunction.js",
+        ".github/workflows/node_modules/katex/src/defineMacro.js",
+        ".github/workflows/node_modules/katex/src/delimiter.js",
+        ".github/workflows/node_modules/katex/src/domTree.js",
+        ".github/workflows/node_modules/katex/src/environments.js",
+        ".github/workflows/node_modules/katex/src/environments/array.js",
+        ".github/workflows/node_modules/katex/src/environments/cd.js",
+        ".github/workflows/node_modules/katex/src/fontMetrics.js",
+        ".github/workflows/node_modules/katex/src/functions.js",
+        ".github/workflows/node_modules/katex/src/functions/accent.js",
+        ".github/workflows/node_modules/katex/src/functions/accentunder.js",
+        ".github/workflows/node_modules/katex/src/functions/arrow.js",
+        ".github/workflows/node_modules/katex/src/functions/char.js",
+        ".github/workflows/node_modules/katex/src/functions/color.js",
+        ".github/workflows/node_modules/katex/src/functions/cr.js",
+        ".github/workflows/node_modules/katex/src/functions/def.js",
+        ".github/workflows/node_modules/katex/src/functions/delimsizing.js",
+        ".github/workflows/node_modules/katex/src/functions/enclose.js",
+        ".github/workflows/node_modules/katex/src/functions/environment.js",
+        ".github/workflows/node_modules/katex/src/functions/font.js",
+        ".github/workflows/node_modules/katex/src/functions/genfrac.js",
+        ".github/workflows/node_modules/katex/src/functions/hbox.js",
+        ".github/workflows/node_modules/katex/src/functions/horizBrace.js",
+        ".github/workflows/node_modules/katex/src/functions/href.js",
+        ".github/workflows/node_modules/katex/src/functions/html.js",
+        ".github/workflows/node_modules/katex/src/functions/htmlmathml.js",
+        ".github/workflows/node_modules/katex/src/functions/includegraphics.js",
+        ".github/workflows/node_modules/katex/src/functions/kern.js",
+        ".github/workflows/node_modules/katex/src/functions/lap.js",
+        ".github/workflows/node_modules/katex/src/functions/math.js",
+        ".github/workflows/node_modules/katex/src/functions/mathchoice.js",
+        ".github/workflows/node_modules/katex/src/functions/mclass.js",
+        ".github/workflows/node_modules/katex/src/functions/op.js",
+        ".github/workflows/node_modules/katex/src/functions/operatorname.js",
+        ".github/workflows/node_modules/katex/src/functions/ordgroup.js",
+        ".github/workflows/node_modules/katex/src/functions/overline.js",
+        ".github/workflows/node_modules/katex/src/functions/phantom.js",
+        ".github/workflows/node_modules/katex/src/functions/pmb.js",
+        ".github/workflows/node_modules/katex/src/functions/raisebox.js",
+        ".github/workflows/node_modules/katex/src/functions/relax.js",
+        ".github/workflows/node_modules/katex/src/functions/rule.js",
+        ".github/workflows/node_modules/katex/src/functions/sizing.js",
+        ".github/workflows/node_modules/katex/src/functions/smash.js",
+        ".github/workflows/node_modules/katex/src/functions/sqrt.js",
+        ".github/workflows/node_modules/katex/src/functions/styling.js",
+        ".github/workflows/node_modules/katex/src/functions/supsub.js",
+        ".github/workflows/node_modules/katex/src/functions/symbolsOp.js",
+        ".github/workflows/node_modules/katex/src/functions/symbolsOrd.js",
+        ".github/workflows/node_modules/katex/src/functions/symbolsSpacing.js",
+        ".github/workflows/node_modules/katex/src/functions/tag.js",
+        ".github/workflows/node_modules/katex/src/functions/text.js",
+        ".github/workflows/node_modules/katex/src/functions/underline.js",
+        ".github/workflows/node_modules/katex/src/functions/utils/assembleSupSub.js",
+        ".github/workflows/node_modules/katex/src/functions/vcenter.js",
+        ".github/workflows/node_modules/katex/src/functions/verb.js",
+        ".github/workflows/node_modules/katex/src/macros.js",
+        ".github/workflows/node_modules/katex/src/mathMLTree.js",
+        ".github/workflows/node_modules/katex/src/parseNode.js",
+        ".github/workflows/node_modules/katex/src/parseTree.js",
+        ".github/workflows/node_modules/katex/src/spacingData.js",
+        ".github/workflows/node_modules/katex/src/stretchy.js",
+        ".github/workflows/node_modules/katex/src/svgGeometry.js",
+        ".github/workflows/node_modules/katex/src/symbols.js",
+        ".github/workflows/node_modules/katex/src/tree.js",
+        ".github/workflows/node_modules/katex/src/types.js",
+        ".github/workflows/node_modules/katex/src/unicodeScripts.js",
+        ".github/workflows/node_modules/katex/src/unicodeSupOrSub.js",
+        ".github/workflows/node_modules/katex/src/units.js",
+        ".github/workflows/node_modules/katex/src/utils.js",
+        ".github/workflows/node_modules/katex/src/wide-character.js"
+      ],
+      "changed": [
+        ".github/workflows/node_modules/.package-lock.json",
+        ".github/workflows/node_modules/katex/README.md",
+        ".github/workflows/node_modules/katex/cli.js",
+        ".github/workflows/node_modules/katex/contrib/auto-render/index.html",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/README.md",
+        ".github/workflows/node_modules/katex/contrib/copy-tex/index.html",
+        ".github/workflows/node_modules/katex/contrib/mathtex-script-type/README.md",
+        ".github/workflows/node_modules/katex/contrib/mathtex-script-type/mathtex-script-type.js",
+        ".github/workflows/node_modules/katex/contrib/mhchem/README.md",
+        ".github/workflows/node_modules/katex/dist/README.md",
+        ".github/workflows/node_modules/katex/dist/contrib/auto-render.js",
+        ".github/workflows/node_modules/katex/dist/contrib/auto-render.min.js",
+        ".github/workflows/node_modules/katex/dist/contrib/auto-render.mjs",
+        ".github/workflows/node_modules/katex/dist/contrib/copy-tex.js",
+        ".github/workflows/node_modules/katex/dist/contrib/copy-tex.min.js",
+        ".github/workflows/node_modules/katex/dist/contrib/copy-tex.mjs",
+        ".github/workflows/node_modules/katex/dist/contrib/mathtex-script-type.js",
+        ".github/workflows/node_modules/katex/dist/contrib/mathtex-script-type.min.js",
+        ".github/workflows/node_modules/katex/dist/contrib/mathtex-script-type.mjs",
+        ".github/workflows/node_modules/katex/dist/contrib/mhchem.js",
+        ".github/workflows/node_modules/katex/dist/contrib/mhchem.min.js",
+        ".github/workflows/node_modules/katex/dist/contrib/mhchem.mjs",
+        ".github/workflows/node_modules/katex/dist/contrib/render-a11y-string.js",
+        ".github/workflows/node_modules/katex/dist/contrib/render-a11y-string.min.js",
+        ".github/workflows/node_modules/katex/dist/contrib/render-a11y-string.mjs",
+        ".github/workflows/node_modules/katex/dist/katex-swap.css",
+        ".github/workflows/node_modules/katex/dist/katex-swap.min.css",
+        ".github/workflows/node_modules/katex/dist/katex.css",
+        ".github/workflows/node_modules/katex/dist/katex.js",
+        ".github/workflows/node_modules/katex/dist/katex.min.css",
+        ".github/workflows/node_modules/katex/dist/katex.min.js",
+        ".github/workflows/node_modules/katex/dist/katex.mjs",
+        ".github/workflows/node_modules/katex/package.json",
+        ".github/workflows/node_modules/katex/src/styles/fonts.scss",
+        ".github/workflows/node_modules/katex/src/styles/katex.scss",
+        ".github/workflows/node_modules/katex/src/unicodeAccents.js",
+        ".github/workflows/node_modules/katex/src/unicodeSymbols.js",
+        ".github/workflows/node_modules/katex/types/katex.d.ts"
+      ]
+    },
+    "installer_handoff": {
+      "helper": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\install-and-list.mjs",
+      "helper_sha256": "d61df2c4a2c3040e9d7600936b275e00791b095642ab7e2d8ccdbe671304755a",
+      "command": [
+        "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\install-and-list.mjs",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "<new existing root-owned output directory>"
+      ],
+      "effects": "Only both installed package trees plus chosen output files; no hook/bootstrap/config/index/ref changes; four locked inputs guarded; root owns execution."
+    },
+    "artifacts": {
+      "lock-delta.json": "bdb0f41d5ea58abf36ffaef40450843eb8d5cade1cfcb27f9664ff9a3887fa4f",
+      "source-final.json": "40ad27429d2fbca02c067050dc6ca39bfc6e0b3bbc3a2cb6e118cd212e58a4d1",
+      "dependency-catalog.json": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "dependencies.tar": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "dependency-delta.json": "c8f321bd885c0a63fb132d14824ff89d397b925e740034bf1bbca62ef48132ee",
+      "focus.mjs": "2070c2245311e5c973e3e3f6e9592b6bad227d5f60b2748c0f8b24c45d1a6f61",
+      "install-and-list.mjs": "d61df2c4a2c3040e9d7600936b275e00791b095642ab7e2d8ccdbe671304755a",
+      "refresh-lock.mjs": "88287f58c6da19172605ade6c601f3cff6988235726efb8db2aa0e93650089d9",
+      "windows-suites.log": "a01e7d778af3210cb1e684804fcf411bbf9e1a353e903dabb428ef0348b0edc9",
+      "windows-install\\install-results.json": "9741215794ab5ce730905d25e5491f40aadbce28161c2ad3c23bd7e6e24b4985",
+      "old-controls.json": "aa13df23b32f4986889762f598f6557de6334bba27ed4afafb7319ca218b6f52",
+      "old-controls.log": "487ae3321a54035a24a15a3a8360217bfb035c3e7fb88d0cad186ede6d49ff92",
+      "patched-controls-windows.json": "72aad87f4c575ee29183b0f02845ed9d530df8dd730587dafd37977f4b647a6a",
+      "patched-controls-windows.log": "487ae3321a54035a24a15a3a8360217bfb035c3e7fb88d0cad186ede6d49ff92",
+      "linux-host-result.json": "dfd7c95afb28072416dbaccad7954b6d2d37d5a825a767f2cf15f4c10777a17a",
+      "linux-output\\result.json": "0686a27acfea256b8cd55c3065cd819949566502f7ad5b33d2c64859f26f9ebc",
+      "linux-output\\focused-suites.log": "144efe9b02f066b52ec15c22c4654d4d0c4a0c2a98f907dea4945b9ce6d73eb8",
+      "linux-output\\old-controls.json": "59a13e616f463721fb55a091e89265a07910ddc81c127afea782ed2f10ce7177",
+      "linux-output\\patched-controls.json": "e1114b7361a3c9d3bd07ecb8d95e905a880724d23479fc1a1584f62a7d7c2fae",
+      "linux-inputs\\inside.py": "eb0c53dde639f03435af155502c993021d8c01e5893b501b9d16d2c0976468e8",
+      "launch-linux-focus.py": "c180953005a13b6106d8ce36030d592e01814283abc91ecddd3834c0df80ba75"
+    },
+    "remaining": "Root worktree install/current audit/aggregate/accepted-base endpoints/reviews and native acceptance, then paired PS R1+R2 transfer. No new material finding."
+  }
+}

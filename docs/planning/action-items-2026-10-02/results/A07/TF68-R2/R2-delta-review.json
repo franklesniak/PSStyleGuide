@@ -1,0 +1,176 @@
+{
+  "status": "FOCUSED_READY_FOR_FINAL_AGGREGATE",
+  "findings": [],
+  "reviewed_at_utc": "2026-10-06T01:50:18.325176+00:00",
+  "reviewer": {
+    "agent": "/root/ps234_final_quality",
+    "role": "independent local read-only quality reviewer",
+    "capabilities_used": [
+      "raw source and Git object reads",
+      "static code and caller review",
+      "artifact hashing",
+      "archive member validation",
+      "official upstream documentation reads"
+    ],
+    "not_claimed": [
+      "implementation ownership",
+      "remote Codex service identity or acceptance",
+      "executed tests",
+      "native review or mutation"
+    ]
+  },
+  "scope": {
+    "parent": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+    "parent_tree": "ee79a77e117d26f995008d2def0983bf879b7fc1",
+    "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "changed_files": [
+      {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      }
+    ],
+    "tracked_files": 79,
+    "unchanged_from_parent": 76,
+    "R1_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "source_catalog_sha256": "40ad27429d2fbca02c067050dc6ca39bfc6e0b3bbc3a2cb6e118cd212e58a4d1",
+    "lock_changed_fields": [
+      "/packages/node_modules/katex/integrity",
+      "/packages/node_modules/katex/resolved",
+      "/packages/node_modules/katex/version"
+    ]
+  },
+  "decision": {
+    "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF68-R2\\DECISION.md",
+    "sha256": "a4ac919e835b026e155ce0d6908cf8d631bf2e883d8bba817a2a1298b3f64afa",
+    "selection": "D",
+    "score": 96.5,
+    "recomputed_scores": {
+      "A": 59.0,
+      "B": 57.0,
+      "C": 73.5,
+      "D": 96.5,
+      "E": 88.5,
+      "F": 85.0,
+      "G": 62.0,
+      "H": 65.5,
+      "I": 56.0,
+      "J": 60.5,
+      "K": 36.5,
+      "L": 39.0
+    },
+    "no_admission_policy_change": true
+  },
+  "evidence": {
+    "writer_packet_sha256": "98ccba82efb1070752fa70b07718f3edf96b20fee1b976a7f8cd6e5075489dfc",
+    "writer_report_sha256": "8464688ec8b92431df321a2ecc0675b64a4be532c7843ced8e85cb8c7c5318d6",
+    "artifact_hashes_independently_matched": {
+      "lock-delta.json": "bdb0f41d5ea58abf36ffaef40450843eb8d5cade1cfcb27f9664ff9a3887fa4f",
+      "source-final.json": "40ad27429d2fbca02c067050dc6ca39bfc6e0b3bbc3a2cb6e118cd212e58a4d1",
+      "dependency-catalog.json": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "dependencies.tar": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "dependency-delta.json": "c8f321bd885c0a63fb132d14824ff89d397b925e740034bf1bbca62ef48132ee",
+      "focus.mjs": "2070c2245311e5c973e3e3f6e9592b6bad227d5f60b2748c0f8b24c45d1a6f61",
+      "install-and-list.mjs": "d61df2c4a2c3040e9d7600936b275e00791b095642ab7e2d8ccdbe671304755a",
+      "refresh-lock.mjs": "88287f58c6da19172605ade6c601f3cff6988235726efb8db2aa0e93650089d9",
+      "windows-suites.log": "a01e7d778af3210cb1e684804fcf411bbf9e1a353e903dabb428ef0348b0edc9",
+      "windows-install\\install-results.json": "9741215794ab5ce730905d25e5491f40aadbce28161c2ad3c23bd7e6e24b4985",
+      "old-controls.json": "aa13df23b32f4986889762f598f6557de6334bba27ed4afafb7319ca218b6f52",
+      "old-controls.log": "487ae3321a54035a24a15a3a8360217bfb035c3e7fb88d0cad186ede6d49ff92",
+      "patched-controls-windows.json": "72aad87f4c575ee29183b0f02845ed9d530df8dd730587dafd37977f4b647a6a",
+      "patched-controls-windows.log": "487ae3321a54035a24a15a3a8360217bfb035c3e7fb88d0cad186ede6d49ff92",
+      "linux-host-result.json": "dfd7c95afb28072416dbaccad7954b6d2d37d5a825a767f2cf15f4c10777a17a",
+      "linux-output\\result.json": "0686a27acfea256b8cd55c3065cd819949566502f7ad5b33d2c64859f26f9ebc",
+      "linux-output\\focused-suites.log": "144efe9b02f066b52ec15c22c4654d4d0c4a0c2a98f907dea4945b9ce6d73eb8",
+      "linux-output\\old-controls.json": "59a13e616f463721fb55a091e89265a07910ddc81c127afea782ed2f10ce7177",
+      "linux-output\\patched-controls.json": "e1114b7361a3c9d3bd07ecb8d95e905a880724d23479fc1a1584f62a7d7c2fae",
+      "linux-inputs\\inside.py": "eb0c53dde639f03435af155502c993021d8c01e5893b501b9d16d2c0976468e8",
+      "launch-linux-focus.py": "c180953005a13b6106d8ce36030d592e01814283abc91ecddd3834c0df80ba75"
+    },
+    "source_all_79_hashes_matched": true,
+    "dependencies": {
+      "count": 1914,
+      "bytes": 18816897,
+      "catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "archive_sha256": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "all_archive_members_regular_safe_exact_catalog_bytes": true
+    },
+    "windows": {
+      "tests": 244,
+      "pass": 244,
+      "fail": 0,
+      "skip": 0,
+      "native_exit": 0,
+      "actual_two_root_clean_ci_and_ls": true
+    },
+    "linux": {
+      "tests": 244,
+      "pass": 244,
+      "fail": 0,
+      "skip": 0,
+      "native_exit": 0,
+      "result_sha256": "0686a27acfea256b8cd55c3065cd819949566502f7ad5b33d2c64859f26f9ebc",
+      "offline_transported_dependencies": true,
+      "networked_linux_ci": false,
+      "source_dependency_bytes_equal": true
+    },
+    "security_controls": "Both platforms: old inherited trust permits local link; patched refuses; default and own-false refuse in both; own-true permits in both. No HTML executed.",
+    "behavior": "All four old/patched records have identical actual outer/nested lint outputs and inline/display math token types; existing 244-test suites also exercise staged caller and policy/input negative cases.",
+    "ordinary_audit": {
+      "log_sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9",
+      "status": "CLEAN",
+      "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "proposedState": false,
+      "findings": [],
+      "acceptedPackages": 0,
+      "limitation": "Dated observation from local-origin-main authority; does not establish external ref freshness."
+    }
+  },
+  "limits": [
+    "Focused readiness only, not final product acceptance.",
+    "Final aggregate and whole-source/dependency/ref/config guard are pending for this repair.",
+    "Actual accepted-base/new-head metadata endpoints, commit/tree/body binding, hosted and remote review lifecycle and landed checks remain root-owned.",
+    "Offline Linux transport is not networked Linux ci or hosted platform credit.",
+    "Security probe establishes this inherited-trust fix, not absence of all prototype vulnerabilities.",
+    "Paired PS R1 SelfTest reverse with T1/P1 provenance exception and common R2 manifest/lock/documentation repair remain required after TF acceptance.",
+    "A03/A06/A21/R5/B1/recovery and human gates are not discharged."
+  ],
+  "commands_inspected": [
+    "git --no-optional-locks --no-replace-objects -C <TF> diff HEAD -- <three released paths>",
+    "git --no-optional-locks --no-replace-objects -C <TF> show <parent>:<each catalog path>",
+    "git --no-optional-locks --no-replace-objects -C <TF> rev-parse HEAD and HEAD^{tree}",
+    "git --no-optional-locks --no-replace-objects -C <TF> status --porcelain=v1 --untracked-files=all",
+    "Python standard-library SHA256 reads over source/catalog/artifacts and tarfile member reads; no extraction or tests"
+  ],
+  "sources": [
+    "https://github.com/KaTeX/KaTeX/security/advisories/GHSA-238p-pmpm-9mq7",
+    "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.18.2/CHANGELOG.md",
+    "https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#overrides"
+  ],
+  "reused_reviews": [
+    "REPORT.md",
+    "evidence.json",
+    "final-binding.md",
+    "final-binding.json",
+    "R1-delta-review.md",
+    "R1-delta-review.json",
+    "R1-focused-binding.md",
+    "R1-focused-binding.json"
+  ]
+}

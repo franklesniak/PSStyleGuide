@@ -1,0 +1,3731 @@
+{
+  "captured_at_utc": "2026-10-06T01:30:05.939323+00:00",
+  "status": "read-only proposal evidence; no installation or tests",
+  "committed_sources": [
+    {
+      "repository": "TF",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "manifest": {
+        "name": "terraformstyleguide-agent-governance",
+        "version": "1.0.0",
+        "private": true,
+        "description": "Locked agent-governance validation for TerraformStyleGuide.",
+        "license": "MIT",
+        "engines": {
+          "node": "24.18.1",
+          "npm": "11.16.0"
+        },
+        "packageManager": "npm@11.16.0",
+        "scripts": {
+          "bootstrap:agent-instructions": "node .github/workflows/NpmTools.mjs install",
+          "lint:md": "npm --prefix .github/workflows run lint:md",
+          "lint:md:nested": "npm --prefix .github/workflows run lint:md:nested",
+          "test:agent-instructions": "pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/franklesniak/TerraformStyleGuide.git"
+        },
+        "devDependencies": {
+          "markdown-it": "14.3.2"
+        }
+      },
+      "selected_lock_entries": {}
+    },
+    {
+      "repository": "TF",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+      "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "manifest": null,
+      "selected_lock_entries": {
+        "": {
+          "name": "terraformstyleguide-agent-governance",
+          "version": "1.0.0",
+          "license": "MIT",
+          "devDependencies": {
+            "markdown-it": "14.3.2"
+          },
+          "engines": {
+            "node": "24.18.1",
+            "npm": "11.16.0"
+          }
+        }
+      }
+    },
+    {
+      "repository": "TF",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+      "manifest": {
+        "name": "terraformstyleguide",
+        "version": "1.0.0",
+        "description": "Repository Markdown tooling.",
+        "private": true,
+        "scripts": {
+          "lint:md": "node lint-markdown.mjs",
+          "lint:md:nested": "node lint-nested-markdown.js",
+          "prepare": "node install-husky.mjs"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/franklesniak/TerraformStyleGuide.git"
+        },
+        "keywords": [
+          "terraform",
+          "style-guide",
+          "coding-standards"
+        ],
+        "author": "Frank Lesniak, Blake Cherry, and Danny Stutz",
+        "license": "MIT",
+        "bugs": {
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/issues"
+        },
+        "homepage": "https://github.com/franklesniak/TerraformStyleGuide#readme",
+        "devDependencies": {
+          "glob": "13.0.6",
+          "husky": "^9.1.7",
+          "jsonc-parser": "3.3.1",
+          "markdown-it": "14.3.2",
+          "markdownlint": "0.41.1",
+          "yaml": "2.9.0"
+        }
+      },
+      "selected_lock_entries": {}
+    },
+    {
+      "repository": "TF",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "manifest": null,
+      "selected_lock_entries": {
+        "": {
+          "name": "terraformstyleguide",
+          "version": "1.0.0",
+          "license": "MIT",
+          "devDependencies": {
+            "glob": "13.0.6",
+            "husky": "^9.1.7",
+            "jsonc-parser": "3.3.1",
+            "markdown-it": "14.3.2",
+            "markdownlint": "0.41.1",
+            "yaml": "2.9.0"
+          }
+        },
+        "node_modules/@types/katex": {
+          "version": "0.16.7",
+          "resolved": "https://registry.npmjs.org/@types/katex/-/katex-0.16.7.tgz",
+          "integrity": "sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==",
+          "dev": true,
+          "license": "MIT"
+        },
+        "node_modules/katex": {
+          "version": "0.16.27",
+          "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+          "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+          "dev": true,
+          "funding": [
+            "https://opencollective.com/katex",
+            "https://github.com/sponsors/katex"
+          ],
+          "license": "MIT",
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "bin": {
+            "katex": "cli.js"
+          }
+        },
+        "node_modules/markdownlint": {
+          "version": "0.41.1",
+          "resolved": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+          "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "engines": {
+            "node": ">=22"
+          },
+          "funding": {
+            "url": "https://github.com/sponsors/DavidAnson"
+          }
+        },
+        "node_modules/micromark-extension-math": {
+          "version": "3.1.0",
+          "resolved": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+          "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "funding": {
+            "type": "opencollective",
+            "url": "https://opencollective.com/unified"
+          }
+        }
+      }
+    },
+    {
+      "repository": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+      "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "manifest": {
+        "name": "psstyleguide-agent-governance",
+        "version": "1.0.0",
+        "private": true,
+        "description": "Locked agent-governance validation for PSStyleGuide.",
+        "license": "MIT",
+        "engines": {
+          "node": "24.18.1",
+          "npm": "11.16.0"
+        },
+        "packageManager": "npm@11.16.0",
+        "scripts": {
+          "bootstrap:agent-instructions": "node .github/workflows/NpmTools.mjs install",
+          "lint:md": "npm --prefix .github/workflows run lint:md",
+          "lint:md:nested": "npm --prefix .github/workflows run lint:md:nested",
+          "test:agent-instructions": "pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/franklesniak/PSStyleGuide.git"
+        },
+        "devDependencies": {
+          "markdown-it": "14.3.2"
+        }
+      },
+      "selected_lock_entries": {}
+    },
+    {
+      "repository": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+      "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "manifest": null,
+      "selected_lock_entries": {
+        "": {
+          "name": "psstyleguide-agent-governance",
+          "version": "1.0.0",
+          "license": "MIT",
+          "devDependencies": {
+            "markdown-it": "14.3.2"
+          },
+          "engines": {
+            "node": "24.18.1",
+            "npm": "11.16.0"
+          }
+        }
+      }
+    },
+    {
+      "repository": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+      "manifest": {
+        "name": "psstyleguide",
+        "version": "1.0.0",
+        "description": "Repository Markdown tooling.",
+        "private": true,
+        "scripts": {
+          "lint:md": "node lint-markdown.mjs",
+          "lint:md:nested": "node lint-nested-markdown.js",
+          "prepare": "node install-husky.mjs"
+        },
+        "repository": {
+          "type": "git",
+          "url": "git+https://github.com/franklesniak/PSStyleGuide.git"
+        },
+        "keywords": [
+          "powershell",
+          "style-guide",
+          "coding-standards"
+        ],
+        "author": "Frank Lesniak",
+        "license": "MIT",
+        "bugs": {
+          "url": "https://github.com/franklesniak/PSStyleGuide/issues"
+        },
+        "homepage": "https://github.com/franklesniak/PSStyleGuide#readme",
+        "devDependencies": {
+          "glob": "13.0.6",
+          "husky": "^9.1.7",
+          "jsonc-parser": "3.3.1",
+          "markdown-it": "14.3.2",
+          "markdownlint": "0.41.1",
+          "yaml": "2.9.0"
+        }
+      },
+      "selected_lock_entries": {}
+    },
+    {
+      "repository": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      "manifest": null,
+      "selected_lock_entries": {
+        "": {
+          "name": "psstyleguide",
+          "version": "1.0.0",
+          "license": "MIT",
+          "devDependencies": {
+            "glob": "13.0.6",
+            "husky": "^9.1.7",
+            "jsonc-parser": "3.3.1",
+            "markdown-it": "14.3.2",
+            "markdownlint": "0.41.1",
+            "yaml": "2.9.0"
+          }
+        },
+        "node_modules/@types/katex": {
+          "version": "0.16.7",
+          "resolved": "https://registry.npmjs.org/@types/katex/-/katex-0.16.7.tgz",
+          "integrity": "sha512-HMwFiRujE5PjrgwHQ25+bsLJgowjGjm5Z8FVSf0N6PwgJrwxH0QxzHYDcKsTfV3wva0vzrpqMTJS2jXPr5BMEQ==",
+          "dev": true,
+          "license": "MIT"
+        },
+        "node_modules/katex": {
+          "version": "0.16.27",
+          "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+          "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+          "dev": true,
+          "funding": [
+            "https://opencollective.com/katex",
+            "https://github.com/sponsors/katex"
+          ],
+          "license": "MIT",
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "bin": {
+            "katex": "cli.js"
+          }
+        },
+        "node_modules/markdownlint": {
+          "version": "0.41.1",
+          "resolved": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+          "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "engines": {
+            "node": ">=22"
+          },
+          "funding": {
+            "url": "https://github.com/sponsors/DavidAnson"
+          }
+        },
+        "node_modules/micromark-extension-math": {
+          "version": "3.1.0",
+          "resolved": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+          "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "funding": {
+            "type": "opencollective",
+            "url": "https://opencollective.com/unified"
+          }
+        }
+      }
+    }
+  ],
+  "registry": [
+    {
+      "package": "katex",
+      "url": "https://registry.npmjs.org/katex",
+      "raw_sha256": "555cfef543ede66dd197f2a58b23d67422fe1a341f60b26402446e63e6e917be",
+      "dist_tags": {
+        "latest": "0.19.0"
+      },
+      "modified": "2026-10-01T16:54:55.142Z",
+      "published_times": {
+        "0.16.0": "2022-06-06T16:13:33.555Z",
+        "0.16.1": "2022-08-28T04:24:49.066Z",
+        "0.16.10": "2024-03-24T22:12:42.137Z",
+        "0.16.11": "2024-07-02T15:51:21.948Z",
+        "0.16.12": "2024-12-08T16:53:42.001Z",
+        "0.16.13": "2024-12-08T21:55:32.118Z",
+        "0.16.14": "2024-12-08T22:07:07.095Z",
+        "0.16.15": "2024-12-09T19:27:14.677Z",
+        "0.16.16": "2024-12-17T15:03:08.440Z",
+        "0.16.17": "2024-12-17T15:09:42.501Z",
+        "0.16.18": "2024-12-18T17:06:36.686Z",
+        "0.16.19": "2024-12-29T14:52:16.768Z",
+        "0.16.2": "2022-08-29T21:57:34.048Z",
+        "0.16.20": "2025-01-12T21:50:50.593Z",
+        "0.16.21": "2025-01-17T20:30:40.613Z",
+        "0.16.22": "2025-04-09T22:03:05.138Z",
+        "0.16.23": "2025-10-03T18:34:55.384Z",
+        "0.16.24": "2025-10-12T11:39:02.138Z",
+        "0.16.25": "2025-10-13T03:01:01.703Z",
+        "0.16.26": "2025-12-07T16:01:09.332Z",
+        "0.16.27": "2025-12-07T21:01:19.426Z",
+        "0.16.28": "2026-01-25T20:58:14.998Z",
+        "0.16.29": "2026-02-22T16:36:09.505Z",
+        "0.16.3": "2022-10-22T16:11:19.225Z",
+        "0.16.30": "2026-02-22T21:30:41.267Z",
+        "0.16.31": "2026-02-22T22:42:14.936Z",
+        "0.16.32": "2026-02-22T22:48:28.414Z",
+        "0.16.33": "2026-02-23T18:05:25.705Z",
+        "0.16.34": "2026-03-05T14:34:08.863Z",
+        "0.16.35": "2026-03-05T17:45:14.237Z",
+        "0.16.36": "2026-03-06T17:39:43.264Z",
+        "0.16.37": "2026-03-06T17:58:55.734Z",
+        "0.16.38": "2026-03-08T17:02:54.737Z",
+        "0.16.39": "2026-03-19T13:42:21.240Z",
+        "0.16.4": "2022-12-07T23:04:49.743Z",
+        "0.16.40": "2026-03-20T12:28:30.518Z",
+        "0.16.41": "2026-03-24T14:26:35.699Z",
+        "0.16.42": "2026-03-24T19:56:06.454Z",
+        "0.16.43": "2026-03-26T07:20:17.270Z",
+        "0.16.44": "2026-03-27T13:51:29.436Z",
+        "0.16.45": "2026-04-05T13:32:39.675Z",
+        "0.16.46": "2026-05-13T18:12:43.377Z",
+        "0.16.47": "2026-05-16T07:48:35.236Z",
+        "0.16.5": "2023-04-17T17:52:04.374Z",
+        "0.16.6": "2023-04-17T20:02:39.976Z",
+        "0.16.7": "2023-04-28T11:42:25.217Z",
+        "0.16.8": "2023-06-24T05:29:53.905Z",
+        "0.16.9": "2023-10-02T20:11:17.134Z",
+        "0.18.2": "2026-08-08T11:55:16.681Z",
+        "0.19.0": "2026-10-01T16:54:54.994Z"
+      },
+      "selected_versions": {
+        "0.16.0": {
+          "version": "0.16.0",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "4faff4c905aad0c6010e85901c4d9140efb80a5e",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.0.tgz",
+            "fileCount": 204,
+            "integrity": "sha512-wPRB4iUPysfH97wTgG5/tRLYxmKVq6Q4jRAWRVOUxXB1dsiv4cvcNjqabHkrOvJHM1Bpk3WrgmllSO1vIvP24w==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDZ7b7YqITVxk1RgvRwvejq+/hmw518j3mS6YCn7ChppQIgeouRDNO9KAb07RvyHLAVWctT1Gs5jnSZDB3nFjkrBYQ=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3939413,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJinietACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpAHA/+IxgU4/rIu2Vc0785MaitROUSTq2lpXWb8458+RqJ9kdkdG8p\r\n6R7+3gWvTj8ETci93Fi0ftjme2t5AqE+kHiHtguXB0DkCYvYTB81cJc4lEvH\r\n/0Sxi7cnshB0XaoL2RM2yhYiAh6t309xWUzcR8Q4x19HRQuuj/wp0RULkFAo\r\ncNkiRSKWOOpKeAcElSL+iSM6uSo+k7vKbsYCbZbP7lWfVT3VFP2bNRkxDPSc\r\nTI6giTCL84ya5o2JMCMx+adTgn3B6RrwK6NvKyg0ldTggqcIVzwjyuGcttQo\r\njTMrF4Rdm46uo42z7b7ZN1RXh91SqcrGyGOzknVXwJPjR8uaCYtOZ0VE8OBh\r\nkTFtvLOK614ckizTQdyKJSrsEnkz9msAK38TuJrdqlSne0Xt5OgywuA+j5AE\r\nu0M8te6qr80RFeBVAko9gSDtbcmFE2vvFsn/RyWYg9FuE6zT+ErkvvunZ1Yi\r\nUBYHdbsRgnKAJPuER7bQY/YG+07qFEgkbyhDyZ7j8DxT+q1xWfM5NShsC2zE\r\n6EiBpVIcnt/vl6mBn3v6z1vPOdIdhyvygTjWXnBadZ6UnyCcGMd2LWcSs5Tk\r\nkEmrdbCX3lnkfayLch1ELpO4cEP4EzncRzD8p+7Ns8I0aSKO83hK+Iks0+JL\r\nH/qMNlwMzpN9fb3J1/5Jo3P5FdAVK22aAOA=\r\n=jPRV\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.1": {
+          "version": "0.16.1",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "f03279fc1ddc611ab530c9be072101299cfdc87a",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.1.tgz",
+            "fileCount": 204,
+            "integrity": "sha512-UBMAkwVv0kG5StxdAegSSCPSUb8oXO5WIIMm/c9GP+7gR3BNcmdNnmA3FIgJlsKKjRyapWFQj27h9+CNjbxVIw==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDKkeHXV2n7v2dD/Cgsmsur2i2tAEQoOYkNgTgYcd+v8gIgLgYAFMvPP3vXuGrUkAf5+IBYmodRkGJOi03fI8wSC1c=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3956979,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjCu4RACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpRNA//dTljiyJuFvFqfh/klsG7zF85wTudmLtcPqJ9sV9/INaxoo4n\r\nL/Wz5A19G8dPDLQ4vjVoMqAeMeHCjZCBltSp2Kpf7fvTy/1YTq2M/4l/Mf1v\r\nNZAyV1u3aMZmk+k0ZFM4rLmfAzmo4v/VhUWdNsi04MnOdS6OL94nwZ9gW+uN\r\nFfjFVkgMJTBl0BwNElDcPwcjWjo9byP8n2Y1VYCXL+QRjBHq1BThDxW/P1/S\r\nE4LJKcDkv6FIYI0vFlp5DYjRqOMLcWOpWW9b3Kiz0Ts4Pf5Er+2tfx6Qkkd7\r\nz6NabIpHovy3WSjc/2KZBIH+9anV56eyLr5CnGr5GNpLU7O0+Zo1sEZgA7cx\r\nudxsxRQjwZhzcihiCRqFKYeY4fZL2u8mtPFadbVIGULrKD2yABz5GcyScEVk\r\n0A6GoUJWGRUUeDQdrSdynIdN7IbP4UfdsgUUmjaT+PfMQZe75hIReoDmL8jr\r\n/y+8umkXATgc9ZPONKUBrQNiEvZFMOVwd8COvAKaxysz4NWCgQ6+KL6Hvpb+\r\nfPl7lDPkItaeza8Qdao0SxmH6ClnJPWPoMTZgQlEWQ7lM3DBS+uLvhBn36gB\r\ntqqdD9382yPB5nveNfdDCMKzfI1/775oe3uLFppgM7WGKxt/N0UPf5nz4xS7\r\ni4sgEV+dD3HgTOaAaQ4qp8syexFFfLB3598=\r\n=9bNg\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.10": {
+          "version": "0.16.10",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "6f81b71ac37ff4ec7556861160f53bc5f058b185",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.10.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-ZiqaC04tp2O5utMsl2TEZTXxa6WSC4yo0fv5ML++D3QZv/vx2Mct0mTlRx3O+uUkjfuAgOkzsCmq5MiUEsDDdA==",
+            "signatures": [
+              {
+                "sig": "MEQCIC3MmKBtwv97+pD9FFbQ5j2YG6tq8M3gCAjtmtH6e1T9AiBJZwiolz1lIEm3eJYVggp1IktiNO9QaORkSAwZdO2bjQ==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3957540
+          },
+          "deprecated": null
+        },
+        "0.16.11": {
+          "version": "0.16.11",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "4bc84d5584f996abece5f01c6ad11304276a33f5",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.11.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-RQrI8rlHY92OLf3rho/Ts8i/XvjgguEjOkO1BEXcU3N8BqPpSzBNwV/G0Ukr+P/l3ivvJUE/Fa/CwbS6HesGNQ==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDidDd+JOtFwWzoa52sf0ONzUiqc28sBRdWn1H/8xv2sQIhAKEg3Dm6/qUQfFjh4u+w3OfSwFZPFCe7e7KQcvOpMlKT",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3962415
+          },
+          "deprecated": null
+        },
+        "0.16.12": {
+          "version": "0.16.12",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "a81e0658ea471a6421d0a995abc9bbb2f4cc9c82",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.12.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-PB5jsdbRVdtAOlGfDmpQTAnofvHb/13/tJMg2m5UOGkLP2gabxvbwoB3IMUXfsYI6iMphFz/gNtYZ5GBEaRthg==",
+            "signatures": [
+              {
+                "sig": "MEUCIQCR6MYMisjoHwcOA6SX1M5X5tlpfEmXNgqRa9kUYf8XLwIgdy4L3W1tSTQDJxlVqaw3oxKGlDPVeHHS/FWKLvgLZsw=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3961883
+          },
+          "deprecated": null
+        },
+        "0.16.13": {
+          "version": "0.16.13",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "3d8fde0ab5007b51cf7894f218d51803b9b7dfe5",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.13.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-epFEaPsNUdHcJ5Ax1OHdPbiiIyCgqsbgGhPznDa78DJ+jdo9vCNSEf/aujFtCTo8s4xnpDgsNinZHu/qQH+xUw==",
+            "signatures": [
+              {
+                "sig": "MEUCIEsNv4L8M+c+7hZL9saFna5AUZcqxs1uaFpYfkgmk/cBAiEAzbhBvc9RfkCs4XpZGrwMEBEfZScomnB7N2Ksv7nP8Zw=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3962430
+          },
+          "deprecated": null
+        },
+        "0.16.14": {
+          "version": "0.16.14",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "888e230b82403425f3ddf1d26b34f7f894ce1a98",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.14.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-tnUUAL/S+f/w8KrRpCFcCW/msuIlBkOmVnTmvdEK6WCkx6uDPRj3d9SBAP+qB5x0MCeOyUbdbIMtT5cUJD8aRw==",
+            "signatures": [
+              {
+                "sig": "MEQCICuk9oA4ublcfV73iHHzoYbevZ6ivI6m32lVJ0isnGFQAiBD9n2giHS0BObBx0O46o3awXRHgPfZVTipLqpnkv8w6g==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3963568
+          },
+          "deprecated": null
+        },
+        "0.16.15": {
+          "version": "0.16.15",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "16b0d235aae8dfa3b2d5d63fd9874bfa394abfab",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.15.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-yE9YJIEAk2aZ+FL/G8r+UGw0CTUzEA8ZFy6E+8tc3spHUKq3qBnzCkI1CQwGoI9atJhVyFPEypQsTY7mJ1Pi9w==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDhEtzP1VqyLwaeyaVto9FZzGc/NZH03/6hgE1/kh4GegIhALkm1A725AEKvASosFcP6MlUSHXaheOAWnSSqBdGfqrm",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3964270
+          },
+          "deprecated": null
+        },
+        "0.16.16": {
+          "version": "0.16.16",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "ca3ae7bea035e2848f552c5736e5e4f263d189a7",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.16.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-KaxHoO5VuLmCfOLkiBGZzGz03RW/4YeUs9A8OcrUHQx3flq6K/mzOpUxwUxLaRoR1B1ZeeSIdTinDOQ4y1n75Q==",
+            "signatures": [
+              {
+                "sig": "MEUCICbHIhyDyGzfi5mFT+k2JFjFLjVlhe1NV6m7zJQF5X6SAiEA5PH6edMTepjDB8UsM4iMtKbL7mIbD32s1+J4HT4Bk8U=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3965282
+          },
+          "deprecated": null
+        },
+        "0.16.17": {
+          "version": "0.16.17",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "72c588a0beca0cac10c30f447c2fb14647f773ed",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.17.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-OyzSrXBllz+Jdc9Auiw0kt21gbZ4hkz8Q5srVAb2U9INcYIfGKbxe+bvNvEz1bQ/NrDeRRho5eLCyk/L03maAw==",
+            "signatures": [
+              {
+                "sig": "MEUCIQD4krOemWiGgjOQpDm74JclpXpBrBjyKFUxC7rhLcCr9wIgGGVzSc5blj8RPmgAqS75GHGPAdH/E+jCkVGLb0ITLbM=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3971812
+          },
+          "deprecated": null
+        },
+        "0.16.18": {
+          "version": "0.16.18",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "20781284288bc52805c519e48ac756163ad4b1f3",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.18.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-LRuk0rPdXrecAFwQucYjMiIs0JFefk6N1q/04mlw14aVIVgxq1FO0MA9RiIIGVaKOB5GIP5GH4aBBNraZERmaQ==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCSP7bgHDhQ6WZP0FSPFrWOC+9SQ17TvERHOXjPCvCGrQIhAN7b1swDY44IAOInLbeNwr52fWtEVCyFqgOKf38RIfo+",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3979949
+          },
+          "deprecated": null
+        },
+        "0.16.19": {
+          "version": "0.16.19",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "698e026188876f9c8c93d3ecb27b212aaa056d0a",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.19.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-3IA6DYVhxhBabjSLTNO9S4+OliA3Qvb8pBQXMfC4WxXJgLwZgnfDl0BmB4z6nBMdznBsZ+CGM8DrGZ5hcguDZg==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCQJJkKjM5Yt+bWCZSjYwyVD3J90We/k0tSHI/kS9uXAAIhAMDxRbixH6bOGHUQKBx1QddczUZpkynsy519O2pNVa9I",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3980523
+          },
+          "deprecated": null
+        },
+        "0.16.2": {
+          "version": "0.16.2",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "9d3dc2a7e65fb8aa31101b1f86888ec40eed7b24",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.2.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-70DJdQAyh9EMsthw3AaQlDyFf54X7nWEUIa5W+rq8XOpEk//w5Th7/8SqFqpvi/KZ2t6MHUj4f9wLmztBmAYQA==",
+            "signatures": [
+              {
+                "sig": "MEUCIADCfEvX1apheuTl2I7eccgSF3GA967o3KnAK/WKq4INAiEAiIA3riEkeAjmvim5rdYXjEXlD/YsBRK/GeKX1kbxopI=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3965354,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjDTZOACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpeBQ/+L1B8YcciYjmLpEsaDf9kxMPuYgRWcmqi0DRgHGMUhKVSgi+z\r\nz6Y+pew25kC5dKOLLpgWYovtJTOa8IFRl5kR1aBkpfifygZUErKPRtt+MRf0\r\n7fOlCw7/r8PDRWmVMNzad9DzIsAsPcbgQTebM7frKn/wK7/Z2IavH66nOsbF\r\nXE8xMKW0+kEOkgt6AAblHNgTkXe351q85+tEVndSnCghlvx6vQPqD214kiyh\r\nWeWCBWWJ8fkFW13ejdzF0BhHJTyCA32hbrYToe4HkQgdADSVW2W2rBsDcVK/\r\nN1B20I1Xr8FGz78bp9PSNF+P4o3uCMYeNqILSu9NMK04P3XC0FRKOkE96uW6\r\nfAWfjijjB5DTSDQg6wz970vVkDuzA5AzqTuh1n7ttQ8fTfn1/vDDC2prsjXi\r\nies1s2HiAUVDRJE6etTXjzi6OW5sef7brGKg5AkWoc3AKqrR8ICXAEhrSPIL\r\nh9M8rf/WY6r8a3jrT/g3ZusIoRErmAuOrUxZtDFXqOwZTbHsNLx+yl1wmc41\r\nDcfDdHUBPruB7AIvihrax5MP2z29cQMLTjzBuVXSXry/APq3TahOzTlp5FSk\r\nf42CeWVcSpZxPioPJ2PrB9QYqzAan7chVzc/KNmxYbBxT9Ci+MF/ND4nFfr5\r\nR9O/VMIci7RrJVjxhR4eVkFp5HJd42r5pgI=\r\n=9j+4\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.20": {
+          "version": "0.16.20",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "75c741ded0f7ee8d896a1d31bac307e61af863c3",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.20.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-jjuLaMGD/7P8jUTpdKhA9IoqnH+yMFB3sdAFtq5QdAqeP2PjiSbnC3EaguKPNtv6dXXanHxp1ckwvF4a86LBig==",
+            "signatures": [
+              {
+                "sig": "MEQCICgj3w4bfywNcpPlRtuRd74tS4iOpumDpcNo7hCZ2dlEAiBoLv2Zjhlt/7oD+MFpY2T0zf6Emt1C4OwjhFhmJ4GQhA==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3980834
+          },
+          "deprecated": null
+        },
+        "0.16.21": {
+          "version": "0.16.21",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "8f63c659e931b210139691f2cc7bb35166b792a3",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.21.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-XvqR7FgOHtWupfMiigNzmh+MgUVmDGU2kXZm899ZkPfcuoPuFxyHmXsgATDpFZDAXCI8tvinaVcDo8PIIJSo4A==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDHqIMzvysf8XJcnztgrZnsD8EeiLDNnP3nhB3oAOW8ewIgQOojt2kua7hVDJsbHhnw1eAP0qpufIEk4guNUdk6pU8=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3982429
+          },
+          "deprecated": null
+        },
+        "0.16.22": {
+          "version": "0.16.22",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "d2b3d66464b1e6d69e6463b28a86ced5a02c5ccd",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.22.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-XCHRdUw4lf3SKBaJe4EvgqIuWwkPSo9XoeO8GjQW94Bp7TWv9hNhzZjZ+OH9yf1UmLygb7DIT5GSFQiyt16zYg==",
+            "signatures": [
+              {
+                "sig": "MEUCIBzomVt1IIPaXWT/AE38pgmZ9hf9RIPJcF+zZO0yBiTFAiEA4z4t+CTjNW1FGtjWIowpzZz9A9OsLEhpcrc7yXy3D2s=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3984019
+          },
+          "deprecated": null
+        },
+        "0.16.23": {
+          "version": "0.16.23",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "24f2655a7922d0efb388107743718a4fd176265c",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.23.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-7VlC1hsEEolL9xNO05v9VjrvWZePkCVBJqj8ruICxYjZfHaHbaU53AlP+PODyFIXEnaEIEWi3wJy7FPZ95JAVg==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCq+7NXFkoYBlcZE9CQ4qX+tL6kzM6KaCrUq8Ds5bcWOQIhAOfHKnAb5EFKv95ElJwWAo/0uXv6MWCQorOTrorKnj8R",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3984159
+          },
+          "deprecated": null
+        },
+        "0.16.24": {
+          "version": "0.16.24",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "5fd1d5aabf9075f9469e7e380bcd488670cc2fbb",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.24.tgz",
+            "fileCount": 206,
+            "integrity": "sha512-g/PXUTqqppA6XL2beQtIxoYBPdO1u3vnc2FHMQqJ53n9L5faHDm7UYa+tlYvnNQRuSX6eVusF30/v7ADkcFC8A==",
+            "signatures": [
+              {
+                "sig": "MEQCIGvqCEmsXBurPlTyeuWNszbnOCpFj9fG1TNEhGSzGdKlAiA9TUEYIDyQMeIZ8QSkc/92O+U8ZKLQtfgb5kh4/P4+uQ==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 3983085
+          },
+          "deprecated": null
+        },
+        "0.16.25": {
+          "version": "0.16.25",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "61699984277e3bdb3e89e0e446b83cd0a57d87db",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.25.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-woHRUZ/iF23GBP1dkDQMh1QBad9dmr8/PAwNA54VrSOVYgI12MAcE14TqnDdQOdzyEonGzMepYnqBMYdsoAr8Q==",
+            "signatures": [
+              {
+                "sig": "MEYCIQD7nN9wsr/CAKBj/NEq9Ihwwq53uul0egQmLMWmABUH1QIhAPiWpXQ4bG5BrjbJXzUDahkQMzG+0F8YH4uSRUnTdMmg",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4039588
+          },
+          "deprecated": null
+        },
+        "0.16.26": {
+          "version": "0.16.26",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "7bfd7fd2ce10cffdf872a3a6c5a593c26d1bd084",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.26.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-LvYwQDwfcFB3rCkxwzqVFxhIB21x1JivrWAs3HT9NsmtgvQrcVCZ6xihnNwXwiQ8UhqRtDJRmwrRz5EgzQ2DuA==",
+            "signatures": [
+              {
+                "sig": "MEUCICBr9eJjMe3oOhm3nq8dx3PYGu2XryTmmjR3Jj/ak/jIAiEArxI5cNOmTUmzVFSz1ho6DhskwikNlQPciXY9xVub5Ig=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4039700
+          },
+          "deprecated": null
+        },
+        "0.16.27": {
+          "version": "0.16.27",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "4ecf6f620e0ca1c1a5de722e85fcdcec49086a48",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQC9A9wa5zT79vcrBiYW6kRlDgF4VhzFLg7NUOtDGH8wBAIhALM3v5iImXqOouXmcKH1EL7MdNRsBcwBxFzOjD+QqLS3",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4040184
+          },
+          "deprecated": null
+        },
+        "0.16.28": {
+          "version": "0.16.28",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "64068425b5a29b41b136aae0d51cbb2c71d64c39",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.28.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-YHzO7721WbmAL6Ov1uzN/l5mY5WWWhJBSW+jq4tkfZfsxmo1hu6frS0EOswvjBUnWE6NtjEs48SFn5CQESRLZg==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCbrcv14N9zTHPRXVuolJZZquKllzdGJ+4J/Look5oWYQIhAICBELjgvx5BeMy4eTU1qYzWUvukkr48HLD6kaydoUlw",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4040218
+          },
+          "deprecated": null
+        },
+        "0.16.29": {
+          "version": "0.16.29",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "d6d2cc2e1840663c2ceb6fc764d4f0d9ca04fa4c",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.29.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-ef+wYUDehNgScWoA0ZhEngsNqUv9uIj4ftd/PapQmT+E85lXI6Wx6BvJO48v80Vhj3t/IjEoZWw9/ZPe8kHwHg==",
+            "signatures": [
+              {
+                "sig": "MEUCIDHWBnQ2XCGqvt8QwjigW3rr+W7py+oz5urkwvJj297GAiEA9Hgq9SYJf0KhwU7Ifk/UfNmogYQZcobx1AsGJXRbn/Q=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4021941
+          },
+          "deprecated": null
+        },
+        "0.16.3": {
+          "version": "0.16.3",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "29640560b8fa0403e45f3aa20da5fdbb6d2b83a8",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.3.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-3EykQddareoRmbtNiNEDgl3IGjryyrp2eg/25fHDEnlHymIDi33bptkMv6K4EOC2LZCybLW/ZkEo6Le+EM9pmA==",
+            "signatures": [
+              {
+                "sig": "MEQCICXONC1IgYtrJzbV6ZLumC8+0lkExWFFfZBeBKVPSIXaAiBAsmZRk9XeRFr2k+9K0sFKtQyKLj/xEqy/jGZKx9kXjw==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3965924,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjVBYnACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmqZGxAAhbjV+FXCp3OZy/NxAO816bvqhEsycAaZUgl/h+Pnoh1X8dnZ\r\nCoshbb1abc90xw6Bg1lGcycAYwcxeEtHy7xUYiToALa5/cwpp5LTtDYiYG56\r\nMSW1zvpsz/ACMH8shhgreShDSJrTwnCOqG1lZeEl7hu+JJ+lnDFKC55J26EX\r\nhxRRPFkrg/2i0u8SIHDij/qcTZ+TLk+eIWnVCpI5YvnkAyWcREE3vnrF2XVY\r\nI3my65MLJhUs1ZZrf2ePo8V1KsEuyK4rosxJprKApH4vuRDE5KaKRr2CVgE8\r\nFkCNAwZgJvL/lPX96TGg91Ge6Fsvgg4mw1yK4jy4XERygIbJ1tW1T8xKt26z\r\nQnuXFO4oO39fYWthibLQxlXvIfkSzkrCCVX8vb610nqXIO85EizUkrDyfdWb\r\nQftB+GDO1Zt5T+nyiX4HK5dGzqKADlBSNOeKd9gZ5O8b8q27FLRxG93n52lT\r\nM8rfVXchvRF8ZLaqlAGzsrYpxKFx5r2lwQg0ny2esSptPyVe8R69AeCS/g2d\r\n/stf4pHznP6IZGUPgsOjfOcwkEl+3r151YRCoZnvvEzxz1P8wpswJ5mnBWK0\r\nn45jB0mF6rnaqyG/Ua4CpBGBnkKDubM/3nW5NtkE+PwHaRyGOrjto7G/oL87\r\n4xHFFb+6UGEhg29qpfkE1vvMNw4PE6X8OnA=\r\n=cM7V\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.30": {
+          "version": "0.16.30",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "a286fc6d91b3448328a27954d8cab8a183f14c88",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.30.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-sLI15PjdxqkQORYiFG/wXJ+v+Am8LkHaLYwsmqYtt1SrqyMfE45ciLa+seFMyl83pLBp+lTrxXOvbpFqvzto/g==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDF0Gh3/i0pbnfh+TcTc/CjsbwfPirAuUKmLE0YyDHJOQIhAP2ks1ZjtQHKRrFAE7Gvx9c6bgeWP+WQWERPK4VIpxLa",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4021999
+          },
+          "deprecated": null
+        },
+        "0.16.31": {
+          "version": "0.16.31",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "12e50f06e876ccb9b80bc5cf730f677a04fa2186",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.31.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-qo5+xEuot6oAZMVrixZH8kEPXP73uxxI9rj8+Nv+RpphT3WXYkoVAR/FuX7Q9cz+Q0jEfL1v0MCrBi2DfHj4JA==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDdrbnKRfkRjITKCYVoKVrqqBDLA/bd8b11xfe2cZj98AIgY9xOmK3fXDbVRcgDbAgV7vBCJqov9osvokIh6sIacbk=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4017242
+          },
+          "deprecated": null
+        },
+        "0.16.32": {
+          "version": "0.16.32",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "4f0cbfb68db20f2ea333173c35e8e45d729a65fa",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.32.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-ac0FzkRJlpw4WyH3Zu/OgU9LmPKqjHr6O2BxfSrBt8uJ1BhvH2YK3oJ4ut/K+O+6qQt2MGpdbn0MrffVEnnUDQ==",
+            "signatures": [
+              {
+                "sig": "MEQCICtqJzluWTHPyCrtmu44ADBIZAx1mg1z/5rnE6QePAyAAiBKd8lhzRuxXGVa2WxHS3+kp9TFiPHHEf51FNysTflzDw==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4017826
+          },
+          "deprecated": null
+        },
+        "0.16.33": {
+          "version": "0.16.33",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "5cd5af2ddc1132fe6a710ae6604ec1f19fca9e91",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.33.tgz",
+            "fileCount": 209,
+            "integrity": "sha512-q3N5u+1sY9Bu7T4nlXoiRBXWfwSefNGoKeOwekV+gw0cAXQlz2Ww6BLcmBxVDeXBMUDQv6fK5bcNaJLxob3ZQA==",
+            "signatures": [
+              {
+                "sig": "MEQCIGrCxvtzl3dPMs3a5GeHFz3Mlwx5wp3w1ZmGvbaAQYtqAiAq0l1T8lT8MWLG0TXiFpQTZU/JWcaamNSsWm/+yDjaFg==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4018137
+          },
+          "deprecated": null
+        },
+        "0.16.34": {
+          "version": "0.16.34",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "a4f5d2fe0b1cb916ed3bcf8d4de3c02340a43fb7",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.34.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-z1RSvOYzV7dykg9Jwl3EfGhIfo9mrotTx1uuEXWpXRCBbX9eKVywxa60mvFYipjOSus5hzj+F7Kh2fmnjFwA5w==",
+            "signatures": [
+              {
+                "sig": "MEQCIBAC96WCwC+H8oqQBkM0DgtPIqetyUScoB28bnvgdFQ+AiAvBV1xxhtGZUAhF/Kf3isCUlN2Hm8ec7sI5LnKMjTj7g==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 6453871
+          },
+          "deprecated": null
+        },
+        "0.16.35": {
+          "version": "0.16.35",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "ed01b19a1994c3978c236c980d693efc9e3be027",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.35.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-S0+riEvy1CK4VKse1ivMff8gmabe/prY7sKB3njjhyoLLsNFDQYtKNgXrbWUggGDCJBz7Fctl5i8fLCESHXzSg==",
+            "signatures": [
+              {
+                "sig": "MEUCIQCdcUW5SiYe7ZTKS3cv9jvY7Y/Cw2pLGwA6x63vS42ESQIgMwfH7xLJD3T5l6nYEx5Pn5hsFkTJu19fD1VYD4ky/VU=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 6256166
+          },
+          "deprecated": null
+        },
+        "0.16.36": {
+          "version": "0.16.36",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "b5d817eb4ed9c0bb978b6122ee5c933ab0382949",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.36.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-1G6lbE9BmkGoDMgoOvUwYzIpc2uG4wbzm8IRZEsGnw1QVlEmagEaSlzSy03nQGZFI31ggCFG+DWOTNVkvqcgUw==",
+            "signatures": [
+              {
+                "sig": "MEUCIQD9T5NeYOiqNXAY5AedJIMqb0aph/mWLcYcfh2uTU0YmgIgRB6XUJSKFfrCHq+OQ9imwEO7asFlbnBhH2Ajqum9Jno=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4013888
+          },
+          "deprecated": null
+        },
+        "0.16.37": {
+          "version": "0.16.37",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "aae346d30ebfde946c915405a48099d71ab9b149",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.37.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-TIGjO2cCGYono+uUzgkE7RFF329mLLWGuHUlSr6cwIVj9O8f0VQZ783rsanmJpFUo32vvtj7XT04NGRPh+SZFg==",
+            "signatures": [
+              {
+                "sig": "MEUCIDdSgwBrgwDBm+rjCI/NG8rbkVF8SE+1rWYnjxTiRGLaAiEAzgO/rVleReavEGeGDJ5/D8LpQGSkZQ99yKb/gU4UODQ=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4009881
+          },
+          "deprecated": null
+        },
+        "0.16.38": {
+          "version": "0.16.38",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "45f7b9253ac6b6a80fd168ee893fe0209b755338",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.38.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-cjHooZUmIAUmDsHBN+1n8LaZdpmbj03LtYeYPyuYB7OuloiaeaV6N4LcfjcnHVzGWjVQmKrxxTrpDcmSzEZQwQ==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCxN8A1gGM3GBBgHoB+qLQb7dCQnKUUO2CacmSgX+OdMgIhAIFRJ03muAN+2UC1OtFZj0p4QNDJbfA0qC0I9mBQleDL",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4010758
+          },
+          "deprecated": null
+        },
+        "0.16.39": {
+          "version": "0.16.39",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "feebed0a95c6e0bae24e7d41d82c85e40558a7ef",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.39.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-FR2f6y85+81ZLO0GPhyQ+EJl/E5ILNWltJhpAeOTzRny952Z13x2867lTFDmvMZix//Ux3CuMQ2VkLXRbUwOFg==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDL3rtDJM2vHbEXEdkqttx9F0zFOVnlsEAohuLsb3IMmAIhAKlNrAzMGVg4ysgHgtaSwS/xMOjKw6xFToCnBFAhvb4C",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4011060
+          },
+          "deprecated": null
+        },
+        "0.16.4": {
+          "version": "0.16.4",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "87021bc3bbd80586ef715aeb476794cba6a49ad4",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.4.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-WudRKUj8yyBeVDI4aYMNxhx5Vhh2PjpzQw1GRu/LVGqL4m1AxwD1GcUp0IMbdJaf5zsjtj8ghP0DOQRYhroNkw==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDgZu3zrYnpzrN0CZ0AQwe+RmeS048qkKY8gh1N3DU9fQIhAIOPb52Vba8cBcEhSxOz7J5CfrRiRoX5mh+G1diK7sgz",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3966078,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJjkRwRACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmoItA/9HZdWyyBoe9JPCodkOgWNoSEYud1PeQENCkX4sZnmd3jwyR8A\r\nq6SZR4MHiyru2+QpvBOvMS967eQuJEU8HaGIy9CF71H5HQi54AuEMNdkkQS0\r\n6F4i6wiPZOCmya4Vl/8Z6pN+Hy1tYfVDDMVZwvLnLd1Vs2b3p+/RDhFUx5VI\r\nvZ3Ej/l/kuOccrFeQqz6pxdZn7DaIuO0IsVwwrumNcRem51u8oghBjJApkYw\r\nRDOwP1pAO0oVnlK6bqSZ1kjMJHgUqrjg1I/laLZsT2UiDu8UfvuVXLbkN56A\r\niPbi2ok2hT0f+Jyu7OAGOMHJ7KqNNl9WNTtsGXMlmTNS5A30Pu0V4/THJm6c\r\n/7EKR2yYlPZL15BtQaGNm14d480cUu25SsEvx0LuX2VsYlUmICHLtmhMKq0U\r\n66TXIfg37h3nCDrD6SEpIZ34VcTbcaZhLLGm+gM4HQGCVgb+vOo13Wk2Aq9I\r\nuCcq8S0+O+z1Ly51Eci6t1HfCEzcN5s9oqh9z8/NtaHIRFlWU7IFMxYg6Svt\r\nk4+vsAd0gSRJzLiz0CGMl+iIchBF+vODfdB6Iqn7L8UQ42L1RheTLBdl3I1n\r\nWIIJQg6JR/VvSkeCt0QZ/JfrSkVVVTBq4Ezji5XbMtTHWqvGcRscTnaire5D\r\n5bn63tM8dhjCDul9ZoK/Wi5AG6+iUbHXJO0=\r\n=Y/ZV\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.40": {
+          "version": "0.16.40",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "87c94e4149f8fa7c22ff95bae1dc687355a38d63",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.40.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-1DJcK/L05k1Y9Gf7wMcyuqFOL6BiY3vY0CFcAM/LPRN04NALxcl6u7lOWNsp3f/bCHWxigzQl6FbR95XJ4R84Q==",
+            "signatures": [
+              {
+                "sig": "MEQCIACV8c+wkn0HsshCRg6ZrRJlHDNEStrb68vaNpI7TVqqAiBtqVB7/gL2r1aTWRAjaj3e7RgnI0tbkOCrURoTnyeBKQ==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4011164
+          },
+          "deprecated": null
+        },
+        "0.16.41": {
+          "version": "0.16.41",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "21d5b950ddec764d2c6f445cded96406d8701ba3",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.41.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-AdDAqox1xU1h5yGai/uksjxwXby0gbRkwQaWvaE6Esp2wDX/Y/lL6qxQhVg84gzFsriyIv+WVg7bXaVy1PbcJg==",
+            "signatures": [
+              {
+                "sig": "MEQCIG30g3WPlWATVYBofmBMXAHYkvKEJn4OvWGD81pfDqNzAiAr62MUq+Ao1vag49W5+MlPi8ED6cAyn+UBlUYirvPoYQ==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4013075
+          },
+          "deprecated": null
+        },
+        "0.16.42": {
+          "version": "0.16.42",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "444e81ad095e1c14e54229f65c26b5ea4e5e153c",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.42.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-sZ4jqyEXfHTLEFK+qsFYToa3UZ0rtFcPGwKpyiRYh2NJn8obPWOQ+/u7ux0F6CAU/y78+Mksh1YkxTPXTh47TQ==",
+            "signatures": [
+              {
+                "sig": "MEUCIQD5s7ThPRIOBkQ67NsNRUPI04lVOfEhvkXUuoZOImtdqQIgGBaJSDHAqSSiHLtzLab34leOg3WJC1z7usOCKnYA4u8=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4016037
+          },
+          "deprecated": null
+        },
+        "0.16.43": {
+          "version": "0.16.43",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "db7920b61889d053a815d29ed2219a81c0b3c582",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.43.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-K7NL5JtGrFEglipOAjY4UYA69CnTuNmjArxeXF6+bw7h2OGySUPv6QWRjfb1gmutJ4Mw/qLeBqiROOEDULp4nA==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDINMsRhzlmACL5XK47pWJUimugYCQfG4cR+7MIa7UDfwIgVh7BdNF5Fg+HlDkNqUbDYRk64SYhSit/vc6nNSbBitE=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4015911
+          },
+          "deprecated": null
+        },
+        "0.16.44": {
+          "version": "0.16.44",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "fcd7c25803d999f17780bfefe859993d083fb4b6",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.44.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-EkxoDTk8ufHqHlf9QxGwcxeLkWRR3iOuYfRpfORgYfqc8s13bgb+YtRY59NK5ZpRaCwq1kqA6a5lpX8C/eLphQ==",
+            "signatures": [
+              {
+                "sig": "MEUCIQDC+lYdOdQ5vbL/PxaeoD5Vcqp5ftEHECF3ShIZuGQ1lgIgU3uFW5tgfbhXMeDoMlkdgvVgduT6AnHAVy6f45mzOKY=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4016222
+          },
+          "deprecated": null
+        },
+        "0.16.45": {
+          "version": "0.16.45",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "ba60d39c54746b6b8d39ce0e7f6eace07143149c",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.45.tgz",
+            "fileCount": 210,
+            "integrity": "sha512-pQpZbdBu7wCTmQUh7ufPmLr0pFoObnGUoL/yhtwJDgmmQpbkg/0HSVti25Fu4rmd1oCR6NGWe9vqTWuWv3GcNA==",
+            "signatures": [
+              {
+                "sig": "MEQCIHTbqndK0o9qSRVogLlCHrQR0d5HyZ4YNxGqBTRF3b2PAiB+VSpoFuPl3HelpWsBh8dnPITZa/1cVxrDgSsei44R4Q==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4015429
+          },
+          "deprecated": null
+        },
+        "0.16.46": {
+          "version": "0.16.46",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "8e19feefe14aac04c9d6516c086a78f61d06c0b4",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.46.tgz",
+            "fileCount": 212,
+            "integrity": "sha512-WHy4Coo+bGZyH7NwJKHkS04YFsFcarWbAEOAC3EMndzdN6VSZqklLLIgfxzyaW9jDoeGYJX9SWbJPKpecox0Uw==",
+            "signatures": [
+              {
+                "sig": "MEQCIApPFMuaRAPyE0qBQTzUphqqYEu9z0Y1oB05xfsN9sx/AiA5srL2krw3ohbyPZkZbyZ7NQoEGX1o+Vu/58QhPdEykg==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4037044
+          },
+          "deprecated": null
+        },
+        "0.16.47": {
+          "version": "0.16.47",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "0a13a42c2deb4f74e61f162d440b9165a548030f",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.47.tgz",
+            "fileCount": 212,
+            "integrity": "sha512-Eeo8Ys1doU1z+x8AZsPpQu+p/QcZBI5PeOo7QGQdy2x2m0MU/hYagBbGOmXwr5KVbEfVuWv9LpnQWeehogurjg==",
+            "signatures": [
+              {
+                "sig": "MEQCIF2DDQxmnXDqI3dUuYs1xLSnULJh8j5LBe+pL4itM//4AiBVZ010ZW0r/Yrq38q6ktzzKiy23MfszHKMn13L3VitLA==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4037040
+          },
+          "deprecated": null
+        },
+        "0.16.5": {
+          "version": "0.16.5",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "56c610663340418e464c4949ee26b8ee27a03bd7",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.5.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-f7YHQcZy8wQDWcKd4wA2z3M2aaznC5rdbMOqS/WngBeczKfq0cpLLOCfn2mkzPexu7NyaFVv2qT1Fn9wQ15Rug==",
+            "signatures": [
+              {
+                "sig": "MEUCIQCivc68MvibnfXUUexySEaMpPuvAhmIPqIdhmXM5doygAIgcYKkfWN97XV0GBlTBeM+f6j+4MOKX6LgOZ0naXUYzhA=",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3966544,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJkPYdEACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmpD8w/+Ky2hnMRYKJKyH/H+tsuRF1mciImHGAUbOfZKxI3Xyk0bB/Dw\r\nNFx8iMv+9c3s6j2pLAfm0PHPzZX7xTEM3CFzIyo2hhUwERFJzfAroFpiPtpm\r\no1+2z5uxqqbptC4BxliI38E3qMaz7jvFAFpwERPdwi55d2MyO1KK+W1vV9mB\r\nuVmuiZUyHhks6TkMlWUhgevwJIIflWPWQY1xRqsljdhUXv73bdXAJtUdzck2\r\nEepsDMcYg91e+Ulzimi5bvirSMTqiUW2EJEAmvKbdClNV4WXi+aPE+R7ah4E\r\nrvw8ACGdfWaUuPf3maYn3TGT1RxktKvIrZlZtKqbDGn3Yg6PbOTqrfIoJfdW\r\nt24nOx4EvR9tsuy6QC2X2gkUw6uTTcemytDgVM5hZr3j/JjHL6BA/DE0x4Pi\r\nIdkcWRiRtE0MZZx2ppCawZg5jrp1sQ+IRifjq/hq8kVyPWudCutZhRtNfbA+\r\nPxdS5NSvOQe5fwOB0XH//O1U4lgbzI+q5lId31AkkLacvuwQlmoqcoooiito\r\nW3usA7uLf/1EBCAo4BhOjCe6K25hqhVKEpEGIbRP0TcrjDRgXCSnTXuw7x+y\r\nGMYuhXub2W5014c0iPToisCA2NCJPHBsRxYLGMQOj/aDDwnRXEUCPhiN8yKZ\r\nS21neniHiD1es8wMYg25YKoRF3TegOH/Yf8=\r\n=EDmm\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.6": {
+          "version": "0.16.6",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "cf06c11bdda435b5ae5cb06efa080f4a4fcadf23",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.6.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-XVB7X8jEogjJ+OY+a9JdE+VOk9i7znela0HP6WaDbpB4sUh8ghrG0Ccluu2MA2tcJbFAViBC9aVXus2UvkEr8A==",
+            "signatures": [
+              {
+                "sig": "MEQCIHWdMYn8FdEffy9nOM4nfQZANUINGdop39yfnE7R8BSvAiB1OqBwhkFIJRVXFKYRENMm3ssESZ19Xw+j/bOIT1xPIQ==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3965849,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJkPaXgACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2Vmrt4w//aQ2BAHSn1NutK0lK41ghswqRECEBcU7DAtIXK/PaKoE9U4ZG\r\nWXtd86XiTj5zesSNvfFJpy0p0vsLYrc353tDjpY8gGLxfS24s0jYb1ia3soA\r\nDToGuY6CHy76d1mKLMA78zgUj5yVNjSz9rkOETAHBCOT4edXFhwRpOvtt7ft\r\n4MiMOALSrKaSyHyg+Nnsn6ANNx4SrFlD7UFiMlxf4XjJEQITgsJVkX+jDMsh\r\ng88DnCPi9sHhYj1WqKYKnlbJDPHjZFLZfUHvKppo5D7vOn8fUEZbrL+Ke87w\r\nijFD3kGW0mxJPRfmYAhjNKwGINJ9lAjAaZaFeR96TY5ZffMaIWZe09/GiG/G\r\n0WYQqoUS0NLPV17JDY8y5qJ/FDrPVXHFWTiAM3rofFNP506OUYucghCYU+YR\r\nmNGlY1VaP1lXpffxojz8n94T0gnVfgw7hwV6Ds6e2hoZjsFEdiP93YMbslS5\r\nW9upSi4QTt5fSzSSTvAlTM/YbxAOobMxGL2aiHvq0R87rvEdYgjQhPXZurEB\r\nwL4E6YcfYSfgmI4yiS533DkaMomwZlpMJkph/uCLF7SnE7i4DLfkLFCbQoww\r\njIXC6E8+ceqXIPAcQzojAcyQ6cPQtDezptxiz1lvrKuoBRxDrrhnnztjnrha\r\nDqKQOHXtHlIyuFgJHtdKP0OVt5H9CBdz6yY=\r\n=KEg/\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.7": {
+          "version": "0.16.7",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "36be1d4ed96e8afdc5863407e70f8fb250aeafd5",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.7.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-Xk9C6oGKRwJTfqfIbtr0Kes9OSv6IFsuhFGc7tW4urlpMJtuh+7YhzU6YEG9n8gmWKcMAFzkp7nr+r69kV0zrA==",
+            "signatures": [
+              {
+                "sig": "MEQCIC1MHXcgBw6W9D7M9vTwC/bY70SWwhWGeFkVv8B7P0PtAiAdsdKOIrascxbsWVjOd6PkBE9CQbLAaNXwkR7Wvr6eTw==",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3965849,
+            "npm-signature": "-----BEGIN PGP SIGNATURE-----\r\nVersion: OpenPGP.js v4.10.10\r\nComment: https://openpgpjs.org\r\n\r\nwsFzBAEBCAAGBQJkS7EhACEJED1NWxICdlZqFiEECWMYAoorWMhJKdjhPU1b\r\nEgJ2VmoYJBAAhfEP5W4M9EW3uY+5Q/QOMbd/hcgCYLWyhaRZdLM+S90tSvDq\r\nwT/Jkvvo+/2ycwQ+hEHl8NKX9TDYGXysUtQ3dnUVw5L3rqhV0u8W280ezGWb\r\nmhKhgrXXwYAgcLSClrBLy2sVg7iYHLqxY5Z4kceJ1R+PwBjnO+UnVW6Nlgwo\r\nGxnjmA4PT+4Wv41xKii27AAyq890Ete0b3/Orm4pncA2t7Ra0IhOadeLdL0l\r\nzX6979vEX+dGyVzm16oenRnPCK0OFqQTwSLZ21w+lPmery+k69Zk6w1dsokd\r\nxZ13XwAuIRiCyYjBfu3vT5tRpXeLqNgKFI4VXc6swTAbw/IFRA46DCDS843Z\r\nuIg6jnd8eUxG86kSyUt3MP+BX6gYjr7bDuHDp3tYMHMMtL+tQ6+JSs+3NQQH\r\nNqyHVSa+XkdU51tgf+ew+8zzrw4t3diF3e6ItDp9QlcCUdkXPJnLy1D/qQZi\r\nvECW+Li0FrEuyantJAwpjrk8TjYMQrEpY0o+umVjV8Q0oQBD59oJI8gWR2Yl\r\nhH2P4xf4NIYdCeakucukeh+fM6O7HLdsToo+JNaKOvrzij9axmpMJmzV4qQk\r\nBtou87KPS2cyuYS4u0Lc551Q0mBdkDQRHyO35qymm+h1lUwZ9PX/1/CVD2at\r\n7T+1Rq6Kz81fA/3fC74uYMXdB+Mnk1FrAKo=\r\n=6pr6\r\n-----END PGP SIGNATURE-----\r\n"
+          },
+          "deprecated": null
+        },
+        "0.16.8": {
+          "version": "0.16.8",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "89b453f40e8557f423f31a1009e9298dd99d5ceb",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.8.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-ftuDnJbcbOckGY11OO+zg3OofESlbR5DRl2cmN8HeWeeFIV7wTXvAOx8kEjZjobhA+9wh2fbKeO6cdcA9Mnovg==",
+            "signatures": [
+              {
+                "sig": "MEYCIQDhroTP5+iu8iyrtm1ZBasp4VTpoT+m7OgyFU+NuI7QvgIhALulNFmmigYV2dnEq+k0piDQ/7ZHD++7oASkMt+oinfn",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3967283
+          },
+          "deprecated": null
+        },
+        "0.16.9": {
+          "version": "0.16.9",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": "./dist/katex.mjs",
+              "require": "./dist/katex.js"
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "bc62d8f7abfea6e181250f85a56e4ef292dcb1fa",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.16.9.tgz",
+            "fileCount": 205,
+            "integrity": "sha512-fsSYjWS0EEOwvy81j3vRA8TEAhQhKiqO+FQaKWp0m39qwOzHVBgAUBIXWj1pB+O2W3fIpNa6Y9KSKCVbfPhyAQ==",
+            "signatures": [
+              {
+                "sig": "MEYCIQCwNN4+REpRoQ+mH5ZFLyO/9iQ6GPrVePgoerZ/p3EZKgIhAKLrprYFluhxUTRJIyuyAgm2ou7g41uak9ZllLoq+Mjh",
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA"
+              }
+            ],
+            "unpackedSize": 3968911
+          },
+          "deprecated": null
+        },
+        "0.18.2": {
+          "version": "0.18.2",
+          "engines": null,
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": "./dist/contrib/mhchem.mjs",
+              "require": "./dist/contrib/mhchem.js"
+            },
+            "./contrib/copy-tex": {
+              "import": "./dist/contrib/copy-tex.mjs",
+              "require": "./dist/contrib/copy-tex.js"
+            },
+            "./contrib/auto-render": {
+              "import": "./dist/contrib/auto-render.mjs",
+              "require": "./dist/contrib/auto-render.js"
+            },
+            "./contrib/render-a11y-string": {
+              "import": "./dist/contrib/render-a11y-string.mjs",
+              "require": "./dist/contrib/render-a11y-string.js"
+            },
+            "./contrib/mathtex-script-type": {
+              "import": "./dist/contrib/mathtex-script-type.mjs",
+              "require": "./dist/contrib/mathtex-script-type.js"
+            }
+          },
+          "dist": {
+            "shasum": "7ab6ff83e21c097a59c9afd213b2d2955fa6c6ce",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.18.2.tgz",
+            "fileCount": 213,
+            "integrity": "sha512-3snve4y0SXTMequLim1FMiPvLGElySam0blN5xQZBqEY3lOJz1TnuaaiugnBZBqHzlSAGmFTYL7MCQkORuLKCA==",
+            "signatures": [
+              {
+                "sig": "MEUCICGM1FurLoTqeOxdIo9LYWYof5vtSotWd5vzkUvQ0cHYAiEA01gJ2ruJGAuuLmE7YbeiTXACqv6AFXprjo9otQUotrc=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "sig": "MEUCIC6EgUr+yFiy+Ahfhp0NMJ0kmhN3V3akkn1dBbqXjBLxAiEAkhWhQgTwLhqnL8pGMVFaYkzbxyhaOVhlNlW9p+zf8D4=",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              }
+            ],
+            "unpackedSize": 4032120
+          },
+          "deprecated": null
+        },
+        "0.19.0": {
+          "version": "0.19.0",
+          "engines": null,
+          "dependencies": {
+            "commander": "^15.0.0"
+          },
+          "peerDependencies": null,
+          "type": null,
+          "main": "dist/katex.js",
+          "module": null,
+          "exports": {
+            ".": {
+              "import": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.mjs"
+              },
+              "require": {
+                "types": "./types/katex.d.ts",
+                "default": "./dist/katex.js"
+              }
+            },
+            "./*": "./*",
+            "./contrib/mhchem": {
+              "import": {
+                "types": "./types/contrib/mhchem.d.mts",
+                "default": "./dist/contrib/mhchem.mjs"
+              },
+              "require": {
+                "types": "./types/contrib/mhchem.d.cts",
+                "default": "./dist/contrib/mhchem.js"
+              }
+            },
+            "./contrib/copy-tex": {
+              "import": {
+                "types": "./types/contrib/copy-tex.d.mts",
+                "default": "./dist/contrib/copy-tex.mjs"
+              },
+              "require": {
+                "types": "./types/contrib/copy-tex.d.cts",
+                "default": "./dist/contrib/copy-tex.js"
+              }
+            },
+            "./contrib/auto-render": {
+              "import": {
+                "types": "./types/contrib/auto-render.d.mts",
+                "default": "./dist/contrib/auto-render.mjs"
+              },
+              "require": {
+                "types": "./types/contrib/auto-render.d.cts",
+                "default": "./dist/contrib/auto-render.js"
+              }
+            },
+            "./contrib/render-a11y-string": {
+              "import": {
+                "types": "./types/contrib/render-a11y-string.d.mts",
+                "default": "./dist/contrib/render-a11y-string.mjs"
+              },
+              "require": {
+                "types": "./types/contrib/render-a11y-string.d.cts",
+                "default": "./dist/contrib/render-a11y-string.js"
+              }
+            },
+            "./contrib/mathtex-script-type": {
+              "import": {
+                "types": "./types/contrib/mathtex-script-type.d.mts",
+                "default": "./dist/contrib/mathtex-script-type.mjs"
+              },
+              "require": {
+                "types": "./types/contrib/mathtex-script-type.d.cts",
+                "default": "./dist/contrib/mathtex-script-type.js"
+              }
+            }
+          },
+          "dist": {
+            "shasum": "b69c8cbcfc8c331be3f4f6e606b02b7146501ec7",
+            "tarball": "https://registry.npmjs.org/katex/-/katex-0.19.0.tgz",
+            "fileCount": 225,
+            "integrity": "sha512-v6Tznz3zJ7u3niRCoDTsumM2+HA2XXcCu+WAacCeHD2z3p9A9Ks987o5FzfTGBN0e8A0vjEgIDvLbICrXpdw/Q==",
+            "signatures": [
+              {
+                "sig": "MEQCIFvMyd6nXVj9nd/ieCxuqXJzuodEQgHV+BiSwMRdA9UPAiAEp//k3zntrxO8DUtQ21onulIYvN0I/3fAYundZ3RIQg==",
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+              },
+              {
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+                "sig": "MEUCIQCXI14ESqYs4W7XVJTzrStlqxpHBbpoWm78/O22mEjr1AIgElkxCcvj+8Q43SikVpCeKDOXbd2czuoKK4RyCExA5xQ="
+              }
+            ],
+            "unpackedSize": 4043696
+          },
+          "deprecated": null
+        }
+      }
+    },
+    {
+      "package": "micromark-extension-math",
+      "url": "https://registry.npmjs.org/micromark-extension-math",
+      "raw_sha256": "1d7d94ca51266536e336d3176d8e7583820fc06361c76d8752307c650d024aae",
+      "dist_tags": {
+        "latest": "3.1.0"
+      },
+      "modified": "2024-07-08T10:14:07.869Z",
+      "published_times": {
+        "3.1.0": "2024-07-08T10:14:07.623Z"
+      },
+      "selected_versions": {
+        "3.1.0": {
+          "version": "3.1.0",
+          "engines": null,
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "peerDependencies": null,
+          "type": "module",
+          "main": null,
+          "module": null,
+          "exports": {
+            "development": "./dev/index.js",
+            "default": "./index.js"
+          },
+          "dist": {
+            "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+            "shasum": "c42ee3b1dd5a9a03584e83dd8f08e3de510212c1",
+            "tarball": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+            "fileCount": 23,
+            "unpackedSize": 53884,
+            "signatures": [
+              {
+                "keyid": "SHA256:jl3bwswu80PjjokCgh0o2w5c2U4LhQAE57gj9cz1kzA",
+                "sig": "MEUCIQDpcrLjNUHK4q5K7Mp+GUXJFFXDYwObTUTXLcIN6+IGUgIgRNSaxD16F9R7Af4+vLETSrny+yNs9dsJ0V3qFGEZ4mM="
+              }
+            ]
+          },
+          "deprecated": null
+        }
+      }
+    },
+    {
+      "package": "markdownlint",
+      "url": "https://registry.npmjs.org/markdownlint",
+      "raw_sha256": "154147b7d68a5ae8c08aa6d1c7e197b7364860fa9a945e5b79b1b8ab80886a3e",
+      "dist_tags": {
+        "latest": "0.41.1"
+      },
+      "modified": "2026-07-13T04:50:00.440Z",
+      "published_times": {
+        "0.41.1": "2026-07-13T04:50:00.339Z"
+      },
+      "selected_versions": {
+        "0.41.1": {
+          "version": "0.41.1",
+          "engines": {
+            "node": ">=22"
+          },
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "peerDependencies": null,
+          "type": "module",
+          "main": null,
+          "module": null,
+          "exports": {
+            ".": "./lib/exports.mjs",
+            "./async": "./lib/exports-async.mjs",
+            "./promise": "./lib/exports-promise.mjs",
+            "./sync": "./lib/exports-sync.mjs",
+            "./helpers": "./helpers/helpers.cjs",
+            "./style/all": "./style/all.json",
+            "./style/cirosantilli": "./style/cirosantilli.json",
+            "./style/prettier": "./style/prettier.json",
+            "./style/relaxed": "./style/relaxed.json"
+          },
+          "dist": {
+            "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+            "shasum": "8d92bb2708148ae54d0f122f8565638a22eb7ae6",
+            "tarball": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+            "fileCount": 153,
+            "unpackedSize": 840497,
+            "signatures": [
+              {
+                "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+                "sig": "MEQCIEvXxrJX2gdGJGhv/OC5vpunTRTcEw++5opFulU/86qHAiAiRZe3iGIUtPOQ5Y8Y0m5F+FuOa8KzpiIUfkRtKiEEhA=="
+              }
+            ]
+          },
+          "deprecated": null
+        }
+      }
+    }
+  ],
+  "installed_readonly_sources": [
+    {
+      "path": ".github/workflows/node_modules/markdownlint/lib/micromark-parse.mjs",
+      "sha256": "372fbbd02815edfd51e04efdaabc66463c71edf8ea145b81198a09e1abece115",
+      "bytes": 11753
+    },
+    {
+      "path": ".github/workflows/node_modules/micromark-extension-math/index.js",
+      "sha256": "d2651b530ac7e16dac559f6230bae438846f693dbc7b8e39b2b3001bf8455208",
+      "bytes": 124
+    },
+    {
+      "path": ".github/workflows/node_modules/micromark-extension-math/lib/html.js",
+      "sha256": "556cea30c8cbfb9f4482de842d504bf714c15c1634416b2f3d654d8f25eb3396",
+      "bytes": 2115
+    },
+    {
+      "path": ".github/workflows/node_modules/katex/package.json",
+      "sha256": "125f3796ca6008cfa5674c6a1c22d1b597bd3b476278ff46efe9ceefd06704ce",
+      "bytes": 6256
+    }
+  ],
+  "committed_consumer_policy_sources": [
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+      "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+      "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+      "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "commit": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "mode": "100644",
+      "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+      "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
+    }
+  ],
+  "validation": {
+    "product_changes": false,
+    "dependency_changes": false,
+    "tests_executed": false,
+    "head": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+    "tree": "ee79a77e117d26f995008d2def0983bf879b7fc1",
+    "status_porcelain": "",
+    "finding": "newly surfaced current-audit finding; not a code regression",
+    "audit_log_sha256": "b4672d2c5c7ee689311cc58e27d6374ad8785eb06190e9c497a3653bc150e60c",
+    "advisory": "GHSA-238p-pmpm-9mq7",
+    "cve": "CVE-2026-103923",
+    "affected_range": ">=0.11.0 <0.18.2",
+    "fixed_version": "0.18.2",
+    "database_published_utc": "2026-10-05T23:41:05Z",
+    "database_updated_utc": "2026-10-05T23:41:06Z",
+    "upstream_published_date": "2026-09-21",
+    "applicability": "markdownlint calls math syntax extension, not mathHtml; eager HTML reexport imports KaTeX. Browser insertion exploit chain not demonstrated here; affected installed package and current policy failure are real.",
+    "admission": "No override prohibition found in immutable validatePackagePair, NpmTools, or Get-AgentSetupPackageFailure; no production validator change proposed."
+  },
+  "primary_sources": [
+    {
+      "url": "https://github.com/advisories/GHSA-238p-pmpm-9mq7"
+    },
+    {
+      "url": "https://github.com/KaTeX/KaTeX/security/advisories/GHSA-238p-pmpm-9mq7"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.18.2/CHANGELOG.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/KaTeX/KaTeX/v0.19.0/CHANGELOG.md"
+    },
+    {
+      "url": "https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#overrides"
+    },
+    {
+      "url": "https://registry.npmjs.org/katex"
+    },
+    {
+      "url": "https://registry.npmjs.org/micromark-extension-math"
+    },
+    {
+      "url": "https://registry.npmjs.org/markdownlint"
+    }
+  ],
+  "decision": {
+    "status": "draft recommendation; awaiting root display, selection and implementation release",
+    "weights": {
+      "security_truth": 30,
+      "lint_fidelity": 25,
+      "supply_reproducibility": 20,
+      "operator_usability": 15,
+      "maintenance": 10
+    },
+    "score_scale": "0 unusable; 5 material limitations; 10 strong bounded support; forecasts, not executed results",
+    "options": [
+      {
+        "id": "A",
+        "name": "Keep current graph or retry unchanged",
+        "scores": [
+          1,
+          10,
+          9,
+          2,
+          10
+        ],
+        "total": 59.0,
+        "currently_implementable": false
+      },
+      {
+        "id": "B",
+        "name": "Compatible lock refresh to 0.16.47",
+        "scores": [
+          1,
+          9,
+          9,
+          3,
+          9
+        ],
+        "total": 57.0,
+        "currently_implementable": false
+      },
+      {
+        "id": "C",
+        "name": "Wait for maintained parent upgrade",
+        "scores": [
+          7,
+          10,
+          9,
+          1,
+          8
+        ],
+        "total": 73.5,
+        "currently_implementable": false
+      },
+      {
+        "id": "D",
+        "name": "Exact parent-version scoped override to 0.18.2",
+        "scores": [
+          10,
+          9,
+          10,
+          10,
+          9
+        ],
+        "total": 96.5,
+        "currently_implementable": true
+      },
+      {
+        "id": "E",
+        "name": "Workflow-root global KaTeX override to 0.18.2",
+        "scores": [
+          10,
+          8,
+          8,
+          9,
+          9
+        ],
+        "total": 88.5,
+        "currently_implementable": true
+      },
+      {
+        "id": "F",
+        "name": "Scoped override to latest 0.19.0",
+        "scores": [
+          10,
+          7,
+          8,
+          9,
+          8
+        ],
+        "total": 85.0,
+        "currently_implementable": true
+      },
+      {
+        "id": "G",
+        "name": "Backport/fork KaTeX or math package",
+        "scores": [
+          8,
+          7,
+          5,
+          5,
+          3
+        ],
+        "total": 62.0,
+        "currently_implementable": false
+      },
+      {
+        "id": "H",
+        "name": "Remove unused renderer through maintained syntax-only replacement",
+        "scores": [
+          9,
+          6,
+          6,
+          5,
+          4
+        ],
+        "total": 65.5,
+        "currently_implementable": false
+      },
+      {
+        "id": "I",
+        "name": "Replace Markdown lint engine",
+        "scores": [
+          9,
+          3,
+          7,
+          3,
+          3
+        ],
+        "total": 56.0,
+        "currently_implementable": false
+      },
+      {
+        "id": "J",
+        "name": "Scoped temporary risk exception plus upstream wait",
+        "scores": [
+          5,
+          10,
+          5,
+          3,
+          6
+        ],
+        "total": 60.5,
+        "currently_implementable": false
+      },
+      {
+        "id": "K",
+        "name": "Drop or disable affected lint coverage",
+        "scores": [
+          5,
+          0,
+          7,
+          1,
+          6
+        ],
+        "total": 36.5,
+        "currently_implementable": false
+      },
+      {
+        "id": "L",
+        "name": "Runtime prototype/sanitizer mitigation only",
+        "scores": [
+          3,
+          5,
+          5,
+          3,
+          3
+        ],
+        "total": 39.0,
+        "currently_implementable": false
+      }
+    ],
+    "recommended": "D",
+    "override": {
+      "micromark-extension-math@3.1.0": {
+        "katex": "0.18.2"
+      }
+    },
+    "proposed_paths": [
+      ".github/workflows/package.json",
+      ".github/workflows/package-lock.json",
+      "docs/dependency-maintenance.md"
+    ],
+    "production_policy_changes_required": false,
+    "existing_runtime_change_indicated": false,
+    "dependency_archive_requalification_required": true,
+    "paired_repair_required": "PS accepted source has identical affected tuple; port after TF acceptance under root controlled A07 transfer, independently preserve repository descriptors."
+  },
+  "last_updated_utc": "2026-10-06T01:34:43.053481+00:00"
+}

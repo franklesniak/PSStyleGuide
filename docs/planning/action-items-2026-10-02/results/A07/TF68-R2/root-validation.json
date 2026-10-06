@@ -1,0 +1,252 @@
+{
+  "status": "material_current_audit_finding_validated_proposal_pending",
+  "checked_at": "2026-10-06T01:30:47.536794+00:00",
+  "advisory_id": "GHSA-238p-pmpm-9mq7",
+  "cve_id": "CVE-2026-103923",
+  "primary_url": "https://github.com/advisories/GHSA-238p-pmpm-9mq7",
+  "published_at": "2026-10-05T23:41:05Z",
+  "updated_at": "2026-10-05T23:41:06Z",
+  "upstream_published_at": "2026-10-01T18:17:13Z",
+  "severity": "low",
+  "vulnerabilities": [
+    {
+      "package": {
+        "ecosystem": "npm",
+        "name": "katex"
+      },
+      "vulnerable_version_range": ">= 0.11.0, < 0.18.2",
+      "first_patched_version": "0.18.2",
+      "vulnerable_functions": []
+    }
+  ],
+  "audit": {
+    "exit": 1,
+    "head": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+    "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-06T01:27:24.118677+00:00",
+    "finished_at": "2026-10-06T01:27:37.573235+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-current-audit-2de8f4e.log",
+    "sha256": "b4672d2c5c7ee689311cc58e27d6374ad8785eb06190e9c497a3653bc150e60c"
+  },
+  "advisory_record": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\TF68-R2\\github-advisory.json",
+    "sha256": "1ee61ac855b3bd71787d7f385d71ad0a1864ef4add5cc67c826dbfe9315944ea"
+  },
+  "lock_evidence": [
+    {
+      "role": "accepted_PS",
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package-lock.json",
+      "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      "packages": {
+        "node_modules/markdownlint": {
+          "version": "0.41.1",
+          "resolved": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+          "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "engines": {
+            "node": ">=22"
+          },
+          "funding": {
+            "url": "https://github.com/sponsors/DavidAnson"
+          }
+        },
+        "node_modules/micromark-extension-math": {
+          "version": "3.1.0",
+          "resolved": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+          "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "funding": {
+            "type": "opencollective",
+            "url": "https://opencollective.com/unified"
+          }
+        },
+        "node_modules/katex": {
+          "version": "0.16.27",
+          "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+          "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+          "dev": true,
+          "funding": [
+            "https://opencollective.com/katex",
+            "https://github.com/sponsors/katex"
+          ],
+          "license": "MIT",
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "bin": {
+            "katex": "cli.js"
+          }
+        }
+      }
+    },
+    {
+      "role": "local_TF_candidate",
+      "revision": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
+      "path": ".github/workflows/package-lock.json",
+      "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "packages": {
+        "node_modules/markdownlint": {
+          "version": "0.41.1",
+          "resolved": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+          "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "engines": {
+            "node": ">=22"
+          },
+          "funding": {
+            "url": "https://github.com/sponsors/DavidAnson"
+          }
+        },
+        "node_modules/micromark-extension-math": {
+          "version": "3.1.0",
+          "resolved": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+          "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "funding": {
+            "type": "opencollective",
+            "url": "https://opencollective.com/unified"
+          }
+        },
+        "node_modules/katex": {
+          "version": "0.16.27",
+          "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+          "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+          "dev": true,
+          "funding": [
+            "https://opencollective.com/katex",
+            "https://github.com/sponsors/katex"
+          ],
+          "license": "MIT",
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "bin": {
+            "katex": "cli.js"
+          }
+        }
+      }
+    },
+    {
+      "role": "published_TF",
+      "revision": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "path": ".github/workflows/package-lock.json",
+      "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "packages": {
+        "node_modules/markdownlint": {
+          "version": "0.41.1",
+          "resolved": "https://registry.npmjs.org/markdownlint/-/markdownlint-0.41.1.tgz",
+          "integrity": "sha512-qHKeU2E1bdyNAT077go2FVTNXvYcktN5IHtF6XyeD1l0PClxzSp2tUApAV14ORI8DGX4H9bNKZEzelZp4qn8IA==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "micromark": "4.0.2",
+            "micromark-core-commonmark": "2.0.3",
+            "micromark-extension-directive": "4.0.0",
+            "micromark-extension-gfm-autolink-literal": "2.1.0",
+            "micromark-extension-gfm-footnote": "2.1.0",
+            "micromark-extension-gfm-table": "2.1.1",
+            "micromark-extension-math": "3.1.0",
+            "micromark-util-types": "2.0.2",
+            "string-width": "8.2.1"
+          },
+          "engines": {
+            "node": ">=22"
+          },
+          "funding": {
+            "url": "https://github.com/sponsors/DavidAnson"
+          }
+        },
+        "node_modules/micromark-extension-math": {
+          "version": "3.1.0",
+          "resolved": "https://registry.npmjs.org/micromark-extension-math/-/micromark-extension-math-3.1.0.tgz",
+          "integrity": "sha512-lvEqd+fHjATVs+2v/8kg9i5Q0AP2k85H0WUOwpIVvUML8BapsMvh1XAogmQjOCsLpoKRCVQqEkQBB3NhVBcsOg==",
+          "dev": true,
+          "license": "MIT",
+          "dependencies": {
+            "@types/katex": "^0.16.0",
+            "devlop": "^1.0.0",
+            "katex": "^0.16.0",
+            "micromark-factory-space": "^2.0.0",
+            "micromark-util-character": "^2.0.0",
+            "micromark-util-symbol": "^2.0.0",
+            "micromark-util-types": "^2.0.0"
+          },
+          "funding": {
+            "type": "opencollective",
+            "url": "https://opencollective.com/unified"
+          }
+        },
+        "node_modules/katex": {
+          "version": "0.16.27",
+          "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+          "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+          "dev": true,
+          "funding": [
+            "https://opencollective.com/katex",
+            "https://github.com/sponsors/katex"
+          ],
+          "license": "MIT",
+          "dependencies": {
+            "commander": "^8.3.0"
+          },
+          "bin": {
+            "katex": "cli.js"
+          }
+        }
+      }
+    }
+  ],
+  "root_findings": [
+    "Both accepted PS and current TF lock KaTeX0.16.27 in markdownlint0.41.1 -> micromark-extension-math3.1.0 -> katex^0.16.0.",
+    "Fixed KaTeX0.18.2 lies outside the declared parent range. A lock-only in-range update cannot fix the published advisory.",
+    "Actual Markdownlint imports math syntax; package index also exports mathHtml which imports KaTeX. Static inspection establishes import exposure, not an actual repository exploit or rendering call.",
+    "Fresh audit is a real policy refusal. Earlier clean results remain their dated observations, not current acceptance. No bypass, exception or dependency change has been applied."
+  ],
+  "scope": "Read-only current finding validation. Worker prepares full options/rubric/scores/selection proposal before any implementation."
+}

@@ -1,0 +1,38 @@
+## Problem and behavior
+
+The Terraform generator, exact-path verifier and artifact gate use separate implementations from the accepted PowerShell foundation. This change ports the shared implementation from [PSStyleGuide PR234](https://github.com/franklesniak/PSStyleGuide/pull/234), accepted at `98177628b7bc02c646724bfc8aa0fd73fed0cd24`. Terraform keeps its language descriptors and current recovery checks.
+
+The generator prepares complete payloads before publication and uses common versioned result contracts. Artifact verification retains the actual Terraform semantic child, checked native status, bounded wait, first resolved Node executable, independent output allowlist and final identity checks. All 16 Terraform semantic modes remain covered. The build requires two successful generator-suite passes on each of Windows PowerShell 5.1, Windows PowerShell 7 and native-ext4 Linux PowerShell 7 for the same revision before publication.
+
+This PR also repairs a shared metadata self-test defect exposed by two hosted runs crossing UTC midnight. The synthetic documents retained the previous day's date while child validators read the new day. Private fixture clock controls now cover the actual current, delayed, accepted-worktree, proposed, local and capacity callers. The controls check exact source anchors and completed clock readbacks, preserve primary errors, reject instrumentation failure and remove their state after each action. Production validator bytes, its public interface and its date policy are unchanged.
+
+A fresh audit also identified [GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7) in the Markdown checker dependency graph. The existing math package permits only affected KaTeX versions. A workflow-root npm override now selects exactly KaTeX 0.18.2 under `micromark-extension-math@3.1.0`. This explicitly crosses the parent's declared range and requires installation and lint compatibility checks. Current callers use math syntax parsing; no browser rendering exploit was established here. The dependency-maintenance note gives the reason and conditions for removing the override.
+
+## Scope and decisions
+
+Exactly 16 files change: the original 12-file generator port, the SelfTest repair, two workflow package files and the dependency-maintenance note. The original 12-file generator port retains these finite differences from the accepted PowerShell source:
+
+- Generator and artifact gate: the marked Terraform descriptors and `TerraformRecovery` semantics.
+- CI-helper tests and build: exact repository identity substitutions, Terraform's existing `verify` role and output scope.
+- Script index: the common harness row, with the Terraform semantic entry and T1 provenance reference retained. Its existing Last Updated field uses Oct6 for the current whole-PR finalization.
+
+The additional file is `Test-AgentInstructions.SelfTest.ps1`. The selected C97 repair followed comparison of eight options. Correctness across callers, preservation of the exact production source and deterministic midnight behavior had the highest weights. Retry-only, partial clock coverage and production clock overrides were rejected. Tests preserve stale/future/calendar and mode refusals, exact installed-source identity, negative mutations and the P1/T1 provenance distinction. After Terraform acceptance, carry the common SelfTest repair, required script-index metadata alignment and selected dependency repair back to PowerShell, then compare actual raw bytes again.
+
+The production validator, runtime pins, guides and four generated documents retain accepted Terraform bytes. Current filesystem threat-model limits remain; [PS issue155](https://github.com/franklesniak/PSStyleGuide/issues/155) stays open. Generator platform proof is separate from recovery-harness proof and human recovery gates.
+
+For the dependency finding, twelve options were compared using security resolution 30%, lint fidelity 25%, reproducible supply/recovery 20%, contributor usability 15% and maintenance 10%. The exact parent-version override scored 96.5/100; a workflow-wide override scored 88.5 and the latest KaTeX override 85. Keeping/retrying the affected graph, waiting for an unavailable parent update, an unapproved risk exception and disabling coverage do not meet current gates. A private fork or lint replacement adds unsupported ownership or behavior changes. Existing manifest validators and audit authority remain unchanged. The selected release is conditional on actual compatibility and current audit results; scores are engineering judgments, not test results.
+
+## Validation
+
+The final local candidate is `f89d47d6780db47df29be4eb6d79cab35051f598`, tree `24ca66c74b176bb83037c453ee506aa3fee0cf5f`, against accepted Terraform base `e21b74fe0b56551008f78f9f2946cd2a0f9c19ce`.
+
+- All 567 Node tests passed with zero failures, cancellations or skips. All 11 repository hooks passed with zero skips, including the full instruction and mutation self-test. All 79 source files, Git index/refs/configuration and 1,914 newly qualified dependency files remained unchanged through the final guard.
+- The local Linux generator suite passed 156 assertions twice. Actual Terraform generation reported NoChange twice and retained all four output hashes. The independent Terraform semantic checks passed.
+- Windows and offline Linux each passed all 244 affected lint, npm-helper and workflow-policy tests. Old/patched security controls reproduced inherited-trust behavior in KaTeX 0.16.27 and its rejection in 0.18.2. Default and explicit own-trust controls remained intact. Actual imports, math tokens and clean/invalid outer/nested lint outputs matched. No test HTML was executed.
+- Actual clean Windows installs and installed-graph checks passed for both package roots through existing sanitized npm controls. The worktree installation matches the new complete dependency inventory. Offline Linux tested transported package bytes and real installed graphs; it does not establish networked Linux installation.
+- R1's original-byte control reproduces the midnight failure. Instrumentation mutants and the accepted-worktree bypass are rejected; cleanup preserves primary errors and a subsequent uninstrumented validator captures real current UTC. Linux combined prior-day focus passed. Windows author focus and separate native-path capacity/cleanup passed. The combined Windows temporary driver exited 1 on a mixed-path breakpoint; that failure remains recorded. This is composed Windows focused coverage, and the original focused runs preceded the README date refresh.
+- Normal commit hooks, accepted-policy classification/content, actual accepted-B/new-H whole-PR author finalization, metadata classification and proposed-policy checks passed. The ordinary current two-root dependency audit is CLEAN with no findings or risk exceptions. Independent local focused review found no material issue.
+
+The previous published input `6c0c987799425b60c0e7b76650aa5ec7946811e2` passed both hosted three-platform generator/artifact runs but failed PR behavior and Copilot setup on the midnight fixture defect. Those results remain historical. Fresh reviews, current-head hosted CI and independent final binding remain required. Local Linux Current is not the hosted ext4 cell; no new local Windows PowerShell 5.1 result or recovery-harness acceptance is claimed.
+
+After normal reviewed landing, verify the actual landed workflows and compare the merged Terraform files and coupled contracts with current PowerShell main. This PR alone does not complete the paired plan.

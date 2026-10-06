@@ -1,0 +1,45 @@
+{
+  "package_paths_changed": [
+    "node_modules/katex"
+  ],
+  "fields_changed": [
+    "version",
+    "resolved",
+    "integrity"
+  ],
+  "old": {
+    "version": "0.16.27",
+    "resolved": "https://registry.npmjs.org/katex/-/katex-0.16.27.tgz",
+    "integrity": "sha512-aeQoDkuRWSqQN6nSvVCEFvfXdqo1OQiCmmW1kc9xSdjutPv7BGO7pqY9sQRJpMOGrEdfDgF2TfRXe5eUAD2Waw==",
+    "dev": true,
+    "funding": [
+      "https://opencollective.com/katex",
+      "https://github.com/sponsors/katex"
+    ],
+    "license": "MIT",
+    "dependencies": {
+      "commander": "^8.3.0"
+    },
+    "bin": {
+      "katex": "cli.js"
+    }
+  },
+  "new": {
+    "version": "0.18.2",
+    "resolved": "https://registry.npmjs.org/katex/-/katex-0.18.2.tgz",
+    "integrity": "sha512-3snve4y0SXTMequLim1FMiPvLGElySam0blN5xQZBqEY3lOJz1TnuaaiugnBZBqHzlSAGmFTYL7MCQkORuLKCA==",
+    "dev": true,
+    "funding": [
+      "https://opencollective.com/katex",
+      "https://github.com/sponsors/katex"
+    ],
+    "license": "MIT",
+    "dependencies": {
+      "commander": "^8.3.0"
+    },
+    "bin": {
+      "katex": "cli.js"
+    }
+  },
+  "lock_sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176"
+}
