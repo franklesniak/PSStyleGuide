@@ -1,0 +1,17 @@
+{
+  "scope": "ParseFile only; no product import, invocation or tests",
+  "utc": "2026-10-06T23:43:36.5439408+00:00",
+  "pwsh": "7.6.5",
+  "rows": [
+    {
+      "file": "Test-AgentInstructions.ps1",
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "errors": []
+    },
+    {
+      "file": "Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "errors": []
+    }
+  ]
+}

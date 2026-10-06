@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "status": "SOURCE_DELTA_REVIEWED_UNTESTED",
+  "at": "2026-10-06T23:41:24.953773+00:00",
+  "root_read_complete_source_diff": true,
+  "source_recovery_byte_exact": true,
+  "references_checked": 17,
+  "changed_paths": 2,
+  "bystanders_equal": 76,
+  "index_and_git_metadata_equal": true,
+  "shared_ref_changes_only": "planning branch local and origin-tracking refs advanced from c14 through a8 to baa21da; all other rows reconstruct prior digest",
+  "candidate": {
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "bytes": 510837,
+      "preimage_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "bytes": 298994,
+      "preimage_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8"
+    }
+  },
+  "tests_executed": false,
+  "measurements_executed": false,
+  "pending": [
+    "baseline/candidate focused behavior and full-context parity",
+    "null-element characterization and durable final SelfTest expectations",
+    "mandatory ABBA practical-benefit gate",
+    "normal final quality/endpoints/audit/review/CI"
+  ],
+  "next_action": "Prepare exact bounded private Windows/Linux correctness packet; no payload release yet."
+}

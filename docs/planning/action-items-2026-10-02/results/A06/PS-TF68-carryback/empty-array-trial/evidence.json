@@ -1,0 +1,159 @@
+{
+  "schema": 1,
+  "state": "SOURCE_PREPARATION_ONLY_UNTESTED_FROZEN",
+  "selected": "D94.1",
+  "execution_authorized": false,
+  "source_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "source_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "candidate": {
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "bytes": 510837,
+      "preimage_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "bytes": 298994,
+      "preimage_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8"
+    }
+  },
+  "bystanders_equal": 76,
+  "tracked_source_count": 78,
+  "raw_index_unchanged": true,
+  "raw_index_sha256": "841b9851673a12917660caf2d2ef27709b48da3568b0e047ab2eaedf2b8af693",
+  "dependency_count": 1914,
+  "dependency_catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+  "dependencies_used_or_written": false,
+  "recovery": {
+    "validator_reverse_six_guards_and_two_metadata_versions_equal_exact_preimage": true,
+    "selftest_remove_new_function_call_and_version_equal_exact_preimage": true,
+    "patch_sha256": "7952b01c7ab252ef81a1e3c3f4e39e1d160e5c2abfcfa890ca47843b908fb81d",
+    "patch_bytes": 18774,
+    "git_apply_not_run": true
+  },
+  "controls": {
+    "natural_real_parser_plain_fixture": 1,
+    "synthetic_cases_per_field": 13,
+    "fields": 6,
+    "new_real_parser_calls_per_selftest": 79,
+    "expectations_verified": false,
+    "null_array_element_expectations": "PENDING exact-H differential; no admission change",
+    "prospective_private_null_cases_per_field": 5,
+    "prospective_private_null_native_calls_each_variant": 30,
+    "product_reference_reversal_or_second_validator": false,
+    "added_selftest_runtime_measured": false
+  },
+  "future_focused_adapter_prepared": false,
+  "future_comparison": {
+    "prepared_or_run": false,
+    "order": [
+      "baseline",
+      "candidate",
+      "candidate",
+      "baseline"
+    ],
+    "children": 4,
+    "child_seconds": 120,
+    "whole_seconds": 600,
+    "max_output_bytes": 2097152,
+    "max_events": 2000,
+    "auto_repeat": false,
+    "both_pairs_faster_required": true,
+    "minimum_gain_percent": 5,
+    "minimum_gain_seconds": 0.5,
+    "absence_or_inconclusive_benefit": "NO_CHANGE"
+  },
+  "temporary_product_help_obligation": "Replace null-characterization sentence with durable behavior help after baseline establishes literal expectations, before final candidate seal.",
+  "operations_performed": [
+    "read-only source/Git identity inspection",
+    "two authorized product source edits",
+    "host-only byte/hash/JSON construction",
+    "private candidate archives and raw full-index patch"
+  ],
+  "operations_not_performed": [
+    "PowerShell parsing/import/payload or product execution",
+    "tests or runtime measurements",
+    "containers/install/network/native requests",
+    "Git index/ref/config mutations",
+    "stage/commit/push/review/support message",
+    "B99 writes",
+    "planning/state/counter changes"
+  ],
+  "refs": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-before.json": {
+      "sha256": "7ed75ddefb52acd46c4242bf83ff01c10288807e4564fad20131796b84453130",
+      "bytes": 9057
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-after.json": {
+      "sha256": "532a830e01a76b2ce6b362425ede5331831a5fb1a65050f35b16f8e267c2836b",
+      "bytes": 10859
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\recovery.patch": {
+      "sha256": "7952b01c7ab252ef81a1e3c3f4e39e1d160e5c2abfcfa890ca47843b908fb81d",
+      "bytes": 18774
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\REPORT.md": {
+      "sha256": "ba81e85cda686746c60550c9d4c77a3631d41611fe5ae778e2e42ad671bf0493",
+      "bytes": 13074
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json": {
+      "sha256": "4b62332550246304186353badb936f4364db9e662a84ebd74a0e960f72eabf45",
+      "bytes": 3684
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\REPORT.md": {
+      "sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+      "bytes": 23934
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\evidence.json": {
+      "sha256": "3480c0ed80c31489d7d5dfc15002d276180917364f1df6e505aa93030760c801",
+      "bytes": 18701
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\ROOT-RESULT-VERIFICATION.json": {
+      "sha256": "83b7981748cc7364b13fab3c701ac43ecf0baa68357dc003b5d503998e0f7ee7",
+      "bytes": 6683
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\load-functions.ps1": {
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf",
+      "bytes": 1920
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\converter-focus.ps1": {
+      "sha256": "e1f773a0bd570eda9241618e49feb97ed5e99fd6bf26ccffa2a0772193c179d3",
+      "bytes": 2458
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json": {
+      "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+      "bytes": 400393
+    },
+    "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\AGENTS.md": {
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\powershell.instructions.md": {
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\preimage\\.github\\workflows\\Test-AgentInstructions.ps1": {
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\candidate\\.github\\workflows\\Test-AgentInstructions.ps1": {
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "bytes": 510837
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\preimage\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+      "bytes": 285244
+    },
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\candidate\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "bytes": 298994
+    }
+  },
+  "future_focus_checklist": [
+    "Assert-MarkdownStringArrayContextSelfTest",
+    "Assert-MarkdownParseReuseSelfTest",
+    "Assert-ParserJsonConversionSelfTest"
+  ],
+  "private_cross_variant_full_context_parity": "Requires new adapter complete-context/type/refusal receipts bound to exact frozen H and candidate; not inferred from separate product control passes."
+}
