@@ -1,0 +1,71 @@
+{
+  "state": "passed",
+  "role": "proposed-staged-candidate-against-accepted-base",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+  "workspace": "/work/validation-a06-tf-peer-20261006-r8-_ms2r9ar",
+  "started_at": "2026-10-06T05:02:33.647388+00:00",
+  "commands": [
+    {
+      "name": "staged-preflight",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-06T05:02:35.701419+00:00",
+      "timeout_seconds": 600,
+      "state": "passed",
+      "pid": 79,
+      "exit": 0,
+      "finished_at": "2026-10-06T05:02:44.696114+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "name": "artifact-wrapper",
+      "command": [
+        "node",
+        "--test",
+        "--test-name-pattern",
+        "^artifact gate recovery role includes verifier child effects: (clean|stale|verifier-worktree|recovery-source)$",
+        ".github/workflows/Test-CiHelpers.test.mjs"
+      ],
+      "started_at": "2026-10-06T05:02:44.896907+00:00",
+      "timeout_seconds": 600,
+      "state": "passed",
+      "pid": 671,
+      "exit": 0,
+      "finished_at": "2026-10-06T05:02:47.783127+00:00",
+      "log_sha256": "255bb2befa285dd8205a9b1dfa0dea1029a46f79ee20b5e6df9fa88b90fe1565"
+    },
+    {
+      "name": "aggregate",
+      "command": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-06T05:02:47.984569+00:00",
+      "timeout_seconds": 14400,
+      "state": "passed",
+      "pid": 969,
+      "exit": 0,
+      "finished_at": "2026-10-06T05:18:51.013675+00:00",
+      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "passed_hooks": 11,
+      "skipped_hooks": 0
+    }
+  ],
+  "affected_wrapper_counts": {
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0
+  },
+  "finished_at": "2026-10-06T05:18:51.699379+00:00"
+}

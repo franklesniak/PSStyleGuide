@@ -1,0 +1,12 @@
+✔ artifact gate recovery role includes verifier child effects: clean (739.046387ms)
+✔ artifact gate recovery role includes verifier child effects: stale (771.611196ms)
+✔ artifact gate recovery role includes verifier child effects: verifier-worktree (736.630059ms)
+✔ artifact gate recovery role includes verifier child effects: recovery-source (494.367221ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2839.132149

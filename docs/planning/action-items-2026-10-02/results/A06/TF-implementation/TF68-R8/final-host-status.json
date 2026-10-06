@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "3793f413071183aac300ea4ca580562d5c92d28fb2bced15bc89aa0b661b0157",
+  "started_at": "2026-10-06T05:02:29.483556+00:00",
+  "run_id": "a06-tf-peer-20261006-r8",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "proposed-staged-candidate-against-accepted-base",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "psstyleguide-future-validation-a06-tf-peer-20261006-r8",
+    "--label",
+    "psstyleguide.validation-manifest=3793f413071183aac300ea4ca580562d5c92d28fb2bced15bc89aa0b661b0157",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r8\\runs\\a06-tf-peer-20261006-r8\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r8\\runs\\a06-tf-peer-20261006-r8\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T05:18:59.073337+00:00"
+}
