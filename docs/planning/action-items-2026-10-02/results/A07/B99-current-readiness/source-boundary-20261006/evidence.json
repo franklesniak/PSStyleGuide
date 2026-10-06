@@ -1,0 +1,447 @@
+{
+  "status": "PROPOSAL_ONLY_D93_4_CURRENT_NATIVE_MAIN_LOCAL_SOURCE_ELIGIBLE_FROZEN_H_INELIGIBLE",
+  "created_at_utc": "2026-10-06T21:22:27.119740+00:00",
+  "implementation_released": false,
+  "new_human_gate": false,
+  "authority_finding": {
+    "formal_A07_dependencies": [
+      "A00",
+      "A01"
+    ],
+    "PS235_acceptance_before_any_local_edit": "agent-selected serialization condition; root selection required to narrow",
+    "current_native_main_start": "explicit owner prompt and README requirement; preserved",
+    "frozen_H_product_start_eligible": false
+  },
+  "bound_inputs": {
+    "PS_B": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "PS_H": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "PS_H_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "PS_H_status": "clean",
+    "local_origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "native_ref_refresh_performed": false,
+    "PS_body_sha256": "ccfa3c9a42f3989afcc59c13f4ea8d15844c54a45b162dd0b73b389ff148a641",
+    "TF_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2"
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "f075393866735302f6aa7f6e1d083bdd5da489882befc363230180b2c0d74ba0",
+      "bytes": 11019
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4",
+      "bytes": 10209
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\ROUTING-AND-PARALLELISM.md",
+      "sha256": "8dcdc68eb243fdebd79043036641dfd4dc0ae20d12296b5eca39de78017d69a2",
+      "bytes": 3410
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A07.md",
+      "sha256": "63cb7d51f26adc12072ed82d63b3bc82c0b722a2d1a8dd817fc4afbc65538af9",
+      "bytes": 4529
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\RESULT.md",
+      "sha256": "0fe9cf35d40efe81821e567b4fdedd65ae6c90d5d3476c2b3967dc009183bb82",
+      "bytes": 82216
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\foundation-dependency-decision.md",
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4",
+      "bytes": 10441
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\coding-agent-loop.md",
+      "sha256": "ecb11f46f4060e64f418fe6ea7f7d42da62c4e206d7bfc8ae9fed75843f39971",
+      "bytes": 7450
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\REPORT.md",
+      "sha256": "997533e09ec2068abb6f23edfdb515f651d918d42b6f051f1997a339b7955745",
+      "bytes": 16432
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\evidence.json",
+      "sha256": "e54784630256118eb598028ec5bb5ca48aa5daf57912336c2c61a071dba3e97d",
+      "bytes": 21248
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\ROOT-DECISION.json",
+      "sha256": "36a6355698db93fda5c3f673e507ecae575078772e49f8d11345958fafe15ccf",
+      "bytes": 1255
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\README.md",
+      "sha256": "56b0bf385894d63630e625b8dca504674fd9c0debc6c65e2dc1846ecd739f506",
+      "bytes": 4030
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\REPORT.md",
+      "sha256": "19c4d3ac6a89fc2101bbbdfdb0d5680d6db68674b065ea8061c12d6e6d0e35c3",
+      "bytes": 4014
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\evidence.json",
+      "sha256": "dc8a7202d18847afe77115f3d3b57d784461818fcf333e031356a297078589b0",
+      "bytes": 7182
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\result.json",
+      "sha256": "440492f9c3e8faf579029be5b3874f78496943bb52a64e61116682deec77698e",
+      "bytes": 9524
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\HANDOFF.md",
+      "sha256": "4421cdd23b7a4657134796fe31b9f8d8858e3ac30b61ff191ccf16edfba5e667",
+      "bytes": 11305
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\ADDENDUM-authority-boundary.md",
+      "sha256": "850f55429cd403333d0e2f64ce6c30a5013a51ff88b0ecb09d0f0680afeb5b91",
+      "bytes": 4792
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\hook-block.proposed.yaml",
+      "sha256": "b682208d3aa19ff2f4d700f75953ea1bdb2e1cf6ff2ac02910bcd2450ee2c248",
+      "bytes": 441
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\ignore-lines.proposed.txt",
+      "sha256": "b6908aa83aef57866e683fdf92a2e5b4786aecb4e0df9ea08405755a91827d3c",
+      "bytes": 80
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\execution-state.json",
+      "sha256": "e87fcea49f4879fdbc9f046086ccac228517d7ef6bc24a5312bb0941ebf6bf2e",
+      "bytes": 39752
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-CI-retry-one.json",
+      "sha256": "bc585a2f6c1611155ea9f7b1ac5a8c051c130ad5ac4b8d5e797fabba495fe50a",
+      "bytes": 31986
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-CI-retry-one-baseline.json",
+      "sha256": "1ad03d48f4caa124d472fa44a70d82bec3240c5cc3cfdc6c1a0773f09fa24469",
+      "bytes": 613350
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-local\\REPORT.md",
+      "sha256": "1feff5093cfaa69624457c471b70e01d8032529668149ef84e7349ed856a6a42",
+      "bytes": 5539
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-local\\evidence.json",
+      "sha256": "5a1f9fba11aec3095b83ece5d71464576925cb70ef3ae188cd18243e1d193d2f",
+      "bytes": 25540
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\REPORT.md",
+      "sha256": "8b2bb9c6dd6576292b4dda2f2b07f273d63916722f2505cd61a2ba57f272b0f3",
+      "bytes": 5099
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\final-current\\evidence.json",
+      "sha256": "a168c19b9b61c08166dacf6eb023599ea9a21cf15a5640ff75c5544570f2138f",
+      "bytes": 23064
+    }
+  ],
+  "raw_objects": [
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".pre-commit-config.yaml",
+      "mode_blob_row": "100644 blob f0fcbb13bfdb25d7549cae7aea216ae9b81ee564\t.pre-commit-config.yaml",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+    },
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".gitignore",
+      "mode_blob_row": "100644 blob 926d96e120f52d9e812ab4f07d6c835ab74941a6\t.gitignore",
+      "bytes": 289,
+      "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+    },
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode_blob_row": "100644 blob 7ee712e048ab512aa751cf77c530d985d458bf7f\t.github/workflows/Test-AgentInstructions.ps1",
+      "bytes": 482175,
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode_blob_row": "100644 blob 9918aaae6d0658c0e9ab4d8bf16de9716d52ac87\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "bytes": 229936,
+      "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+    },
+    {
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".pre-commit-config.yaml",
+      "mode_blob_row": "100644 blob f0fcbb13bfdb25d7549cae7aea216ae9b81ee564\t.pre-commit-config.yaml",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+    },
+    {
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".gitignore",
+      "mode_blob_row": "100644 blob 926d96e120f52d9e812ab4f07d6c835ab74941a6\t.gitignore",
+      "bytes": 289,
+      "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+    },
+    {
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode_blob_row": "100644 blob 67e0c1ce95ff6b99c76f1959b5c284e208b450dd\t.github/workflows/Test-AgentInstructions.ps1",
+      "bytes": 510470,
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+    },
+    {
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode_blob_row": "100644 blob 43e08f56376b1b67b8e797b06649ab04fce12aed\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "bytes": 285244,
+      "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8"
+    }
+  ],
+  "changed_function_boundaries": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "function": "Get-AgentSetupInputSpec",
+      "B_sha256": "fabd4094de2d30b25295c6a2de796fca9be3fee69f960514a443ceefbe7fba6d",
+      "H_sha256": "ff494a3e2ab54f544090bdb038ab22b4894a7d3d0eed92361e3e26708aa187c6",
+      "identical": false,
+      "boundary": "lexical top-level function start to next top-level function; data inspection only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "function": "Read-AgentSetupInputContent",
+      "B_sha256": "403d9f4e8c5bfe3d4af5045067df7604af7ae9fafa2737482be3d814b7ac3d39",
+      "H_sha256": "00e5844a78a8a13f3c5ab09d6dd15a88a8af9e86fe28994f25f36ad084337feb",
+      "identical": false,
+      "boundary": "lexical top-level function start to next top-level function; data inspection only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "function": "Get-AgentSetupContractFailure",
+      "B_sha256": "691e1a5a60c3fb5c2c278484ca431aab29c01928b4811db7634494ed3655cfe5",
+      "H_sha256": "ae232ca9c387842fe9291138e25ff02c5256584fc0e2d0d140b119bdda2c67e5",
+      "identical": false,
+      "boundary": "lexical top-level function start to next top-level function; data inspection only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "function": "Assert-AgentSetupSelfTest",
+      "B_sha256": "c404ae61726e5f2d8acc9366a1bcf87f60113f7dfb669bf4c4d60adf1387ecb0",
+      "H_sha256": "4d114b9d2bb52a0f9d325b40919dac7b41e866a071a41476c0a2fe0baddf7023",
+      "identical": false,
+      "boundary": "lexical top-level function start to next top-level function; data inspection only"
+    }
+  ],
+  "rubric": {
+    "criteria": [
+      "correctness",
+      "security",
+      "evidence",
+      "usability",
+      "coupling",
+      "cost"
+    ],
+    "weights": [
+      31,
+      27,
+      19,
+      13,
+      7,
+      3
+    ],
+    "scale": "0-5",
+    "formula": "sum(weight*rating)/5",
+    "scores": [
+      {
+        "id": "A",
+        "option": "Retain acceptance-first wait",
+        "ratings": [
+          5,
+          5,
+          5,
+          2,
+          5,
+          2
+        ],
+        "eligible": true,
+        "weighted_numerator": 452,
+        "total": 90.4
+      },
+      {
+        "id": "B",
+        "option": "Private patch-only preparation",
+        "ratings": [
+          5,
+          5,
+          4,
+          2,
+          4,
+          3
+        ],
+        "eligible": true,
+        "weighted_numerator": 429,
+        "total": 85.8
+      },
+      {
+        "id": "C",
+        "option": "Frozen-H504 stacked product worktree",
+        "ratings": [
+          2,
+          4,
+          3,
+          4,
+          4,
+          4
+        ],
+        "eligible": false,
+        "weighted_numerator": 319,
+        "total": 63.8
+      },
+      {
+        "id": "D",
+        "option": "Current-main B981 isolated source-only work; integrate after acceptance",
+        "ratings": [
+          5,
+          5,
+          5,
+          4,
+          3,
+          3
+        ],
+        "eligible": true,
+        "weighted_numerator": 467,
+        "total": 93.4
+      },
+      {
+        "id": "E",
+        "option": "Other independently ready non-overlapping work",
+        "ratings": [
+          5,
+          5,
+          5,
+          3,
+          4,
+          2
+        ],
+        "eligible": true,
+        "weighted_numerator": 458,
+        "total": 91.6
+      },
+      {
+        "id": "F",
+        "option": "Only two configuration edits now; defer coupled contract",
+        "ratings": [
+          3,
+          4,
+          5,
+          2,
+          4,
+          4
+        ],
+        "eligible": true,
+        "weighted_numerator": 362,
+        "total": 72.4
+      },
+      {
+        "id": "G",
+        "option": "Publish or validate as final on B before accepted PS235 integration",
+        "ratings": [
+          3,
+          2,
+          3,
+          2,
+          1,
+          3
+        ],
+        "eligible": false,
+        "weighted_numerator": 246,
+        "total": 49.2
+      },
+      {
+        "id": "H",
+        "option": "Direct main, CI bypass or weakened B99 enforcement",
+        "ratings": [
+          0,
+          0,
+          0,
+          1,
+          2,
+          5
+        ],
+        "eligible": false,
+        "weighted_numerator": 42,
+        "total": 8.4
+      }
+    ],
+    "recommended": "D93.4"
+  },
+  "retry_evidence": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-CI-retry-one.json",
+    "requested_at": "2026-10-06T21:10:39.477709+00:00",
+    "response": "{\"message\":\"This workflow run cannot be retried\",\"documentation_url\":\"https://docs.github.com/rest/actions/workflow-runs#re-run-a-workflow\",\"status\":\"403\"}",
+    "status": "request_rejected_attempt1_unchanged",
+    "run_id": 37524396256,
+    "readback": {
+      "head_sha": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "run_attempt": 1,
+      "status": "completed",
+      "conclusion": "cancelled"
+    },
+    "next_attempt_not_before": "2026-10-06T22:10:39.477709+00:00"
+  },
+  "reuse": {
+    "root_D98_report_evidence_hashes_verified": true,
+    "current_quality_report_evidence_hashes_verified": true,
+    "existing_source_review_repeated": false,
+    "native_review_or_CI_refreshed": false,
+    "pure_D98_claim": "47 controls; no native integration; reused unchanged",
+    "native_guard_claim": "historical29-case Windows/Linux semantics; not future assembled B99 acceptance"
+  },
+  "obligations": [
+    "root display and selection before release",
+    "fresh accepted-main start binding",
+    "sole writer; freeze B99 before resumed PS235 repair",
+    "four-path source-only phase with no tests/install/commit/publication",
+    "genuine PS235 acceptance before final integration",
+    "preserve landed behavior and invalidate changed-input evidence",
+    "final actual B/H and D98 configuration/platform checks",
+    "normal independent quality/reviews/all current CI gates",
+    "PS B99 acceptance before TF transfer; S1 and paired foundations remain open"
+  ],
+  "transfers_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "inspection_notes": [
+    "Two compact data-inspection commands stopped on a wrong receipt key and stdout encoding; later correct native_readback and UTF-8 projections completed. No payload executed or product changed."
+  ],
+  "report_sha256": "f71cd88431dc8014657aab4aa9f052abcf4256a0fbc6e03f4cfc18c33633fcba"
+}

@@ -1,0 +1,55 @@
+{
+  "status": "ROOT_VERIFIED_EXISTING_D1_R5_B1_NINTH_READER_MAP_CORRECTION",
+  "verified_at": "2026-10-06T21:09:53.707981+00:00",
+  "report_sha256": "0d7608ace59c78d46ccb38c577bc48ab345a2ad6ee557049e58f8db2f4ce7d9d",
+  "evidence_sha256": "3fdeb7e7f0d25caf216d2bd1a7f9099e01583a61c007935fce84cb129b4ce14f",
+  "references": 13,
+  "raw_source_rows": 54,
+  "authority": "Existing R5/B1 requires every direct metadata reader; same D1 finite map revised as its manifestRules require. No new design or implementation release.",
+  "path_added": ".github/workflows/copilot-code-review.yml",
+  "future_R5_batch_count": 9,
+  "current_inputs": [
+    {
+      "repository": "PS",
+      "root": "C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide",
+      "current": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "former": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "current_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+      "former_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    },
+    {
+      "repository": "TF",
+      "root": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+      "current": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "former": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "current_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "former_tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631"
+    }
+  ],
+  "current_ninth_path_identities": [
+    {
+      "repo": "PS",
+      "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "role": "current",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "repo": "TF",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "role": "current",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016
+    }
+  ],
+  "GateA13_GateB9_unchanged": true,
+  "original_counters_deadlines_unchanged": true
+}

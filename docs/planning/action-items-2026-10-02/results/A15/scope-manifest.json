@@ -65,7 +65,8 @@
         ".github/workflows/workflow-policy-cases.json",
         ".github/workflows/Test-CiHelpers.test.mjs",
         ".github/workflows/Test-CheckoutCredentials.ps1",
-        ".github/workflows/copilot-setup-steps.yml"
+        ".github/workflows/copilot-setup-steps.yml",
+        ".github/workflows/copilot-code-review.yml"
       ],
       "consumeWithoutAssumingEdit": [
         ".github/workflows/markdownlint.yml",
@@ -398,5 +399,42 @@
       "bytes": 33862,
       "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
     }
+  },
+  "currentRuntimeConsumerRefresh": {
+    "recorded_at": "2026-10-06T21:09:53.707981+00:00",
+    "source_report": "../A07/recovery-runtime/current-consumers-20261006/REPORT.md",
+    "same_selected_decisions": [
+      "D1",
+      "R5",
+      "B1",
+      "C98"
+    ],
+    "implementation_released": false,
+    "PS_head_status": "unaccepted PR235; rebind after genuine acceptance",
+    "current_ninth_path_identities": [
+      {
+        "repo": "PS",
+        "ref": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "role": "current",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "bytes": 44995
+      },
+      {
+        "repo": "TF",
+        "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "role": "current",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "bytes": 45016
+      }
+    ],
+    "coordinated_R5_path_count": 9
   }
 }

@@ -1,0 +1,17 @@
+{
+  "selected_at": "2026-10-06T21:24:16.633287+00:00",
+  "selected_option": "D93.4",
+  "report_sha256": "f71cd88431dc8014657aab4aa9f052abcf4256a0fbc6e03f4cfc18c33633fcba",
+  "evidence_sha256": "f9cbd0330b2c5b2d0df4210521c78bb26d45e3925b50f00c3eabd3eca66a6936",
+  "root_verification": {
+    "sampled_reference_hashes": 7,
+    "raw_source_rows": 8,
+    "score_totals": 8,
+    "authority_and_report_read": true
+  },
+  "displayed_before_release": true,
+  "release": "Only isolated four-path uncommitted source work from current native main; final integration/tests/admission/publication held until genuine PS235 acceptance.",
+  "worktree_reuse": "Reuse clean attached governance-push-exit checkout with a new current-main branch; retain former branch/commit and all ignored files. No active consumer or writer identified.",
+  "current_native_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "changes_to_prior_D98": "Narrow only the agent-added wait before local source edits. Preserve D98 mechanism, native profile and final gates. Earlier condition remains history."
+}
