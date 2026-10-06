@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.8.20261005.0
+# Version: 1.11.20261006.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -50,6 +50,496 @@ param(
 )
 
 $hashtableRuntimeContext = $RuntimeContext
+
+function Assert-ParserJsonConversionSelfTest {
+    # .SYNOPSIS
+    # Checks native Markdown conversion against the original strict decoder.
+    #
+    # .DESCRIPTION
+    # Compares exact types, ordered properties, type names and array elements.
+    # Refusal cases require no partial output from either conversion path.
+    #
+    # .EXAMPLE
+    # Assert-ParserJsonConversionSelfTest
+    #
+    # # Throws if the structural opt-in changes the JSON contract.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. A failed contract throws.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Positional parameters are disabled for internal callers.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $scriptBlockCompare = {
+        param($Expected, $Actual)
+        if ($null -eq $Expected) {
+            if ($null -ne $Actual) { throw 'JSON conversion changed a null value.' }
+            return
+        }
+        if ($null -eq $Actual -or $Expected.GetType() -ne $Actual.GetType()) {
+            throw 'JSON conversion changed a value type.'
+        }
+        if ($Expected -is [array]) {
+            if ($Expected.Count -ne $Actual.Count) { throw 'JSON conversion changed array cardinality.' }
+            for ($intIndex = 0; $intIndex -lt $Expected.Count; $intIndex++) {
+                & $scriptBlockCompare -Expected $Expected[$intIndex] -Actual $Actual[$intIndex]
+            }
+        } elseif ($Expected -is [pscustomobject]) {
+            $arrExpectedProperties = @($Expected.PSObject.Properties)
+            $arrActualProperties = @($Actual.PSObject.Properties)
+            if ($arrExpectedProperties.Count -ne $arrActualProperties.Count -or
+                ($Expected.PSObject.TypeNames -join "`0") -cne ($Actual.PSObject.TypeNames -join "`0")) {
+                throw 'JSON conversion changed object properties or type names.'
+            }
+            for ($intIndex = 0; $intIndex -lt $arrExpectedProperties.Count; $intIndex++) {
+                if ($arrExpectedProperties[$intIndex].Name -cne $arrActualProperties[$intIndex].Name) {
+                    throw 'JSON conversion changed property order or spelling.'
+                }
+                & $scriptBlockCompare -Expected $arrExpectedProperties[$intIndex].Value `
+                    -Actual $arrActualProperties[$intIndex].Value
+            }
+        } elseif ($Expected -is [double]) {
+            if ([BitConverter]::DoubleToInt64Bits($Expected) -ne [BitConverter]::DoubleToInt64Bits($Actual)) {
+                throw 'JSON conversion changed a floating-point value.'
+            }
+        } elseif ($Expected -cne $Actual) {
+            throw 'JSON conversion changed a scalar value.'
+        }
+    }
+    $arrValidJson = @(
+        '{}',
+        '{"z":[],"a":[null],"nested":[[1],[],[null]],"object":{"b":true,"a":false}}',
+        '{"a":null,"b":1,"c":1.0,"d":-0.0,"e":-9223372036854775808,"f":9223372036854775807,"g":9223372036854775808,"h":1e-300}',
+        '{"value":"2026-10-29T23:59:59.123456789+05:45","newline":"a\nb","unicode":"\u00e9\ud83d\ude03"}',
+        '{"PSTypeName":"StyleGuide.JsonFixture","value":1}',
+        '{"nested":[{"pstypename":"StyleGuide.NestedFixture","value":null}]}',
+        '{"PSTypeName":null}', '{"PSTypeName":17}', '{"PSTypeName":[1,2]}',
+        '{"Count":1,"Length":2,"value":3}',
+        ('{"a":' + ('[' * 63) + '1' + (']' * 63) + '}')
+    )
+    foreach ($strContent in $arrValidJson) {
+        $objExpected = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 16384
+        $objActual = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 16384 `
+            -UseNativeStructuralConversion
+        & $scriptBlockCompare -Expected $objExpected -Actual $objActual
+    }
+    $strBoundaryContent = '{"text":"' + [char]0x00e9 + '"}'
+    $intExactBytes = [Text.Encoding]::UTF8.GetByteCount($strBoundaryContent)
+    foreach ($boolNative in @($false, $true)) {
+        $objBoundary = ConvertFrom-ParserJsonContext -Content $strBoundaryContent `
+            -MaximumBytes $intExactBytes -UseNativeStructuralConversion:$boolNative
+        if ($objBoundary.text -cne [string][char]0x00e9) {
+            throw 'JSON conversion changed exact-boundary Unicode text.'
+        }
+        $objBoundaryFailure = $null
+        try {
+            $null = ConvertFrom-ParserJsonContext -Content $strBoundaryContent `
+                -MaximumBytes ($intExactBytes - 1) -UseNativeStructuralConversion:$boolNative
+        } catch { $objBoundaryFailure = $_ }
+        if ($null -eq $objBoundaryFailure -or
+            $objBoundaryFailure.Exception.Message -cne 'The parser returned oversized JSON context.') {
+            throw 'JSON conversion lost its exact UTF-8 byte bound.'
+        }
+    }
+    # Some reserved names are rejected by PowerShell itself. Preserve that result,
+    # as well as successful special-name casts, without inventing an admission rule.
+    foreach ($strName in @('PSObject', 'PSBase', 'PSAdapted', 'PSExtended', 'PSTypeNames')) {
+        $strContent = '{"first":1,"nested":{"' + $strName + '":"value"},"last":2}'
+        $objExpected = $null
+        $objExpectedFailure = $null
+        $objActual = $null
+        $objActualFailure = $null
+        try { $objExpected = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 } catch {
+            $objExpectedFailure = $_
+        }
+        try {
+            $objActual = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 `
+                -UseNativeStructuralConversion
+        } catch { $objActualFailure = $_ }
+        if (($null -eq $objExpectedFailure) -ne ($null -eq $objActualFailure)) {
+            throw 'JSON conversion changed reserved-name acceptance.'
+        }
+        if ($null -ne $objExpectedFailure) {
+            if ($objExpectedFailure.Exception.Message -cne $objActualFailure.Exception.Message) {
+                throw 'JSON conversion changed reserved-name failure.'
+            }
+        } else { & $scriptBlockCompare -Expected $objExpected -Actual $objActual }
+    }
+    foreach ($strContent in @(
+            '', '[]', 'null', 'true', '1', '"text"',
+            '{"":1}', '{"a":1,"a":2}', '{"a":1,"A":2}', '{"a":1,"\u0061":2}',
+            '{"items":[{"a":1,"A":2}]}', '{"items":[{"":1}]}',
+            '{"first":1,"nested":{"PSTypeName":"Fixture","a":1,"A":2}}',
+            '{"first":1,"last":1e400}', '{"first":1,"last":-1e400}',
+            '{"a":NaN}', '{"a":Infinity}', '{"a":1,}', '{"a":/*comment*/1}',
+            ('{"a":' + ('[' * 64) + '1' + (']' * 64) + '}'),
+            ('{"a":"' + ('x' * 4096) + '"}')
+        )) {
+        $strExpectedFailure = $null
+        foreach ($boolNative in @($false, $true)) {
+            $listOutput = [Collections.Generic.List[object]]::new()
+            $objFailure = $null
+            try {
+                ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 `
+                    -UseNativeStructuralConversion:$boolNative | ForEach-Object { $listOutput.Add($_) }
+            } catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $listOutput.Count -ne 0) {
+                throw 'JSON conversion accepted invalid input or emitted partial output.'
+            }
+            if (-not $boolNative) {
+                $strExpectedFailure = $objFailure.Exception.Message
+            } elseif ($objFailure.Exception.Message -cne $strExpectedFailure) {
+                throw 'JSON conversion changed a strict decoder failure.'
+            }
+        }
+    }
+}
+
+
+function Assert-MarkdownParseReuseSelfTest {
+    # .SYNOPSIS
+    # Tests isolated structural reuse without skipping the real parser.
+    #
+    # .DESCRIPTION
+    # Counts actual parser and decoder calls, changes fresh output and definitions,
+    # mutates returned graphs, and exercises bounded retention and owner cleanup.
+    # Scoped wrappers delegate to the installed functions and cannot outlive this test.
+    #
+    # .EXAMPLE
+    # Assert-MarkdownParseReuseSelfTest
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. Throws on an incorrect result.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $scriptBlockActualParser = ${function:Invoke-MarkdownParserProcess}
+    $scriptBlockActualDecoder = ${function:ConvertFrom-ParserJsonContext}
+    $scriptBlockActualNode = ${function:Get-NodeApplicationContext}
+    $scriptBlockActualCopy = ${function:Copy-MarkdownParseReuseContext}
+    $scriptBlockActualContext = ${function:Get-MarkdownParseContext}
+    $hashtableProbe = @{ Processes = 0; Decodes = 0; NativeDecodes = 0; RuntimeDecodes = 0; NodeChecks = 0; Mode = ''; OverrideCalls = 0 }
+    function Invoke-MarkdownParserProcess {
+        param($StartInfo, $Content)
+        $hashtableProbe.Processes++
+        if ($hashtableProbe.Mode -ceq 'native-failure') { throw 'Fresh parser failure control.' }
+        $objResult = & $scriptBlockActualParser -StartInfo $StartInfo -Content $Content
+        if ($hashtableProbe.Mode -ceq 'bad-json') { $objResult.Output = '{"a":1,"a":2}' }
+        if ($hashtableProbe.Mode -ceq 'bad-range') {
+            $hashtableRaw = $objResult.Output | ConvertFrom-Json -AsHashtable
+            $hashtableRaw.codeBlockRanges = ,@(-1, 1)
+            $objResult.Output = $hashtableRaw | ConvertTo-Json -Depth 20 -Compress
+        }
+        return $objResult
+    }
+    function ConvertFrom-ParserJsonContext {
+        param($Content, $MaximumBytes, [switch] $UseNativeStructuralConversion)
+        if ($MaximumBytes -eq 16777216) {
+            $hashtableProbe.Decodes++
+            if ($UseNativeStructuralConversion) { $hashtableProbe.NativeDecodes++ }
+        } else {
+            $hashtableProbe.RuntimeDecodes++
+        }
+        return & $scriptBlockActualDecoder -Content $Content -MaximumBytes $MaximumBytes `
+            -UseNativeStructuralConversion:$UseNativeStructuralConversion
+    }
+    function Get-NodeApplicationContext {
+        $hashtableProbe.NodeChecks++
+        if ($hashtableProbe.Mode -ceq 'missing-node') { return $null }
+        return & $scriptBlockActualNode
+    }
+    $scriptBlockCountedDecoder = ${function:ConvertFrom-ParserJsonContext}
+    $strMarkdown = @(
+        '# Title', '', '## Metadata', '', '- **Status:** Active',
+        '- **Owner:** Test', '- **Last Updated:** 2026-10-01', '- **Scope:** Test', '',
+        'Text `code` [link](https://example.invalid).', '',
+        '| Field | Value |', '| --- | --- |', '| Cell | `code` [link](https://example.invalid) |', '',
+        '```text', 'code', '```'
+    ) -join "`n"
+    $intLineCount = @([regex]::Split($strMarkdown, '\r\n|\r|\n')).Count
+    $objBudget = [pscustomobject]@{ Retained = 0 }
+    $listSlots = [Collections.Generic.List[object]]::new()
+    $objSlot = Get-MarkdownParseReuseSlot -Budget $objBudget
+    $listSlots.Add($objSlot)
+    try {
+        $objFirst = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+        $strExpected = $objFirst | ConvertTo-Json -Depth 12 -Compress
+        $objSecond = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+        if ($hashtableProbe.Processes -ne 2 -or $hashtableProbe.NodeChecks -ne 2 -or
+            $hashtableProbe.Decodes -ne 1 -or $hashtableProbe.NativeDecodes -ne 1 -or
+            ($objSecond | ConvertTo-Json -Depth 12 -Compress) -cne $strExpected) {
+            throw 'Structural reuse must retain two real parser calls and one interpretation.'
+        }
+        foreach ($objResult in @($objFirst, $objSecond)) {
+            foreach ($strArrayName in @('CodeBlockRanges', 'ProseBlocks', 'TableRows',
+                    'TopLevelBlocks', 'TopLevelListItems', 'Headings', 'LevelTwoHeadings')) {
+                if ($objResult.$strArrayName -isnot [pscustomobject[]]) {
+                    throw 'Structural reuse changed an exact array type.'
+                }
+                foreach ($objRecord in $objResult.$strArrayName) {
+                    $objRecord.Start = -900
+                    if ($null -ne $objRecord.PSObject.Properties['Text']) { $objRecord.Text = 'mutated' }
+                    foreach ($strStrings in @('Code', 'Links')) {
+                        if ($null -ne $objRecord.PSObject.Properties[$strStrings]) {
+                            if ($objRecord.$strStrings -isnot [string[]]) { throw 'String-array type changed.' }
+                            if ($objRecord.$strStrings.Count -gt 0) { $objRecord.$strStrings[0] = 'mutated' }
+                        }
+                    }
+                    if ($null -ne $objRecord.PSObject.Properties['Cells']) {
+                        if ($objRecord.Cells -isnot [pscustomobject[]]) { throw 'Cell-array type changed.' }
+                        foreach ($objCell in $objRecord.Cells) {
+                            $objCell.Start = -901
+                            $objCell.End = -902
+                            $objCell.Text = 'mutated'
+                            if ($objCell.Code.Count -gt 0) { $objCell.Code[0] = 'mutated' }
+                            if ($objCell.Links.Count -gt 0) { $objCell.Links[0] = 'mutated' }
+                        }
+                    }
+                }
+            }
+        }
+        $objAfterMutation = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+        if (($objAfterMutation | ConvertTo-Json -Depth 12 -Compress) -cne $strExpected -or
+            $hashtableProbe.Decodes -ne 1 -or $hashtableProbe.Processes -ne 3) {
+            throw 'Returned-object mutation reached the owned interpretation.'
+        }
+        $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount ($intLineCount + 1) -ReuseSlot $objSlot
+        $null = Get-MarkdownParseContext -Content ($strMarkdown + ' ') -LineCount $intLineCount -ReuseSlot $objSlot
+        $null = Get-MarkdownParseContext -Content ($strMarkdown + ' ') -LineCount $intLineCount
+        if ($hashtableProbe.Processes -ne 6 -or $hashtableProbe.Decodes -ne 4) {
+            throw 'Changed parser input, LineCount or fresh direct call reused stale interpretation.'
+        }
+        foreach ($strMode in @('native-failure', 'bad-json', 'bad-range', 'missing-node')) {
+            $hashtableProbe.Mode = ''
+            $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+            $hashtableProbe.Mode = $strMode
+            $objFailure = $null
+            try { $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot } catch {
+                $objFailure = $_
+            }
+            $strFailure = switch ($strMode) {
+                'native-failure' { 'Fresh parser failure control' }
+                'bad-json' { 'invalid context data' }
+                'bad-range' { 'invalid or overlapping range' }
+                'missing-node' { 'trusted Node.js runtime is required' }
+            }
+            if ($null -eq $objFailure -or $objFailure.Exception.Message -notmatch $strFailure -or
+                $null -ne $objSlot.Snapshot -or $objBudget.Retained -ne 0) {
+                throw "Fresh failure or snapshot release failed: $strMode."
+            }
+        }
+        $hashtableProbe.Mode = ''
+        $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+        Set-Item -LiteralPath Function:ConvertFrom-ParserJsonContext -Value {
+            param($Content, $MaximumBytes)
+            $hashtableProbe.OverrideCalls++
+            if ($Content.Length -le $MaximumBytes) { throw 'Decoder replacement control.' }
+            throw 'Unexpected decoder replacement input.'
+        }
+        $objFailure = $null
+        try { $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot } catch {
+            $objFailure = $_
+        } finally {
+            Set-Item -LiteralPath Function:ConvertFrom-ParserJsonContext -Value $scriptBlockCountedDecoder
+        }
+        if ($null -eq $objFailure -or $objFailure.Exception.Message -notmatch 'invalid context data' -or
+            $hashtableProbe.OverrideCalls -ne 1 -or $null -ne $objSlot.Snapshot) {
+            throw 'A decoder replacement was hidden by reuse.'
+        }
+        foreach ($strDefinition in @('Copy-MarkdownParseReuseContext', 'Get-MarkdownParseContext')) {
+            $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+            $intPriorDecodes = $hashtableProbe.Decodes
+            $intPriorProcesses = $hashtableProbe.Processes
+            try {
+                if ($strDefinition -ceq 'Copy-MarkdownParseReuseContext') {
+                    Set-Item -LiteralPath Function:Copy-MarkdownParseReuseContext -Value {
+                        param($Context, $ParserText, $ParserOutput)
+                        return & $scriptBlockActualCopy -Context $Context -ParserText $ParserText -ParserOutput $ParserOutput
+                    }
+                } else {
+                    Set-Item -LiteralPath Function:Get-MarkdownParseContext -Value {
+                        param($Content, $LineCount, $ReuseSlot)
+                        return & $scriptBlockActualContext -Content $Content -LineCount $LineCount -ReuseSlot $ReuseSlot
+                    }
+                }
+                $objReplaced = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot
+                if ($hashtableProbe.Decodes -ne ($intPriorDecodes + 1) -or
+                    $hashtableProbe.Processes -ne ($intPriorProcesses + 1) -or
+                    ($objReplaced | ConvertTo-Json -Depth 12 -Compress) -cne $strExpected) {
+                    throw "A structural helper replacement reused its former interpretation: $strDefinition."
+                }
+            } finally {
+                Set-Item -LiteralPath Function:Copy-MarkdownParseReuseContext -Value $scriptBlockActualCopy
+                Set-Item -LiteralPath Function:Get-MarkdownParseContext -Value $scriptBlockActualContext
+            }
+        }
+        foreach ($objExisting in $listSlots) { Clear-MarkdownParseReuseSlot -Slot $objExisting }
+        for ($intSlot = 0; $intSlot -lt 9; $intSlot++) {
+            $objNext = Get-MarkdownParseReuseSlot -Budget $objBudget
+            $listSlots.Add($objNext)
+            $null = Get-MarkdownParseContext -Content '' -LineCount 1 -ReuseSlot $objNext
+        }
+        if ($objBudget.Retained -ne 8 -or $null -ne $objNext.Snapshot) {
+            throw 'Snapshot retention exceeded eight or rejected its fresh fallback.'
+        }
+        Clear-MarkdownParseReuseSlot -Slot $listSlots[1]
+        $null = Get-MarkdownParseContext -Content '' -LineCount 1 -ReuseSlot $objNext
+        if ($objBudget.Retained -ne 8 -or $null -eq $objNext.Snapshot) {
+            throw 'Released capacity was not available to the next eligible owner.'
+        }
+        $objEmpty = Get-MarkdownParseContext -Content '' -LineCount 1
+        if ($null -eq (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText (' ' * 524288) -ParserOutput '') -or
+            $null -ne (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText (' ' * 524289) -ParserOutput '')) {
+            throw 'UTF-16 retention boundary changed.'
+        }
+        $objEmpty.CodeBlockRanges = [pscustomobject[]]@(
+            for ($intRange = 0; $intRange -lt 2048; $intRange++) {
+                [pscustomobject]@{ Start = $intRange * 2; End = $intRange * 2 + 1 }
+            })
+        if ($null -eq (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText '' -ParserOutput '')) {
+            throw 'Exact structural-record retention limit was rejected.'
+        }
+        $objEmpty.CodeBlockRanges += [pscustomobject]@{ Start = 4096; End = 4097 }
+        if ($null -ne (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText '' -ParserOutput '')) {
+            throw 'Structural-record retention limit was ignored.'
+        }
+        $objEmpty.CodeBlockRanges = [pscustomobject[]]@()
+        $objEmpty.ProseBlocks = [pscustomobject[]]@([pscustomobject]@{
+                Start = 0; End = 1; Text = ''; Code = [string[]]@('' * 0); Links = [string[]]@()
+            })
+        $objEmpty.ProseBlocks[0].Code = [string[]]@(for ($intElement = 0; $intElement -lt 8191; $intElement++) { '' })
+        if ($null -eq (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText '' -ParserOutput '')) {
+            throw 'Exact array-element retention limit was rejected.'
+        }
+        $objEmpty.ProseBlocks[0].Code += ''
+        if ($null -ne (Copy-MarkdownParseReuseContext -Context $objEmpty -ParserText '' -ParserOutput '')) {
+            throw 'Array-element retention limit was ignored.'
+        }
+    } finally {
+        foreach ($objExisting in $listSlots) { Clear-MarkdownParseReuseSlot -Slot $objExisting }
+    }
+    if ($objBudget.Retained -ne 0) { throw 'Document-owned reuse leaked after cleanup.' }
+
+    $scriptBlockActualSlot = ${function:Get-MarkdownParseReuseSlot}
+    $scriptBlockActualClear = ${function:Clear-MarkdownParseReuseSlot}
+    $hashtableOwnerProbe = @{ Allocations = 0; FailSecond = $false; FailCleanup = $false }
+    $listOwnedSlots = [Collections.Generic.List[object]]::new()
+    function Get-MarkdownParseReuseSlot {
+        param($Budget)
+        $hashtableOwnerProbe.Allocations++
+        if ($hashtableOwnerProbe.FailSecond -and $hashtableOwnerProbe.Allocations -eq 2) {
+            throw 'Second-slot allocation control.'
+        }
+        $objOwnedSlot = & $scriptBlockActualSlot -Budget $Budget
+        $listOwnedSlots.Add($objOwnedSlot)
+        return $objOwnedSlot
+    }
+    function Clear-MarkdownParseReuseSlot {
+        param($Slot)
+        & $scriptBlockActualClear -Slot $Slot
+        if ($hashtableOwnerProbe.FailCleanup) { throw 'Cleanup failure control.' }
+    }
+    $strVersioned = "# Fixture`n`n**Version:** 1.0.20261001.0`n`n## Metadata`n`n" +
+        "- **Status:** Active`n- **Owner:** Test`n- **Last Updated:** 2026-10-01`n" +
+        "- **Scope:** Test`n`n## Procedure`n`nFollow the procedure.`n"
+    $objNormalizedSlot = & $scriptBlockActualSlot
+    try {
+        $hashtableProbe.Processes = 0
+        $hashtableProbe.Decodes = 0
+        foreach ($strNewline in @("`n", "`r`n", "`r")) {
+            $objMetadata = Get-DocumentMetadataContext `
+                -Content ($strVersioned.Replace("`n", $strNewline)) -ReuseSlot $objNormalizedSlot
+            if ($null -ne $objMetadata.Failure) { throw 'A normalized newline metadata fixture failed.' }
+        }
+        if ($hashtableProbe.Processes -ne 3 -or $hashtableProbe.Decodes -ne 1) {
+            throw 'Metadata consumers did not bind reuse to actual normalized text and line count.'
+        }
+    } finally {
+        & $scriptBlockActualClear -Slot $objNormalizedSlot
+    }
+    $hashtableProbe.Processes = 0
+    $hashtableProbe.Decodes = 0
+    $arrFailure = @(Get-PublishedEndpointMetadataFailure -Name 'fixture.md' `
+            -CurrentContent $strVersioned -ParentContent $strVersioned `
+            -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false)
+    if ($arrFailure.Count -ne 0 -or $hashtableOwnerProbe.Allocations -ne 0 -or
+        $hashtableProbe.Processes -ne 2 -or $hashtableProbe.Decodes -ne 2) {
+        throw 'A direct required-Version call allocated retention or stopped parsing fresh.'
+    }
+    $hashtableProbe.Processes = 0
+    $hashtableProbe.Decodes = 0
+    $arrFailure = @(Get-PublishedEndpointLastUpdatedFailure -Name 'fixture.md' `
+            -CurrentContent $strVersioned -BaseContent $strVersioned -TrustedEventUtcDate '')
+    if ($arrFailure.Count -ne 0 -or $hashtableOwnerProbe.Allocations -ne 2 -or
+        $hashtableProbe.Processes -ne 4 -or $hashtableProbe.Decodes -ne 2 -or
+        @($listOwnedSlots | Where-Object { $null -ne $_.Snapshot -or $_.Budget.Retained -ne 0 }).Count -ne 0) {
+        throw 'The optional-Version owner did not reuse and release its two interpretations.'
+    }
+    $objBorrowedCurrent = Get-MarkdownParseReuseSlot
+    $objBorrowedParent = Get-MarkdownParseReuseSlot -Budget $objBorrowedCurrent.Budget
+    try {
+        $hashtableOwnerProbe.Allocations = 0
+        $hashtableProbe.Processes = 0
+        $hashtableProbe.Decodes = 0
+        $arrFailure = @(Get-PublishedEndpointLastUpdatedFailure -Name 'fixture.md' `
+                -CurrentContent $strVersioned -BaseContent $strVersioned -TrustedEventUtcDate '' `
+                -CurrentParseReuse $objBorrowedCurrent -ParentParseReuse $objBorrowedParent)
+        if ($arrFailure.Count -ne 0 -or $hashtableOwnerProbe.Allocations -ne 0 -or
+            $hashtableProbe.Processes -ne 4 -or $hashtableProbe.Decodes -ne 2 -or
+            $objBorrowedCurrent.Budget.Retained -ne 2) {
+            throw 'Nested borrowed slots changed owner count or lost their interpretations.'
+        }
+        Clear-MarkdownParseReuseSlot -Slot $objBorrowedCurrent
+        Clear-MarkdownParseReuseSlot -Slot $objBorrowedParent
+        $hashtableProbe.Processes = 0
+        $hashtableProbe.Decodes = 0
+        $arrFailure = @(Get-PublishedEndpointLastUpdatedFailure -Name 'fixture.md' `
+                -CurrentContent $strVersioned -BaseContent $strVersioned -TrustedEventUtcDate '' `
+                -CurrentParseReuse $objBorrowedCurrent)
+        if ($arrFailure.Count -ne 0 -or $hashtableOwnerProbe.Allocations -ne 0 -or
+            $hashtableProbe.Processes -ne 4 -or $hashtableProbe.Decodes -ne 3 -or
+            $objBorrowedCurrent.Budget.Retained -ne 1) {
+            throw 'A partial borrowed pair allocated an owner or reused its absent slot.'
+        }
+    } finally {
+        Clear-MarkdownParseReuseSlot -Slot $objBorrowedCurrent
+        Clear-MarkdownParseReuseSlot -Slot $objBorrowedParent
+    }
+    $hashtableOwnerProbe.Allocations = 0
+    $hashtableOwnerProbe.FailSecond = $true
+    $hashtableOwnerProbe.FailCleanup = $true
+    $objFailure = $null
+    try {
+        $null = Get-PublishedEndpointLastUpdatedFailure -Name 'fixture.md' `
+            -CurrentContent $strVersioned -BaseContent $strVersioned -TrustedEventUtcDate ''
+    } catch {
+        $objFailure = $_
+    } finally {
+        $hashtableOwnerProbe.FailSecond = $false
+        $hashtableOwnerProbe.FailCleanup = $false
+    }
+    if ($null -eq $objFailure -or $objFailure.Exception.Message -notmatch 'Second-slot allocation control' -or
+        @($listOwnedSlots | Where-Object { $null -ne $_.Snapshot -or $_.Budget.Retained -ne 0 }).Count -ne 0) {
+        throw 'Partial allocation cleanup replaced the primary failure or retained data.'
+    }
+}
+
 
 function Assert-DocumentMetadataClassificationSelfTest {
     # .SYNOPSIS
@@ -891,6 +1381,318 @@ function Assert-ClassificationAdmissionGitFixture {
     }
 }
 
+function Invoke-AgentInstructionFixtureClock {
+    # .SYNOPSIS
+    # Runs a private fixture action with checked debugger clock controls.
+    #
+    # .DESCRIPTION
+    # Pins the exact validator's two UTC date consumers without changing its
+    # bytes or production interface. Breakpoints exist only for this action.
+    #
+    # .PARAMETER CheckerPath
+    # The absolute path of the actual validator supplying both clock anchors.
+    #
+    # .PARAMETER UtcNow
+    # The private fixture timestamp shared by related synthetic documents.
+    #
+    # .PARAMETER Action
+    # The actual validator invocation or in-process local-context call.
+    #
+    # .PARAMETER LocalOnly
+    # Controls only an already-loaded local-context function.
+    #
+    # .PARAMETER RequireLocal
+    # Requires the local-context breakpoint to fire during the action.
+    #
+    # .EXAMPLE
+    # Invoke-AgentInstructionFixtureClock -CheckerPath $strChecker -UtcNow $objNow -Action { & $strChecker }
+    #
+    # # Runs the exact checker with the private fixture date.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # System.Object. The unchanged output of the fixture action.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([object])]
+    param(
+        [Parameter(Mandatory)][string] $CheckerPath,
+        [Parameter(Mandatory)][DateTimeOffset] $UtcNow,
+        [Parameter(Mandatory)][scriptblock] $Action,
+        [Parameter()][switch] $LocalOnly,
+        [Parameter()][switch] $RequireLocal
+    )
+
+    $strSource = [IO.File]::ReadAllText($CheckerPath)
+    $strBreakpointPath = [Management.Automation.WildcardPattern]::Escape($CheckerPath)
+    $strInitialization = @'
+$script:objValidationUtcNow = [DateTimeOffset]::UtcNow
+$script:strMaximumMetadataUtcDate = $script:objValidationUtcNow.ToString('yyyy-MM-dd')
+$script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5)
+'@
+    $strLocal = @'
+    $strExpectedUtcDate = if ($intDiffExitCode -eq 1) {
+        [DateTimeOffset]::UtcNow.ToString('yyyy-MM-dd')
+    } else {
+        ''
+    }
+'@
+    $arrLines = foreach ($strAnchor in @($strInitialization, $strLocal)) {
+        $strPattern = [regex]::Escape($strAnchor.Replace("`r`n", "`n")).Replace('\n', '\r?\n')
+        $arrMatches = @([regex]::Matches($strSource, '(?m)^' + $strPattern + '\r?$'))
+        if ($arrMatches.Count -ne 1) {
+            throw 'Fixture clock requires one exact initialization and local-date anchor.'
+        }
+        # Break on the first executable statement after the complete assignment.
+        1 + [regex]::Matches($strSource.Substring(0, $arrMatches[0].Index + $arrMatches[0].Length), "`n").Count + 1
+    }
+    $strTimestamp = $UtcNow.ToUniversalTime().ToString('o')
+    $strDate = $UtcNow.ToUniversalTime().ToString('yyyy-MM-dd')
+    $strStateName = 'hashtableFixtureClock' + [Guid]::NewGuid().ToString('N')
+    $hashtableClockState = @{ InitializationReadbacks = 0; LocalReadbacks = 0 }
+    $scriptblockInitialize = [scriptblock]::Create(@'
+$script:objValidationUtcNow = [DateTimeOffset]::Parse('TIMESTAMP')
+$script:strMaximumMetadataUtcDate = 'DATE'
+$script:objMaximumCommitUtcTimestamp = [DateTimeOffset]::Parse('TIMESTAMP').AddMinutes(5)
+if ($script:strMaximumMetadataUtcDate -cne 'DATE' -or
+    $script:objValidationUtcNow -ne [DateTimeOffset]::Parse('TIMESTAMP') -or
+    $script:objMaximumCommitUtcTimestamp -ne [DateTimeOffset]::Parse('TIMESTAMP').AddMinutes(5)) {
+    throw 'Fixture initialization clock readback failed.'
+}
+$global:STATE.InitializationReadbacks++
+'@.Replace('TIMESTAMP', $strTimestamp).Replace('DATE', $strDate).Replace('STATE', $strStateName))
+    $scriptblockLocal = [scriptblock]::Create(@'
+$strFixtureExpectedDate = if ((Get-Variable -Name intDiffExitCode -Scope 1 -ValueOnly) -eq 1) { 'DATE' } else { '' }
+Set-Variable -Name strExpectedUtcDate -Scope 1 -Value $strFixtureExpectedDate
+if ((Get-Variable -Name strExpectedUtcDate -Scope 1 -ValueOnly) -cne $strFixtureExpectedDate) {
+    throw 'Fixture local clock readback failed.'
+}
+$global:STATE.LocalReadbacks++
+'@.Replace('DATE', $strDate).Replace('STATE', $strStateName))
+    $objInitializationBreakpoint = $null
+    $objLocalBreakpoint = $null
+    $objPrimaryFailure = $null
+    $listClockFailures = [Collections.Generic.List[string]]::new()
+    # Debugger action exceptions do not reliably escape the debugger. A unique
+    # runspace-local receipt records completed readbacks, checked outside it.
+    Set-Variable -Name $strStateName -Scope Global -Value $hashtableClockState
+    try {
+        if (-not $LocalOnly) {
+            $objInitializationBreakpoint = Set-PSBreakpoint -Script $strBreakpointPath -Line $arrLines[0] -Action $scriptblockInitialize
+        }
+        $objLocalBreakpoint = Set-PSBreakpoint -Script $strBreakpointPath -Line $arrLines[1] -Action $scriptblockLocal
+        & $Action
+    } catch {
+        $objPrimaryFailure = $_
+    } finally {
+        foreach ($objBreakpoint in @($objInitializationBreakpoint, $objLocalBreakpoint)) {
+            if ($null -ne $objBreakpoint) {
+                try { Remove-PSBreakpoint -Breakpoint $objBreakpoint -ErrorAction Stop } catch { $listClockFailures.Add($_.Exception.Message) }
+            }
+        }
+        try { Remove-Variable -Name $strStateName -Scope Global -ErrorAction Stop } catch { $listClockFailures.Add($_.Exception.Message) }
+        if (-not $LocalOnly -and ($null -eq $objInitializationBreakpoint -or
+                ($objInitializationBreakpoint.HitCount -eq 0 -and $null -eq $objPrimaryFailure) -or
+                $hashtableClockState.InitializationReadbacks -ne $objInitializationBreakpoint.HitCount)) {
+            $listClockFailures.Add('Initialization clock did not fire with a successful readback.')
+        }
+        if (($RequireLocal -and ($null -eq $objLocalBreakpoint -or $objLocalBreakpoint.HitCount -eq 0)) -or
+            ($null -ne $objLocalBreakpoint -and $hashtableClockState.LocalReadbacks -ne $objLocalBreakpoint.HitCount)) {
+            $listClockFailures.Add('Local clock did not fire with a successful readback.')
+        }
+    }
+    if ($listClockFailures.Count -gt 0) {
+        $strFailure = 'Fixture clock control failed: ' + ($listClockFailures -join ' ')
+        if ($null -ne $objPrimaryFailure) { $strFailure = $objPrimaryFailure.Exception.Message + "`n" + $strFailure }
+        throw $strFailure
+    }
+    if ($null -ne $objPrimaryFailure) { throw $objPrimaryFailure }
+}
+
+function Get-AgentFinalizationDateMutant {
+    # .SYNOPSIS
+    # Changes the two actual document finalization arguments for private tests.
+    #
+    # .DESCRIPTION
+    # Parses the checker and requires one script-level named argument for each
+    # endpoint. Verifies the original member expressions, replaces only their
+    # distinct source extents, and rejects unchanged or malformed output.
+    # Function-local callers are not the main document dispatch under test.
+    #
+    # .PARAMETER Content
+    # Exact checker source to mutate without changing any file.
+    #
+    # .PARAMETER Replacement
+    # The deliberate private fault expression to insert at both argument spans.
+    #
+    # .EXAMPLE
+    # Get-AgentFinalizationDateMutant -Content $strChecker -Replacement '$false'
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # System.String. The checked private mutant source.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Content,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $Replacement
+    )
+
+    $arrTokens = $null
+    $arrErrors = $null
+    $objAst = [Management.Automation.Language.Parser]::ParseInput($Content, [ref]$arrTokens, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'Finalization mutant source must parse without errors.' }
+    $listArguments = [Collections.Generic.List[object]]::new()
+    foreach ($objTarget in @(
+            @{ Command = 'Get-PublishedEndpointMetadataFailure'; Parameter = 'RequireExpectedUtcDateForRenderedChange' },
+            @{ Command = 'Get-PublishedEndpointLastUpdatedFailure'; Parameter = 'RequireCurrentMaximumDateForRenderedChange' })) {
+        $listTargetArguments = [Collections.Generic.List[object]]::new()
+        foreach ($objCommand in $objAst.FindAll({
+                    param($objNode)
+                    $objNode -is [Management.Automation.Language.CommandAst]
+                }, $true)) {
+            if ($objCommand.GetCommandName() -cne $objTarget.Command) { continue }
+            $objAncestor = $objCommand.Parent
+            while ($null -ne $objAncestor -and
+                $objAncestor -isnot [Management.Automation.Language.FunctionDefinitionAst]) {
+                $objAncestor = $objAncestor.Parent
+            }
+            if ($null -ne $objAncestor) { continue }
+            for ($intIndex = 1; $intIndex -lt $objCommand.CommandElements.Count; $intIndex++) {
+                $objParameter = $objCommand.CommandElements[$intIndex]
+                if ($objParameter -isnot [Management.Automation.Language.CommandParameterAst] -or
+                    $objParameter.ParameterName -cne $objTarget.Parameter) { continue }
+                $objArgument = $objParameter.Argument
+                if ($null -eq $objArgument) {
+                    if ($intIndex + 1 -ge $objCommand.CommandElements.Count -or
+                        $objCommand.CommandElements[$intIndex + 1] -is [Management.Automation.Language.CommandParameterAst]) {
+                        throw "Finalization mutant argument is absent: $($objTarget.Parameter)."
+                    }
+                    $objArgument = $objCommand.CommandElements[$intIndex + 1]
+                }
+                $objExpression = $objArgument
+                while ($objExpression -is [Management.Automation.Language.ParenExpressionAst] -and
+                    $objExpression.Pipeline -is [Management.Automation.Language.PipelineAst] -and
+                    $objExpression.Pipeline.PipelineElements.Count -eq 1 -and
+                    $objExpression.Pipeline.PipelineElements[0] -is [Management.Automation.Language.CommandExpressionAst]) {
+                    $objExpression = $objExpression.Pipeline.PipelineElements[0].Expression
+                }
+                if ($objExpression -isnot [Management.Automation.Language.MemberExpressionAst] -or
+                    $objExpression -is [Management.Automation.Language.InvokeMemberExpressionAst] -or
+                    $objExpression.Static -or
+                    $objExpression.Expression -isnot [Management.Automation.Language.VariableExpressionAst] -or
+                    $objExpression.Expression.VariablePath.UserPath -cne 'objDocumentContext' -or
+                    $objExpression.Member -isnot [Management.Automation.Language.StringConstantExpressionAst] -or
+                    $objExpression.Member.Value -cne 'RequireFinalizationDate') {
+                    throw "Finalization mutant argument has an unexpected expression: $($objTarget.Parameter)."
+                }
+                $listTargetArguments.Add($objArgument)
+            }
+        }
+        if ($listTargetArguments.Count -ne 1) {
+            throw "Finalization mutant requires exactly one script-level argument: $($objTarget.Command)/$($objTarget.Parameter)."
+        }
+        $listArguments.Add($listTargetArguments[0])
+    }
+    $arrArguments = @($listArguments | Sort-Object { $_.Extent.StartOffset })
+    if ($arrArguments.Count -ne 2 -or
+        $arrArguments[0].Extent.EndOffset -gt $arrArguments[1].Extent.StartOffset -or
+        $arrArguments[0].Extent.StartOffset -eq $arrArguments[1].Extent.StartOffset) {
+        throw 'Finalization mutant requires two distinct non-overlapping argument spans.'
+    }
+    $strMutant = $Content
+    foreach ($objArgument in @($arrArguments | Sort-Object { $_.Extent.StartOffset } -Descending)) {
+        $strMutant = $strMutant.Remove($objArgument.Extent.StartOffset,
+            $objArgument.Extent.EndOffset - $objArgument.Extent.StartOffset).
+            Insert($objArgument.Extent.StartOffset, $Replacement)
+    }
+    if ($strMutant -ceq $Content) { throw 'Finalization mutant construction must change the checker.' }
+    $arrTokens = $null
+    $arrErrors = $null
+    $null = [Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$arrTokens, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'Finalization mutant output must parse without errors.' }
+    return $strMutant
+}
+
+function Assert-AgentFinalizationDateMutationSelfTest {
+    # .SYNOPSIS
+    # Checks exact mutation construction and rejects ineffective target changes.
+    #
+    # .DESCRIPTION
+    # Uses small parsed source fixtures with the actual command and parameter
+    # identities. Checks formatting, extra arguments, comments and private
+    # function decoys without executing a checker or changing a file.
+    #
+    # .EXAMPLE
+    # Assert-AgentFinalizationDateMutationSelfTest
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. Throws when construction or refusal changes.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $strMember = '$objDocumentContext.RequireFinalizationDate'
+    $strVersioned = 'Get-PublishedEndpointMetadataFailure -RequireExpectedUtcDateForRenderedChange ' + $strMember
+    $strOptional = 'Get-PublishedEndpointLastUpdatedFailure -RequireCurrentMaximumDateForRenderedChange ' + $strMember
+    $strSource = $strVersioned + "`n" + $strOptional
+    $strMutant = Get-AgentFinalizationDateMutant -Content $strSource -Replacement '$false'
+    if ($strMutant -cne $strSource.Replace($strMember, '$false')) {
+        throw 'The date mutation did not change exactly its two source arguments.'
+    }
+    $strExtra = '-CurrentParseReuse $objSlot -ParentParseReuse $objPrior'
+    $strComment = '# ' + $strMember
+    $strDecoy = 'function Test-PrivateDecoy { ' + $strVersioned + ' }'
+    $strFormatted = $strComment + "`n" + $strDecoy + "`n" +
+        $strVersioned.Replace(' ' + $strMember, ':(' + $strMember + ')') + " `n" +
+        $strOptional.Replace(' -Require', " $strExtra -Require") + ' ' + $strExtra
+    $strExpected = $strFormatted.Replace(':(' + $strMember + ')', ':$false').
+        Replace('-RequireCurrentMaximumDateForRenderedChange ' + $strMember,
+            '-RequireCurrentMaximumDateForRenderedChange $false')
+    if ((Get-AgentFinalizationDateMutant -Content $strFormatted -Replacement '$false') -cne $strExpected) {
+        throw 'Formatting or extra arguments changed mutation scope or a private decoy.'
+    }
+    foreach ($objCase in @(
+            @{ Content = $strVersioned; Replacement = '$false'; Expected = 'exactly one'; Name = 'missing target' },
+            @{ Content = $strSource + "`n" + $strVersioned; Replacement = '$false'; Expected = 'exactly one'; Name = 'duplicate command' },
+            @{ Content = $strSource.Replace($strVersioned, $strVersioned + ' -RequireExpectedUtcDateForRenderedChange ' + $strMember); Replacement = '$false'; Expected = 'exactly one'; Name = 'duplicate parameter' },
+            @{ Content = $strSource.Replace(' -RequireExpectedUtcDateForRenderedChange ' + $strMember, ' -RequireExpectedUtcDateForRenderedChange'); Replacement = '$false'; Expected = 'argument is absent'; Name = 'absent argument' },
+            @{ Content = $strSource.Replace($strMember, '$objOther.RequireFinalizationDate'); Replacement = '$false'; Expected = 'unexpected expression'; Name = 'incorrect owner' },
+            @{ Content = $strSource.Replace($strMember, $strMember + '()'); Replacement = '$false'; Expected = 'unexpected expression'; Name = 'method invocation' },
+            @{ Content = $strSource.Replace(' ' + $strMember, ' $false'); Replacement = '$false'; Expected = 'unexpected expression'; Name = 'already changed' },
+            @{ Content = $strSource; Replacement = $strMember; Expected = 'must change'; Name = 'no-op' },
+            @{ Content = $strSource + '('; Replacement = '$false'; Expected = 'source must parse'; Name = 'invalid source' },
+            @{ Content = $strSource; Replacement = '('; Expected = 'output must parse'; Name = 'invalid replacement' })) {
+        $objFailure = $null
+        try { $null = Get-AgentFinalizationDateMutant -Content $objCase.Content -Replacement $objCase.Replacement } catch {
+            $objFailure = $_
+        }
+        if ($null -eq $objFailure -or $objFailure.Exception.Message -notmatch $objCase.Expected) {
+            throw "Finalization mutation refusal failed: $($objCase.Name)."
+        }
+    }
+}
+
 function Assert-AuthorFinalizationGitFixture {
     # .SYNOPSIS
     # Tests the deliberate finalization caller and unchanged delayed verification.
@@ -918,10 +1720,16 @@ function Assert-AuthorFinalizationGitFixture {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
+
+    $strValidatorContent = [IO.File]::ReadAllText([IO.Path]::Combine(
+            $RepositoryRootPath, '.github', 'workflows', 'Test-AgentInstructions.ps1'))
+    Assert-AgentFinalizationDateMutationSelfTest
+    $strRequireDateMutant = Get-AgentFinalizationDateMutant -Content $strValidatorContent -Replacement '$false'
+    $strInitialCoverageMutant = Get-AgentFinalizationDateMutant -Content $strValidatorContent -Replacement '($objDocumentContext.RequireFinalizationDate -or $objDocumentContext.IsInitialMetadataCoverage)'
 
     $strTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     $strFixtureRoot = [IO.Path]::Combine($strTempRoot,
@@ -940,8 +1748,6 @@ function Assert-AuthorFinalizationGitFixture {
     $strFutureDate = $objFixtureUtcNow.AddDays(1).ToString('yyyy-MM-dd')
     $strValidatorPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'workflows', 'Test-AgentInstructions.ps1')
     $strRunbookPath = [IO.Path]::Combine($strFixtureRoot, 'docs', 'finalization-fixture.md')
-    $strValidatorContent = [IO.File]::ReadAllText([IO.Path]::Combine(
-            $RepositoryRootPath, '.github', 'workflows', 'Test-AgentInstructions.ps1'))
     $strMetadataDocument = "# Finalization fixture`n`n## Metadata`n`n- **Status:** Active`n- **Owner:** Fixture Maintainers`n- **Last Updated:** DATE`n- **Scope:** Author finalization tests.`n`n## Procedure`n`nFollow the current procedure.`n"
     # Private installed-policy setup uses only current tracked regular files.
     # Bound index output, each file and aggregate bytes; keep dependencies separate.
@@ -1142,43 +1948,112 @@ function Assert-AuthorFinalizationGitFixture {
         & $scriptblockAssertModes $strCommittedHead
         return $strCommittedHead
     }
-    $scriptblockCheck = {
-        param([string] $Candidate, [bool] $Now, [bool] $Later, [bool] $Accept, [string] $Expected)
-        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
-        if ($LASTEXITCODE -ne 0) { throw 'Finalization policy checkout failed.' }
-        $strClockShim = if ($Later) {
-            '$clockLine = ([IO.File]::ReadAllLines($checker) | Select-String -SimpleMatch ''$script:objMaximumCommitUtcTimestamp ='' | Select-Object -First 1).LineNumber; ' +
-            '$null = Set-PSBreakpoint -Script $checker -Line ($clockLine + 1) -Action { ' +
-            '$script:objValidationUtcNow = [DateTimeOffset]::Parse(''' + $objFixtureUtcNow.AddDays(1).ToString('o') + '''); ' +
-            '$script:strMaximumMetadataUtcDate = $script:objValidationUtcNow.ToString(''yyyy-MM-dd''); ' +
-            '$script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5) }; '
-        } else { '' }
-        $strCommand = '$ErrorActionPreference = ''Stop''; $checker = ''' + $strValidatorPath.Replace("'", "''") + '''; ' +
-            $strClockShim + 'try { & $checker -InputRevision ' + $Candidate + ' -PublishedBaselineRevision ' + $strBaseline +
-            $(if ($Now) { ' -FinalizeMetadataNow' } else { '' }) +
-            ' } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 }'
-        $strOutput = (& $strHostPath -NoLogo -NoProfile -NonInteractive -Command $strCommand 2>&1 | Out-String)
-        $intExit = $LASTEXITCODE
-        if (($intExit -eq 0) -ne $Accept -or $strOutput -notmatch $Expected) {
-            throw "Author finalization caller failed (Now=$Now Later=$Later Accept=$Accept exit=$intExit): $strOutput"
-        }
-    }
-    $scriptblockInvokeProposedCheck = {
-        param([string[]] $Argument)
-        # Preserve the exception message rather than host-specific ConciseView wrapping.
+    $scriptblockInvokeCheck = {
+        param([string[]] $Argument, [DateTimeOffset] $Clock, [string] $Checker, [bool] $RequireLocal)
+        # The wrapper preserves actual checker bytes, arguments, native exit and
+        # exception text. It is not a literal -File launch of the documented command.
         $arrParameterTokens = @('-ProposedPolicy', '-InputRevision', '-PublishedBaselineRevision',
             '-SelfTest', '-MetadataClassificationOnly', '-FinalizeMetadataNow')
         $strCommandArguments = (@($Argument | ForEach-Object {
                     if ($arrParameterTokens -ccontains $_) { $_ } else { "'" + $_.Replace("'", "''") + "'" }
                 }) -join ' ')
-        $strCommand = '$ErrorActionPreference = ''Stop''; $checker = ''' + $strValidatorPath.Replace("'", "''") +
-            '''; try { & $checker ' + $strCommandArguments +
-            ' } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 }'
+        $strCommand = '$ErrorActionPreference = ''Stop''; function Invoke-AgentInstructionFixtureClock {' +
+            ${function:Invoke-AgentInstructionFixtureClock}.ToString() + '}; $checker = ''' + $Checker.Replace("'", "''") +
+            '''; try { Invoke-AgentInstructionFixtureClock -CheckerPath $checker -UtcNow ''' + $Clock.ToString('o') +
+            ''' ' + $(if ($RequireLocal) { '-RequireLocal ' } else { '' }) +
+            '-Action { & $checker ' + $strCommandArguments +
+            ' } } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 }'
         $strOutput = (& $strHostPath -NoLogo -NoProfile -NonInteractive -Command $strCommand 2>&1 | Out-String)
         $intExit = $LASTEXITCODE
+        if ($strOutput -match 'Fixture clock control failed:|Fixture clock requires one exact') {
+            throw "The private caller clock failed: $strOutput"
+        }
         [pscustomobject]@{ Output = $strOutput; ExitCode = $intExit }
     }
+    $scriptblockCheck = {
+        param([string] $Candidate, [bool] $Now, [bool] $Later, [bool] $Accept, [string] $Expected)
+        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Finalization policy checkout failed.' }
+        $arrArguments = @('-InputRevision', $Candidate, '-PublishedBaselineRevision', $strBaseline)
+        if ($Now) { $arrArguments += '-FinalizeMetadataNow' }
+        $objClock = if ($Later) { $objFixtureUtcNow.AddDays(1) } else { $objFixtureUtcNow }
+        $objResult = & $scriptblockInvokeCheck $arrArguments $objClock $strValidatorPath $false
+        if (($objResult.ExitCode -eq 0) -ne $Accept -or $objResult.Output -notmatch $Expected) {
+            throw "Author finalization caller failed (Now=$Now Later=$Later Accept=$Accept exit=$($objResult.ExitCode)): $($objResult.Output)"
+        }
+    }
+    $scriptblockInvokeProposedCheck = {
+        param([string[]] $Argument)
+        & $scriptblockInvokeCheck $Argument $objFixtureUtcNow $strValidatorPath $false
+    }
     try {
+        # A fixed synthetic clock makes omission and scope regressions visible
+        # on every day. Only this private probe file contains synthetic code;
+        # the real installed checker remains byte-for-byte source-qualified.
+        $strClockProbePath = [IO.Path]::Combine($strEmptyHooks, 'clock-probe[fixture].ps1')
+        $strClockDecoyPath = [IO.Path]::Combine($strEmptyHooks, 'clock-probef.ps1')
+        $strClockProbeContent = @'
+param([int] $Difference = 1)
+$script:objValidationUtcNow = [DateTimeOffset]::UtcNow
+$script:strMaximumMetadataUtcDate = $script:objValidationUtcNow.ToString('yyyy-MM-dd')
+$script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5)
+function Read-FixtureClock {
+    param([int] $intDiffExitCode)
+    $strExpectedUtcDate = if ($intDiffExitCode -eq 1) {
+        [DateTimeOffset]::UtcNow.ToString('yyyy-MM-dd')
+    } else {
+        ''
+    }
+    [pscustomobject]@{ Captured = $script:strMaximumMetadataUtcDate; Local = $strExpectedUtcDate }
+}
+Read-FixtureClock -intDiffExitCode $Difference
+'@
+        $arrInitialBreakpoints = @(Get-PSBreakpoint | Select-Object -ExpandProperty Id)
+        $arrInitialClockState = @(Get-Variable -Name 'hashtableFixtureClock*' -Scope Global | Select-Object -ExpandProperty Name)
+        [IO.File]::WriteAllText($strClockProbePath, $strClockProbeContent, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strClockDecoyPath, $strClockProbeContent, [Text.UTF8Encoding]::new($false))
+        foreach ($intDifference in @(0, 1)) {
+            $objClockProbe = Invoke-AgentInstructionFixtureClock -CheckerPath $strClockProbePath `
+                -UtcNow ([DateTimeOffset]::Parse('2000-01-02T23:59:59Z')) -RequireLocal -Action {
+                $arrClockBreakpoints = @(Get-PSBreakpoint | Where-Object { $_.Id -notin $arrInitialBreakpoints })
+                if ($arrClockBreakpoints.Count -ne 2 -or
+                    @($arrClockBreakpoints | Where-Object { $_.Script -cne $strClockProbePath }).Count -ne 0) {
+                    throw 'The fixture clock registered breakpoints outside the exact probe path.'
+                }
+                & $strClockProbePath -Difference $intDifference
+            }
+            $strExpectedLocal = if ($intDifference -eq 1) { '2000-01-02' } else { '' }
+            if ($objClockProbe.Captured -cne '2000-01-02' -or $objClockProbe.Local -cne $strExpectedLocal) {
+                throw 'The fixture clock lost its initialization, local scope or unchanged-path branch.'
+            }
+        }
+        foreach ($objClockCase in @(
+                @{ Content = $strClockProbeContent.Replace('$script:objValidationUtcNow =', '$script:objOtherNow ='); Action = { & $strClockProbePath }; Expected = 'requires one exact' },
+                @{ Content = $strClockProbeContent + "`n" + $strClockProbeContent; Action = { & $strClockProbePath }; Expected = 'requires one exact' },
+                @{ Content = $strClockProbeContent; Action = { }; Expected = 'Initialization clock did not fire' },
+                @{ Content = $strClockProbeContent; Action = { throw 'Expected primary fixture error.' }; Expected = '^Expected primary fixture error\.$' }
+            )) {
+            [IO.File]::WriteAllText($strClockProbePath, $objClockCase.Content, [Text.UTF8Encoding]::new($false))
+            $objExpectedClockFailure = $null
+            try {
+                Invoke-AgentInstructionFixtureClock -CheckerPath $strClockProbePath `
+                    -UtcNow ([DateTimeOffset]::Parse('2000-01-02T23:59:59Z')) -Action $objClockCase.Action
+            } catch { $objExpectedClockFailure = $_ }
+            if ($null -eq $objExpectedClockFailure -or $objExpectedClockFailure.Exception.Message -notmatch $objClockCase.Expected) {
+                throw 'A missing/duplicate/inactive clock anchor or primary-error regression escaped its control.'
+            }
+        }
+        [IO.File]::WriteAllText($strClockProbePath, $strClockProbeContent, [Text.UTF8Encoding]::new($false))
+        $objUninstrumentedProbe = & $strClockProbePath
+        if ($objUninstrumentedProbe.Captured -ceq '2000-01-02' -or
+            $objUninstrumentedProbe.Local -ceq '2000-01-02' -or
+            @(Compare-Object -ReferenceObject (@('sentinel') + $arrInitialBreakpoints) `
+                -DifferenceObject (@('sentinel') + @(Get-PSBreakpoint | Select-Object -ExpandProperty Id))).Count -ne 0 -or
+            @(Compare-Object -ReferenceObject (@('sentinel') + $arrInitialClockState) `
+                -DifferenceObject (@('sentinel') + @(Get-Variable -Name 'hashtableFixtureClock*' -Scope Global | Select-Object -ExpandProperty Name))).Count -ne 0) {
+            throw 'The fixture clock leaked into an ordinary invocation or failed scoped cleanup.'
+        }
+
         # Exercise the actual bounded inquiry before the longer installed-policy
         # scenarios. Controlled programs replace only the native response producer.
         $strInquiryControlPath = [IO.Path]::Combine($strEmptyHooks, 'inquiry-control.dat')
@@ -1330,11 +2205,11 @@ function Assert-AuthorFinalizationGitFixture {
         }
         Push-Location $strPolicyPath
         try {
-            $strDocumentedOutput = (& $strHostPath -NoLogo -NoProfile -NonInteractive -File `
-                    .github/workflows/Test-AgentInstructions.ps1 -InputRevision $strCurrentCandidate `
-                    -PublishedBaselineRevision $strBaseline -FinalizeMetadataNow 2>&1 | Out-String)
-            if ($LASTEXITCODE -ne 0 -or $strDocumentedOutput -notmatch "B=$strBaseline H=$strCurrentCandidate") {
-                throw "Documented accepted-worktree finalization caller failed: $strDocumentedOutput"
+            $strPolicyChecker = [IO.Path]::Combine($strPolicyPath, '.github', 'workflows', 'Test-AgentInstructions.ps1')
+            $objDocumentedResult = & $scriptblockInvokeCheck @('-InputRevision', $strCurrentCandidate,
+                '-PublishedBaselineRevision', $strBaseline, '-FinalizeMetadataNow') $objFixtureUtcNow $strPolicyChecker $false
+            if ($objDocumentedResult.ExitCode -ne 0 -or $objDocumentedResult.Output -notmatch "B=$strBaseline H=$strCurrentCandidate") {
+                throw "Documented accepted-worktree finalization caller failed: $($objDocumentedResult.Output)"
             }
         } finally { Pop-Location }
         # Ignore the fixture-only nested policy checkout in subsequent commits.
@@ -1648,9 +2523,10 @@ function Assert-AuthorFinalizationGitFixture {
             & git -C $strFixtureRoot -c core.autocrlf=false add -- docs/finalization-fixture.md
             if ($LASTEXITCODE -ne 0) { throw 'Local finalization fixture staging failed.' }
             & $scriptblockAssertModes
-            $strLocalOutput = (& $strHostPath -NoProfile -File $strValidatorPath 2>&1 | Out-String)
-            if (($LASTEXITCODE -eq 0) -ne ($strLocalDate -ceq $strCurrentDate)) {
-                throw "Local staged creation date regression: $strLocalOutput"
+            $objLocalResult = & $scriptblockInvokeCheck @() $objFixtureUtcNow $strValidatorPath $true
+            if (($objLocalResult.ExitCode -eq 0) -ne ($strLocalDate -ceq $strCurrentDate) -or
+                ($strLocalDate -ceq $strPriorDate -and $objLocalResult.Output -notmatch 'Last Updated must')) {
+                throw "Local staged creation date regression: $($objLocalResult.Output)"
             }
         }
         & git -C $strFixtureRoot restore --staged -- docs/finalization-fixture.md
@@ -1658,18 +2534,17 @@ function Assert-AuthorFinalizationGitFixture {
         Remove-Item -LiteralPath $strRunbookPath -Force
         foreach ($arrMode in @(@('-FinalizeMetadataNow'), @('-FinalizeMetadataNow', '-SelfTest'),
                 @('-FinalizeMetadataNow', '-MetadataClassificationOnly', '-InputRevision', $strCurrentCandidate, '-PublishedBaselineRevision', $strBaseline))) {
-            $null = & $strHostPath -NoProfile -File $strValidatorPath @arrMode 2>&1
-            if ($LASTEXITCODE -eq 0) { throw 'An invalid finalization mode combination was accepted.' }
+            $objModeResult = & $scriptblockInvokeCheck $arrMode $objFixtureUtcNow $strValidatorPath $false
+            if ($objModeResult.ExitCode -eq 0 -or $objModeResult.Output -notmatch 'FinalizeMetadataNow') {
+                throw "An invalid finalization mode combination lost its refusal: $($objModeResult.Output)"
+            }
         }
         # Mutations execute the same accepted-B caller against the meaningful negative.
-        $strRequireDateMutant = $strValidatorContent.Replace(
-            '$objDocumentContext.RequireFinalizationDate))', '$false))')
         [IO.File]::WriteAllText($strValidatorPath, $strRequireDateMutant, [Text.UTF8Encoding]::new($false))
         & $scriptblockCheck $strVersionedEarlierCandidate $true $false $true 'Author finalization UTC date checked'
         [IO.File]::WriteAllText($strValidatorPath, $strValidatorContent, [Text.UTF8Encoding]::new($false))
         foreach ($strClockMutation in @(
-                $strValidatorContent.Replace('$objDocumentContext.RequireFinalizationDate))',
-                    '($objDocumentContext.RequireFinalizationDate -or $objDocumentContext.IsInitialMetadataCoverage)))'),
+                $strInitialCoverageMutant,
                 $strValidatorContent.Replace('if ($FinalizeMetadataNow) {',
                     'if ($FinalizeMetadataNow -or $boolPublishedEndpointsRequested) {').Replace(
                     'RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)',
@@ -2294,7 +3169,7 @@ function Assert-PublishedBaselineCapacitySelfTest {
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Positional parameters are disabled; callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
@@ -2340,8 +3215,12 @@ function Assert-PublishedBaselineCapacitySelfTest {
         [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'AGENTS.md'), $strCurrent, [Text.UTF8Encoding]::new($false))
         $strExplicitParent = Read-PublishedBaselineDocumentText -RepositoryRootPath $strFixtureRoot `
             -Revision $strRevision -RepositoryRelativePath 'AGENTS.md' -CurrentMaximumBytes 32768
-        $objLocalParent = Get-PublishedBaselineDocumentContext -RepositoryRootPath $strFixtureRoot `
-            -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768
+        $strCheckerPath = (Get-Command -Name Get-PublishedBaselineDocumentContext -CommandType Function).ScriptBlock.File
+        $objLocalParent = Invoke-AgentInstructionFixtureClock -CheckerPath $strCheckerPath `
+            -UtcNow ([DateTimeOffset]::Parse($MaximumMetadataUtcDate + 'T00:00:00Z')) -LocalOnly -RequireLocal -Action {
+            Get-PublishedBaselineDocumentContext -RepositoryRootPath $strFixtureRoot `
+                -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768
+        }
         if ($strExplicitParent -cne $strParent -or $objLocalParent.ParentContent -cne $strParent -or
             -not $objLocalParent.IsWorktreeTransition -or $objLocalParent.ExpectedUtcDate -cne $MaximumMetadataUtcDate) {
             throw 'Complete historical metadata did not survive both parent callers.'
@@ -2497,7 +3376,7 @@ function Assert-AgentSetupSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -2569,21 +3448,29 @@ function Assert-AgentSetupSelfTest {
         ($hashtableContent['.pre-commit-config.yaml'] + "`n        additional_dependencies: []`n") 'separate dependency environment'
     & $scriptblockReject 'extra hook group' '.pre-commit-config.yaml' `
         ($hashtableContent['.pre-commit-config.yaml'] + "`n  - repo: local`n    hooks: []`n") 'two local groups'
-    $strSetup = $hashtableContent['.github/workflows/copilot-setup-steps.yml']
-    foreach ($strProjection in @(
-            'GITHUB_TOKEN: value', 'GH_TOKEN: value', 'ACTIONS_RUNTIME_TOKEN: value'
-            'ALIAS: ${{ github.token }}', "ALIAS: `${{ github['token'] }}"
-            'ALIAS: ${{ secrets.TOKEN }}', 'ALIAS: ${{ toJSON(github) }}'
-        )) {
-        & $scriptblockReject 'credential projection' '.github/workflows/copilot-setup-steps.yml' `
-            ($strSetup + "`n        env:`n          $strProjection`n") 'must not project credentials'
+    $strReviewSetupPath = '.github/workflows/copilot-code-review.yml'
+    if (-not $hashtableContent.ContainsKey($strReviewSetupPath)) {
+        # Historical absence is valid, but both present-file security contracts
+        # must still be tested in the private fixture on historical source trees.
+        $hashtableContent[$strReviewSetupPath] = $hashtableContent['.github/workflows/copilot-setup-steps.yml']
     }
-    & $scriptblockReject 'action step' '.github/workflows/copilot-setup-steps.yml' `
-        ($strSetup + "`n      - uses: actions/checkout@v4`n") 'must not execute an action'
-    $hashtableHarmless = $hashtableContent.Clone()
-    $hashtableHarmless['.github/workflows/copilot-setup-steps.yml'] += "`n        env:`n          REVISION: `${{ github.sha }}`n"
-    if (@(Get-AgentSetupContractFailure -Content $hashtableHarmless).Count) {
-        throw 'Harmless setup revision expression was rejected.'
+    foreach ($strSetupPath in @('.github/workflows/copilot-setup-steps.yml', $strReviewSetupPath)) {
+        $strSetup = $hashtableContent[$strSetupPath]
+        foreach ($strProjection in @(
+                'GITHUB_TOKEN: value', 'GH_TOKEN: value', 'ACTIONS_RUNTIME_TOKEN: value'
+                'ALIAS: ${{ github.token }}', "ALIAS: `${{ github['token'] }}"
+                'ALIAS: ${{ secrets.TOKEN }}', 'ALIAS: ${{ toJSON(github) }}'
+            )) {
+            & $scriptblockReject 'credential projection' $strSetupPath `
+                ($strSetup + "`n        env:`n          $strProjection`n") 'must not project credentials'
+        }
+        & $scriptblockReject 'action step' $strSetupPath `
+            ($strSetup + "`n      - uses: actions/checkout@v4`n") 'must not execute an action'
+        $hashtableHarmless = $hashtableContent.Clone()
+        $hashtableHarmless[$strSetupPath] += "`n        env:`n          REVISION: `${{ github.sha }}`n"
+        if (@(Get-AgentSetupContractFailure -Content $hashtableHarmless).Count) {
+            throw 'Harmless setup revision expression was rejected.'
+        }
     }
     $strIndex = $hashtableContent['.github/workflows/scripts-README.md']
     foreach ($arrNearMiss in @(
@@ -2667,21 +3554,92 @@ function Assert-AgentSetupSelfTest {
             if (-not $boolRejected) { throw "Required installed setup input was silently omitted: $strMissing" }
             [IO.File]::WriteAllText($strTarget, $hashtableContent[$strMissing], $objEncoding)
         }
-        $strBoundPath = '.github/workflows/copilot-setup-steps.yml'
-        $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
-        if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw 'Setup workflow read bound changed.' }
-        foreach ($intExtra in @(0, 1)) {
-            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
+        foreach ($strBoundPath in @('.github/workflows/copilot-setup-steps.yml', $strReviewSetupPath)) {
+            $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
+            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw 'Setup workflow read bound changed.' }
+            foreach ($intExtra in @(0, 1)) {
+                [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
+                $boolRejected = $false
+                try {
+                    $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+                    if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
+                } catch {
+                    if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed') { throw }
+                    $boolRejected = $true
+                }
+                if ($intExtra -eq 1 -and -not $boolRejected) { throw 'One-byte oversized setup input was accepted.' }
+            }
+            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath),
+                $hashtableContent[$strBoundPath], $objEncoding)
+        }
+        $strReviewTarget = Join-Path $strFixtureRoot $strReviewSetupPath
+        $scriptblockRejectRead = {
+            param([string] $Name, [string] $Revision, [Collections.Generic.HashSet[string]] $Staged,
+                [string] $Expected)
             $boolRejected = $false
             try {
-                $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
-                if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
+                $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+                    -Revision $Revision -StagedInputPaths $Staged
             } catch {
-                if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed') { throw }
+                if ($_.Exception.Message -notmatch $Expected) { throw }
                 $boolRejected = $true
             }
-            if ($intExtra -eq 1 -and -not $boolRejected) { throw 'One-byte oversized setup input was accepted.' }
+            if (-not $boolRejected) { throw "Optional setup negative control was accepted: $Name" }
         }
+        [IO.File]::Delete($strReviewTarget)
+        & $scriptblockRejectRead 'indexed missing worktree' '' $setEmpty 'does not exist|Cannot find path'
+        & git -C $strFixtureRoot rm --quiet --cached -- $strReviewSetupPath
+        if ($LASTEXITCODE -ne 0) { throw 'Optional setup fixture index removal failed.' }
+        $hashtableAbsent = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+            -Revision '' -StagedInputPaths $setEmpty
+        if ($hashtableAbsent.ContainsKey($strReviewSetupPath)) { throw 'Absent review setup produced content.' }
+        $boolStrictRejected = $false
+        try {
+            $null = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot `
+                -RepositoryRelativePath $strReviewSetupPath
+        } catch {
+            if ($_.Exception.Message -notmatch 'not one regular 100644 blob') { throw }
+            $boolStrictRejected = $true
+        }
+        if (-not $boolStrictRejected) { throw 'Default Git entry admission silently allowed absence.' }
+        $setMissingStaged = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        [void]$setMissingStaged.Add($strReviewSetupPath)
+        & $scriptblockRejectRead 'staged-set entry missing from index' '' $setMissingStaged 'absent from the Git index'
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m historical-absence
+        if ($LASTEXITCODE -ne 0) { throw 'Historical setup fixture commit failed.' }
+        $strAbsentRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+        if ($LASTEXITCODE -ne 0) { throw 'Historical setup fixture revision failed.' }
+        $hashtableAbsentRevision = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+            -Revision $strAbsentRevision -StagedInputPaths $setEmpty
+        if ($hashtableAbsentRevision.ContainsKey($strReviewSetupPath)) { throw 'Historical absent review setup produced content.' }
+        $hashtableOriginalRevision = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+            -Revision $strBaseline -StagedInputPaths $setEmpty
+        if ($hashtableOriginalRevision[$strReviewSetupPath] -cne $hashtableContent[$strReviewSetupPath]) {
+            throw 'Historical absence changed the immutable present-file input.'
+        }
+        [IO.File]::WriteAllText($strReviewTarget, $hashtableContent[$strReviewSetupPath], $objEncoding)
+        & $scriptblockRejectRead 'untracked or residual deleted file' '' $setEmpty 'Repository input is unsafe'
+        [IO.File]::Delete($strReviewTarget)
+        [void][IO.Directory]::CreateDirectory($strReviewTarget)
+        & $scriptblockRejectRead 'directory instead of absent optional file' '' $setEmpty 'Repository input is unsafe'
+        [IO.Directory]::Delete($strReviewTarget)
+        [IO.File]::WriteAllText($strReviewTarget, $hashtableContent[$strReviewSetupPath], $objEncoding)
+        & git -C $strFixtureRoot -c core.autocrlf=false add -- $strReviewSetupPath
+        if ($LASTEXITCODE -ne 0) { throw 'Optional setup fixture restoration failed.' }
+        [IO.File]::WriteAllBytes($strReviewTarget, [byte[]]@(255))
+        & $scriptblockRejectRead 'invalid UTF-8' '' $setEmpty 'UTF-8'
+        [IO.File]::WriteAllText($strReviewTarget, $hashtableContent[$strReviewSetupPath], $objEncoding)
+        $strReviewBlob = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot `
+            -RepositoryRelativePath $strReviewSetupPath
+        & git -C $strFixtureRoot update-index --cacheinfo "120000,$strReviewBlob,$strReviewSetupPath"
+        if ($LASTEXITCODE -ne 0) { throw 'Optional setup nonregular fixture index failed.' }
+        & $scriptblockRejectRead 'nonregular index entry' '' $setEmpty 'not one regular 100644 blob'
+        $strNonregularTree = ([string](& git -C $strFixtureRoot write-tree)).Trim()
+        if ($LASTEXITCODE -ne 0) { throw 'Optional setup nonregular fixture tree failed.' }
+        & $scriptblockRejectRead 'nonregular immutable entry' $strNonregularTree $setEmpty 'not one regular 100644 blob'
+        & git -C $strFixtureRoot update-index --cacheinfo "100644,$strReviewBlob,$strReviewSetupPath"
+        if ($LASTEXITCODE -ne 0) { throw 'Optional setup regular fixture index restoration failed.' }
     } finally {
         if ([IO.Path]::GetDirectoryName($strFixtureRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
             $strTemporaryRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) -or
@@ -3020,6 +3978,8 @@ if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont
 }
 
 
+Assert-ParserJsonConversionSelfTest
+Assert-MarkdownParseReuseSelfTest
 Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
 
 Assert-StagedInputSelfTest

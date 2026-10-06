@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.18.20261005.0
+# Version: 1.20.20261006.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -92,6 +92,7 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/markdownlint.yml',
     '.github/workflows/agent-instructions.yml',
     '.github/workflows/copilot-setup-steps.yml',
+    '.github/workflows/copilot-code-review.yml',
     '.gitignore',
     '.npmrc',
     'docs/ISSUE_EVALUATION_PROMPT.md',
@@ -242,6 +243,10 @@ function ConvertFrom-ParserJsonContext {
     # .PARAMETER MaximumBytes
     # The maximum permitted UTF-8 output size.
     #
+    # .PARAMETER UseNativeStructuralConversion
+    # Uses the installed-runtime walker for Markdown context only. Name-sensitive
+    # objects retain the original PowerShell cast and all its failure behavior.
+    #
     # .EXAMPLE
     # ConvertFrom-ParserJsonContext -Content '{"value":"2026-10-02T00:00:00Z"}' -MaximumBytes 4096
     #
@@ -257,12 +262,13 @@ function ConvertFrom-ParserJsonContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][AllowEmptyString()][string] $Content,
-        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes
+        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes,
+        [Parameter()][switch] $UseNativeStructuralConversion
     )
 
     if ([Text.Encoding]::UTF8.GetByteCount($Content) -gt $MaximumBytes) {
@@ -318,6 +324,137 @@ function ConvertFrom-ParserJsonContext {
         if ($objDocument.RootElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
             throw 'The parser JSON context root must be an object.'
         }
+        if ($UseNativeStructuralConversion) {
+            # Only code is retained by the process. Every graph belongs to this call.
+            # The payload digest identifies the exact implementation, including on
+            # repeated script loads; a same-name type is not accepted on name alone.
+            $strNativeTemplate = @'
+using System;
+using System.Collections.Generic;
+using System.Management.Automation;
+using System.Text.Json;
+
+namespace StyleGuide.AgentJson {
+    public static class StructuralDecoder_IDENTITY_ {
+        public const string SourceIdentity = "_IDENTITY_";
+
+        public sealed class Result {
+            public readonly int Kind;
+            public readonly object Value;
+            public Result(int kind, object value) { Kind = kind; Value = value; }
+        }
+
+        public static Result DecodeRoot(JsonElement root) {
+            int kind = 0;
+            object value = Decode(root, ref kind);
+            return new Result(kind, kind == 0 ? value : null);
+        }
+
+        private static object Decode(JsonElement element, ref int kind) {
+            switch (element.ValueKind) {
+                case JsonValueKind.Object:
+                    var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                    var result = new PSObject();
+                    foreach (JsonProperty property in element.EnumerateObject()) {
+                        string name = property.Name;
+                        if (String.IsNullOrEmpty(name) || !names.Add(name)) {
+                            kind = 2;
+                            return null;
+                        }
+                        // Preserve the complete PowerShell cast for these names.
+                        // Do not approximate PSTypeName or reserved member behavior.
+                        if (String.Equals(name, "PSTypeName", StringComparison.OrdinalIgnoreCase) ||
+                            String.Equals(name, "PSObject", StringComparison.OrdinalIgnoreCase) ||
+                            String.Equals(name, "PSBase", StringComparison.OrdinalIgnoreCase) ||
+                            String.Equals(name, "PSAdapted", StringComparison.OrdinalIgnoreCase) ||
+                            String.Equals(name, "PSExtended", StringComparison.OrdinalIgnoreCase) ||
+                            String.Equals(name, "PSTypeNames", StringComparison.OrdinalIgnoreCase)) {
+                            kind = 1;
+                            return null;
+                        }
+                        object value = Decode(property.Value, ref kind);
+                        if (kind != 0) { return null; }
+                        result.Properties.Add(new PSNoteProperty(name, value));
+                    }
+                    return result;
+                case JsonValueKind.Array:
+                    var values = new object[element.GetArrayLength()];
+                    int index = 0;
+                    foreach (JsonElement child in element.EnumerateArray()) {
+                        values[index++] = Decode(child, ref kind);
+                        if (kind != 0) { return null; }
+                    }
+                    return values;
+                case JsonValueKind.String:
+                    return element.GetString();
+                case JsonValueKind.Number:
+                    long integer;
+                    if (element.TryGetInt64(out integer)) { return integer; }
+                    double number = element.GetDouble();
+                    if (Double.IsNaN(number) || Double.IsInfinity(number)) {
+                        kind = 3;
+                        return null;
+                    }
+                    return number;
+                case JsonValueKind.True:
+                    return true;
+                case JsonValueKind.False:
+                    return false;
+                case JsonValueKind.Null:
+                    return null;
+                default:
+                    kind = 4;
+                    return null;
+            }
+        }
+    }
+}
+'@
+            $objSourceHash = [Security.Cryptography.SHA256]::Create()
+            try {
+                $strSourceIdentity = [BitConverter]::ToString(
+                    $objSourceHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($strNativeTemplate))
+                ).Replace('-', '').ToLowerInvariant()
+            } finally {
+                $objSourceHash.Dispose()
+            }
+            $strNativeTypeName = 'StyleGuide.AgentJson.StructuralDecoder' + $strSourceIdentity
+            $objNativeType = $strNativeTypeName -as [type]
+            if ($null -eq $objNativeType) {
+                $strNativeSource = $strNativeTemplate.Replace('_IDENTITY_', $strSourceIdentity)
+                $arrCompiledTypes = @(Add-Type -TypeDefinition $strNativeSource -PassThru -ErrorAction Stop)
+                $objNativeType = $strNativeTypeName -as [type]
+                if ($null -eq $objNativeType -or
+                    @($arrCompiledTypes | Where-Object {
+                            [object]::ReferenceEquals($_, $objNativeType)
+                        }).Count -ne 1) {
+                    throw 'The structural JSON converter type could not be verified.'
+                }
+            }
+            $objIdentityField = $objNativeType.GetField('SourceIdentity')
+            $objResultType = $objNativeType.GetNestedType('Result')
+            $objDecodeMethod = $objNativeType.GetMethod('DecodeRoot', [type[]]@([System.Text.Json.JsonElement]))
+            if (-not $objNativeType.IsPublic -or -not $objNativeType.IsAbstract -or
+                -not $objNativeType.IsSealed -or $null -eq $objIdentityField -or
+                -not $objIdentityField.IsLiteral -or $objIdentityField.FieldType -ne [string] -or
+                $objIdentityField.GetRawConstantValue() -cne $strSourceIdentity -or
+                $null -eq $objResultType -or $null -eq $objDecodeMethod -or
+                -not $objDecodeMethod.IsStatic -or
+                -not [object]::ReferenceEquals($objDecodeMethod.DeclaringType, $objNativeType) -or
+                -not [object]::ReferenceEquals($objDecodeMethod.ReturnType, $objResultType) -or
+                $objNativeType.GetFields([Reflection.BindingFlags]'Static,Public,NonPublic').Count -ne 1) {
+                throw 'The structural JSON converter type could not be verified.'
+            }
+            $objNativeResult = $objDecodeMethod.Invoke($null, [object[]]@($objDocument.RootElement))
+            switch ($objNativeResult.Kind) {
+                0 { return $objNativeResult.Value }
+                1 { break }
+                2 { throw 'The parser returned ambiguous JSON properties.' }
+                3 { throw 'The parser returned an unsupported JSON number.' }
+                4 { throw 'The parser returned an unsupported JSON type.' }
+                default { throw 'The structural JSON converter returned an invalid result.' }
+            }
+        }
         return & $scriptBlockDecode -Element $objDocument.RootElement
     } finally {
         if ($null -ne $objDocument) { $objDocument.Dispose() }
@@ -340,13 +477,13 @@ function Get-AgentSetupInputSpec {
     # None. No pipeline input.
     #
     # .OUTPUTS
-    # [pscustomobject] A repository-relative path and its byte limit.
+    # [pscustomobject] A path, byte limit and explicit optional-presence flag.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; there are no parameters.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param()
@@ -356,6 +493,7 @@ function Get-AgentSetupInputSpec {
             ,@('.github/workflows/package.json', 16384)
             ,@('.github/workflows/package-lock.json', 131072)
             ,@('.github/workflows/copilot-setup-steps.yml', 65536)
+            ,@('.github/workflows/copilot-code-review.yml', 65536, $true)
             ,@('.github/workflows/lint-staged-markdown.mjs', 32768)
             ,@('.github/workflows/Invoke-LockedPythonHook.ps1', 32768)
             ,@('.github/workflows/install-husky.mjs', 16384)
@@ -364,7 +502,11 @@ function Get-AgentSetupInputSpec {
             ,@('.github/workflows/scripts-README.md', 32768)
             ,@('requirements-dev.txt', 16384)
         )) {
-        [pscustomobject]@{ Path = [string]$arrSpec[0]; MaximumBytes = [int]$arrSpec[1] }
+        [pscustomobject]@{
+            Path = [string]$arrSpec[0]
+            MaximumBytes = [int]$arrSpec[1]
+            Optional = $arrSpec.Count -eq 3 -and $arrSpec[2] -eq $true
+        }
     }
 }
 
@@ -374,7 +516,10 @@ function Read-AgentSetupInputContent {
     #
     # .DESCRIPTION
     # Selects local or immutable revision inputs and checks each staged local read.
-    # Missing inputs are failures, not optional setup profiles.
+    # Required inputs cannot be omitted. Only the dedicated review workflow can
+    # be absent from both the selected Git input and local filesystem. Removing
+    # it from a committed tree restores the required shared setup fallback.
+    # Read, metadata and access failures are never treated as optional absence.
     #
     # .PARAMETER RepositoryRootPath
     # The actual repository root.
@@ -400,7 +545,7 @@ function Read-AgentSetupInputContent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([hashtable])]
     param(
@@ -411,6 +556,24 @@ function Read-AgentSetupInputContent {
     )
     $hashtableContent = @{}
     foreach ($objSpec in @(Get-AgentSetupInputSpec)) {
+        if ($objSpec.Optional) {
+            $strOptionalBlob = Get-GitRegularFileBlobId -RepositoryRootPath $RepositoryRootPath `
+                -RepositoryRelativePath $objSpec.Path -Revision $Revision -AllowMissing
+            if ([string]::IsNullOrEmpty($strOptionalBlob)) {
+                if (-not [string]::IsNullOrEmpty($Revision)) { continue }
+                if ($StagedInputPaths.Contains($objSpec.Path)) {
+                    throw 'Staged optional setup input is absent from the Git index.'
+                }
+                try {
+                    $null = Get-Item -Force -LiteralPath (Join-Path $RepositoryRootPath $objSpec.Path) `
+                        -ErrorAction Stop
+                } catch [System.Management.Automation.ItemNotFoundException] {
+                    # Only an exact missing item and an empty successful index
+                    # lookup permit omission. Present untracked items are read.
+                    continue
+                }
+            }
+        }
         $hashtableContent[$objSpec.Path] = if ([string]::IsNullOrEmpty($Revision)) {
             ConvertFrom-StrictUtf8Data -Bytes (Read-RepositoryInputData `
                     -Path (Join-Path $RepositoryRootPath $objSpec.Path) `
@@ -584,7 +747,7 @@ function Get-AgentSetupContractFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.1
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][hashtable] $Content)
@@ -678,20 +841,24 @@ function Get-AgentSetupContractFailure {
             Write-Output "Hook must retain its reviewed activation and selector: $($arrRequiredLine[0])"
         }
     }
-    $strSetup = $Content['.github/workflows/copilot-setup-steps.yml']
-    if ($strSetup -match '(?m)^[ \t]+(?:-[ \t]*)?uses[ \t]*:') {
-        Write-Output 'Copilot setup must not execute an action.'
-    }
-    foreach ($strPattern in @(
-            '(?m)^[ \t]+(?:GITHUB_TOKEN|GH_TOKEN|ACTIONS_RUNTIME_TOKEN)[ \t]*:'
-            '\bgithub\s*\.\s*token\b'
-            '\bgithub\s*\['
-            '\bsecrets\b'
-            '\btojson\s*\(\s*github\s*\)'
-        )) {
-        if ($strSetup -match $strPattern) {
-            Write-Output 'Copilot setup must not project credentials.'
-            break
+    foreach ($strSetupPath in @('.github/workflows/copilot-setup-steps.yml',
+            '.github/workflows/copilot-code-review.yml')) {
+        if (-not $Content.ContainsKey($strSetupPath)) { continue }
+        $strSetup = $Content[$strSetupPath]
+        if ($strSetup -match '(?m)^[ \t]+(?:-[ \t]*)?uses[ \t]*:') {
+            Write-Output 'Copilot setup must not execute an action.'
+        }
+        foreach ($strPattern in @(
+                '(?m)^[ \t]+(?:GITHUB_TOKEN|GH_TOKEN|ACTIONS_RUNTIME_TOKEN)[ \t]*:'
+                '\bgithub\s*\.\s*token\b'
+                '\bgithub\s*\['
+                '\bsecrets\b'
+                '\btojson\s*\(\s*github\s*\)'
+            )) {
+            if ($strSetup -match $strPattern) {
+                Write-Output 'Copilot setup must not project credentials.'
+                break
+            }
         }
     }
     $strRequirements = $Content['requirements-dev.txt'].Replace("`r`n", "`n").Replace("`r", "`n")
@@ -1822,6 +1989,8 @@ function Get-GitRegularFileBlobId {
     # Uses bounded literal NUL Git metadata. Requires one100644 blob in a
     # revision, or one100644 stage0 index entry for a local candidate.
     # Does not inspect worktree file-system types or open generated bodies.
+    # Missing entries fail unless the caller explicitly selects AllowMissing.
+    # Native, malformed and nonregular entry failures always throw.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -1832,6 +2001,10 @@ function Get-GitRegularFileBlobId {
     # .PARAMETER Revision
     # The exact Git revision. Empty selects the current index.
     #
+    # .PARAMETER AllowMissing
+    # Returns no object only for successful empty Git metadata output. The
+    # default still requires one regular entry; errors never indicate absence.
+    #
     # .EXAMPLE
     # Get-GitRegularFileBlobId @hashtableArguments
     #
@@ -1841,19 +2014,21 @@ function Get-GitRegularFileBlobId {
     # None. No pipeline input.
     #
     # .OUTPUTS
-    # [string] The regular entry's immutable blob identity.
+    # [string] The regular entry's immutable blob identity; no object for an
+    # absent entry only when AllowMissing is selected. All other failures throw.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
         [Parameter(Mandatory)][string] $RepositoryRootPath,
         [Parameter(Mandatory)][string] $RepositoryRelativePath,
-        [Parameter()][AllowEmptyString()][string] $Revision = ''
+        [Parameter()][AllowEmptyString()][string] $Revision = '',
+        [Parameter()][switch] $AllowMissing
     )
 
     $longTreeMaximumBytes = [long][Text.Encoding]::UTF8.GetByteCount($RepositoryRelativePath) + 78
@@ -1882,6 +2057,7 @@ function Get-GitRegularFileBlobId {
     if ($objTreeResult.ExitCode -ne 0) {
         throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
     }
+    if ($AllowMissing -and $objTreeResult.Bytes.Length -eq 0) { return }
     $strTreeRecord = if ($objTreeResult.Bytes.Length -eq 0) { '' } else {
         ConvertFrom-StrictUtf8Data -Bytes $objTreeResult.Bytes -DisplayName 'Git revision entry'
     }
@@ -3143,6 +3319,199 @@ function Invoke-MarkdownParserProcess {
     }
 }
 
+function Get-MarkdownParseReuseSlot {
+    # .SYNOPSIS
+    # Creates one private document-owned structural reuse slot.
+    #
+    # .DESCRIPTION
+    # Shares only a retained-snapshot counter with sibling document slots.
+    # No lookup table or process-wide state is created.
+    #
+    # .PARAMETER Budget
+    # The private invocation-owned counter, or null for a new owner.
+    #
+    # .EXAMPLE
+    # Get-MarkdownParseReuseSlot -Budget $objBudget
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # System.Management.Automation.PSCustomObject. One private empty slot.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param([Parameter()][AllowNull()][pscustomobject] $Budget)
+
+    if ($null -eq $Budget) { $Budget = [pscustomobject]@{ Retained = 0 } }
+    return [pscustomobject]@{ Budget = $Budget; Snapshot = $null }
+}
+
+function Clear-MarkdownParseReuseSlot {
+    # .SYNOPSIS
+    # Releases a private retained snapshot without changing validation results.
+    #
+    # .DESCRIPTION
+    # Is idempotent, accepts an absent slot and clears before updating its owner.
+    # Only slots created by the private factory are supplied by production callers.
+    #
+    # .PARAMETER Slot
+    # The document-owned slot to clear.
+    #
+    # .EXAMPLE
+    # Clear-MarkdownParseReuseSlot -Slot $objSlot
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter()][AllowNull()][object] $Slot)
+
+    if ($null -eq $Slot -or $null -eq $Slot.PSObject.Properties['Snapshot']) { return }
+    if ($null -eq $Slot.Snapshot) { return }
+    $Slot.Snapshot = $null
+    if ($null -ne $Slot.PSObject.Properties['Budget'] -and $null -ne $Slot.Budget -and
+        $null -ne $Slot.Budget.PSObject.Properties['Retained'] -and
+        $Slot.Budget.Retained -is [int] -and $Slot.Budget.Retained -gt 0) {
+        $Slot.Budget.Retained--
+    }
+}
+
+function Copy-MarkdownParseReuseContext {
+    # .SYNOPSIS
+    # Copies the seven validated structural arrays within fixed retention bounds.
+    #
+    # .DESCRIPTION
+    # Copies every mutable record and nested array. Strings are immutable.
+    # Returns null when retention would exceed one MiB of charged UTF-16 payload,
+    # 2048 records or 8192 array elements. This is not a content-admission limit.
+    #
+    # .PARAMETER Context
+    # The fully validated structural result; never raw parser output.
+    #
+    # .PARAMETER ParserText
+    # The exact normalized parser input charged to retention.
+    #
+    # .PARAMETER ParserOutput
+    # The exact successful raw parser JSON charged to retention.
+    #
+    # .EXAMPLE
+    # Copy-MarkdownParseReuseContext -Context $objContext -ParserText $strText -ParserOutput $strJson
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # System.Management.Automation.PSCustomObject. Isolated context and accounting, or null.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Version: 1.0.20261006.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][pscustomobject] $Context,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $ParserText,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $ParserOutput
+    )
+
+    $longCharacters = [long]$ParserText.Length + [long]$ParserOutput.Length
+    if ($longCharacters -gt 524288) { return $null }
+    $longElements = 0L
+    $listRecords = [Collections.Generic.List[object]]::new()
+    foreach ($strArrayName in @('CodeBlockRanges', 'ProseBlocks', 'TableRows',
+            'TopLevelBlocks', 'TopLevelListItems', 'Headings', 'LevelTwoHeadings')) {
+        $longElements += $Context.$strArrayName.Count
+        if ($longElements -gt 8192) { return $null }
+        foreach ($objRecord in $Context.$strArrayName) {
+            $listRecords.Add($objRecord)
+            if ($listRecords.Count -gt 2048) { return $null }
+            if ($strArrayName -ceq 'TableRows') {
+                $longElements += $objRecord.Cells.Count
+                if ($longElements -gt 8192) { return $null }
+                foreach ($objCell in $objRecord.Cells) {
+                    $listRecords.Add($objCell)
+                    if ($listRecords.Count -gt 2048) { return $null }
+                }
+            }
+        }
+    }
+    foreach ($objRecord in $listRecords) {
+        foreach ($strPropertyName in @('Type', 'Tag', 'Text')) {
+            $objProperty = $objRecord.PSObject.Properties[$strPropertyName]
+            if ($null -ne $objProperty -and $null -ne $objProperty.Value) {
+                $longCharacters += $objProperty.Value.Length
+            }
+        }
+        foreach ($strArrayName in @('Code', 'Links')) {
+            $objProperty = $objRecord.PSObject.Properties[$strArrayName]
+            if ($null -ne $objProperty) {
+                $longElements += $objProperty.Value.Count
+                if ($longElements -gt 8192) { return $null }
+                foreach ($strValue in $objProperty.Value) {
+                    $longCharacters += $strValue.Length
+                    if ($longCharacters -gt 524288) { return $null }
+                }
+            }
+        }
+        if ($longCharacters -gt 524288) { return $null }
+    }
+
+    $objCopy = [pscustomobject]@{
+        CodeBlockRanges = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.CodeBlockRanges) {
+                [pscustomobject]@{ Start = $objRecord.Start; End = $objRecord.End }
+            })
+        ProseBlocks = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.ProseBlocks) {
+                [pscustomobject]@{ Start = $objRecord.Start; End = $objRecord.End; Text = $objRecord.Text
+                    Code = [string[]]$objRecord.Code.Clone(); Links = [string[]]$objRecord.Links.Clone() }
+            })
+        TableRows = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.TableRows) {
+                [pscustomobject]@{ Start = $objRecord.Start; End = $objRecord.End
+                    Cells = [pscustomobject[]]@(
+                        foreach ($objCell in $objRecord.Cells) {
+                            [pscustomobject]@{ Tag = $objCell.Tag; Start = $objCell.Start; End = $objCell.End
+                                Text = $objCell.Text; Code = [string[]]$objCell.Code.Clone()
+                                Links = [string[]]$objCell.Links.Clone() }
+                        }) }
+            })
+        TopLevelBlocks = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.TopLevelBlocks) {
+                [pscustomobject]@{ Type = $objRecord.Type; Tag = $objRecord.Tag
+                    Start = $objRecord.Start; End = $objRecord.End; Text = $objRecord.Text }
+            })
+        TopLevelListItems = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.TopLevelListItems) {
+                [pscustomobject]@{ Start = $objRecord.Start; End = $objRecord.End; Text = $objRecord.Text
+                    Code = [string[]]$objRecord.Code.Clone(); Links = [string[]]$objRecord.Links.Clone() }
+            })
+        Headings = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.Headings) {
+                [pscustomobject]@{ Tag = $objRecord.Tag; Start = $objRecord.Start
+                    End = $objRecord.End; Text = $objRecord.Text }
+            })
+        LevelTwoHeadings = [pscustomobject[]]@(
+            foreach ($objRecord in $Context.LevelTwoHeadings) {
+                [pscustomobject]@{ Start = $objRecord.Start; End = $objRecord.End; Text = $objRecord.Text }
+            })
+    }
+    return [pscustomobject]@{ Context = $objCopy; Characters = $longCharacters
+        Records = $listRecords.Count; Elements = $longElements }
+}
+
+
 function Get-MarkdownParseContext {
     # .SYNOPSIS
     # Parses Markdown into trusted structural context.
@@ -3160,6 +3529,9 @@ function Get-MarkdownParseContext {
     # .PARAMETER LineCount
     # The source line count used to bound parser ranges.
     #
+    # .PARAMETER ReuseSlot
+    # Optional private document-owned structural interpretation slot.
+    #
     # .EXAMPLE
     # Get-MarkdownParseContext -Content $strMarkdown -LineCount $arrLines.Count
     #
@@ -3175,7 +3547,7 @@ function Get-MarkdownParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20261003.0
+    # Version: 1.2.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3185,462 +3557,525 @@ function Get-MarkdownParseContext {
 
         [Parameter(Mandatory)]
         [ValidateRange(1, 2147483647)]
-        [int] $LineCount
+        [int] $LineCount,
+
+        [Parameter()][AllowNull()][object] $ReuseSlot
     )
 
-    $strRepositoryRootPath = [IO.Path]::GetDirectoryName(
-        [IO.Path]::GetDirectoryName($PSScriptRoot)
-    )
-    $strMarkdownParserPath = Join-Path `
-        -Path $strRepositoryRootPath `
-        -ChildPath 'node_modules/markdown-it/package.json'
-    if (-not (Test-Path -LiteralPath $strMarkdownParserPath -PathType Leaf)) {
-        throw 'The locked markdown-it package is required to validate operative Markdown.'
+    if ($null -ne $ReuseSlot -and
+        ($null -eq $ReuseSlot.PSObject.Properties['Snapshot'] -or
+            $null -eq $ReuseSlot.PSObject.Properties['Budget'] -or
+            $null -eq $ReuseSlot.Budget -or
+            $null -eq $ReuseSlot.Budget.PSObject.Properties['Retained'] -or
+            $ReuseSlot.Budget.Retained -isnot [int] -or
+            $ReuseSlot.Budget.Retained -lt 0 -or $ReuseSlot.Budget.Retained -gt 8)) {
+        $ReuseSlot = $null
     }
-
-    $objNodeCommand = Get-NodeApplicationContext
-    if ($null -eq $objNodeCommand) {
-        throw 'A trusted Node.js runtime is required to validate operative Markdown.'
-    }
-
-    $strNodeProgram = @(
-        'const fs = require("node:fs");'
-        'const MarkdownIt = require("markdown-it");'
-        'const input = fs.readFileSync(0, "utf8");'
-        'const tokens = new MarkdownIt({ html: true }).parse(input, {});'
-        'const inlineHtmlTagPattern = /^<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:-]*)(?=[\s/>])/;'
-        'const voidHtmlTags = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);'
-        'const getOperativeInlineContext = (children) => {'
-        '  const deletionStack = [];'
-        '  const htmlContainerStack = [];'
-        '  const output = [];'
-        '  const renderedOutput = [];'
-        '  const code = [];'
-        '  const links = [];'
-        '  for (const child of children) {'
-        '    if (child.type === "s_open" || child.type === "s_close") {'
-        '      const isOpening = child.type === "s_open";'
-        '      if (child.tag !== "s" || child.nesting !== (isOpening ? 1 : -1)) throw new Error("Invalid Markdown deletion token.");'
-        '      if (isOpening) deletionStack.push("s");'
-        '      else if (deletionStack.pop() !== "s") throw new Error("Unbalanced Markdown deletion token.");'
-        '      continue;'
-        '    }'
-        '    if (child.type === "html_inline") {'
-        '      const htmlTag = inlineHtmlTagPattern.exec(child.content);'
-        '      if (htmlTag) {'
-        '        const tagName = htmlTag[2].toLowerCase();'
-        '        const isClosing = htmlTag[1] === "/";'
-        '        if (voidHtmlTags.has(tagName)) {'
-        '          if (isClosing) throw new Error("Invalid closing HTML void tag.");'
-        '        } else if (!isClosing) {'
-        '          htmlContainerStack.push(tagName);'
-        '        } else if (htmlContainerStack.pop() !== tagName) {'
-        '          throw new Error("Unbalanced inline HTML container.");'
-        '        }'
-        '        continue;'
-        '      }'
-        '    }'
-        '    if (deletionStack.length > 0 || htmlContainerStack.length > 0) continue;'
-        '    if (child.type === "link_open") {'
-        '      const href = child.attrGet("href");'
-        '      if (typeof href !== "string") throw new Error("Invalid Markdown link destination.");'
-        '      links.push(href);'
-        '    }'
-        '    if (child.type === "text" || child.type === "text_special") {'
-        '      output.push(child.content);'
-        '      renderedOutput.push(child.content);'
-        '    } else if (child.type === "softbreak" || child.type === "hardbreak") {'
-        '      output.push("\n");'
-        '      renderedOutput.push("\n");'
-        '    } else if (child.type === "code_inline") {'
-        '      code.push(child.content);'
-        '      renderedOutput.push(child.content);'
-        '    }'
-        '  }'
-        '  if (deletionStack.length > 0) throw new Error("Unclosed deletion container.");'
-        '  if (htmlContainerStack.length > 0) throw new Error("Unclosed inline HTML container.");'
-        '  return { text: output.join(""), renderedText: renderedOutput.join(""), code, links };'
-        '};'
-        'const codeBlockRanges = tokens.filter((token) => token.type === "fence" || token.type === "code_block").map((token) => token.map);'
-        'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => {'
-        '  const context = getOperativeInlineContext(token.children);'
-        '  return { range: token.map, text: context.text, code: context.code, links: context.links };'
-        '});'
-        'const topLevelBlocks = tokens.flatMap((token, index) => {'
-        '  if (token.level !== 0 || !Array.isArray(token.map) || (token.nesting !== 0 && token.nesting !== 1)) return [];'
-        '  let text = null;'
-        '  if (token.type === "heading_open" || token.type === "paragraph_open") {'
-        '    const inlineToken = tokens[index + 1];'
-        '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children)) throw new Error("Invalid top-level inline container.");'
-        '    text = getOperativeInlineContext(inlineToken.children).text;'
-        '  }'
-        '  return [{ type: token.type, tag: token.tag, range: token.map, text }];'
-        '});'
-        'const topLevelListItems = tokens.flatMap((token, index) => {'
-        '  if (token.type !== "list_item_open" || token.tag !== "li" || token.level !== 1 || !Array.isArray(token.map)) return [];'
-        '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "list_item_close" && candidate.tag === "li" && candidate.level === 1);'
-        '  if (closeIndex < 0) throw new Error("Unclosed top-level list item.");'
-        '  const blocks = [];'
-        '  for (let paragraphIndex = index + 1; paragraphIndex < closeIndex; paragraphIndex += 1) {'
-        '    const paragraphToken = tokens[paragraphIndex];'
-        '    if (paragraphToken.type !== "paragraph_open" || paragraphToken.level !== 2) continue;'
-        '    if (paragraphToken.tag !== "p" || paragraphToken.nesting !== 1 || !Array.isArray(paragraphToken.map)) throw new Error("Invalid top-level list-item paragraph.");'
-        '    const inlineToken = tokens[paragraphIndex + 1];'
-        '    const closeToken = tokens[paragraphIndex + 2];'
-        '    if (inlineToken?.type !== "inline" || inlineToken.level !== 3 || !Array.isArray(inlineToken.children) || closeToken?.type !== "paragraph_close" || closeToken.tag !== "p" || closeToken.level !== 2 || closeToken.nesting !== -1) throw new Error("Invalid top-level list-item paragraph container.");'
-        '    const context = getOperativeInlineContext(inlineToken.children);'
-        '    blocks.push({ range: paragraphToken.map, text: context.text, code: context.code, links: context.links });'
-        '  }'
-        '  return blocks;'
-        '});'
-        'const headings = tokens.flatMap((token, index) => {'
-        '  if (token.type !== "heading_open" || token.level !== 0) return [];'
-        '  if (!/^h[1-6]$/.test(token.tag) || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown heading.");'
-        '  const inlineToken = tokens[index + 1];'
-        '  const closeToken = tokens[index + 2];'
-        '  if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== "heading_close" || closeToken.tag !== token.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown heading container.");'
-        '  return [{ tag: token.tag, range: token.map, text: getOperativeInlineContext(inlineToken.children).text }];'
-        '});'
-        'const levelTwoHeadings = tokens.flatMap((token, index) => {'
-        '  if (token.type !== "heading_open" || token.tag !== "h2" || token.level !== 0) return [];'
-        '  const inlineToken = tokens[index + 1];'
-        '  return [{ range: token.map, text: inlineToken?.type === "inline" ? inlineToken.content : null }];'
-        '});'
-        'const tableContainers = new Map();'
-        'const tableStack = [];'
-        'tokens.forEach((token, index) => {'
-        '  if (token.type === "table_open") {'
-        '    if (token.tag !== "table" || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown table container.");'
-        '    tableStack.push({ level: token.level, index });'
-        '  } else if (token.type === "table_close") {'
-        '    const table = tableStack.pop();'
-        '    if (token.tag !== "table" || token.nesting !== -1 || !table || table.level !== token.level) throw new Error("Unbalanced Markdown table container.");'
-        '  } else if (token.type === "tr_open") {'
-        '    const table = tableStack[tableStack.length - 1];'
-        '    if (!table) throw new Error("Markdown table row has no table container.");'
-        '    tableContainers.set(index, table);'
-        '  }'
-        '});'
-        'if (tableStack.length > 0) throw new Error("Unclosed Markdown table container.");'
-        'const tableRows = tokens.flatMap((token, index) => {'
-        '  if (token.type !== "tr_open" || token.tag !== "tr" || token.nesting !== 1 || !Array.isArray(token.map)) return [];'
-        '  const table = tableContainers.get(index);'
-        '  if (!table) throw new Error("Markdown table row has no tracked container.");'
-        '  if (table.level !== 0) return [];'
-        '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "tr_close" && candidate.tag === "tr" && candidate.nesting === -1 && candidate.level === token.level);'
-        '  if (closeIndex < 0) throw new Error("Unclosed Markdown table row.");'
-        '  const cells = [];'
-        '  for (let cellIndex = index + 1; cellIndex < closeIndex; cellIndex += 1) {'
-        '    const cellToken = tokens[cellIndex];'
-        '    if (cellToken.type !== "th_open" && cellToken.type !== "td_open") continue;'
-        '    if ((cellToken.tag !== "th" && cellToken.tag !== "td") || cellToken.nesting !== 1) throw new Error("Invalid Markdown table cell.");'
-        '    const inlineToken = tokens[cellIndex + 1];'
-        '    const closeToken = tokens[cellIndex + 2];'
-        '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== `${cellToken.tag}_close` || closeToken.tag !== cellToken.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown table-cell container.");'
-        '    const context = getOperativeInlineContext(inlineToken.children);'
-        '    cells.push({ tag: cellToken.tag, text: context.renderedText, code: context.code, links: context.links });'
-        '  }'
-        '  if (cells.length === 0) throw new Error("Markdown table row has no cells.");'
-        '  return [{ range: token.map, cells }];'
-        '});'
-        'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, headings, levelTwoHeadings }));'
-    ) -join "`n"
-
-    $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
-    $objStartInfo.FileName = $objNodeCommand.Path
-    $objStartInfo.WorkingDirectory = $strRepositoryRootPath
-    $objStartInfo.UseShellExecute = $false
-    $objStartInfo.CreateNoWindow = $true
-    $objStartInfo.RedirectStandardInput = $true
-    $objStartInfo.RedirectStandardOutput = $true
-    $objStartInfo.RedirectStandardError = $true
-    $objStartInfo.StandardInputEncoding = [System.Text.UTF8Encoding]::new($false)
-    $objStartInfo.StandardOutputEncoding = [System.Text.UTF8Encoding]::new($false)
-    $objStartInfo.StandardErrorEncoding = [System.Text.UTF8Encoding]::new($false)
-    [void]$objStartInfo.Environment.Remove('NODE_OPTIONS')
-    [void]$objStartInfo.Environment.Remove('NODE_PATH')
-    $objStartInfo.ArgumentList.Add('-e')
-    $objStartInfo.ArgumentList.Add($strNodeProgram)
-
-    $objParserResult = Invoke-MarkdownParserProcess `
-        -StartInfo $objStartInfo `
-        -Content $Content
-    $strParserOutput = $objParserResult.Output
-
     try {
-        $objRawContext = ConvertFrom-ParserJsonContext `
-            -Content $strParserOutput -MaximumBytes 16777216
-    } catch {
-        throw [System.IO.InvalidDataException]::new(
-            'The locked Markdown parser returned invalid context data.',
-            $_.Exception
+        $strRepositoryRootPath = [IO.Path]::GetDirectoryName(
+            [IO.Path]::GetDirectoryName($PSScriptRoot)
         )
-    }
-    if ($null -eq $objRawContext -or
-        $null -eq $objRawContext.codeBlockRanges -or
-        $null -eq $objRawContext.proseBlocks -or
-        $null -eq $objRawContext.tableRows -or
-        $null -eq $objRawContext.topLevelBlocks -or
-        $null -eq $objRawContext.topLevelListItems -or
-        $null -eq $objRawContext.headings -or
-        $null -eq $objRawContext.levelTwoHeadings) {
-        throw 'The locked Markdown parser returned incomplete context data.'
-    }
-
-    $listRanges = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousEnd = 0
-    foreach ($arrRawRange in @($objRawContext.codeBlockRanges)) {
-        if ($arrRawRange -isnot [array] -or $arrRawRange.Count -ne 2) {
-            throw 'The locked Markdown parser returned a malformed range.'
+        $strMarkdownParserPath = Join-Path `
+            -Path $strRepositoryRootPath `
+            -ChildPath 'node_modules/markdown-it/package.json'
+        if (-not (Test-Path -LiteralPath $strMarkdownParserPath -PathType Leaf)) {
+            throw 'The locked markdown-it package is required to validate operative Markdown.'
         }
 
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$arrRawRange[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$arrRawRange[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid or overlapping range.'
+        $objNodeCommand = Get-NodeApplicationContext
+        if ($null -eq $objNodeCommand) {
+            throw 'A trusted Node.js runtime is required to validate operative Markdown.'
         }
 
-        $listRanges.Add([pscustomobject]@{
-                Start = [int]$intStart
-                End = [int]$intEnd
-            })
-        $intPreviousEnd = [int]$intEnd
-    }
+        $strNodeProgram = @(
+            'const fs = require("node:fs");'
+            'const MarkdownIt = require("markdown-it");'
+            'const input = fs.readFileSync(0, "utf8");'
+            'const tokens = new MarkdownIt({ html: true }).parse(input, {});'
+            'const inlineHtmlTagPattern = /^<\s*(\/?)\s*([A-Za-z][A-Za-z0-9:-]*)(?=[\s/>])/;'
+            'const voidHtmlTags = new Set(["area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"]);'
+            'const getOperativeInlineContext = (children) => {'
+            '  const deletionStack = [];'
+            '  const htmlContainerStack = [];'
+            '  const output = [];'
+            '  const renderedOutput = [];'
+            '  const code = [];'
+            '  const links = [];'
+            '  for (const child of children) {'
+            '    if (child.type === "s_open" || child.type === "s_close") {'
+            '      const isOpening = child.type === "s_open";'
+            '      if (child.tag !== "s" || child.nesting !== (isOpening ? 1 : -1)) throw new Error("Invalid Markdown deletion token.");'
+            '      if (isOpening) deletionStack.push("s");'
+            '      else if (deletionStack.pop() !== "s") throw new Error("Unbalanced Markdown deletion token.");'
+            '      continue;'
+            '    }'
+            '    if (child.type === "html_inline") {'
+            '      const htmlTag = inlineHtmlTagPattern.exec(child.content);'
+            '      if (htmlTag) {'
+            '        const tagName = htmlTag[2].toLowerCase();'
+            '        const isClosing = htmlTag[1] === "/";'
+            '        if (voidHtmlTags.has(tagName)) {'
+            '          if (isClosing) throw new Error("Invalid closing HTML void tag.");'
+            '        } else if (!isClosing) {'
+            '          htmlContainerStack.push(tagName);'
+            '        } else if (htmlContainerStack.pop() !== tagName) {'
+            '          throw new Error("Unbalanced inline HTML container.");'
+            '        }'
+            '        continue;'
+            '      }'
+            '    }'
+            '    if (deletionStack.length > 0 || htmlContainerStack.length > 0) continue;'
+            '    if (child.type === "link_open") {'
+            '      const href = child.attrGet("href");'
+            '      if (typeof href !== "string") throw new Error("Invalid Markdown link destination.");'
+            '      links.push(href);'
+            '    }'
+            '    if (child.type === "text" || child.type === "text_special") {'
+            '      output.push(child.content);'
+            '      renderedOutput.push(child.content);'
+            '    } else if (child.type === "softbreak" || child.type === "hardbreak") {'
+            '      output.push("\n");'
+            '      renderedOutput.push("\n");'
+            '    } else if (child.type === "code_inline") {'
+            '      code.push(child.content);'
+            '      renderedOutput.push(child.content);'
+            '    }'
+            '  }'
+            '  if (deletionStack.length > 0) throw new Error("Unclosed deletion container.");'
+            '  if (htmlContainerStack.length > 0) throw new Error("Unclosed inline HTML container.");'
+            '  return { text: output.join(""), renderedText: renderedOutput.join(""), code, links };'
+            '};'
+            'const codeBlockRanges = tokens.filter((token) => token.type === "fence" || token.type === "code_block").map((token) => token.map);'
+            'const proseBlocks = tokens.filter((token) => token.type === "inline" && Array.isArray(token.map) && Array.isArray(token.children)).map((token) => {'
+            '  const context = getOperativeInlineContext(token.children);'
+            '  return { range: token.map, text: context.text, code: context.code, links: context.links };'
+            '});'
+            'const topLevelBlocks = tokens.flatMap((token, index) => {'
+            '  if (token.level !== 0 || !Array.isArray(token.map) || (token.nesting !== 0 && token.nesting !== 1)) return [];'
+            '  let text = null;'
+            '  if (token.type === "heading_open" || token.type === "paragraph_open") {'
+            '    const inlineToken = tokens[index + 1];'
+            '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children)) throw new Error("Invalid top-level inline container.");'
+            '    text = getOperativeInlineContext(inlineToken.children).text;'
+            '  }'
+            '  return [{ type: token.type, tag: token.tag, range: token.map, text }];'
+            '});'
+            'const topLevelListItems = tokens.flatMap((token, index) => {'
+            '  if (token.type !== "list_item_open" || token.tag !== "li" || token.level !== 1 || !Array.isArray(token.map)) return [];'
+            '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "list_item_close" && candidate.tag === "li" && candidate.level === 1);'
+            '  if (closeIndex < 0) throw new Error("Unclosed top-level list item.");'
+            '  const blocks = [];'
+            '  for (let paragraphIndex = index + 1; paragraphIndex < closeIndex; paragraphIndex += 1) {'
+            '    const paragraphToken = tokens[paragraphIndex];'
+            '    if (paragraphToken.type !== "paragraph_open" || paragraphToken.level !== 2) continue;'
+            '    if (paragraphToken.tag !== "p" || paragraphToken.nesting !== 1 || !Array.isArray(paragraphToken.map)) throw new Error("Invalid top-level list-item paragraph.");'
+            '    const inlineToken = tokens[paragraphIndex + 1];'
+            '    const closeToken = tokens[paragraphIndex + 2];'
+            '    if (inlineToken?.type !== "inline" || inlineToken.level !== 3 || !Array.isArray(inlineToken.children) || closeToken?.type !== "paragraph_close" || closeToken.tag !== "p" || closeToken.level !== 2 || closeToken.nesting !== -1) throw new Error("Invalid top-level list-item paragraph container.");'
+            '    const context = getOperativeInlineContext(inlineToken.children);'
+            '    blocks.push({ range: paragraphToken.map, text: context.text, code: context.code, links: context.links });'
+            '  }'
+            '  return blocks;'
+            '});'
+            'const headings = tokens.flatMap((token, index) => {'
+            '  if (token.type !== "heading_open" || token.level !== 0) return [];'
+            '  if (!/^h[1-6]$/.test(token.tag) || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown heading.");'
+            '  const inlineToken = tokens[index + 1];'
+            '  const closeToken = tokens[index + 2];'
+            '  if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== "heading_close" || closeToken.tag !== token.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown heading container.");'
+            '  return [{ tag: token.tag, range: token.map, text: getOperativeInlineContext(inlineToken.children).text }];'
+            '});'
+            'const levelTwoHeadings = tokens.flatMap((token, index) => {'
+            '  if (token.type !== "heading_open" || token.tag !== "h2" || token.level !== 0) return [];'
+            '  const inlineToken = tokens[index + 1];'
+            '  return [{ range: token.map, text: inlineToken?.type === "inline" ? inlineToken.content : null }];'
+            '});'
+            'const tableContainers = new Map();'
+            'const tableStack = [];'
+            'tokens.forEach((token, index) => {'
+            '  if (token.type === "table_open") {'
+            '    if (token.tag !== "table" || token.nesting !== 1 || !Array.isArray(token.map)) throw new Error("Invalid Markdown table container.");'
+            '    tableStack.push({ level: token.level, index });'
+            '  } else if (token.type === "table_close") {'
+            '    const table = tableStack.pop();'
+            '    if (token.tag !== "table" || token.nesting !== -1 || !table || table.level !== token.level) throw new Error("Unbalanced Markdown table container.");'
+            '  } else if (token.type === "tr_open") {'
+            '    const table = tableStack[tableStack.length - 1];'
+            '    if (!table) throw new Error("Markdown table row has no table container.");'
+            '    tableContainers.set(index, table);'
+            '  }'
+            '});'
+            'if (tableStack.length > 0) throw new Error("Unclosed Markdown table container.");'
+            'const tableRows = tokens.flatMap((token, index) => {'
+            '  if (token.type !== "tr_open" || token.tag !== "tr" || token.nesting !== 1 || !Array.isArray(token.map)) return [];'
+            '  const table = tableContainers.get(index);'
+            '  if (!table) throw new Error("Markdown table row has no tracked container.");'
+            '  if (table.level !== 0) return [];'
+            '  const closeIndex = tokens.findIndex((candidate, candidateIndex) => candidateIndex > index && candidate.type === "tr_close" && candidate.tag === "tr" && candidate.nesting === -1 && candidate.level === token.level);'
+            '  if (closeIndex < 0) throw new Error("Unclosed Markdown table row.");'
+            '  const cells = [];'
+            '  for (let cellIndex = index + 1; cellIndex < closeIndex; cellIndex += 1) {'
+            '    const cellToken = tokens[cellIndex];'
+            '    if (cellToken.type !== "th_open" && cellToken.type !== "td_open") continue;'
+            '    if ((cellToken.tag !== "th" && cellToken.tag !== "td") || cellToken.nesting !== 1) throw new Error("Invalid Markdown table cell.");'
+            '    const inlineToken = tokens[cellIndex + 1];'
+            '    const closeToken = tokens[cellIndex + 2];'
+            '    if (inlineToken?.type !== "inline" || !Array.isArray(inlineToken.children) || closeToken?.type !== `${cellToken.tag}_close` || closeToken.tag !== cellToken.tag || closeToken.nesting !== -1) throw new Error("Invalid Markdown table-cell container.");'
+            '    const context = getOperativeInlineContext(inlineToken.children);'
+            '    cells.push({ tag: cellToken.tag, text: context.renderedText, code: context.code, links: context.links });'
+            '  }'
+            '  if (cells.length === 0) throw new Error("Markdown table row has no cells.");'
+            '  return [{ range: token.map, cells }];'
+            '});'
+            'process.stdout.write(JSON.stringify({ codeBlockRanges, proseBlocks, tableRows, topLevelBlocks, topLevelListItems, headings, levelTwoHeadings }));'
+        ) -join "`n"
 
-    $listProseBlocks = [Collections.Generic.List[pscustomobject]]::new()
-    foreach ($objRawProseBlock in @($objRawContext.proseBlocks)) {
-        if ($null -eq $objRawProseBlock -or
-            $objRawProseBlock.range -isnot [array] -or
-            $objRawProseBlock.range.Count -ne 2 -or
-            $null -eq $objRawProseBlock.text -or
-            $objRawProseBlock.code -isnot [array] -or
-            @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
-            $objRawProseBlock.links -isnot [array] -or
-            @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
-            throw 'The locked Markdown parser returned a malformed prose block.'
-        }
+        $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
+        $objStartInfo.FileName = $objNodeCommand.Path
+        $objStartInfo.WorkingDirectory = $strRepositoryRootPath
+        $objStartInfo.UseShellExecute = $false
+        $objStartInfo.CreateNoWindow = $true
+        $objStartInfo.RedirectStandardInput = $true
+        $objStartInfo.RedirectStandardOutput = $true
+        $objStartInfo.RedirectStandardError = $true
+        $objStartInfo.StandardInputEncoding = [System.Text.UTF8Encoding]::new($false)
+        $objStartInfo.StandardOutputEncoding = [System.Text.UTF8Encoding]::new($false)
+        $objStartInfo.StandardErrorEncoding = [System.Text.UTF8Encoding]::new($false)
+        [void]$objStartInfo.Environment.Remove('NODE_OPTIONS')
+        [void]$objStartInfo.Environment.Remove('NODE_PATH')
+        $objStartInfo.ArgumentList.Add('-e')
+        $objStartInfo.ArgumentList.Add($strNodeProgram)
 
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawProseBlock.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawProseBlock.range[1], [ref]$intEnd) -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid prose-block range.'
-        }
+        $objParserResult = Invoke-MarkdownParserProcess `
+            -StartInfo $objStartInfo `
+            -Content $Content
+        $strParserOutput = $objParserResult.Output
 
-        $listProseBlocks.Add([pscustomobject]@{
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Text = [string]$objRawProseBlock.text
-                Code = [string[]]@($objRawProseBlock.code)
-                Links = [string[]]@($objRawProseBlock.links)
-            })
-    }
-
-    $listTableRows = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousTableRowEnd = 0
-    foreach ($objRawTableRow in @($objRawContext.tableRows)) {
-        if ($null -eq $objRawTableRow -or
-            $objRawTableRow.range -isnot [array] -or
-            $objRawTableRow.range.Count -ne 2 -or
-            $objRawTableRow.cells -isnot [array] -or
-            $objRawTableRow.cells.Count -eq 0) {
-            throw 'The locked Markdown parser returned a malformed table row.'
-        }
-
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawTableRow.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawTableRow.range[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousTableRowEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid table-row range.'
-        }
-
-        $listCells = [Collections.Generic.List[pscustomobject]]::new()
-        foreach ($objRawCell in @($objRawTableRow.cells)) {
-            if ($null -eq $objRawCell -or
-                $objRawCell.tag -isnot [string] -or
-                @('th', 'td') -cnotcontains $objRawCell.tag -or
-                $objRawCell.text -isnot [string] -or
-                $objRawCell.code -isnot [array] -or
-                @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
-                $objRawCell.links -isnot [array] -or
-                @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
-                throw 'The locked Markdown parser returned a malformed table cell.'
+        # Every call above has checked availability and executed the bounded parser.
+        # Reuse only interpretation of identical fresh output under unchanged helpers.
+        if ($null -ne $ReuseSlot -and $null -ne $ReuseSlot.Snapshot) {
+            $objSnapshot = $ReuseSlot.Snapshot
+            $boolCompleteSnapshot = $true
+            foreach ($strProperty in @('ParserText', 'LineCount', 'ParserOutput',
+                    'ParserDefinition', 'DecoderDefinition', 'CopyDefinition', 'Context')) {
+                if ($null -eq $objSnapshot.PSObject.Properties[$strProperty]) {
+                    $boolCompleteSnapshot = $false
+                }
             }
-            $listCells.Add([pscustomobject]@{
-                    Tag = [string]$objRawCell.tag
+            if ($boolCompleteSnapshot -and $objSnapshot.ParserText -is [string] -and
+                $objSnapshot.ParserOutput -is [string] -and $objSnapshot.LineCount -is [int] -and
+                [string]::Equals($objSnapshot.ParserText, $Content, [StringComparison]::Ordinal) -and
+                $objSnapshot.LineCount -eq $LineCount -and
+                [string]::Equals($objSnapshot.ParserOutput, $strParserOutput, [StringComparison]::Ordinal) -and
+                [object]::ReferenceEquals($objSnapshot.ParserDefinition, ${function:Get-MarkdownParseContext}) -and
+                [object]::ReferenceEquals($objSnapshot.DecoderDefinition, ${function:ConvertFrom-ParserJsonContext}) -and
+                [object]::ReferenceEquals($objSnapshot.CopyDefinition, ${function:Copy-MarkdownParseReuseContext})) {
+                $objCopy = Copy-MarkdownParseReuseContext -Context $objSnapshot.Context `
+                    -ParserText $Content -ParserOutput $strParserOutput
+                if ($null -ne $objCopy) { return $objCopy.Context }
+            }
+            Clear-MarkdownParseReuseSlot -Slot $ReuseSlot
+        }
+
+        try {
+            $objRawContext = ConvertFrom-ParserJsonContext `
+                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion
+        } catch {
+            throw [System.IO.InvalidDataException]::new(
+                'The locked Markdown parser returned invalid context data.',
+                $_.Exception
+            )
+        }
+        if ($null -eq $objRawContext -or
+            $null -eq $objRawContext.codeBlockRanges -or
+            $null -eq $objRawContext.proseBlocks -or
+            $null -eq $objRawContext.tableRows -or
+            $null -eq $objRawContext.topLevelBlocks -or
+            $null -eq $objRawContext.topLevelListItems -or
+            $null -eq $objRawContext.headings -or
+            $null -eq $objRawContext.levelTwoHeadings) {
+            throw 'The locked Markdown parser returned incomplete context data.'
+        }
+
+        $listRanges = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousEnd = 0
+        foreach ($arrRawRange in @($objRawContext.codeBlockRanges)) {
+            if ($arrRawRange -isnot [array] -or $arrRawRange.Count -ne 2) {
+                throw 'The locked Markdown parser returned a malformed range.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$arrRawRange[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$arrRawRange[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid or overlapping range.'
+            }
+
+            $listRanges.Add([pscustomobject]@{
                     Start = [int]$intStart
                     End = [int]$intEnd
-                    Text = [string]$objRawCell.text
-                    Code = [string[]]@($objRawCell.code)
-                    Links = [string[]]@($objRawCell.links)
+                })
+            $intPreviousEnd = [int]$intEnd
+        }
+
+        $listProseBlocks = [Collections.Generic.List[pscustomobject]]::new()
+        foreach ($objRawProseBlock in @($objRawContext.proseBlocks)) {
+            if ($null -eq $objRawProseBlock -or
+                $objRawProseBlock.range -isnot [array] -or
+                $objRawProseBlock.range.Count -ne 2 -or
+                $null -eq $objRawProseBlock.text -or
+                $objRawProseBlock.code -isnot [array] -or
+                @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                $objRawProseBlock.links -isnot [array] -or
+                @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                throw 'The locked Markdown parser returned a malformed prose block.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawProseBlock.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawProseBlock.range[1], [ref]$intEnd) -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid prose-block range.'
+            }
+
+            $listProseBlocks.Add([pscustomobject]@{
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = [string]$objRawProseBlock.text
+                    Code = [string[]]@($objRawProseBlock.code)
+                    Links = [string[]]@($objRawProseBlock.links)
                 })
         }
 
-        $listTableRows.Add([pscustomobject]@{
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Cells = [pscustomobject[]]$listCells.ToArray()
-            })
-        $intPreviousTableRowEnd = [int]$intEnd
-    }
+        $listTableRows = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousTableRowEnd = 0
+        foreach ($objRawTableRow in @($objRawContext.tableRows)) {
+            if ($null -eq $objRawTableRow -or
+                $objRawTableRow.range -isnot [array] -or
+                $objRawTableRow.range.Count -ne 2 -or
+                $objRawTableRow.cells -isnot [array] -or
+                $objRawTableRow.cells.Count -eq 0) {
+                throw 'The locked Markdown parser returned a malformed table row.'
+            }
 
-    $listTopLevelBlocks = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousTopLevelBlockEnd = 0
-    foreach ($objRawBlock in @($objRawContext.topLevelBlocks)) {
-        if ($null -eq $objRawBlock -or
-            $objRawBlock.type -isnot [string] -or
-            $objRawBlock.tag -isnot [string] -or
-            $objRawBlock.range -isnot [array] -or
-            $objRawBlock.range.Count -ne 2 -or
-            ($null -ne $objRawBlock.text -and $objRawBlock.text -isnot [string])) {
-            throw 'The locked Markdown parser returned a malformed top-level block.'
-        }
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawTableRow.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawTableRow.range[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousTableRowEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid table-row range.'
+            }
 
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawBlock.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawBlock.range[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousTopLevelBlockEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid top-level block range.'
-        }
-
-        $listTopLevelBlocks.Add([pscustomobject]@{
-                Type = [string]$objRawBlock.type
-                Tag = [string]$objRawBlock.tag
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Text = if ($null -eq $objRawBlock.text) {
-                    $null
-                } else {
-                    [string]$objRawBlock.text
+            $listCells = [Collections.Generic.List[pscustomobject]]::new()
+            foreach ($objRawCell in @($objRawTableRow.cells)) {
+                if ($null -eq $objRawCell -or
+                    $objRawCell.tag -isnot [string] -or
+                    @('th', 'td') -cnotcontains $objRawCell.tag -or
+                    $objRawCell.text -isnot [string] -or
+                    $objRawCell.code -isnot [array] -or
+                    @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                    $objRawCell.links -isnot [array] -or
+                    @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                    throw 'The locked Markdown parser returned a malformed table cell.'
                 }
-            })
-        $intPreviousTopLevelBlockEnd = [int]$intEnd
-    }
+                $listCells.Add([pscustomobject]@{
+                        Tag = [string]$objRawCell.tag
+                        Start = [int]$intStart
+                        End = [int]$intEnd
+                        Text = [string]$objRawCell.text
+                        Code = [string[]]@($objRawCell.code)
+                        Links = [string[]]@($objRawCell.links)
+                    })
+            }
 
-    $listTopLevelListItems = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousTopLevelListItemEnd = 0
-    foreach ($objRawListItem in @($objRawContext.topLevelListItems)) {
-        if ($null -eq $objRawListItem -or
-            $objRawListItem.range -isnot [array] -or
-            $objRawListItem.range.Count -ne 2 -or
-            ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or
-            $objRawListItem.code -isnot [array] -or
-            @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
-            $objRawListItem.links -isnot [array] -or
-            @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
-            throw 'The locked Markdown parser returned a malformed top-level list item.'
+            $listTableRows.Add([pscustomobject]@{
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Cells = [pscustomobject[]]$listCells.ToArray()
+                })
+            $intPreviousTableRowEnd = [int]$intEnd
         }
 
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawListItem.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawListItem.range[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousTopLevelListItemEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid top-level list-item range.'
+        $listTopLevelBlocks = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousTopLevelBlockEnd = 0
+        foreach ($objRawBlock in @($objRawContext.topLevelBlocks)) {
+            if ($null -eq $objRawBlock -or
+                $objRawBlock.type -isnot [string] -or
+                $objRawBlock.tag -isnot [string] -or
+                $objRawBlock.range -isnot [array] -or
+                $objRawBlock.range.Count -ne 2 -or
+                ($null -ne $objRawBlock.text -and $objRawBlock.text -isnot [string])) {
+                throw 'The locked Markdown parser returned a malformed top-level block.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawBlock.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawBlock.range[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousTopLevelBlockEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid top-level block range.'
+            }
+
+            $listTopLevelBlocks.Add([pscustomobject]@{
+                    Type = [string]$objRawBlock.type
+                    Tag = [string]$objRawBlock.tag
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = if ($null -eq $objRawBlock.text) {
+                        $null
+                    } else {
+                        [string]$objRawBlock.text
+                    }
+                })
+            $intPreviousTopLevelBlockEnd = [int]$intEnd
         }
 
-        $listTopLevelListItems.Add([pscustomobject]@{
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Text = if ($null -eq $objRawListItem.text) {
-                    $null
-                } else {
-                    [string]$objRawListItem.text
+        $listTopLevelListItems = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousTopLevelListItemEnd = 0
+        foreach ($objRawListItem in @($objRawContext.topLevelListItems)) {
+            if ($null -eq $objRawListItem -or
+                $objRawListItem.range -isnot [array] -or
+                $objRawListItem.range.Count -ne 2 -or
+                ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or
+                $objRawListItem.code -isnot [array] -or
+                @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                $objRawListItem.links -isnot [array] -or
+                @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                throw 'The locked Markdown parser returned a malformed top-level list item.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawListItem.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawListItem.range[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousTopLevelListItemEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid top-level list-item range.'
+            }
+
+            $listTopLevelListItems.Add([pscustomobject]@{
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = if ($null -eq $objRawListItem.text) {
+                        $null
+                    } else {
+                        [string]$objRawListItem.text
+                    }
+                    Code = [string[]]@($objRawListItem.code)
+                    Links = [string[]]@($objRawListItem.links)
+                })
+            $intPreviousTopLevelListItemEnd = [int]$intEnd
+        }
+
+        $listHeadings = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousHeadingEnd = 0
+        foreach ($objRawHeading in @($objRawContext.headings)) {
+            if ($null -eq $objRawHeading -or
+                $objRawHeading.tag -isnot [string] -or
+                $objRawHeading.tag -cnotmatch '^h[1-6]$' -or
+                $objRawHeading.range -isnot [array] -or
+                $objRawHeading.range.Count -ne 2 -or
+                $objRawHeading.text -isnot [string]) {
+                throw 'The locked Markdown parser returned a malformed heading.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousHeadingEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid heading range.'
+            }
+
+            $listHeadings.Add([pscustomobject]@{
+                    Tag = [string]$objRawHeading.tag
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = [string]$objRawHeading.text
+                })
+            $intPreviousHeadingEnd = [int]$intEnd
+        }
+
+        $listLevelTwoHeadings = [Collections.Generic.List[pscustomobject]]::new()
+        $intPreviousHeadingEnd = 0
+        foreach ($objRawHeading in @($objRawContext.levelTwoHeadings)) {
+            if ($null -eq $objRawHeading -or
+                $objRawHeading.range -isnot [array] -or
+                $objRawHeading.range.Count -ne 2 -or
+                $objRawHeading.text -isnot [string]) {
+                throw 'The locked Markdown parser returned a malformed level-two heading.'
+            }
+
+            $intStart = [int64] 0
+            $intEnd = [int64] 0
+            if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
+                -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
+                $intStart -lt $intPreviousHeadingEnd -or
+                $intStart -lt 0 -or
+                $intEnd -le $intStart -or
+                $intEnd -gt $LineCount) {
+                throw 'The locked Markdown parser returned an invalid level-two heading range.'
+            }
+
+            $listLevelTwoHeadings.Add([pscustomobject]@{
+                    Start = [int]$intStart
+                    End = [int]$intEnd
+                    Text = [string]$objRawHeading.text
+                })
+            $intPreviousHeadingEnd = [int]$intEnd
+        }
+
+        $objValidatedContext = [pscustomobject]@{
+            CodeBlockRanges = [pscustomobject[]]$listRanges.ToArray()
+            ProseBlocks = [pscustomobject[]]$listProseBlocks.ToArray()
+            TableRows = [pscustomobject[]]$listTableRows.ToArray()
+            TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
+            TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
+            Headings = [pscustomobject[]]$listHeadings.ToArray()
+            LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
+        }
+        if ($null -ne $ReuseSlot -and $ReuseSlot.Budget.Retained -lt 8) {
+            $objCopy = Copy-MarkdownParseReuseContext -Context $objValidatedContext `
+                -ParserText $Content -ParserOutput $strParserOutput
+            if ($null -ne $objCopy) {
+                $ReuseSlot.Snapshot = [pscustomobject]@{
+                    ParserText = $Content
+                    LineCount = $LineCount
+                    ParserOutput = $strParserOutput
+                    ParserDefinition = ${function:Get-MarkdownParseContext}
+                    DecoderDefinition = ${function:ConvertFrom-ParserJsonContext}
+                    CopyDefinition = ${function:Copy-MarkdownParseReuseContext}
+                    Context = $objCopy.Context
+                    Characters = $objCopy.Characters
+                    Records = $objCopy.Records
+                    Elements = $objCopy.Elements
                 }
-                Code = [string[]]@($objRawListItem.code)
-                Links = [string[]]@($objRawListItem.links)
-            })
-        $intPreviousTopLevelListItemEnd = [int]$intEnd
-    }
-
-    $listHeadings = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousHeadingEnd = 0
-    foreach ($objRawHeading in @($objRawContext.headings)) {
-        if ($null -eq $objRawHeading -or
-            $objRawHeading.tag -isnot [string] -or
-            $objRawHeading.tag -cnotmatch '^h[1-6]$' -or
-            $objRawHeading.range -isnot [array] -or
-            $objRawHeading.range.Count -ne 2 -or
-            $objRawHeading.text -isnot [string]) {
-            throw 'The locked Markdown parser returned a malformed heading.'
+                $ReuseSlot.Budget.Retained++
+            }
         }
-
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousHeadingEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid heading range.'
-        }
-
-        $listHeadings.Add([pscustomobject]@{
-                Tag = [string]$objRawHeading.tag
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Text = [string]$objRawHeading.text
-            })
-        $intPreviousHeadingEnd = [int]$intEnd
-    }
-
-    $listLevelTwoHeadings = [Collections.Generic.List[pscustomobject]]::new()
-    $intPreviousHeadingEnd = 0
-    foreach ($objRawHeading in @($objRawContext.levelTwoHeadings)) {
-        if ($null -eq $objRawHeading -or
-            $objRawHeading.range -isnot [array] -or
-            $objRawHeading.range.Count -ne 2 -or
-            $objRawHeading.text -isnot [string]) {
-            throw 'The locked Markdown parser returned a malformed level-two heading.'
-        }
-
-        $intStart = [int64] 0
-        $intEnd = [int64] 0
-        if (-not [int64]::TryParse([string]$objRawHeading.range[0], [ref]$intStart) -or
-            -not [int64]::TryParse([string]$objRawHeading.range[1], [ref]$intEnd) -or
-            $intStart -lt $intPreviousHeadingEnd -or
-            $intStart -lt 0 -or
-            $intEnd -le $intStart -or
-            $intEnd -gt $LineCount) {
-            throw 'The locked Markdown parser returned an invalid level-two heading range.'
-        }
-
-        $listLevelTwoHeadings.Add([pscustomobject]@{
-                Start = [int]$intStart
-                End = [int]$intEnd
-                Text = [string]$objRawHeading.text
-            })
-        $intPreviousHeadingEnd = [int]$intEnd
-    }
-
-    return [pscustomobject]@{
-        CodeBlockRanges = [pscustomobject[]]$listRanges.ToArray()
-        ProseBlocks = [pscustomobject[]]$listProseBlocks.ToArray()
-        TableRows = [pscustomobject[]]$listTableRows.ToArray()
-        TopLevelBlocks = [pscustomobject[]]$listTopLevelBlocks.ToArray()
-        TopLevelListItems = [pscustomobject[]]$listTopLevelListItems.ToArray()
-        Headings = [pscustomobject[]]$listHeadings.ToArray()
-        LevelTwoHeadings = [pscustomobject[]]$listLevelTwoHeadings.ToArray()
+        return $objValidatedContext
+    } catch {
+        $objPrimaryFailure = $_
+        try { Clear-MarkdownParseReuseSlot -Slot $ReuseSlot } catch { Write-Verbose 'Reuse cleanup failed after validation failure.' }
+        throw $objPrimaryFailure
     }
 }
 
@@ -4339,6 +4774,12 @@ function Get-PublishedEndpointLastUpdatedFailure {
     # .PARAMETER RequireCurrentMaximumDateForRenderedChange
     # Requires changed rendered content to use the latest allowed current date.
     #
+    # .PARAMETER CurrentParseReuse
+    # Borrowed private structural slot for current content.
+    #
+    # .PARAMETER ParentParseReuse
+    # Borrowed private structural slot for prior content.
+    #
     # .EXAMPLE
     # Get-PublishedEndpointLastUpdatedFailure @hashtableArguments
     #
@@ -4354,7 +4795,7 @@ function Get-PublishedEndpointLastUpdatedFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4362,95 +4803,120 @@ function Get-PublishedEndpointLastUpdatedFailure {
         [Parameter(Mandatory)][string] $CurrentContent,
         [Parameter()][AllowNull()][object] $BaseContent,
         [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate,
-        [Parameter()][bool] $RequireCurrentMaximumDateForRenderedChange = $false
+        [Parameter()][bool] $RequireCurrentMaximumDateForRenderedChange = $false,
+
+        [Parameter()][AllowNull()][object] $CurrentParseReuse,
+        [Parameter()][AllowNull()][object] $ParentParseReuse
     )
 
-    $objCurrentMetadata = Get-DocumentMetadataContext `
-        -Content $CurrentContent -RequiresVersion $false
-    if ($null -ne $objCurrentMetadata.Failure) {
-        Write-Output "$Name $($objCurrentMetadata.Failure)"
-        return
-    }
-    $strCurrentDate = $objCurrentMetadata.UpdatedDate
-    if (-not (Test-MetadataCalendarDatePair `
-                -VersionDate $strCurrentDate.Replace('-', '') `
-                -UpdatedDate $strCurrentDate)) {
-        Write-Output "$Name Last Updated must contain one real calendar date."
-        return
-    }
-    if ([string]::CompareOrdinal(
-            $strCurrentDate, $script:strMaximumMetadataUtcDate) -gt 0) {
-        Write-Output "$Name Last Updated is later than trusted UTC."
-        return
-    }
-
-    $boolRenderedContentChanged = $true
-    $objBaseMetadata = $null
-    if ($null -ne $BaseContent) {
-        $objBaseMetadata = Get-DocumentMetadataContext `
-            -Content $BaseContent -RequiresVersion $false
-        if ($null -ne $objBaseMetadata.Failure) {
-            Write-Output "The parent of $Name $($objBaseMetadata.Failure)"
+    $boolOwnParseReuse = $null -eq $CurrentParseReuse -and $null -eq $ParentParseReuse
+    $objReusePrimaryFailure = $null
+    try {
+        if ($boolOwnParseReuse) {
+            $CurrentParseReuse = Get-MarkdownParseReuseSlot
+            $ParentParseReuse = Get-MarkdownParseReuseSlot -Budget $CurrentParseReuse.Budget
+        }
+        $objCurrentMetadata = Get-DocumentMetadataContext `
+            -Content $CurrentContent -RequiresVersion $false -ReuseSlot $CurrentParseReuse
+        if ($null -ne $objCurrentMetadata.Failure) {
+            Write-Output "$Name $($objCurrentMetadata.Failure)"
             return
         }
-        $strBaseDate = $objBaseMetadata.UpdatedDate
+        $strCurrentDate = $objCurrentMetadata.UpdatedDate
         if (-not (Test-MetadataCalendarDatePair `
-                    -VersionDate $strBaseDate.Replace('-', '') `
-                    -UpdatedDate $strBaseDate)) {
-            Write-Output "The parent of $Name Last Updated must contain one real calendar date."
+                    -VersionDate $strCurrentDate.Replace('-', '') `
+                    -UpdatedDate $strCurrentDate)) {
+            Write-Output "$Name Last Updated must contain one real calendar date."
             return
         }
-        $boolRenderedContentChanged = (
-            (ConvertTo-MetadataComparisonText -Content $CurrentContent `
-                -MetadataContext $objCurrentMetadata) -cne
-            (ConvertTo-MetadataComparisonText -Content $BaseContent `
-                -MetadataContext $objBaseMetadata)
-        )
         if ([string]::CompareOrdinal(
-                $strCurrentDate,
-                $strBaseDate
-            ) -lt 0) {
-            Write-Output (
-                "$Name Last Updated must not move backward from " +
-                "$strBaseDate to $strCurrentDate."
-            )
+                $strCurrentDate, $script:strMaximumMetadataUtcDate) -gt 0) {
+            Write-Output "$Name Last Updated is later than trusted UTC."
             return
         }
-    }
-    if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate -and
-        $null -eq $objCurrentMetadata.VersionDate) {
-        Write-Output @(Get-PublishedEndpointMetadataFailure -Name "The parent of $Name" `
-                -CurrentContent $BaseContent -ParentContent $null -ExpectedUtcDate '' `
-                -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false)
-    }
-    if ($null -ne $objCurrentMetadata.VersionDate) {
-        $objVersionParentContent = $null
-        if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate) {
-            $objVersionParentContent = $BaseContent
+
+        $boolRenderedContentChanged = $true
+        $objBaseMetadata = $null
+        if ($null -ne $BaseContent) {
+            $objBaseMetadata = Get-DocumentMetadataContext `
+                -Content $BaseContent -RequiresVersion $false -ReuseSlot $ParentParseReuse
+            if ($null -ne $objBaseMetadata.Failure) {
+                Write-Output "The parent of $Name $($objBaseMetadata.Failure)"
+                return
+            }
+            $strBaseDate = $objBaseMetadata.UpdatedDate
+            if (-not (Test-MetadataCalendarDatePair `
+                        -VersionDate $strBaseDate.Replace('-', '') `
+                        -UpdatedDate $strBaseDate)) {
+                Write-Output "The parent of $Name Last Updated must contain one real calendar date."
+                return
+            }
+            $boolRenderedContentChanged = (
+                (ConvertTo-MetadataComparisonText -Content $CurrentContent `
+                    -MetadataContext $objCurrentMetadata) -cne
+                (ConvertTo-MetadataComparisonText -Content $BaseContent `
+                    -MetadataContext $objBaseMetadata)
+            )
+            if ([string]::CompareOrdinal(
+                    $strCurrentDate,
+                    $strBaseDate
+                ) -lt 0) {
+                Write-Output (
+                    "$Name Last Updated must not move backward from " +
+                    "$strBaseDate to $strCurrentDate."
+                )
+                return
+            }
         }
-        # Null here describes only the new Version tuple. The actual parent
-        # has already passed Last Updated and rendered-comparison checks above.
-        Write-Output @(Get-PublishedEndpointMetadataFailure -Name $Name `
-                -CurrentContent $CurrentContent -ParentContent $objVersionParentContent `
-                -ExpectedUtcDate '' -IsNewDocumentTransition ($null -eq $objVersionParentContent) `
-                -RequireExpectedUtcDateForRenderedChange $false)
-    }
-    if (-not $boolRenderedContentChanged) {
-        return
-    }
-    if (-not [string]::IsNullOrEmpty($TrustedEventUtcDate) -and
-        $strCurrentDate -cne $TrustedEventUtcDate) {
-        Write-Output (
-            "$Name Last Updated must be $TrustedEventUtcDate after the current " +
-            'event input changes rendered content.'
-        )
-    } elseif ($RequireCurrentMaximumDateForRenderedChange -and
-        -not $TrustedEventUtcDate -and
-        $strCurrentDate -cne $script:strMaximumMetadataUtcDate) {
-        Write-Output (
-            "$Name Last Updated must be $script:strMaximumMetadataUtcDate " +
-            'after a rendered-content change without a trusted event date.'
-        )
+        if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate -and
+            $null -eq $objCurrentMetadata.VersionDate) {
+            Write-Output @(Get-PublishedEndpointMetadataFailure -Name "The parent of $Name" `
+                    -CurrentContent $BaseContent -ParentContent $null -ExpectedUtcDate '' `
+                    -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false `
+                    -CurrentParseReuse $ParentParseReuse)
+        }
+        if ($null -ne $objCurrentMetadata.VersionDate) {
+            $objVersionParentContent = $null
+            if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate) {
+                $objVersionParentContent = $BaseContent
+            }
+            # Null here describes only the new Version tuple. The actual parent
+            # has already passed Last Updated and rendered-comparison checks above.
+            Write-Output @(Get-PublishedEndpointMetadataFailure -Name $Name `
+                    -CurrentContent $CurrentContent -ParentContent $objVersionParentContent `
+                    -ExpectedUtcDate '' -IsNewDocumentTransition ($null -eq $objVersionParentContent) `
+                    -RequireExpectedUtcDateForRenderedChange $false `
+                    -CurrentParseReuse $CurrentParseReuse `
+                    -ParentParseReuse $(if ($null -ne $objVersionParentContent) { $ParentParseReuse } else { $null }))
+        }
+        if (-not $boolRenderedContentChanged) {
+            return
+        }
+        if (-not [string]::IsNullOrEmpty($TrustedEventUtcDate) -and
+            $strCurrentDate -cne $TrustedEventUtcDate) {
+            Write-Output (
+                "$Name Last Updated must be $TrustedEventUtcDate after the current " +
+                'event input changes rendered content.'
+            )
+        } elseif ($RequireCurrentMaximumDateForRenderedChange -and
+            -not $TrustedEventUtcDate -and
+            $strCurrentDate -cne $script:strMaximumMetadataUtcDate) {
+            Write-Output (
+                "$Name Last Updated must be $script:strMaximumMetadataUtcDate " +
+                'after a rendered-content change without a trusted event date.'
+            )
+        }
+    } catch {
+        $objReusePrimaryFailure = $_
+        throw
+    } finally {
+        if ($boolOwnParseReuse) {
+            foreach ($objSlot in @($CurrentParseReuse, $ParentParseReuse)) {
+                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {
+                    if ($null -eq $objReusePrimaryFailure) { throw }
+                }
+            }
+        }
     }
 }
 
@@ -6070,6 +6536,9 @@ function Test-DocumentMetadataHeaderIntent {
     # .PARAMETER Content
     # The bounded document text supplied by the existing safe input reader.
     #
+    # .PARAMETER ReuseSlot
+    # Optional private slot passed only to structural parsing.
+    #
     # .EXAMPLE
     # Test-DocumentMetadataHeaderIntent -Content $strDocument
     #
@@ -6085,10 +6554,13 @@ function Test-DocumentMetadataHeaderIntent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
-    param([Parameter(Mandatory)][AllowEmptyString()][string] $Content)
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Content,
+        [Parameter()][AllowNull()][object] $ReuseSlot
+    )
 
     $arrLines = [regex]::Split($Content, '\r\n|\r|\n')
     $arrParserLines = [string[]]$arrLines.Clone()
@@ -6112,7 +6584,7 @@ function Test-DocumentMetadataHeaderIntent {
         $intBodyStart = $intFrontMatterEnd + 1
     }
     $objParseContext = Get-MarkdownParseContext `
-        -Content ($arrParserLines -join "`n") -LineCount $arrLines.Count
+        -Content ($arrParserLines -join "`n") -LineCount $arrLines.Count -ReuseSlot $ReuseSlot
     $arrBlocks = @($objParseContext.TopLevelBlocks)
     # A later peer Metadata section is misplaced intent, not an ordinary
     # subsection example. Leave deeper headings to the existing header window.
@@ -6189,6 +6661,9 @@ function Get-DocumentMetadataContext {
     # .PARAMETER RequiresVersion
     # Indicates whether the document header must contain Version metadata.
     #
+    # .PARAMETER ReuseSlot
+    # Optional private slot; metadata policy is always evaluated anew.
+    #
     # .EXAMPLE
     # Get-DocumentMetadataContext @hashtableArguments
     #
@@ -6204,7 +6679,7 @@ function Get-DocumentMetadataContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.7.20261005.1
+    # Version: 1.8.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -6212,7 +6687,9 @@ function Get-DocumentMetadataContext {
         [string] $Content,
 
         [Parameter()]
-        [bool] $RequiresVersion = $true
+        [bool] $RequiresVersion = $true,
+
+        [Parameter()][AllowNull()][object] $ReuseSlot
     )
 
     $arrLines = [regex]::Split($Content, '\r\n|\r|\n')
@@ -6242,7 +6719,7 @@ function Get-DocumentMetadataContext {
     $strParserContent = $arrParserLines -join "`n"
     $objParseContext = Get-MarkdownParseContext `
         -Content $strParserContent `
-        -LineCount $arrLines.Count
+        -LineCount $arrLines.Count -ReuseSlot $ReuseSlot
     $arrTopLevelBlocks = @($objParseContext.TopLevelBlocks)
     $arrTopLevelListItems = @($objParseContext.TopLevelListItems)
 
@@ -6500,6 +6977,12 @@ function Get-PublishedEndpointMetadataFailure {
     # .PARAMETER RequireExpectedUtcDateForRenderedChange
     # True to require the expected date after rendered changes.
     #
+    # .PARAMETER CurrentParseReuse
+    # Borrowed private structural slot for current content.
+    #
+    # .PARAMETER ParentParseReuse
+    # Borrowed private structural slot for prior content.
+    #
     # .EXAMPLE
     # $arrFailure = @(Get-PublishedEndpointMetadataFailure `
     #     -Name 'AGENTS.md' -CurrentContent $strCurrent `
@@ -6516,7 +6999,7 @@ function Get-PublishedEndpointMetadataFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.1.20261006.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6538,10 +7021,13 @@ function Get-PublishedEndpointMetadataFailure {
         [bool] $IsNewDocumentTransition,
 
         [Parameter()]
-        [bool] $RequireExpectedUtcDateForRenderedChange = $true
+        [bool] $RequireExpectedUtcDateForRenderedChange = $true,
+
+        [Parameter()][AllowNull()][object] $CurrentParseReuse,
+        [Parameter()][AllowNull()][object] $ParentParseReuse
     )
 
-    $objCurrentMetadata = Get-DocumentMetadataContext -Content $CurrentContent
+    $objCurrentMetadata = Get-DocumentMetadataContext -Content $CurrentContent -ReuseSlot $CurrentParseReuse
     if ($null -ne $objCurrentMetadata.Failure) {
         Write-Output "$Name $($objCurrentMetadata.Failure)"
         return
@@ -6602,7 +7088,7 @@ function Get-PublishedEndpointMetadataFailure {
         return
     }
 
-    $objParentMetadata = Get-DocumentMetadataContext -Content $ParentContent
+    $objParentMetadata = Get-DocumentMetadataContext -Content $ParentContent -ReuseSlot $ParentParseReuse
     if ($null -ne $objParentMetadata.Failure) {
         Write-Output "The parent of $Name $($objParentMetadata.Failure)"
         return
@@ -6720,7 +7206,6 @@ function Get-PublishedEndpointMetadataFailure {
             )
         }
     }
-
 }
 
 function Get-TomlSemanticStatementContext {
@@ -8029,197 +8514,242 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     $hashtableGovernedInstructionContent[$objDocumentSpec.Path] = $strDocumentContent
 }
 
-$listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new()
-foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
-    $objParentContext = if ($boolPublishedEndpointsRequested) {
-        $strPublishedBaselineContent = $null
-        $strMetadataBaselineRevision =
-            $strEffectivePublishedBaselineRevision
-        if (-not [string]::IsNullOrEmpty($strMetadataBaselineRevision)) {
-            & git -C $strRepositoryRootPath cat-file -e `
-                "$strMetadataBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
-            if ($LASTEXITCODE -eq 0) {
-                $strPublishedBaselineContent = Read-PublishedBaselineDocumentText `
-                    -RepositoryRootPath $strRepositoryRootPath `
-                    -Revision $strMetadataBaselineRevision `
-                    -RepositoryRelativePath $objDocumentSpec.Path `
-                    -CurrentMaximumBytes $objDocumentSpec.MaximumBytes
+$objDocumentParseBudget = [pscustomobject]@{ Retained = 0 }
+$listDocumentParseSlots = [Collections.Generic.List[object]]::new()
+$objDocumentParseFailure = $null
+try {
+    $listGovernedDocumentContexts = [Collections.Generic.List[pscustomobject]]::new()
+    foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
+        $objCurrentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget
+        $listDocumentParseSlots.Add($objCurrentParseReuse)
+        $objParentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget
+        $listDocumentParseSlots.Add($objParentParseReuse)
+        $objParentContext = if ($boolPublishedEndpointsRequested) {
+            $strPublishedBaselineContent = $null
+            $strMetadataBaselineRevision =
+                $strEffectivePublishedBaselineRevision
+            if (-not [string]::IsNullOrEmpty($strMetadataBaselineRevision)) {
+                & git -C $strRepositoryRootPath cat-file -e `
+                    "$strMetadataBaselineRevision`:$($objDocumentSpec.Path)" 2>$null
+                if ($LASTEXITCODE -eq 0) {
+                    $strPublishedBaselineContent = Read-PublishedBaselineDocumentText `
+                        -RepositoryRootPath $strRepositoryRootPath `
+                        -Revision $strMetadataBaselineRevision `
+                        -RepositoryRelativePath $objDocumentSpec.Path `
+                        -CurrentMaximumBytes $objDocumentSpec.MaximumBytes
+                }
+            }
+            [pscustomobject]@{
+                ParentContent = $strPublishedBaselineContent
+                ExpectedUtcDate = ''
+                ParentRevision = $strMetadataBaselineRevision
+                IsWorktreeTransition = $false
+            }
+        } elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+            Get-PublishedBaselineDocumentContext `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRelativePath $objDocumentSpec.Path `
+                -MaximumBytes $objDocumentSpec.MaximumBytes
+        } else {
+            [pscustomobject]@{
+                ParentContent = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
+                ExpectedUtcDate = ''
+                ParentRevision = $strValidatedInputRevision
+                IsWorktreeTransition = $false
             }
         }
-        [pscustomobject]@{
-            ParentContent = $strPublishedBaselineContent
-            ExpectedUtcDate = ''
-            ParentRevision = $strMetadataBaselineRevision
-            IsWorktreeTransition = $false
+        if ($FinalizeMetadataNow) {
+            $objParentContext.ExpectedUtcDate = $script:strMaximumMetadataUtcDate
         }
-    } elseif ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
-        Get-PublishedBaselineDocumentContext `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -RepositoryRelativePath $objDocumentSpec.Path `
-            -MaximumBytes $objDocumentSpec.MaximumBytes
+        $boolInitialMetadataCoverage = $false
+        $objMetadataParentContent = $objParentContext.ParentContent
+        $boolValidateMetadata = $objDocumentSpec.RequiresMetadata
+        if (-not $boolValidateMetadata -and
+            $null -ne $hashtableGovernedInstructionContent[$objDocumentSpec.Path]) {
+            $boolValidateMetadata = Test-DocumentMetadataHeaderIntent `
+                -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path] -ReuseSlot $objCurrentParseReuse
+        }
+        if ($boolValidateMetadata -and -not $objDocumentSpec.RequiresVersion -and
+            $null -ne $objMetadataParentContent) {
+            $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent -ReuseSlot $objParentParseReuse
+            if (-not $boolPriorMetadataIntent) {
+                $boolInitialMetadataCoverage = -not $objDocumentSpec.RequiresMetadata -or
+                    (Test-InitialMetadataCoveragePath `
+                        -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
+                        -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
+                        -RepositoryRelativePath $objDocumentSpec.Path)
+                if ($boolInitialMetadataCoverage) {
+                    $objMetadataParentContent = $null
+                    Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse
+                }
+            }
+        }
+        if (-not $boolValidateMetadata) {
+            Clear-MarkdownParseReuseSlot -Slot $objCurrentParseReuse
+            Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse
+        }
+        $listGovernedDocumentContexts.Add([pscustomobject]@{
+                CurrentParseReuse = $objCurrentParseReuse
+                ParentParseReuse = $objParentParseReuse
+                Path = $objDocumentSpec.Path
+                MaximumBytes = $objDocumentSpec.MaximumBytes
+                Content = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
+                ParentContent = $objParentContext.ParentContent
+                MetadataParentContent = $objMetadataParentContent
+                IsInitialMetadataCoverage = $boolInitialMetadataCoverage
+                ExpectedUtcDate = $objParentContext.ExpectedUtcDate
+                IsWorktreeTransition = $objParentContext.IsWorktreeTransition
+                RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)
+                RequiresMetadata = $boolValidateMetadata
+                RequiresVersion = $objDocumentSpec.RequiresVersion
+                RequiredDocument = $arrDecisionRecordInventoryPaths -cnotcontains `
+                    $objDocumentSpec.Path
+            })
+    }
+
+    $listRepositoryFailures = [Collections.Generic.List[string]]::new()
+    $listRepositoryFailures.AddRange([string[]] @(Get-AgentSetupContractFailure -Content $hashtableAgentSetupContent))
+    $listRepositoryFailures.AddRange([string[]] @(Get-AgentInstructionFailure `
+            -AgentsContent $strAgentsContent `
+            -ClaudeContent $strClaudeContent `
+            -CodexConfigContent $strCodexConfigContent))
+    $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+        ConvertFrom-StrictUtf8Data `
+            -Bytes (Read-RepositoryInputData `
+                -Path (Join-Path $strRepositoryRootPath '.gitignore') `
+                -RepositoryRootPath $strRepositoryRootPath `
+                -RepositoryRelativePath '.gitignore' `
+                -DisplayName '.gitignore' `
+                -MaximumBytes $intGitIgnoreMaximumInputBytes `
+                -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('.gitignore'))) `
+            -DisplayName '.gitignore'
     } else {
-        [pscustomobject]@{
-            ParentContent = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
-            ExpectedUtcDate = ''
-            ParentRevision = $strValidatedInputRevision
-            IsWorktreeTransition = $false
+        Read-GitRevisionText `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strValidatedInputRevision `
+            -RepositoryRelativePath '.gitignore' `
+            -MaximumBytes $intGitIgnoreMaximumInputBytes `
+            -RequireRegularFile
+    }
+    if (-not (Test-RecursivePersonalMemoryIgnoreContract `
+            -GitIgnoreContent $strGitIgnoreContent -TrackedPath $arrTrackedRepositoryPaths)) {
+        $listRepositoryFailures.AddRange([string[]] (
+            'The root .gitignore must exclude CLAUDE.local.md at every depth with ' +
+            'CLAUDE.local.md or **/CLAUDE.local.md after all negations. ' +
+            'Nested or case-alias ignore files require a separately validated contract.'
+        ))
+    }
+    foreach ($strPersonalMemoryPath in @('CLAUDE.local.md', 'nested/CLAUDE.local.md', 'tools/project/CLAUDE.local.md')) {
+        if (-not (Test-GitIgnorePathEffective `
+                -GitIgnoreContent $strGitIgnoreContent `
+                -RepositoryRelativePath $strPersonalMemoryPath)) {
+            $listRepositoryFailures.AddRange([string[]] (
+                "The personal CLAUDE.local.md ignore rule is ineffective: $strPersonalMemoryPath"))
         }
     }
-    if ($FinalizeMetadataNow) {
-        $objParentContext.ExpectedUtcDate = $script:strMaximumMetadataUtcDate
-    }
-    $boolInitialMetadataCoverage = $false
-    $objMetadataParentContent = $objParentContext.ParentContent
-    $boolValidateMetadata = $objDocumentSpec.RequiresMetadata
-    if (-not $boolValidateMetadata -and
-        $null -ne $hashtableGovernedInstructionContent[$objDocumentSpec.Path]) {
-        $boolValidateMetadata = Test-DocumentMetadataHeaderIntent `
-            -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
-    }
-    if ($boolValidateMetadata -and -not $objDocumentSpec.RequiresVersion -and
-        $null -ne $objMetadataParentContent) {
-        $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent
-        if (-not $boolPriorMetadataIntent) {
-            $boolInitialMetadataCoverage = -not $objDocumentSpec.RequiresMetadata -or
-                (Test-InitialMetadataCoveragePath `
-                    -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
-                    -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
-                    -RepositoryRelativePath $objDocumentSpec.Path)
-            if ($boolInitialMetadataCoverage) { $objMetadataParentContent = $null }
+    foreach ($strPublicInstructionPath in @('CLAUDE.md', 'nested/CLAUDE.md', 'tools/project/CLAUDE.md')) {
+        if (Test-GitIgnorePathEffective `
+                -GitIgnoreContent $strGitIgnoreContent `
+                -RepositoryRelativePath $strPublicInstructionPath) {
+            $listRepositoryFailures.AddRange([string[]] (
+                "The public instruction file must not be ignored: $strPublicInstructionPath"))
         }
     }
-    $listGovernedDocumentContexts.Add([pscustomobject]@{
-            Path = $objDocumentSpec.Path
-            MaximumBytes = $objDocumentSpec.MaximumBytes
-            Content = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
-            ParentContent = $objParentContext.ParentContent
-            MetadataParentContent = $objMetadataParentContent
-            IsInitialMetadataCoverage = $boolInitialMetadataCoverage
-            ExpectedUtcDate = $objParentContext.ExpectedUtcDate
-            IsWorktreeTransition = $objParentContext.IsWorktreeTransition
-            RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)
-            RequiresMetadata = $boolValidateMetadata
-            RequiresVersion = $objDocumentSpec.RequiresVersion
-            RequiredDocument = $arrDecisionRecordInventoryPaths -cnotcontains `
-                $objDocumentSpec.Path
-        })
+    $listRepositoryFailures.AddRange([string[]] @(Get-DocumentationClaimFailure `
+            -Content $strDocsInstructionsContent `
+            -TrackedPaths $arrTrackedRepositoryPaths))
+    $listRepositoryFailures.AddRange([string[]] @(Get-DecisionLifecyclePolicyFailure `
+            -Content $strDocsInstructionsContent))
+    $arrCanonicalDecisionGuideLinks = @(
+        '../../STYLE_GUIDE.md',
+        '../../STYLE_GUIDE_RATIONALE.md'
+    )
+    foreach ($objDecisionContext in @(
+            $listGovernedDocumentContexts |
+                Where-Object { $_.Path -cmatch $script:strDecisionRecordDirectoryPathPattern }
+        )) {
+        $listRepositoryFailures.AddRange([string[]] @(Get-DecisionRecordPathFailure `
+                -RepositoryRelativePath $objDecisionContext.Path))
+        if ($null -eq $objDecisionContext.Content) {
+            continue
+        }
+        $listRepositoryFailures.AddRange([string[]] @(Get-DecisionRecordLifecycleFailure `
+                -Name $objDecisionContext.Path `
+                -CurrentContent $objDecisionContext.Content `
+                -BaselineContent $objDecisionContext.ParentContent))
+        $objDecisionMarkdownContext = Get-OperativeMarkdownContext `
+            -Content $objDecisionContext.Content
+        $arrDecisionLinks = [string[]]@(
+            $objDecisionMarkdownContext.ProseBlocks.Links
+        )
+        foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
+            if ($arrDecisionLinks -cnotcontains $strGuideLink) {
+                $listRepositoryFailures.AddRange([string[]] "$($objDecisionContext.Path) must contain an operative link to $strGuideLink")
+            }
+        }
+    }
+    $listRepositoryFailures.AddRange([string[]] @(Get-NestedClaudeImportFailure `
+            -DocumentContexts @(
+                $listGovernedDocumentContexts |
+                    Where-Object { $arrGovernedInstructionDocuments.Path -ccontains $_.Path } |
+                    Select-Object -Property Path, Content
+            )))
+    foreach ($objDocumentContext in $listGovernedDocumentContexts) {
+        $objDocumentEndpointFailure = $null
+        try {
+            if (-not $objDocumentContext.RequiresMetadata) {
+                continue
+            }
+            if ($null -eq $objDocumentContext.Content) {
+                if ($objDocumentContext.RequiredDocument) {
+                    $listRepositoryFailures.AddRange([string[]] "$($objDocumentContext.Path) is required in the published final state.")
+                }
+                continue
+            }
+            if ($objDocumentContext.RequiresVersion) {
+                $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointMetadataFailure `
+                        -Name $objDocumentContext.Path `
+                        -CurrentContent $objDocumentContext.Content `
+                        -ParentContent $objDocumentContext.ParentContent `
+                        -ExpectedUtcDate $objDocumentContext.ExpectedUtcDate `
+                        -IsNewDocumentTransition ($null -eq $objDocumentContext.ParentContent) `
+                        -RequireExpectedUtcDateForRenderedChange `
+                            $objDocumentContext.RequireFinalizationDate `
+                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `
+                        -ParentParseReuse $objDocumentContext.ParentParseReuse))
+            } else {
+                $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointLastUpdatedFailure `
+                        -Name $objDocumentContext.Path `
+                        -CurrentContent $objDocumentContext.Content `
+                        -BaseContent $objDocumentContext.MetadataParentContent `
+                        -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
+                        -RequireCurrentMaximumDateForRenderedChange `
+                            $objDocumentContext.RequireFinalizationDate `
+                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `
+                        -ParentParseReuse $objDocumentContext.ParentParseReuse))
+            }
+        } catch {
+            $objDocumentEndpointFailure = $_
+            throw
+        } finally {
+            foreach ($objSlot in @($objDocumentContext.CurrentParseReuse, $objDocumentContext.ParentParseReuse)) {
+                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {
+                    if ($null -eq $objDocumentEndpointFailure) { throw }
+                }
+            }
+        }
+    }
+} catch {
+    $objDocumentParseFailure = $_
+    throw
+} finally {
+    foreach ($objSlot in $listDocumentParseSlots) {
+        try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {
+            if ($null -eq $objDocumentParseFailure) { throw }
+        }
+    }
 }
 
-$listRepositoryFailures = [Collections.Generic.List[string]]::new()
-$listRepositoryFailures.AddRange([string[]] @(Get-AgentSetupContractFailure -Content $hashtableAgentSetupContent))
-$listRepositoryFailures.AddRange([string[]] @(Get-AgentInstructionFailure `
-        -AgentsContent $strAgentsContent `
-        -ClaudeContent $strClaudeContent `
-        -CodexConfigContent $strCodexConfigContent))
-$strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
-    ConvertFrom-StrictUtf8Data `
-        -Bytes (Read-RepositoryInputData `
-            -Path (Join-Path $strRepositoryRootPath '.gitignore') `
-            -RepositoryRootPath $strRepositoryRootPath `
-            -RepositoryRelativePath '.gitignore' `
-            -DisplayName '.gitignore' `
-            -MaximumBytes $intGitIgnoreMaximumInputBytes `
-            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('.gitignore'))) `
-        -DisplayName '.gitignore'
-} else {
-    Read-GitRevisionText `
-        -RepositoryRootPath $strRepositoryRootPath `
-        -Revision $strValidatedInputRevision `
-        -RepositoryRelativePath '.gitignore' `
-        -MaximumBytes $intGitIgnoreMaximumInputBytes `
-        -RequireRegularFile
-}
-if (-not (Test-RecursivePersonalMemoryIgnoreContract `
-        -GitIgnoreContent $strGitIgnoreContent -TrackedPath $arrTrackedRepositoryPaths)) {
-    $listRepositoryFailures.AddRange([string[]] (
-        'The root .gitignore must exclude CLAUDE.local.md at every depth with ' +
-        'CLAUDE.local.md or **/CLAUDE.local.md after all negations. ' +
-        'Nested or case-alias ignore files require a separately validated contract.'
-    ))
-}
-foreach ($strPersonalMemoryPath in @('CLAUDE.local.md', 'nested/CLAUDE.local.md', 'tools/project/CLAUDE.local.md')) {
-    if (-not (Test-GitIgnorePathEffective `
-            -GitIgnoreContent $strGitIgnoreContent `
-            -RepositoryRelativePath $strPersonalMemoryPath)) {
-        $listRepositoryFailures.AddRange([string[]] (
-            "The personal CLAUDE.local.md ignore rule is ineffective: $strPersonalMemoryPath"))
-    }
-}
-foreach ($strPublicInstructionPath in @('CLAUDE.md', 'nested/CLAUDE.md', 'tools/project/CLAUDE.md')) {
-    if (Test-GitIgnorePathEffective `
-            -GitIgnoreContent $strGitIgnoreContent `
-            -RepositoryRelativePath $strPublicInstructionPath) {
-        $listRepositoryFailures.AddRange([string[]] (
-            "The public instruction file must not be ignored: $strPublicInstructionPath"))
-    }
-}
-$listRepositoryFailures.AddRange([string[]] @(Get-DocumentationClaimFailure `
-        -Content $strDocsInstructionsContent `
-        -TrackedPaths $arrTrackedRepositoryPaths))
-$listRepositoryFailures.AddRange([string[]] @(Get-DecisionLifecyclePolicyFailure `
-        -Content $strDocsInstructionsContent))
-$arrCanonicalDecisionGuideLinks = @(
-    '../../STYLE_GUIDE.md',
-    '../../STYLE_GUIDE_RATIONALE.md'
-)
-foreach ($objDecisionContext in @(
-        $listGovernedDocumentContexts |
-            Where-Object { $_.Path -cmatch $script:strDecisionRecordDirectoryPathPattern }
-    )) {
-    $listRepositoryFailures.AddRange([string[]] @(Get-DecisionRecordPathFailure `
-            -RepositoryRelativePath $objDecisionContext.Path))
-    if ($null -eq $objDecisionContext.Content) {
-        continue
-    }
-    $listRepositoryFailures.AddRange([string[]] @(Get-DecisionRecordLifecycleFailure `
-            -Name $objDecisionContext.Path `
-            -CurrentContent $objDecisionContext.Content `
-            -BaselineContent $objDecisionContext.ParentContent))
-    $objDecisionMarkdownContext = Get-OperativeMarkdownContext `
-        -Content $objDecisionContext.Content
-    $arrDecisionLinks = [string[]]@(
-        $objDecisionMarkdownContext.ProseBlocks.Links
-    )
-    foreach ($strGuideLink in $arrCanonicalDecisionGuideLinks) {
-        if ($arrDecisionLinks -cnotcontains $strGuideLink) {
-            $listRepositoryFailures.AddRange([string[]] "$($objDecisionContext.Path) must contain an operative link to $strGuideLink")
-        }
-    }
-}
-$listRepositoryFailures.AddRange([string[]] @(Get-NestedClaudeImportFailure `
-        -DocumentContexts @(
-            $listGovernedDocumentContexts |
-                Where-Object { $arrGovernedInstructionDocuments.Path -ccontains $_.Path }
-        )))
-foreach ($objDocumentContext in $listGovernedDocumentContexts) {
-    if (-not $objDocumentContext.RequiresMetadata) {
-        continue
-    }
-    if ($null -eq $objDocumentContext.Content) {
-        if ($objDocumentContext.RequiredDocument) {
-            $listRepositoryFailures.AddRange([string[]] "$($objDocumentContext.Path) is required in the published final state.")
-        }
-        continue
-    }
-    if ($objDocumentContext.RequiresVersion) {
-        $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointMetadataFailure `
-                -Name $objDocumentContext.Path `
-                -CurrentContent $objDocumentContext.Content `
-                -ParentContent $objDocumentContext.ParentContent `
-                -ExpectedUtcDate $objDocumentContext.ExpectedUtcDate `
-                -IsNewDocumentTransition ($null -eq $objDocumentContext.ParentContent) `
-                -RequireExpectedUtcDateForRenderedChange `
-                    $objDocumentContext.RequireFinalizationDate))
-    } else {
-        $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointLastUpdatedFailure `
-                -Name $objDocumentContext.Path `
-                -CurrentContent $objDocumentContext.Content `
-                -BaseContent $objDocumentContext.MetadataParentContent `
-                -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
-                -RequireCurrentMaximumDateForRenderedChange `
-                    $objDocumentContext.RequireFinalizationDate))
-    }
-}
 if ($listRepositoryFailures.Count -gt 0) {
     throw "Agent-instruction contract failed:`n- $($listRepositoryFailures -join "`n- ")"
 }
