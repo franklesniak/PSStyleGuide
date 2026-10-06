@@ -1,5 +1,5 @@
 {
-  "status": "round2_reviews_pending",
+  "status": "round2_findings_under_decision",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -91,7 +91,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Collect the one pending Copilot request and four ordinary validation runs; no new review request. If all pass, record exact-input acceptance and execute guarded normal merge, then actual landed acceptance and PS reverse repair.",
+  "next_action": "Publish R3/R4 canonical decisions, reply/resolve R4 once; finish separate R5 decision before any source repair. No outstanding reviewer request or ordinary CI. Preserve original clocks and transfers.",
   "checkout_exit": 0,
   "candidate_tree": "24ca66c74b176bb83037c453ee506aa3fee0cf5f",
   "implementation": {
@@ -422,7 +422,7 @@
       }
     ]
   },
-  "local_operations": "No local test, Git write, source freeze or worker remains active. Published product H and body are verified; final independent binding passed. Copilot and four hosted jobs are pending remotely.",
+  "local_operations": "Existing owner worker prepares read-only R4/R5 proposals. No local validation aggregate or Git write is active. Read-only watcher6035 terminal exit1 remains history.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "passed",
@@ -492,7 +492,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r2-candidate-readiness.json",
     "sha256": "6837bc259be0a2ba39172a4256672c5f89baf9e06cb3a0936af94a31c89d0a80"
   },
-  "planning_checkpoint": "b556455feb62b28253e99a557ae46516de6b426c",
+  "planning_checkpoint": "ed558e34f76b8857bff794cb588ac83cf1ff4746",
   "commit": {
     "status": "committed",
     "expected_parent": "2de8f4e8b96e09628d3e571294009cbbbd8d3749",
@@ -860,18 +860,24 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-current-head-baseline.json",
       "baseline_sha256": "84c4ac37308a2da81bdea552371765b2142b586f60b21c023452a376753b9b23",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_with_findings",
         "requested_at": "2026-10-06T02:16:32.867390+00:00",
         "effort_selected": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "channel": "supported GitHub Reviewers UI",
         "request_event_id": 32561626425,
         "native_requested_at": "2026-10-06T02:17:01Z",
         "confirmation": "round2-after-copilot.json",
         "workflow_run": 37403381576,
-        "workflow_status": "in_progress",
-        "workflow_conclusion": null
+        "workflow_status": "completed",
+        "workflow_conclusion": "cancelled",
+        "observed_effort_source": "Complete authenticated overview5423146423 explicit field; supported Balanced UI request fell back after agentic setup timeout.",
+        "review_id": 5423146423,
+        "review_body_sha256": "cc22c6b231e0bc7d268ad27239952ee621e7878b7f6234a48f7c098e8acae9ab",
+        "submitted_at": "2026-10-06T02:35:32Z",
+        "terminal_snapshot": "round2-progress-10.json",
+        "workflow_cause": "Native job112075385627 exceeded20m during complete validation; final immutable-input step passed; supported Lite review was posted. No effort-only retry."
       },
       "codex": {
         "status": "completed_clean",
@@ -895,13 +901,93 @@
         "result_body_sha256": "690f3601ab41ab8965ecb9981914a1314145d7c4356970c55095cb21acd634ae",
         "attribution": "Authenticated post-trigger explicit no-findings result names current reviewed commit; changed Running-to-Completed exact-head summary and complete empty inline/thread inventory. No duplicate trigger."
       },
-      "findings": [],
-      "request_set_terminal": false,
+      "findings": [
+        {
+          "id": "TF68-R3",
+          "owner": "A03/A06",
+          "comments": [
+            4190960527,
+            4190960581
+          ],
+          "threads": [
+            "PRRT_kwDOSAZRhc6pTBh-",
+            "PRRT_kwDOSAZRhc6pTBih"
+          ],
+          "status": "refuted_replied_resolved_no_product_change",
+          "decision": "docs/planning/action-items-2026-10-02/results/A03/TF68-R3-windows-runner.md",
+          "source_change": false,
+          "native_dispositions": {
+            "4190960527": {
+              "status": "replied_resolved_verified",
+              "thread": "PRRT_kwDOSAZRhc6pTBh-",
+              "comment": 4190960527,
+              "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+              "round": 2,
+              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+              "body_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+              "requested_at": "2026-10-06T02:43:21.028610+00:00",
+              "reply_exit": 0,
+              "reply_id": 4191014123,
+              "reply_created_at": "2026-10-06T02:43:45Z",
+              "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191014123",
+              "resolved_at": "2026-10-06T02:43:24.993209+00:00"
+            },
+            "4190960581": {
+              "status": "replied_resolved_verified",
+              "thread": "PRRT_kwDOSAZRhc6pTBih",
+              "comment": 4190960581,
+              "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+              "round": 2,
+              "body": "`windows-2025` is a supported label: [GitHub runner reference](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).\nBoth Windows 5.1 and 7 jobs passed 156 assertions twice on current `f89d47d` in the [PR run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403248039) and [push run](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37403245728).\nTF68-R3 selects retaining the label and required coverage; the two availability comments share this evidence and need no workflow change.",
+              "body_sha256": "056c0b4a8bd4079dbc345775c736b232d4ed0979c2848e9c969c1dd56b8a699d",
+              "requested_at": "2026-10-06T02:47:07.466343+00:00",
+              "reply_exit": 0,
+              "reply_id": 4191034944,
+              "reply_created_at": "2026-10-06T02:47:32Z",
+              "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4191034944",
+              "resolved_at": "2026-10-06T02:47:11.702388+00:00"
+            }
+          }
+        },
+        {
+          "id": "TF68-R4",
+          "owner": "A21",
+          "comments": [
+            4190960625
+          ],
+          "threads": [
+            "PRRT_kwDOSAZRhc6pTBjD"
+          ],
+          "status": "refuted_selected_A96_pending_native_reply_resolution",
+          "finding": "Full fixture-clock helper text embedded in child command; assess native length and quoting/debugging risk before choosing action.",
+          "source_change": false,
+          "decision": "docs/planning/action-items-2026-10-02/results/A21/TF68-R4/DECISION.md",
+          "evidence_sha256": "0365eeeae9460f1669b1a3cf63fa785d4a2c1c28f31eeb12c5665afdedc690d2",
+          "selected": "A96 retain current child transport; bounded present non-defect"
+        },
+        {
+          "id": "TF68-R5",
+          "owner": "A21",
+          "source": "Bounded private R4 validation; separate direct invocation reproduction",
+          "status": "writer_validating_supported_path_contract_and_preparing_full_proposal_no_product_edits",
+          "finding": "Fixture clock fails to fire when checker path contains literal square brackets; direct in-process helper reproduces without child command serialization. Assess wildcard-aware breakpoint matching and supported contract before selecting repair.",
+          "comments": [],
+          "threads": []
+        }
+      ],
+      "request_set_terminal": true,
       "clean": false,
-      "status": "requesting"
+      "status": "terminal_findings_under_disposition",
+      "body_inventory": {
+        "declared_findings": 3,
+        "distinct_findings": 2,
+        "inline_findings": 3,
+        "body_only_findings": [],
+        "service_caveat": "Agentic setup timed out; actual completed Lite fallback accepted as a review result under AGENTS. Findings remain open; no current clean-round claim."
+      }
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-progress-6.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-11.json",
   "hosted_platform_progress": {
     "status": "passed",
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
@@ -2766,23 +2852,70 @@
     }
   ],
   "live_remote_observation": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-4.json",
-    "captured_at": "2026-10-06T02:23:23.558950+00:00",
-    "pending_run_ids": [
-      37403381576,
-      37403248011,
-      37403248022,
-      37403245768,
-      37403245762
-    ]
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-11.json",
+    "captured_at": "2026-10-06T02:47:23.694206+00:00",
+    "pending_run_ids": [],
+    "ordinary_successful": 11,
+    "attempts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\round2-progress-11-attempts.json"
   },
-  "updated_at": "2026-10-06T02:22:48.740709+00:00",
-  "next_poll_not_before": "2026-10-06T02:26:23.558950+00:00",
+  "updated_at": "2026-10-06T02:50:22.477762+00:00",
+  "next_poll_not_before": "2026-10-06T02:38:06.379957+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
-    "status": "prepared_only_not_executed",
+    "status": "Not executed and now stale: current R3/R4 findings invalidate zero-finding acceptance assumptions. Rebind only after actual dispositions/final input.",
     "merge": "merge-reviewed-tf68-r2.py",
     "landed": "collect-landed-tf68-r2.py",
-    "restriction": "Do not use obsolete round1 helpers or run until all current required gates pass."
+    "restriction": "Do not use obsolete round1 helpers or run until all current required gates pass.",
+    "input_acceptance": "accept-tf68-round2.py",
+    "landed_acceptance": "accept-landed-tf68-r2.py",
+    "input_acceptance_condition": "Root must read complete new Copilot review and supply ID/full-body digest, then require terminal current-head CI and logs before executing.",
+    "hashes": {
+      "accept-tf68-round2.py": "153087879d1f18e12e2e2ab39e7e116f9b513abe34aba9297cd3898d5fef9d37",
+      "merge-reviewed-tf68-r2.py": "37535ab38d5ceca90889b00698f0de7ad8d8cc04afa034dc6e83db8b93e23d6c",
+      "collect-landed-tf68-r2.py": "929d178c36447ee8f8803f7ad37699034778e67f71b2439427b7370999d3fb7c",
+      "accept-landed-tf68-r2.py": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
+    }
+  },
+  "last_goal_turn_classification": "progress: collected and verified terminal PRsetup11hooks/finalguard and pushbehavior567tests/0fail/0skip/mutation proof. Remaining three exact-head runs still authenticated live; no retries or product changes.",
+  "partial_hosted_r2": {
+    "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+    "push_behavior": {
+      "run": 37403245768,
+      "passed": 567,
+      "failed": 0,
+      "skipped": 0,
+      "mutations": "passed",
+      "log_sha256": "f8a3dc69bae8a552ada0c431f0197976acc11d9560f550f201da949cc41d0908"
+    },
+    "pr_setup": {
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "run": 37403248022,
+      "attempt": 1,
+      "hooks_passed": 11,
+      "immutable_final_step": "passed",
+      "log_sha256": "3bcfaa57a42866cbd147fc0b7ce4b213a69a844eb882814775e0e3a61504f7d8",
+      "acceptance_helper_status": "Prepared/syntax checked only; no landed acceptance or merge",
+      "acceptance_helper_sha256": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
+    },
+    "scope": "All11 current-head ordinary workflows successful. Both behavior runs pass567tests/0fail/0skip; both setup runs pass11hooks/final immutable guard. Copilot service cancelled with a terminal Lite review; findings and final PR acceptance remain separate.",
+    "pr_behavior": {
+      "run": 37403248011,
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "attempt": 1,
+      "log_sha256": "7b088148fd4e0bded8682bf3a9056e44883371763ba1aa5492d54a474ba4ab14",
+      "passed": 567,
+      "failed": 0,
+      "skipped": 0,
+      "cancelled": 0,
+      "mutations": "passed"
+    },
+    "push_setup": {
+      "run": 37403245762,
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "attempt": 1,
+      "log_sha256": "e25076baeb665343fd26c645058d39ee53f3346c03a61b6196953efd65308943",
+      "hooks_passed": 11,
+      "immutable_final_step": "passed"
+    }
   }
 }

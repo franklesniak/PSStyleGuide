@@ -1,0 +1,90 @@
+{
+  "platform": "Unix 6.6.87.2",
+  "powershell": "7.6.3",
+  "host": "/opt/microsoft/powershell/7/pwsh",
+  "helperCharacters": 6577,
+  "helperUtf8Bytes": 6577,
+  "sourceSha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+  "callerStartLine": 1279,
+  "callerEndLine": 1300,
+  "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+  "cases": [
+    {
+      "name": "no-args-local",
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "",
+        "PublishedBaselineRevision": "",
+        "FinalizeMetadataNow": false,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7065,
+        "CommandPayloadCharacters": 6974,
+        "CommandPayloadUtf8Bytes": 6975,
+        "ArgvUtf8BytesWithNuls": 7057.0
+      },
+      "native_exit": 0
+    },
+    {
+      "name": "current-finalization",
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "FinalizeMetadataNow": true,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7199,
+        "CommandPayloadCharacters": 7108,
+        "CommandPayloadUtf8Bytes": 7109,
+        "ArgvUtf8BytesWithNuls": 7191.0
+      },
+      "native_exit": 0
+    },
+    {
+      "name": "proposed-combined-modes",
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "FinalizeMetadataNow": true,
+        "ProposedPolicy": true,
+        "SelfTest": true,
+        "MetadataClassificationOnly": true,
+        "CommandLineCharacters": 7253,
+        "CommandPayloadCharacters": 7162,
+        "CommandPayloadUtf8Bytes": 7163,
+        "ArgvUtf8BytesWithNuls": 7245.0
+      },
+      "native_exit": 0
+    },
+    {
+      "name": "literal-roundtrip",
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-é",
+        "PublishedBaselineRevision": "\"quoted\" trailing\\",
+        "FinalizeMetadataNow": false,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7183,
+        "CommandPayloadCharacters": 7090,
+        "CommandPayloadUtf8Bytes": 7092,
+        "ArgvUtf8BytesWithNuls": 7174.0
+      },
+      "native_exit": 0
+    },
+    {
+      "name": "early-parameter-refusal",
+      "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again.",
+      "native_exit": 1
+    }
+  ]
+}

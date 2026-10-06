@@ -1,0 +1,90 @@
+{
+  "platform": "Microsoft Windows NT 10.0.26200.0",
+  "powershell": "7.6.5",
+  "host": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+  "helperCharacters": 6577,
+  "helperUtf8Bytes": 6577,
+  "sourceSha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+  "callerStartLine": 1279,
+  "callerEndLine": 1300,
+  "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+  "cases": [
+    {
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "",
+        "PublishedBaselineRevision": "",
+        "FinalizeMetadataNow": false,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7216,
+        "CommandPayloadCharacters": 7060,
+        "CommandPayloadUtf8Bytes": 7061,
+        "ArgvUtf8BytesWithNuls": 7208.0
+      },
+      "name": "no-args-local",
+      "native_exit": 0
+    },
+    {
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "FinalizeMetadataNow": true,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7350,
+        "CommandPayloadCharacters": 7194,
+        "CommandPayloadUtf8Bytes": 7195,
+        "ArgvUtf8BytesWithNuls": 7342.0
+      },
+      "name": "current-finalization",
+      "native_exit": 0
+    },
+    {
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "FinalizeMetadataNow": true,
+        "ProposedPolicy": true,
+        "SelfTest": true,
+        "MetadataClassificationOnly": true,
+        "CommandLineCharacters": 7404,
+        "CommandPayloadCharacters": 7248,
+        "CommandPayloadUtf8Bytes": 7249,
+        "ArgvUtf8BytesWithNuls": 7396.0
+      },
+      "name": "proposed-combined-modes",
+      "native_exit": 0
+    },
+    {
+      "result": {
+        "Captured": "2000-01-02",
+        "Local": "2000-01-02",
+        "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-é",
+        "PublishedBaselineRevision": "\"quoted\" trailing\\",
+        "FinalizeMetadataNow": false,
+        "ProposedPolicy": false,
+        "SelfTest": false,
+        "MetadataClassificationOnly": false,
+        "CommandLineCharacters": 7334,
+        "CommandPayloadCharacters": 7176,
+        "CommandPayloadUtf8Bytes": 7178,
+        "ArgvUtf8BytesWithNuls": 7325.0
+      },
+      "name": "literal-roundtrip",
+      "native_exit": 0
+    },
+    {
+      "name": "early-parameter-refusal",
+      "native_exit": 1,
+      "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again."
+    }
+  ]
+}

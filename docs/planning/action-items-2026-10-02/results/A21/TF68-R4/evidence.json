@@ -1,0 +1,428 @@
+{
+  "captured_at_utc": "2026-10-06T02:46:41.009772+00:00",
+  "status": "R4 draft recommendation; no product mutation or aggregate run",
+  "finding": {
+    "id": "TF68-R4",
+    "comment": 4190960625,
+    "thread": "PRRT_kwDOSAZRhc6pTBjD",
+    "source": {
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "entry": "100644 blob a976b7f224b4e9df0064493e3ec2c5514e9b8046\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "bytes": 241436,
+      "index_sha256": "de2ee5e5f4152ca882bee83ac05c1d02e53479345311ad172c84b3899a9741bc",
+      "refs_sha256": "6ab2eae0d00cdd01b2b8f686c0b786665ffe37458075b1919d6fcbead9c955ee"
+    },
+    "validated_current_length_or_quoting_defect": false,
+    "separate_observation": "Bracket-bearing checker path prevents debugger clock breakpoints even in a direct in-process call. Reported independently to root; not caused or repaired by command serialization alone."
+  },
+  "native_probes": {
+    "windows": {
+      "native_exit": 0,
+      "runtime": "PowerShell 7.6.5",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R4\\probe.ps1",
+        "-Source",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R4\\source-SelfTest.ps1",
+        "-OutputDirectory",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R4\\windows"
+      ],
+      "result": {
+        "platform": "Microsoft Windows NT 10.0.26200.0",
+        "powershell": "7.6.5",
+        "host": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "helperCharacters": 6577,
+        "helperUtf8Bytes": 6577,
+        "sourceSha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+        "callerStartLine": 1279,
+        "callerEndLine": 1300,
+        "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+        "cases": [
+          {
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "",
+              "PublishedBaselineRevision": "",
+              "FinalizeMetadataNow": false,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7216,
+              "CommandPayloadCharacters": 7060,
+              "CommandPayloadUtf8Bytes": 7061,
+              "ArgvUtf8BytesWithNuls": 7208.0
+            },
+            "name": "no-args-local",
+            "native_exit": 0
+          },
+          {
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "FinalizeMetadataNow": true,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7350,
+              "CommandPayloadCharacters": 7194,
+              "CommandPayloadUtf8Bytes": 7195,
+              "ArgvUtf8BytesWithNuls": 7342.0
+            },
+            "name": "current-finalization",
+            "native_exit": 0
+          },
+          {
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "FinalizeMetadataNow": true,
+              "ProposedPolicy": true,
+              "SelfTest": true,
+              "MetadataClassificationOnly": true,
+              "CommandLineCharacters": 7404,
+              "CommandPayloadCharacters": 7248,
+              "CommandPayloadUtf8Bytes": 7249,
+              "ArgvUtf8BytesWithNuls": 7396.0
+            },
+            "name": "proposed-combined-modes",
+            "native_exit": 0
+          },
+          {
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-\u00e9",
+              "PublishedBaselineRevision": "\"quoted\" trailing\\",
+              "FinalizeMetadataNow": false,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7334,
+              "CommandPayloadCharacters": 7176,
+              "CommandPayloadUtf8Bytes": 7178,
+              "ArgvUtf8BytesWithNuls": 7325.0
+            },
+            "name": "literal-roundtrip",
+            "native_exit": 0
+          },
+          {
+            "name": "early-parameter-refusal",
+            "native_exit": 1,
+            "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again."
+          }
+        ]
+      }
+    },
+    "linux": {
+      "native_exit": 0,
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "network": "none",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/probe.ps1",
+        "-Source",
+        "/input/source-SelfTest.ps1",
+        "-OutputDirectory",
+        "/output"
+      ],
+      "result": {
+        "platform": "Unix 6.6.87.2",
+        "powershell": "7.6.3",
+        "host": "/opt/microsoft/powershell/7/pwsh",
+        "helperCharacters": 6577,
+        "helperUtf8Bytes": 6577,
+        "sourceSha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+        "callerStartLine": 1279,
+        "callerEndLine": 1300,
+        "scope": "Exact extracted helper and child caller; synthetic checker only; no full fixture or product tests",
+        "cases": [
+          {
+            "name": "no-args-local",
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "",
+              "PublishedBaselineRevision": "",
+              "FinalizeMetadataNow": false,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7065,
+              "CommandPayloadCharacters": 6974,
+              "CommandPayloadUtf8Bytes": 6975,
+              "ArgvUtf8BytesWithNuls": 7057.0
+            },
+            "native_exit": 0
+          },
+          {
+            "name": "current-finalization",
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "FinalizeMetadataNow": true,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7199,
+              "CommandPayloadCharacters": 7108,
+              "CommandPayloadUtf8Bytes": 7109,
+              "ArgvUtf8BytesWithNuls": 7191.0
+            },
+            "native_exit": 0
+          },
+          {
+            "name": "proposed-combined-modes",
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "PublishedBaselineRevision": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+              "FinalizeMetadataNow": true,
+              "ProposedPolicy": true,
+              "SelfTest": true,
+              "MetadataClassificationOnly": true,
+              "CommandLineCharacters": 7253,
+              "CommandPayloadCharacters": 7162,
+              "CommandPayloadUtf8Bytes": 7163,
+              "ArgvUtf8BytesWithNuls": 7245.0
+            },
+            "native_exit": 0
+          },
+          {
+            "name": "literal-roundtrip",
+            "result": {
+              "Captured": "2000-01-02",
+              "Local": "2000-01-02",
+              "InputRevision": "apostrophe ' dollar $ backtick ` semicolon; brackets[] unicode-\u00e9",
+              "PublishedBaselineRevision": "\"quoted\" trailing\\",
+              "FinalizeMetadataNow": false,
+              "ProposedPolicy": false,
+              "SelfTest": false,
+              "MetadataClassificationOnly": false,
+              "CommandLineCharacters": 7183,
+              "CommandPayloadCharacters": 7090,
+              "CommandPayloadUtf8Bytes": 7092,
+              "ArgvUtf8BytesWithNuls": 7174.0
+            },
+            "native_exit": 0
+          },
+          {
+            "name": "early-parameter-refusal",
+            "output": "Missing an argument for parameter 'InputRevision'. Specify a parameter of type 'System.String' and try again.",
+            "native_exit": 1
+          }
+        ]
+      },
+      "limits": {
+        "pagesize": 4096,
+        "arg_max": 2097152,
+        "rlimit_stack": [
+          8388608,
+          -1
+        ],
+        "environment_bytes": 811
+      }
+    }
+  },
+  "lengths": {
+    "helper_characters": 6577,
+    "windows_max_command_characters": 7404,
+    "windows_limit_including_nul": 32767,
+    "windows_headroom_after_nul": 25362,
+    "linux_max_command_argument_utf8_bytes": 7163,
+    "linux_per_argument_limit_including_nul": 131072,
+    "linux_headroom_after_nul": 123908,
+    "linux_arg_max": 2097152,
+    "linux_environment_bytes": 811
+  },
+  "scope_limits": [
+    "Exact immutable helper and invoke caller extracted by AST, synthetic checker; not a rerun of full author fixture",
+    "Stress switches are a strict superset of actual individual mode calls; revisions have their real fixed width",
+    "Measurements apply to retained source and observed paths/runtimes, not unlimited future helper growth or all path lengths",
+    "No Windows PowerShell 5.1 execution or hosted runner claim",
+    "No code or test change selected for the separate bracket observation"
+  ],
+  "primary_sources": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessw",
+    "https://man7.org/linux/man-pages/man2/execve.2.html",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.5",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/set-psbreakpoint?view=powershell-7.5"
+  ],
+  "rubric": {
+    "weights": {
+      "present_correctness": 30,
+      "debugging_usability": 20,
+      "clock_test_fidelity": 25,
+      "lifecycle_reliability": 20,
+      "maintenance": 5
+    },
+    "score_scale": "0 unusable, 5 material limitations, 10 strong current evidence; ordinal judgment, not empirical probabilities",
+    "options": [
+      {
+        "id": "A",
+        "name": "Keep current transport; evidence-backed refutation",
+        "scores": [
+          10,
+          8,
+          10,
+          10,
+          10
+        ],
+        "total": 96.0
+      },
+      {
+        "id": "B",
+        "name": "Keep transport and add measured length guard/regression",
+        "scores": [
+          9,
+          9,
+          10,
+          9,
+          8
+        ],
+        "total": 92.0
+      },
+      {
+        "id": "C",
+        "name": "Write helper once and dot-source from short Command",
+        "scores": [
+          9,
+          9,
+          9,
+          8,
+          8
+        ],
+        "total": 87.5
+      },
+      {
+        "id": "D",
+        "name": "Write complete parameterized File wrapper",
+        "scores": [
+          9,
+          10,
+          8,
+          8,
+          7
+        ],
+        "total": 86.5
+      },
+      {
+        "id": "E",
+        "name": "Use stdin Command transport",
+        "scores": [
+          8,
+          7,
+          7,
+          7,
+          8
+        ],
+        "total": 73.5
+      },
+      {
+        "id": "F",
+        "name": "Use EncodedCommand",
+        "scores": [
+          7,
+          6,
+          8,
+          8,
+          9
+        ],
+        "total": 73.5
+      },
+      {
+        "id": "G",
+        "name": "New tracked shared helper/module file",
+        "scores": [
+          9,
+          9,
+          9,
+          7,
+          5
+        ],
+        "total": 84.0
+      },
+      {
+        "id": "H",
+        "name": "Replace child with in-process runspace",
+        "scores": [
+          6,
+          7,
+          3,
+          7,
+          6
+        ],
+        "total": 56.5
+      },
+      {
+        "id": "I",
+        "name": "Remove clock or affected fixture coverage",
+        "scores": [
+          1,
+          2,
+          0,
+          6,
+          8
+        ],
+        "total": 23.0
+      }
+    ],
+    "recommended": "A",
+    "winning_score": 96,
+    "next_score": 92
+  },
+  "guard": {
+    "selftest_raw_bytes_equal": true,
+    "head_equal": true,
+    "index_equal": true,
+    "refs_equal": true,
+    "no_product_writes": true
+  },
+  "scratch_corrections": [
+    "Initial multi-line shell submission rejected during parsing before file creation; subsequent files written via apply_patch.",
+    "First probe used a mixed Windows path spelling; normalized with GetFullPath before meaningful path comparison.",
+    "A synthetic unknown argument was quoted as data by the real caller allowlist and therefore was not a meaningful parameter-refusal control. Replaced with missing value for real -InputRevision. Final control returns original parameter error and native exit 1."
+  ],
+  "artifacts": {
+    "build-evidence.py": "9d299ea646ef134d802bf34a0b64ec7d209de612809d2801d36f4fc478cf66eb",
+    "direct-bracket-result.json": "757185ca6d53386c9cc9a71ee716f45c8f9f78572a3d38d1edae3984e808601e",
+    "direct-bracket.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "direct-bracket.ps1": "b38fecdea7e5d201b5570989b59332350f3ef2ac45cd8725a59b0efdcbb40c29",
+    "linux-container.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "linux-probe.py": "6c283ff2eea169073a69666082cebb3700fc8c80815dc7ef60d687c2e6c30a81",
+    "prepare.py": "976b591d30cdc54c8510673b2de8a70d2dd127961515963bf26bf130218e786b",
+    "probe-bracket-path.ps1": "ca4c0fd79cb3142b83e921a5242b1e33081439a720ba031ab0886f0d21c8ecaf",
+    "probe.ps1": "4a168fa855f8ab7f4af1654aa9243a27f80a326f4ad16885cab5d5fb03b6843a",
+    "source-SelfTest.ps1": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "source.json": "5a32fbd945e758e90a2859ac4d600d1d2d847a3b79be194585218baea92e7c00",
+    "windows-bracket-path.log": "c856927069f931415fedcb3fdc0d42cc141a1b1a4a7e7d055690e914ece25871",
+    "windows-invalid-scratch-control.log": "6044204b44b6272c2490fe90b03c4756c768732aa0be57aaa4b6a9eab4a703ef",
+    "windows-mixed-path-scratch.log": "c856927069f931415fedcb3fdc0d42cc141a1b1a4a7e7d055690e914ece25871",
+    "windows.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "linux\\limits.json": "65c788c77514f8052040512d30b7bb8da66199d49c4fb7604cef14045ce34cf3",
+    "linux\\native-result.json": "1acaad66964321b8038ea860759b227a0ead54364636bca6281609a3242d79c4",
+    "linux\\probe-result.json": "55fb3e4b400781b8a5f0268960cbcda0da35706522b7fa71acda8f667202ada0",
+    "linux\\probe.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "windows\\probe-result.json": "e96fc9bc8fee02bcd3ef23a3bc24a58ae2e93cce5192a753e9a7985c97e35808",
+    "windows\\path with apostrophe ' dollar $ backtick ` semi; brackets unicode-\u00e9\\checker.ps1": "e86141c3cf73e8d86e166fe3b5c83823574dda5ecd936a20d04e1797d9ac86cd",
+    "windows\\path with apostrophe ' dollar $ backtick ` semi; [brackets] unicode-\u00e9\\checker.ps1": "e86141c3cf73e8d86e166fe3b5c83823574dda5ecd936a20d04e1797d9ac86cd",
+    "linux\\path with apostrophe ' dollar $ backtick ` semi; brackets unicode-\u00e9\\checker.ps1": "e86141c3cf73e8d86e166fe3b5c83823574dda5ecd936a20d04e1797d9ac86cd"
+  }
+}
