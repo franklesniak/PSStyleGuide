@@ -1,0 +1,292 @@
+diff --git a/.github/workflows/Test-AgentInstructions.SelfTest.ps1 b/.github/workflows/Test-AgentInstructions.SelfTest.ps1
+index 9918aaa..f9e2667 100644
+--- a/.github/workflows/Test-AgentInstructions.SelfTest.ps1
++++ b/.github/workflows/Test-AgentInstructions.SelfTest.ps1
+@@ -33,7 +33,7 @@
+ # None. The script throws when a self-test fails.
+ #
+ # .NOTES
+-# Version: 1.8.20261005.0
++# Version: 1.9.20261006.0
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([void])]
+@@ -2497,7 +2497,7 @@ function Assert-AgentSetupSelfTest {
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.0.20261005.0
++    # Version: 1.1.20261006.0
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([void])]
+     param([Parameter(Mandatory)][string] $RepositoryRootPath)
+@@ -2569,6 +2569,63 @@ function Assert-AgentSetupSelfTest {
+         ($hashtableContent['.pre-commit-config.yaml'] + "`n        additional_dependencies: []`n") 'separate dependency environment'
+     & $scriptblockReject 'extra hook group' '.pre-commit-config.yaml' `
+         ($hashtableContent['.pre-commit-config.yaml'] + "`n  - repo: local`n    hooks: []`n") 'two local groups'
++    $strConfig = $hashtableContent['.pre-commit-config.yaml'].Replace("`r`n", "`n")
++    $arrCompiledHooks = @([regex]::Matches($strConfig,
++            '(?ms)^      - id: no-tracked-compiled-python\n.*?(?=^      - id:|^  - repo:|\z)'))
++    if ($arrCompiledHooks.Count -ne 1) { throw 'Compiled-hook mutation fixture is not unique.' }
++    $strCompiledHook = $arrCompiledHooks[0].Value
++    & $scriptblockReject 'missing compiled hook' '.pre-commit-config.yaml' `
++        ($strConfig.Replace($strCompiledHook, '')) 'compiled-Python fail hook'
++    & $scriptblockReject 'duplicate compiled hook' '.pre-commit-config.yaml' `
++        ($strConfig + "`n$strCompiledHook") 'compiled-Python fail hook'
++    & $scriptblockReject 'compiled hook case alias' '.pre-commit-config.yaml' `
++        ($strConfig.Replace('id: no-tracked-compiled-python', 'id: NO-TRACKED-COMPILED-PYTHON')) 'compiled-Python fail hook'
++    & $scriptblockReject 'additional compiled hook case alias' '.pre-commit-config.yaml' `
++        ($strConfig + "`n" + $strCompiledHook.Replace('id: no-tracked-compiled-python', 'id: NO-TRACKED-COMPILED-PYTHON')) `
++        'compiled-Python fail hook'
++    foreach ($arrNearMiss in @(
++            ,@('language: fail', 'language: system')
++            ,@('(?i)(^|/)__pycache__/|\.py[cod]$', '(^|/)__pycache__/|\.py[cod]$')
++            ,@('(?i)(^|/)__pycache__/|\.py[cod]$', '(?i)(^|/)__pycache__/|\.py[co]$')
++            ,@('(?i)(^|/)__pycache__/|\.py[cod]$', '(?i)\.py[cod]$')
++            ,@('reject tracked compiled Python artifacts', 'compiled Python check')
++            ,@('untrack files.', 'ignore files.')
++            ,@('        language: fail', "        language: fail`n        language: fail")
++        )) {
++        & $scriptblockReject ('compiled hook ' + $arrNearMiss[0]) '.pre-commit-config.yaml' `
++            ($strConfig.Replace($strCompiledHook, $strCompiledHook.Replace($arrNearMiss[0], $arrNearMiss[1]))) `
++            'compiled-Python fail hook'
++    }
++    foreach ($strOverride in @(
++            '        exclude: .*'
++            "        types:`n          - python"
++            "        types_or:`n          - python"
++            "        stages:`n          - manual"
++            '        always_run: true'
++            '        pass_filenames: false'
++            '        files: ^source\.py$'
++        )) {
++        & $scriptblockReject ('compiled hook override ' + $strOverride) '.pre-commit-config.yaml' `
++            ($strConfig.Replace($strCompiledHook, $strCompiledHook.TrimEnd([char]10) + "`n$strOverride`n")) `
++            'compiled-Python fail hook'
++    }
++    foreach ($strOverride in @(
++            'files: ^docs/'
++            'exclude: .*'
++            "'exclude': .*"
++            "default_stages:`n  - manual"
++            "default_install_hook_types:`n  - manual"
++        )) {
++        & $scriptblockReject ('global compiled-hook override ' + $strOverride) '.pre-commit-config.yaml' `
++            ("$strOverride`n$strConfig") 'reviewed root mapping'
++    }
++    $strIgnore = $hashtableContent['.gitignore'].Replace("`r`n", "`n")
++    foreach ($strRequiredRule in @('__pycache__/', '*.py[cod]')) {
++        & $scriptblockReject ('missing ignore rule ' + $strRequiredRule) '.gitignore' `
++            ($strIgnore.Replace($strRequiredRule, '# disabled compiled-artifact rule')) 'compiled-artifact rule'
++        & $scriptblockReject ('duplicate ignore rule ' + $strRequiredRule) '.gitignore' `
++            ($strIgnore + "$strRequiredRule`n") 'compiled-artifact rule'
++    }
+     $strSetup = $hashtableContent['.github/workflows/copilot-setup-steps.yml']
+     foreach ($strProjection in @(
+             'GITHUB_TOKEN: value', 'GH_TOKEN: value', 'ACTIONS_RUNTIME_TOKEN: value'
+@@ -2657,30 +2714,81 @@ function Assert-AgentSetupSelfTest {
+             & git -C $strFixtureRoot -c core.autocrlf=false add -- $strPath
+             if ($LASTEXITCODE -ne 0) { throw 'Setup fixture restoration failed.' }
+         }
+-        foreach ($strMissing in @('requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1')) {
++        foreach ($strMissing in @('requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1', '.gitignore')) {
+             $strTarget = Join-Path $strFixtureRoot $strMissing
+             [IO.File]::Delete($strTarget)
+             $boolRejected = $false
+             try {
+                 $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+-            } catch { $boolRejected = $true }
++            } catch {
++                if ($strMissing -ceq '.gitignore' -and
++                    -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
++                $boolRejected = $true
++            }
+             if (-not $boolRejected) { throw "Required installed setup input was silently omitted: $strMissing" }
+             [IO.File]::WriteAllText($strTarget, $hashtableContent[$strMissing], $objEncoding)
+         }
+-        $strBoundPath = '.github/workflows/copilot-setup-steps.yml'
+-        $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
+-        if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw 'Setup workflow read bound changed.' }
+-        foreach ($intExtra in @(0, 1)) {
+-            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
+-            $boolRejected = $false
+-            try {
+-                $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+-                if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
+-            } catch {
+-                if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed') { throw }
+-                $boolRejected = $true
++        [IO.File]::Delete((Join-Path $strFixtureRoot '.gitignore'))
++        & git -C $strFixtureRoot add --all
++        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture indexing failed.' }
++        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
++            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m missing-ignore
++        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture revision failed.' }
++        $strMissingRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
++        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture identity failed.' }
++        $boolRejected = $false
++        try {
++            $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
++                -Revision $strMissingRevision -StagedInputPaths $setEmpty
++        } catch {
++            if (-not $_.Exception.Message.Contains('Git revision input is not one regular 100644 blob:', [StringComparison]::Ordinal) -or
++                -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
++            $boolRejected = $true
++        }
++        if (-not $boolRejected) { throw 'Missing immutable ignore input was accepted.' }
++        [IO.File]::WriteAllText((Join-Path $strFixtureRoot '.gitignore'), $hashtableContent['.gitignore'], $objEncoding)
++        & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
++        if ($LASTEXITCODE -ne 0) { throw 'Ignore fixture restoration indexing failed.' }
++        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
++            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m restore-ignore
++        if ($LASTEXITCODE -ne 0) { throw 'Ignore fixture restoration revision failed.' }
++        foreach ($strBoundPath in @('.github/workflows/copilot-setup-steps.yml', '.gitignore')) {
++            $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
++            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw "Setup input read bound changed: $strBoundPath" }
++            foreach ($intExtra in @(0, 1)) {
++                [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
++                $boolRejected = $false
++                try {
++                    $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
++                    if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
++                } catch {
++                    if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
++                        -not $_.Exception.Message.Contains($strBoundPath, [StringComparison]::Ordinal)) { throw }
++                    $boolRejected = $true
++                }
++                if ($intExtra -eq 1 -and -not $boolRejected) { throw "One-byte oversized setup input was accepted: $strBoundPath" }
++                if ($strBoundPath -ceq '.gitignore') {
++                    & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
++                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture indexing failed.' }
++                    & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
++                        -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m bounded-ignore
++                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture revision failed.' }
++                    $strBoundRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
++                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture identity failed.' }
++                    $boolRevisionRejected = $false
++                    try {
++                        $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
++                            -Revision $strBoundRevision -StagedInputPaths $setEmpty
++                        if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Immutable ignore bound did not preserve bytes.' }
++                    } catch {
++                        if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
++                            -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
++                        $boolRevisionRejected = $true
++                    }
++                    if ($intExtra -eq 1 -and -not $boolRevisionRejected) { throw 'One-byte oversized immutable ignore input was accepted.' }
++                }
+             }
+-            if ($intExtra -eq 1 -and -not $boolRejected) { throw 'One-byte oversized setup input was accepted.' }
++            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), $hashtableContent[$strBoundPath], $objEncoding)
+         }
+     } finally {
+         if ([IO.Path]::GetDirectoryName($strFixtureRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
+diff --git a/.github/workflows/Test-AgentInstructions.ps1 b/.github/workflows/Test-AgentInstructions.ps1
+index 7ee712e..a0a1037 100644
+--- a/.github/workflows/Test-AgentInstructions.ps1
++++ b/.github/workflows/Test-AgentInstructions.ps1
+@@ -23,7 +23,7 @@
+ #
+ # .NOTES
+ # Positional parameters are not supported.
+-# Version: 1.18.20261005.0
++# Version: 1.19.20261006.0
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([string])]
+@@ -346,7 +346,7 @@ function Get-AgentSetupInputSpec {
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; there are no parameters.
+-    # Version: 1.0.20261003.0
++    # Version: 1.1.20261006.0
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([pscustomobject])]
+     param()
+@@ -361,6 +361,7 @@ function Get-AgentSetupInputSpec {
+             ,@('.github/workflows/install-husky.mjs', 16384)
+             ,@('.husky/pre-commit', 16384)
+             ,@('.pre-commit-config.yaml', 16384)
++            ,@('.gitignore', 65536)
+             ,@('.github/workflows/scripts-README.md', 32768)
+             ,@('requirements-dev.txt', 16384)
+         )) {
+@@ -584,7 +585,7 @@ function Get-AgentSetupContractFailure {
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.0.20261003.1
++    # Version: 1.1.20261006.0
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([string])]
+     param([Parameter(Mandatory)][hashtable] $Content)
+@@ -604,6 +605,10 @@ function Get-AgentSetupContractFailure {
+         } else { $intPrevious = $arrMatches[0].Index }
+     }
+     $strConfig = $Content['.pre-commit-config.yaml'].Replace("`r`n", "`n")
++    if ([regex]::Matches($strConfig, '(?m)^repos:$').Count -ne 1 -or
++        $strConfig -cmatch '(?m)^(?!#|repos:$)[^\s]') {
++        Write-Output 'Pre-commit must retain only the reviewed root mapping without global selectors or stage overrides.'
++    }
+     $arrRepositories = @([regex]::Matches($strConfig,
+             '(?ms)^  - repo: (?<Name>[^\n]+)\n(?<Body>.*?)(?=^  - repo:|\z)'))
+     $arrLocal = @($arrRepositories | Where-Object { $_.Groups['Name'].Value -ceq 'local' })
+@@ -678,6 +683,29 @@ function Get-AgentSetupContractFailure {
+             Write-Output "Hook must retain its reviewed activation and selector: $($arrRequiredLine[0])"
+         }
+     }
++    $arrCompiledHooks = @([regex]::Matches($strConfig,
++            '(?ims)^      - id: no-tracked-compiled-python\n(?<Body>.*?)(?=^      - id:|^  - repo:|\z)'))
++    $strExpectedCompiledHook = @(
++        '      - id: no-tracked-compiled-python'
++        '        name: reject tracked compiled Python artifacts'
++        '        language: fail'
++        '        entry: >-'
++        '          Compiled Python artifacts must not be committed: bytecode (.pyc, .pyo,'
++        '          __pycache__) or extension modules (.pyd) are interpreter- and'
++        '          platform-specific. Remove the tracked artifact; .gitignore does not'
++        '          untrack files.'
++        '        files: ''(?i)(^|/)__pycache__/|\.py[cod]$'''
++    ) -join "`n"
++    if ($arrCompiledHooks.Count -ne 1 -or
++        $arrCompiledHooks[0].Value.TrimEnd([char]10) -cne $strExpectedCompiledHook) {
++        Write-Output 'Pre-commit requires one exact compiled-Python fail hook with its reviewed filename pattern and default activation.'
++    }
++    $strIgnore = ([string]$Content['.gitignore']).Replace("`r`n", "`n")
++    foreach ($strRequiredIgnoreLine in @('__pycache__/', '*.py[cod]')) {
++        if ([regex]::Matches($strIgnore, '(?m)^' + [regex]::Escape($strRequiredIgnoreLine) + '$').Count -ne 1) {
++            Write-Output "Git ignore must contain one compiled-artifact rule: $strRequiredIgnoreLine"
++        }
++    }
+     $strSetup = $Content['.github/workflows/copilot-setup-steps.yml']
+     if ($strSetup -match '(?m)^[ \t]+(?:-[ \t]*)?uses[ \t]*:') {
+         Write-Output 'Copilot setup must not execute an action.'
+diff --git a/.gitignore b/.gitignore
+index 926d96e..1dc3dae 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -17,3 +17,7 @@ yarn-error.log*
+ 
+ # Optional eslint cache
+ .eslintcache
++
++# Local compiled Python artifacts must remain untracked.
++__pycache__/
++*.py[cod]
+diff --git a/.pre-commit-config.yaml b/.pre-commit-config.yaml
+index f0fcbb1..49ed30b 100644
+--- a/.pre-commit-config.yaml
++++ b/.pre-commit-config.yaml
+@@ -163,3 +163,12 @@ repos:
+         language: system
+         pass_filenames: false
+         always_run: true
++      - id: no-tracked-compiled-python
++        name: reject tracked compiled Python artifacts
++        language: fail
++        entry: >-
++          Compiled Python artifacts must not be committed: bytecode (.pyc, .pyo,
++          __pycache__) or extension modules (.pyd) are interpreter- and
++          platform-specific. Remove the tracked artifact; .gitignore does not
++          untrack files.
++        files: '(?i)(^|/)__pycache__/|\.py[cod]$'

@@ -1,0 +1,55 @@
+{
+  "status": "selected_local_source_repair_only",
+  "recorded_at_utc": "2026-10-06T21:55:38.065232+00:00",
+  "selected": [
+    {
+      "finding": "B99-PROVISIONAL-1",
+      "option": "C",
+      "score": 97.0
+    },
+    {
+      "finding": "B99-PROVISIONAL-2",
+      "option": "D",
+      "score": 98.4
+    }
+  ],
+  "decision_evidence_sha256": "ec56ff4e8cf6a0ee44bf0f94bc7ee3354b48ba7235169c4659cd2db6966b5904",
+  "full_proposals_read": true,
+  "displayed_options_rubrics_tables_controlled_steps_before_edit": true,
+  "verified_reference_hashes": 18,
+  "verified_product_hashes": 4,
+  "recomputed_all_scores": true,
+  "selection": "Finite active-envelope proof for the existing agent-instruction-contract hook plus one complete target-inventory filename guard before any classification-only return. Remove prospective native B99 hook; preserve original eleven hooks and required ignore policy.",
+  "supersedes_prospectively": "Earlier native fail-hook mechanism and unbound twelve-row D98 profile; preserve all historical source, decisions, tests and failed evidence without relabeling.",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "allowed_paths": [
+    ".pre-commit-config.yaml",
+    ".gitignore",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "writer": "a06_conversion_cold_packet",
+  "no_descendants": true,
+  "source_repair_released": true,
+  "candidate_tests_released": false,
+  "commit_or_product_publication_released": false,
+  "source_boundary": "D93.4 unchanged: integrate semantically with genuine accepted PS235 main before final candidate validation, preserving all optional-reader/parser/metadata/security changes.",
+  "PS235_CI_hold_unchanged": true,
+  "freeze_writer_before_PS235_repair": true,
+  "qualification_obligations": [
+    "Native parser parity and meaningful configuration structure mutations",
+    "Actual main invocation across index/exact H, Git modes and absent payload states",
+    "All established B/H endpoint modes and current workflow callers",
+    "Qualified Windows/Linux affected tests, parser/PSSA, one eleven-Passed-row aggregate, independent final quality, remote review/CI and paired acceptance"
+  ],
+  "counters_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "previous_turn_classification": "no_progress_status_only; revalidated and selected next safe implementation action"
+}

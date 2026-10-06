@@ -1,0 +1,184 @@
+{
+  "status": "PRIVATE_GIT_INVENTORY_CHARACTERIZATION_PASS",
+  "recorded_at": "2026-10-06T21:46:17.529418+00:00",
+  "git_version": "git version 2.55.0.windows.5",
+  "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\feedback-native-inventory\\fixture",
+  "revision": "59dd4e44e0a35fe3b207bbdfc4ca8490db3e24dd",
+  "tracked_entries": 5,
+  "git_modes": [
+    "100644",
+    "100755",
+    "120000",
+    "160000"
+  ],
+  "all_working_tree_payloads_absent": true,
+  "index_and_revision_name_inventory_identical": true,
+  "filename_pattern_matching_names": [
+    "regular.pyc",
+    "executable.pyo",
+    "link.pyd",
+    "pkg/__pycache__/submodule"
+  ],
+  "nonmatching_name": "safe.py",
+  "candidate_executed": false,
+  "product_hook_executed": false,
+  "acceptance_claim": false,
+  "limit": "Proves native Git inventory semantics for absent paths/modes, not the future validator enforcement or platform acceptance. Scratch hooks disabled only for inert fixture commit; product controls untouched.",
+  "calls": [
+    {
+      "args": [
+        "--version"
+      ],
+      "exit": 0,
+      "stdout": "git version 2.55.0.windows.5\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "init",
+        "--quiet",
+        "--template=",
+        "."
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hash-object",
+        "-w",
+        "--stdin"
+      ],
+      "exit": 0,
+      "stdout": "d47f7c7aea6ca611e69cf3f7fc47863a4d336f73\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "hash-object",
+        "-w",
+        "--stdin"
+      ],
+      "exit": 0,
+      "stdout": "97a69742bbe49b777941d65db33f605030c3dd34\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        "100644,d47f7c7aea6ca611e69cf3f7fc47863a4d336f73,regular.pyc"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        "100755,d47f7c7aea6ca611e69cf3f7fc47863a4d336f73,executable.pyo"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        "120000,97a69742bbe49b777941d65db33f605030c3dd34,link.pyd"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        "160000,98177628b7bc02c646724bfc8aa0fd73fed0cd24,pkg/__pycache__/submodule"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "update-index",
+        "--add",
+        "--cacheinfo",
+        "100644,d47f7c7aea6ca611e69cf3f7fc47863a4d336f73,safe.py"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "ls-files",
+        "--cached",
+        "-z"
+      ],
+      "exit": 0,
+      "stdout": "executable.pyo\u0000link.pyd\u0000pkg/__pycache__/submodule\u0000regular.pyc\u0000safe.py\u0000",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "-c",
+        "core.hooksPath=/dev/null",
+        "-c",
+        "commit.gpgsign=false",
+        "-c",
+        "user.name=Fixture",
+        "-c",
+        "user.email=fixture@example.invalid",
+        "commit",
+        "--quiet",
+        "-m",
+        "Inert tracked-name fixture"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "59dd4e44e0a35fe3b207bbdfc4ca8490db3e24dd\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "ls-tree",
+        "-r",
+        "-z",
+        "--name-only",
+        "59dd4e44e0a35fe3b207bbdfc4ca8490db3e24dd"
+      ],
+      "exit": 0,
+      "stdout": "executable.pyo\u0000link.pyd\u0000pkg/__pycache__/submodule\u0000regular.pyc\u0000safe.py\u0000",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "ls-tree",
+        "-r",
+        "-z",
+        "59dd4e44e0a35fe3b207bbdfc4ca8490db3e24dd"
+      ],
+      "exit": 0,
+      "stdout": "100755 blob d47f7c7aea6ca611e69cf3f7fc47863a4d336f73\texecutable.pyo\u0000120000 blob 97a69742bbe49b777941d65db33f605030c3dd34\tlink.pyd\u0000160000 commit 98177628b7bc02c646724bfc8aa0fd73fed0cd24\tpkg/__pycache__/submodule\u0000100644 blob d47f7c7aea6ca611e69cf3f7fc47863a4d336f73\tregular.pyc\u0000100644 blob d47f7c7aea6ca611e69cf3f7fc47863a4d336f73\tsafe.py\u0000",
+      "stderr": ""
+    }
+  ]
+}

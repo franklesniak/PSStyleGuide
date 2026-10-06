@@ -1,0 +1,202 @@
+{
+  "status": "PROVISIONAL_SOURCE_REVIEW_TWO_MATERIAL_CONCERNS_NO_ACCEPTANCE",
+  "recorded_at_utc": "2026-10-06T21:39:34.294135+00:00",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "source": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "base_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "frozen_and_worktree_sha256": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b",
+      "bytes": 5839,
+      "base_prefix_preserved": true
+    },
+    {
+      "path": ".gitignore",
+      "base_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "frozen_and_worktree_sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370,
+      "base_prefix_preserved": true
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "base_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "frozen_and_worktree_sha256": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
+      "bytes": 483857,
+      "base_prefix_preserved": null
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "base_sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+      "frozen_and_worktree_sha256": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
+      "bytes": 237420,
+      "base_prefix_preserved": null
+    }
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\HANDOFF.md",
+      "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+      "bytes": 4401
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\evidence.json",
+      "sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+      "bytes": 28160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-only.patch",
+      "sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+      "bytes": 17691
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-release-state.json",
+      "sha256": "2a88421074ee02aeb579857cb9c71f623cb9669c296c7a5fc68aa731ebde5a57",
+      "bytes": 10079
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source\\.pre-commit-config.yaml",
+      "sha256": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b",
+      "bytes": 5839
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source\\.gitignore",
+      "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
+      "bytes": 483857
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
+      "bytes": 237420
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\research-hook-applicability.md",
+      "sha256": "7bc9167bd59641e32d5f52b3f02834204ab51e49157f5898efde2b3f4a5cec2c",
+      "bytes": 17883
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\compact-cases.json",
+      "sha256": "19a6a5075b377466e9d8b7b682657e21a76f6322b57c1d1f1faaca3e1c67f599",
+      "bytes": 42275
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A18-research-readiness-20261005\\hook-applicability\\selected-B99-native-readiness\\hook-block.proposed.yaml",
+      "sha256": "b682208d3aa19ff2f4d700f75953ea1bdb2e1cf6ff2ac02910bcd2450ee2c248",
+      "bytes": 441
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-current-readiness-20261006\\profile-preparation\\README.md",
+      "sha256": "56b0bf385894d63630e625b8dca504674fd9c0debc6c65e2dc1846ecd739f506",
+      "bytes": 4030
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit\\clientlib.py",
+      "sha256": "074619194fa0b2a7d4d7599f936b19abd8185340747c2d8343070ba8599fb85d",
+      "bytes": 16815
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit\\commands\\run.py",
+      "sha256": "65a67f03048e3dfbe864d30acd2e0c2ebfec07cd80b442dbf399a6b1247b5693",
+      "bytes": 14163
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit\\languages\\fail.py",
+      "sha256": "e76851c19632d2cf480ae07e953df6d73e901139c67305cc10c376e3fe6ada9e",
+      "bytes": 685
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit\\git.py",
+      "sha256": "1ab2faedf9642929fd1f44c158824a7498d8680a4b8ff38bbf86a35142799732",
+      "bytes": 8544
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\identify\\identify.py",
+      "sha256": "ced105a6e0da4c1273c8f4a7164aa79ad21b65b6f317b9d14ba7adb2077aab9c",
+      "bytes": 7916
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Lib\\site-packages\\pre_commit-4.6.2.dist-info\\METADATA",
+      "sha256": "9bc6183a5087af76ef837daba7a8eda0ba2d7b75dfeccfdaee0fe3687dd1905b",
+      "bytes": 1222
+    }
+  ],
+  "findings": [
+    {
+      "id": "B99-PROVISIONAL-1",
+      "priority": "P2",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        686,
+        701
+      ],
+      "property": "Exact raw block is not bound to active local hooks sequence",
+      "counterexample": "Insert four-space description: | immediately before unchanged six-space B99 block at config166",
+      "evidence_kind": "source tracing; native case unexecuted",
+      "decision_scope": "finite B99 admission and focused mutation",
+      "exact_insertion": {
+        "before_config_line": 166,
+        "text": "    description: |\n",
+        "all_existing_B99_lines_unchanged": true
+      }
+    },
+    {
+      "id": "B99-PROVISIONAL-2",
+      "priority": "P2",
+      "path": ".pre-commit-config.yaml",
+      "lines": [
+        166,
+        174
+      ],
+      "property": "Omitted types defaults to file; matching symlink/directory tags do not reach fail hook",
+      "counterexample": "Tracked native symlink module.pyc or pkg/__pycache__/entry; existing matching-name gitlink directory",
+      "evidence_kind": "pinned native source inspection; no fixture executed",
+      "scope_interpretation": "Selected filename-wide wording lacks regular-only exception; narrower scope requires explicit same-decision disposition",
+      "prior_cases_modes": [
+        "100644"
+      ],
+      "decision_scope": "revisit B99 applicability and D98 contract; do not assume package-byte/native execution proof",
+      "canonical_contract_lines": [
+        30,
+        48,
+        50,
+        78,
+        86
+      ],
+      "D98_inventory_contract_line": 7
+    }
+  ],
+  "bindings": {
+    "expected_handoff_patch_evidence_hashes_verified": true,
+    "archived_release_reference_verified": true,
+    "index_sha256_unchanged": "d0ac0d49dfa211e8152be47ad3e130d6440ce88afbad9e1c78db5e464ece6a24",
+    "status": " M .github/workflows/Test-AgentInstructions.SelfTest.ps1\n M .github/workflows/Test-AgentInstructions.ps1\n M .gitignore\n M .pre-commit-config.yaml\n",
+    "bystander_census": "reuse root77/73 census; not repeated"
+  },
+  "scope_limits": {
+    "executed_tests": false,
+    "candidate_or_dependency_imports": false,
+    "native_reproduction": false,
+    "parser_PSSA": false,
+    "network": false,
+    "git_mutation": false,
+    "future_acceptance": false,
+    "selected_design_changed": false
+  },
+  "reused_native_cases": {
+    "count_per_platform": 29,
+    "recorded_modes": [
+      "100644"
+    ],
+    "source_results": {
+      "windows_sha256": "72b2d621c091f79805229d229642200e658be3e183e65e8c5a4b4f44b00d7c1f",
+      "linux_sha256": "93bab638182fbb986cc87e897bd7dde22c6b9846f26123b38b3d2fb4e0a12e77"
+    },
+    "scope": "regular staged filename semantics only"
+  },
+  "report_sha256": "ef13c3838920e93fc52fc36e81760414dad64d9480f63402fd50b1228a46a841"
+}

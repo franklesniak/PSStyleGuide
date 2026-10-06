@@ -1,0 +1,43 @@
+{
+  "status": "PRIVATE_NATIVE_CONFIG_MASKING_REPRODUCED",
+  "recorded_at": "2026-10-06T21:47:48.783222+00:00",
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "pre_commit": "4.6.2",
+  "clientlib_sha256": "074619194fa0b2a7d4d7599f936b19abd8185340747c2d8343070ba8599fb85d",
+  "original_actual_hook_ids": [
+    "check-json",
+    "check-yaml",
+    "end-of-file-fixer",
+    "trailing-whitespace",
+    "yamllint",
+    "actionlint",
+    "check-dependabot",
+    "check-github-workflows",
+    "staged-markdown",
+    "workflow-policy-contract",
+    "agent-instruction-contract",
+    "no-tracked-compiled-python"
+  ],
+  "masked_actual_hook_ids": [
+    "check-json",
+    "check-yaml",
+    "end-of-file-fixer",
+    "trailing-whitespace",
+    "yamllint",
+    "actionlint",
+    "check-dependabot",
+    "check-github-workflows",
+    "staged-markdown",
+    "workflow-policy-contract",
+    "agent-instruction-contract"
+  ],
+  "both_pass_native_schema": true,
+  "warning": "Unexpected key(s) present on local: description\n",
+  "masking_change": "Insert four-space description: | before exact B99 tail.",
+  "candidate_validator_executed": false,
+  "hooks_executed": false,
+  "dependency_install": false,
+  "native_profile_qualified": false,
+  "network_requested": false,
+  "limit": "Native schema/data-loading reproduction only; no hook, payload, PowerShell candidate or acceptance test executed. No fresh whole-environment package attestation."
+}

@@ -1,5 +1,5 @@
 {
-  "status": "selected_two_findings_local_source_repair_released",
+  "status": "released_uncommitted_source_only",
   "created_at": "2026-10-06T21:24:16.646475+00:00",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide",
   "branch": "codex/no-tracked-compiled-python",
@@ -27,7 +27,7 @@
     "A07": 6,
     "cap": 12
   },
-  "next_action": "One author implements P1 C97.0 plus P2 D98.4 in allowed source only; return frozen versioned patch/evidence for root review. No candidate tests, Git staging/commit/publication, dependency execution or accepted-main substitution.",
+  "next_action": "Writer prepares only selected B99 delta; preserve all bystanders and no test/install/commit/publication.",
   "branch_command_exit": 0,
   "observed_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
   "observed_branch": "codex/no-tracked-compiled-python",
@@ -111,87 +111,5 @@
     "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
     "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
   },
-  "updated_at": "2026-10-06T21:55:38.065232+00:00",
-  "source_writer_stopped": false,
-  "candidate_sha256": {
-    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
-    ".github/workflows/Test-AgentInstructions.ps1": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
-    ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
-    ".pre-commit-config.yaml": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b"
-  },
-  "bystanders_unchanged": 73,
-  "source_index_unchanged": true,
-  "handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\HANDOFF.md",
-  "handoff_sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
-  "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\evidence.json",
-  "evidence_sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
-  "recovery_patch": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-only.patch",
-  "recovery_patch_sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
-  "recovery_source_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\frozen-source",
-  "release_state_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\implementation\\source-release-state.json",
-  "root_read_all_four_diffs": true,
-  "provisional_source_review": {
-    "status": "PROVISIONAL_SOURCE_REVIEW_TWO_MATERIAL_CONCERNS_NO_ACCEPTANCE",
-    "worker": "ps_carryback_final_quality",
-    "not_final_acceptance": true,
-    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\provisional-review\\REPORT.md",
-    "report_sha256": "ef13c3838920e93fc52fc36e81760414dad64d9480f63402fd50b1228a46a841",
-    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\provisional-review\\evidence.json",
-    "evidence_sha256": "144c82f4a501bd11357f347157e76b71499a111c273104bbdaabc82d316ffdec",
-    "root_sampled_references": 5,
-    "root_read_full_report": true
-  },
-  "findings": [
-    {
-      "id": "B99-PROVISIONAL-1",
-      "priority": "P2",
-      "path": ".github/workflows/Test-AgentInstructions.ps1",
-      "lines": [
-        686,
-        701
-      ],
-      "property": "Exact raw block is not bound to active local hooks sequence",
-      "counterexample": "Insert four-space description: | immediately before unchanged six-space B99 block at config166",
-      "evidence_kind": "Native configuration-data loading reproduced inactive hook; candidate bypass remains source-traced.",
-      "decision_scope": "Finite active-envelope proof for existing always-run agent-instruction-contract hook",
-      "exact_insertion": {
-        "before_config_line": 166,
-        "text": "    description: |\n",
-        "all_existing_B99_lines_unchanged": true
-      },
-      "status": "validated_selected_repair_released_not_implemented",
-      "native_probe_executed": true
-    },
-    {
-      "id": "B99-PROVISIONAL-2",
-      "priority": "P2",
-      "path": ".pre-commit-config.yaml",
-      "lines": [
-        166,
-        174
-      ],
-      "property": "Omitted types defaults to file; matching symlink/directory tags do not reach fail hook",
-      "counterexample": "Tracked native symlink module.pyc or pkg/__pycache__/entry; existing matching-name gitlink directory",
-      "evidence_kind": "Pinned native classifier source plus private complete Git index/revision inventory characterization; candidate enforcement unexecuted.",
-      "scope_interpretation": "Selected filename-wide wording lacks regular-only exception; narrower scope requires explicit same-decision disposition",
-      "prior_cases_modes": [
-        "100644"
-      ],
-      "decision_scope": "Complete target-name enforcement in existing validator, preserving filename-wide scope",
-      "canonical_contract_lines": [
-        30,
-        48,
-        50,
-        78,
-        86
-      ],
-      "D98_inventory_contract_line": 7,
-      "status": "validated_selected_repair_released_not_implemented",
-      "native_probe_executed": true
-    }
-  ],
-  "decision_worker": "a06_conversion_cold_packet",
-  "repair_released": true,
-  "finding_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
-  "finding_decision_sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961"
+  "updated_at": "2026-10-06T21:24:19.554517+00:00"
 }

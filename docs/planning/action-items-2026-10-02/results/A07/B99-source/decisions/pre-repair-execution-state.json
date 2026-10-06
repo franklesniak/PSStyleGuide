@@ -1,5 +1,5 @@
 {
-  "status": "selected_two_findings_local_source_repair_released",
+  "status": "source_frozen_two_material_findings_decisions_in_progress",
   "created_at": "2026-10-06T21:24:16.646475+00:00",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide",
   "branch": "codex/no-tracked-compiled-python",
@@ -27,7 +27,7 @@
     "A07": 6,
     "cap": 12
   },
-  "next_action": "One author implements P1 C97.0 plus P2 D98.4 in allowed source only; return frozen versioned patch/evidence for root review. No candidate tests, Git staging/commit/publication, dependency execution or accepted-main substitution.",
+  "next_action": "Prepare and display separate finding-specific decisions for actual-hook admission and complete tracked-name applicability; no repair released. Preserve frozen code/CI hold.",
   "branch_command_exit": 0,
   "observed_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
   "observed_branch": "codex/no-tracked-compiled-python",
@@ -111,8 +111,8 @@
     "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
     "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
   },
-  "updated_at": "2026-10-06T21:55:38.065232+00:00",
-  "source_writer_stopped": false,
+  "updated_at": "2026-10-06T21:42:21.819101+00:00",
+  "source_writer_stopped": true,
   "candidate_sha256": {
     ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
     ".github/workflows/Test-AgentInstructions.ps1": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
@@ -152,15 +152,15 @@
       ],
       "property": "Exact raw block is not bound to active local hooks sequence",
       "counterexample": "Insert four-space description: | immediately before unchanged six-space B99 block at config166",
-      "evidence_kind": "Native configuration-data loading reproduced inactive hook; candidate bypass remains source-traced.",
-      "decision_scope": "Finite active-envelope proof for existing always-run agent-instruction-contract hook",
+      "evidence_kind": "source tracing; native case unexecuted",
+      "decision_scope": "finite B99 admission and focused mutation",
       "exact_insertion": {
         "before_config_line": 166,
         "text": "    description: |\n",
         "all_existing_B99_lines_unchanged": true
       },
-      "status": "validated_selected_repair_released_not_implemented",
-      "native_probe_executed": true
+      "status": "validated_source_level_decision_preparation",
+      "native_probe_executed": false
     },
     {
       "id": "B99-PROVISIONAL-2",
@@ -172,12 +172,12 @@
       ],
       "property": "Omitted types defaults to file; matching symlink/directory tags do not reach fail hook",
       "counterexample": "Tracked native symlink module.pyc or pkg/__pycache__/entry; existing matching-name gitlink directory",
-      "evidence_kind": "Pinned native classifier source plus private complete Git index/revision inventory characterization; candidate enforcement unexecuted.",
+      "evidence_kind": "pinned native source inspection; no fixture executed",
       "scope_interpretation": "Selected filename-wide wording lacks regular-only exception; narrower scope requires explicit same-decision disposition",
       "prior_cases_modes": [
         "100644"
       ],
-      "decision_scope": "Complete target-name enforcement in existing validator, preserving filename-wide scope",
+      "decision_scope": "revisit B99 applicability and D98 contract; do not assume package-byte/native execution proof",
       "canonical_contract_lines": [
         30,
         48,
@@ -186,12 +186,9 @@
         86
       ],
       "D98_inventory_contract_line": 7,
-      "status": "validated_selected_repair_released_not_implemented",
-      "native_probe_executed": true
+      "status": "validated_source_level_decision_preparation",
+      "native_probe_executed": false
     }
   ],
-  "decision_worker": "a06_conversion_cold_packet",
-  "repair_released": true,
-  "finding_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
-  "finding_decision_sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961"
+  "decision_worker": "a06_conversion_cold_packet"
 }

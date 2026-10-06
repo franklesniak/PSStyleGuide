@@ -1,0 +1,443 @@
+{
+  "status": "two_complete_proposals_before_repair",
+  "recorded_at_utc": "2026-10-06T21:46:35.335047+00:00",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "branch": "codex/no-tracked-compiled-python",
+  "frozen_source": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa"
+    }
+  ],
+  "records": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/P1-active-hook-structure.md",
+      "sha256": "19479a8682cae822be75237f215546c4b9d1ab74db6ccb2f946955b7422b6514",
+      "bytes": 11060
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/decisions/P2-filename-wide-enforcement.md",
+      "sha256": "ab665d9a1774ea9893afadb61233a6d1d43cdcfc6d5b12b4cb87e10389f0efc9",
+      "bytes": 17362
+    }
+  ],
+  "references": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/provisional-review/REPORT.md",
+      "sha256": "ef13c3838920e93fc52fc36e81760414dad64d9480f63402fd50b1228a46a841",
+      "bytes": 8137
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/provisional-review/evidence.json",
+      "sha256": "144c82f4a501bd11357f347157e76b71499a111c273104bbdaabc82d316ffdec",
+      "bytes": 9245
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/HANDOFF.md",
+      "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+      "bytes": 4401
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/evidence.json",
+      "sha256": "ec47c9039c6511d5531d2d261fcb746a63e9806c4a57cb9262880332b0f3dcbc",
+      "bytes": 28160
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/docs/planning/action-items-2026-10-02/results/A07/research-hook-applicability.md",
+      "sha256": "7bc9167bd59641e32d5f52b3f02834204ab51e49157f5898efde2b3f4a5cec2c",
+      "bytes": 17883
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-current-readiness-20261006/profile-preparation/README.md",
+      "sha256": "56b0bf385894d63630e625b8dca504674fd9c0debc6c65e2dc1846ecd739f506",
+      "bytes": 4030
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/pre_commit/clientlib.py",
+      "sha256": "074619194fa0b2a7d4d7599f936b19abd8185340747c2d8343070ba8599fb85d",
+      "bytes": 16815
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/pre_commit/commands/run.py",
+      "sha256": "65a67f03048e3dfbe864d30acd2e0c2ebfec07cd80b442dbf399a6b1247b5693",
+      "bytes": 14163
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/pre_commit/languages/fail.py",
+      "sha256": "e76851c19632d2cf480ae07e953df6d73e901139c67305cc10c376e3fe6ada9e",
+      "bytes": 685
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/pre_commit/git.py",
+      "sha256": "1ab2faedf9642929fd1f44c158824a7498d8680a4b8ff38bbf86a35142799732",
+      "bytes": 8544
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/identify/identify.py",
+      "sha256": "ced105a6e0da4c1273c8f4a7164aa79ad21b65b6f317b9d14ba7adb2077aab9c",
+      "bytes": 7916
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/python-venv/Lib/site-packages/pre_commit-4.6.2.dist-info/METADATA",
+      "sha256": "9bc6183a5087af76ef837daba7a8eda0ba2d7b75dfeccfdaee0fe3687dd1905b",
+      "bytes": 1222
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-native-inventory/result.json",
+      "sha256": "e1fa61ca08770b9ff2f07e1264d5ac44ded0206238c85b7c7398633afa886a90",
+      "bytes": 4554
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/.github/workflows/agent-instructions.yml",
+      "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      "bytes": 12837
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/feedback-native-config/result.json",
+      "sha256": "e49fafcaea9f4f22e90b38e64d56ab0c0778b4e38f35da0f4c269afd11392f38",
+      "bytes": 1481
+    }
+  ],
+  "rubrics": [
+    {
+      "finding": "B99-PROVISIONAL-1",
+      "weights": {
+        "Structure": 34,
+        "Security": 25,
+        "Usability": 18,
+        "Compatibility": 12,
+        "Verification": 8,
+        "Cost": 3
+      },
+      "ratings": {
+        "A": [
+          1,
+          1,
+          2,
+          5,
+          2,
+          5
+        ],
+        "B": [
+          2,
+          2,
+          3,
+          4,
+          2,
+          5
+        ],
+        "C": [
+          5,
+          5,
+          5,
+          4,
+          5,
+          4
+        ],
+        "D": [
+          5,
+          5,
+          4,
+          3,
+          5,
+          2
+        ],
+        "E": [
+          5,
+          5,
+          2,
+          2,
+          4,
+          4
+        ],
+        "F": [
+          5,
+          5,
+          4,
+          3,
+          4,
+          1
+        ],
+        "G": [
+          5,
+          5,
+          4,
+          3,
+          5,
+          1
+        ],
+        "H": [
+          1,
+          2,
+          3,
+          5,
+          3,
+          5
+        ],
+        "I": [
+          2,
+          2,
+          4,
+          5,
+          2,
+          5
+        ]
+      },
+      "totals": {
+        "A": 37.2,
+        "B": 50.2,
+        "C": 97.0,
+        "D": 89.8,
+        "E": 79.8,
+        "F": 87.6,
+        "G": 89.2,
+        "H": 47.4,
+        "I": 56.2
+      },
+      "proposed": "C",
+      "total": 97.0
+    },
+    {
+      "finding": "B99-PROVISIONAL-2",
+      "weights": {
+        "Names": 35,
+        "Security": 26,
+        "Usability": 20,
+        "Proof": 11,
+        "Coupling": 6,
+        "Cost": 2
+      },
+      "ratings": {
+        "A": [
+          1,
+          1,
+          2,
+          4,
+          4,
+          5
+        ],
+        "B": [
+          3,
+          2,
+          3,
+          4,
+          4,
+          5
+        ],
+        "C": [
+          3,
+          3,
+          4,
+          3,
+          5,
+          4
+        ],
+        "D": [
+          5,
+          5,
+          5,
+          5,
+          4,
+          4
+        ],
+        "E": [
+          5,
+          5,
+          4,
+          4,
+          3,
+          3
+        ],
+        "F": [
+          5,
+          5,
+          3,
+          4,
+          3,
+          3
+        ],
+        "G": [
+          5,
+          5,
+          4,
+          4,
+          2,
+          2
+        ],
+        "H": [
+          5,
+          5,
+          3,
+          3,
+          1,
+          1
+        ],
+        "I": [
+          5,
+          5,
+          4,
+          4,
+          2,
+          2
+        ],
+        "J": [
+          5,
+          3,
+          3,
+          2,
+          2,
+          1
+        ],
+        "K": [
+          1,
+          1,
+          3,
+          2,
+          5,
+          5
+        ],
+        "L": [
+          4,
+          2,
+          2,
+          2,
+          1,
+          1
+        ],
+        "M": [
+          1,
+          1,
+          0,
+          5,
+          4,
+          5
+        ]
+      },
+      "totals": {
+        "A": 35.8,
+        "B": 59.0,
+        "C": 66.8,
+        "D": 98.4,
+        "E": 90.6,
+        "F": 86.6,
+        "G": 89.0,
+        "H": 81.2,
+        "I": 89.0,
+        "J": 69.8,
+        "K": 36.6,
+        "L": 52.4,
+        "M": 30.0
+      },
+      "proposed": "D",
+      "total": 98.4
+    }
+  ],
+  "primary_urls": [
+    "https://raw.githubusercontent.com/pre-commit/pre-commit/v4.6.2/pre_commit/clientlib.py",
+    "https://raw.githubusercontent.com/pre-commit/pre-commit/v4.6.2/pre_commit/commands/run.py",
+    "https://raw.githubusercontent.com/pre-commit/pre-commit/v4.6.2/pre_commit/languages/fail.py",
+    "https://raw.githubusercontent.com/pre-commit/pre-commit/v4.6.2/pre_commit/git.py",
+    "https://pre-commit.com/#filtering-files-with-types",
+    "https://git-scm.com/docs/git-ls-files",
+    "https://git-scm.com/docs/git-ls-tree"
+  ],
+  "inventory_trace": {
+    "helper_lines": [
+      1415,
+      1487
+    ],
+    "decoder_lines": [
+      1330,
+      1413
+    ],
+    "target_read_line": 7713,
+    "classification_return_line": 7822,
+    "target_revision_assignment_line": 7651,
+    "maximum_bytes": 1048576,
+    "timeout_ms": 10000,
+    "local_argv": [
+      "ls-files",
+      "--cached",
+      "-z"
+    ],
+    "revision_argv": [
+      "ls-tree",
+      "-r",
+      "-z",
+      "--name-only",
+      "exactInputH"
+    ],
+    "no_historical_B_or_exemption_authority": true
+  },
+  "coherent_combination": "P1 C active local always-run envelope + P2 D single complete target-name guard; no native B99 hook; preserve historical D98 unintegrated prototype",
+  "implementation_released": false,
+  "tests_executed": false,
+  "product_or_git_or_state_mutation": false,
+  "counters_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "root_git_data_characterization": {
+    "status": "PRIVATE_GIT_INVENTORY_CHARACTERIZATION_PASS",
+    "version": "git version 2.55.0.windows.5",
+    "revision": "59dd4e44e0a35fe3b207bbdfc4ca8490db3e24dd",
+    "entries": 5,
+    "modes": [
+      "100644",
+      "100755",
+      "120000",
+      "160000"
+    ],
+    "all_payloads_absent": true,
+    "same_index_revision_name_bytes": true,
+    "original_pattern_matches": 4,
+    "scope": "Git-data primitive only, no candidate/hook/parser/acceptance",
+    "replayed": false
+  },
+  "caller_trace": {
+    "source": ".github/workflows/agent-instructions.yml",
+    "no_path_filters_lines": [
+      2,
+      11
+    ],
+    "accepted_metadata_H_call": 94,
+    "classifier_branch_full_ordinary_call": 101,
+    "future_early_inventory_guard_reaches_both_ordinary_and_maintenance_after_genuine_adoption": true,
+    "actual_landed_PS235_final_H_rebind_required": true
+  },
+  "updated_at_utc": "2026-10-06T21:48:25.555214+00:00",
+  "candidate_or_hook_reproduction": false,
+  "root_config_data_reproduction": {
+    "status": "PRIVATE_NATIVE_CONFIG_MASKING_REPRODUCED",
+    "python": "3.12.10",
+    "pre_commit": "4.6.2",
+    "clientlib_sha256": "074619194fa0b2a7d4d7599f936b19abd8185340747c2d8343070ba8599fb85d",
+    "original_actual_hooks": 12,
+    "masked_actual_hooks": 11,
+    "prior_hook_ids_equal": true,
+    "both_pass_native_schema": true,
+    "warning": "Unexpected key(s) present on local: description",
+    "scope": "Native configuration data loading only; no hook/PowerShell candidate/profile/acceptance",
+    "replayed": false
+  }
+}

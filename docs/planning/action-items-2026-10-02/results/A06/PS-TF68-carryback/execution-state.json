@@ -361,7 +361,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "0cc4a3c81c19fb91fe6e183bbe0536dee41c7a98",
+  "planning_checkpoint": "da18f5752f4b9effac09d70fde6a82daab519b92",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -386,7 +386,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-06T21:25:26.362159+00:00",
+  "updated_at": "2026-10-06T21:36:46.491633+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -781,12 +781,18 @@
     "product_implementation_released": false
   },
   "B99_source_boundary_audit": {
-    "status": "selected_D93.4_local_source_released",
+    "status": "selected_two_findings_local_source_repair_released",
     "worker": "ps_carryback_final_quality",
     "directory": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-B99-source-boundary-20261006",
     "implementation_released": true,
     "release_scope": "Four paths on current native main; uncommitted source only; final integration/tests/publication held for genuine PS235 acceptance.",
     "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-current-readiness\\source-boundary-20261006\\ROOT-DECISION.json",
-    "source_state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\execution-state.json"
+    "source_state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\execution-state.json",
+    "material_findings": [
+      "B99-PROVISIONAL-1",
+      "B99-PROVISIONAL-2"
+    ],
+    "repair_released": true,
+    "finding_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json"
   }
 }

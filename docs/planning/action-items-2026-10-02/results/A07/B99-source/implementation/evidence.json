@@ -1,0 +1,598 @@
+{
+  "status": "constructed_untested_unstaged_source_only",
+  "recorded_at": "2026-10-06T21:33:51.390897+00:00",
+  "decision": "D93.4",
+  "worktree": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide",
+  "branch": "codex/no-tracked-compiled-python",
+  "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "accepted_base_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "source_paths": [
+    {
+      "path": ".pre-commit-config.yaml",
+      "base": {
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398
+      },
+      "candidate": {
+        "sha256": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b",
+        "bytes": 5839,
+        "mode": "100644",
+        "utf8_no_bom": true
+      }
+    },
+    {
+      "path": ".gitignore",
+      "base": {
+        "mode": "100644",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        "bytes": 289
+      },
+      "candidate": {
+        "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+        "bytes": 370,
+        "mode": "100644",
+        "utf8_no_bom": true
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "base": {
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      "candidate": {
+        "sha256": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
+        "bytes": 483857,
+        "mode": "100644",
+        "utf8_no_bom": true
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "base": {
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      "candidate": {
+        "sha256": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
+        "bytes": 237420,
+        "mode": "100644",
+        "utf8_no_bom": true
+      }
+    }
+  ],
+  "source_preservation": {
+    "baseline_count": 77,
+    "bystanders_count": 73,
+    "bystanders_equal": true,
+    "changed_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".gitignore",
+      ".pre-commit-config.yaml"
+    ],
+    "all_current_source_sha256": {
+      ".claude/commands/review-loop.md": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+      ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      ".github/copilot-instructions.md": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      ".github/document-metadata-classification.json": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      ".github/instructions/docs.instructions.md": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+      ".github/instructions/yaml.instructions.md": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      ".github/workflows/Check-NpmAudit.mjs": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+      ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+      ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+      ".github/workflows/Initialize-CiToolchain.ps1": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "7300c6f1e52cfb68af01dacedcfcb624cf26e4a35de0b74e745762ee8bebdffa",
+      ".github/workflows/Test-AgentInstructions.ps1": "a45fa851945d20f5e86e51c2a8dce0ccc53b1ecee94c8e332dacd298455f612a",
+      ".github/workflows/Test-BlankLineExamples.ps1": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      ".github/workflows/Test-CheckoutCredentials.ps1": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      ".github/workflows/Test-CiHelpers.test.mjs": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      ".github/workflows/agent-instructions.yml": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      ".github/workflows/build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      ".github/workflows/copilot-setup-steps.yml": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      ".github/workflows/historical-supply-profile.json": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+      ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      ".github/workflows/markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+      ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      ".github/workflows/package-lock.json": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      ".github/workflows/package.json": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+      ".github/workflows/scripts-README.md": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      ".github/workflows/workflow-policy-contract.json": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      ".pre-commit-config.yaml": "ac50cd69f1fdf0e5d4451abcaff2749ab0f70e98241102109f5de6d3f1bdfb3b",
+      ".vscode/settings.json": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+      "ACKNOWLEDGMENTS.md": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+      "AGENTS.md": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "CLAUDE.md": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+      "CONTRIBUTING.md": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+      "LICENSE": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+      "README.md": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+      "STYLE_GUIDE.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "STYLE_GUIDE_CHAT.md": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "STYLE_GUIDE_FULL.md": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "STYLE_GUIDE_RATIONALE.md": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+      "copilot-instructions.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "docs/P1-SUPPLY-FREEZE-v1.md": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "docs/decisions/0001-accept-in-repository-trust-root.md": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+      "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+      "docs/dependency-maintenance.md": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+      "package-lock.json": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "package.json": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "powershell.instructions.md": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+    },
+    "index_equals_accepted_base": true,
+    "index_raw": {
+      "path": "C:/Users/flesniak/GitHub/PSStyleGuide/.git/worktrees/PSStyleGuide6/index",
+      "sha256": "d0ac0d49dfa211e8152be47ad3e130d6440ce88afbad9e1c78db5e464ece6a24",
+      "bytes": 8193
+    },
+    "index_rows": {
+      ".claude/commands/review-loop.md": {
+        "mode": "100644",
+        "blob": "8f361e184eef8b292370d1d6e5b00425ab8226c2"
+      },
+      ".codex/config.toml": {
+        "mode": "100644",
+        "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80"
+      },
+      ".gitattributes": {
+        "mode": "100644",
+        "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
+      },
+      ".github/copilot-instructions.md": {
+        "mode": "100644",
+        "blob": "763aaac2000166b570e39a0c3d8847aa231b294d"
+      },
+      ".github/dependabot.yml": {
+        "mode": "100644",
+        "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132"
+      },
+      ".github/document-metadata-classification.json": {
+        "mode": "100644",
+        "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0"
+      },
+      ".github/instructions/docs.instructions.md": {
+        "mode": "100644",
+        "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd"
+      },
+      ".github/instructions/yaml.instructions.md": {
+        "mode": "100644",
+        "blob": "edef19560d3403985d1417af4772d74bbf9eacf4"
+      },
+      ".github/workflows/.markdownlint.jsonc": {
+        "mode": "100644",
+        "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1"
+      },
+      ".github/workflows/Check-NpmAudit.mjs": {
+        "mode": "100644",
+        "blob": "a99303ac9e828eb1719fd669d969da31ab79c9e2"
+      },
+      ".github/workflows/Check-NpmAudit.test.mjs": {
+        "mode": "100644",
+        "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9"
+      },
+      ".github/workflows/Classify-InstructionMaintenance.mjs": {
+        "mode": "100644",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343"
+      },
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+        "mode": "100644",
+        "blob": "166d137206aff8f503911be9a569efbd204e023b"
+      },
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+        "mode": "100644",
+        "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d"
+      },
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": {
+        "mode": "100644",
+        "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6"
+      },
+      ".github/workflows/Get-SupplyFreezeDigest.test.mjs": {
+        "mode": "100644",
+        "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58"
+      },
+      ".github/workflows/Initialize-CiToolchain.ps1": {
+        "mode": "100644",
+        "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667"
+      },
+      ".github/workflows/Invoke-LockedPythonHook.ps1": {
+        "mode": "100644",
+        "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354"
+      },
+      ".github/workflows/Invoke-MarkdownLint.ps1": {
+        "mode": "100644",
+        "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a"
+      },
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": {
+        "mode": "100644",
+        "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd"
+      },
+      ".github/workflows/NpmTools.mjs": {
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8"
+      },
+      ".github/workflows/NpmTools.test.mjs": {
+        "mode": "100644",
+        "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f"
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87"
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f"
+      },
+      ".github/workflows/Test-BlankLineExamples.ps1": {
+        "mode": "100644",
+        "blob": "068c7139a9e6a9276073211f48eca88464204362"
+      },
+      ".github/workflows/Test-CheckoutCredentials.ps1": {
+        "mode": "100644",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a"
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "mode": "100644",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e"
+      },
+      ".github/workflows/Test-ExactGitPathSet.ps1": {
+        "mode": "100644",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7"
+      },
+      ".github/workflows/Test-LocalValidation.test.mjs": {
+        "mode": "100644",
+        "blob": "7965b2476cf022e6efea355d438162937bef04b3"
+      },
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+        "mode": "100644",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f"
+      },
+      ".github/workflows/Test-StyleGuideGenerator.ps1": {
+        "mode": "100644",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe"
+      },
+      ".github/workflows/Validate-WorkflowPolicy.mjs": {
+        "mode": "100644",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26"
+      },
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+        "mode": "100644",
+        "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055"
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "mode": "100644",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123"
+      },
+      ".github/workflows/build.yml": {
+        "mode": "100644",
+        "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45"
+      },
+      ".github/workflows/ci-toolchain.json": {
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8"
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "mode": "100644",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2"
+      },
+      ".github/workflows/devcontainer-ci.yml": {
+        "mode": "100644",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321"
+      },
+      ".github/workflows/historical-supply-profile.json": {
+        "mode": "100644",
+        "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33"
+      },
+      ".github/workflows/install-husky.mjs": {
+        "mode": "100644",
+        "blob": "6a12568776f6473472193bc98638f1856a7c9dec"
+      },
+      ".github/workflows/lint-markdown.mjs": {
+        "mode": "100644",
+        "blob": "08942d7df2fa607941ebb901e0477f1088175326"
+      },
+      ".github/workflows/lint-markdown.test.mjs": {
+        "mode": "100644",
+        "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58"
+      },
+      ".github/workflows/lint-nested-markdown.js": {
+        "mode": "100644",
+        "blob": "3284f63d128288ce511391b693b1ba350b918f2c"
+      },
+      ".github/workflows/lint-staged-markdown.mjs": {
+        "mode": "100644",
+        "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11"
+      },
+      ".github/workflows/markdownlint.yml": {
+        "mode": "100644",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43"
+      },
+      ".github/workflows/npm-risk-exceptions.json": {
+        "mode": "100644",
+        "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
+      },
+      ".github/workflows/package-lock.json": {
+        "mode": "100644",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196"
+      },
+      ".github/workflows/package.json": {
+        "mode": "100644",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680"
+      },
+      ".github/workflows/scripts-README.md": {
+        "mode": "100644",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f"
+      },
+      ".github/workflows/workflow-policy-cases.json": {
+        "mode": "100644",
+        "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c"
+      },
+      ".github/workflows/workflow-policy-contract.json": {
+        "mode": "100644",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac"
+      },
+      ".gitignore": {
+        "mode": "100644",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6"
+      },
+      ".husky/pre-commit": {
+        "mode": "100644",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7"
+      },
+      ".pre-commit-config.yaml": {
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564"
+      },
+      ".vscode/settings.json": {
+        "mode": "100644",
+        "blob": "bbccb6f224a56a77909ddd133b79adaea68564e1"
+      },
+      "ACKNOWLEDGMENTS.md": {
+        "mode": "100644",
+        "blob": "f10ae23380e94de3feb20d88274635c4fe2ed308"
+      },
+      "AGENTS.md": {
+        "mode": "100644",
+        "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b"
+      },
+      "CLAUDE.md": {
+        "mode": "100644",
+        "blob": "5eeadb1e9d9e2ddb77c9c7904861a2a19659e08c"
+      },
+      "CONTRIBUTING.md": {
+        "mode": "100644",
+        "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b"
+      },
+      "LICENSE": {
+        "mode": "100644",
+        "blob": "fc77effb1732726e1d7445c687023889fe7180f0"
+      },
+      "README.md": {
+        "mode": "100644",
+        "blob": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560"
+      },
+      "STYLE_GUIDE.md": {
+        "mode": "100644",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa"
+      },
+      "STYLE_GUIDE_CHAT.md": {
+        "mode": "100644",
+        "blob": "556538c7664327652bc42875b63a5bf6bc16783f"
+      },
+      "STYLE_GUIDE_FULL.md": {
+        "mode": "100644",
+        "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa"
+      },
+      "STYLE_GUIDE_RATIONALE.md": {
+        "mode": "100644",
+        "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581"
+      },
+      "copilot-instructions.md": {
+        "mode": "100644",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa"
+      },
+      "docs/ISSUE_EVALUATION_PROMPT.md": {
+        "mode": "100644",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d"
+      },
+      "docs/P1-SUPPLY-FREEZE-v1.md": {
+        "mode": "100644",
+        "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5"
+      },
+      "docs/decisions/0001-accept-in-repository-trust-root.md": {
+        "mode": "100644",
+        "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd"
+      },
+      "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": {
+        "mode": "100644",
+        "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995"
+      },
+      "docs/dependency-maintenance.md": {
+        "mode": "100644",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac"
+      },
+      "package-lock.json": {
+        "mode": "100644",
+        "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7"
+      },
+      "package.json": {
+        "mode": "100644",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358"
+      },
+      "powershell.instructions.md": {
+        "mode": "100644",
+        "blob": "b711cec80333e409cb4e644eb94530653ca39109"
+      },
+      "requirements-dev.txt": {
+        "mode": "100644",
+        "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c"
+      },
+      "samples/test-nested-markdown-linting.md": {
+        "mode": "100644",
+        "blob": "1d06987410afac4fdf845d5d976dd9e984639156"
+      },
+      "samples/test-recursive-nested-markdown.md": {
+        "mode": "100644",
+        "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6"
+      }
+    },
+    "status_porcelain": " M .github/workflows/Test-AgentInstructions.SelfTest.ps1\n M .github/workflows/Test-AgentInstructions.ps1\n M .gitignore\n M .pre-commit-config.yaml\n",
+    "diff_sha256": "c1b2d1ecbcca2cefacde228583ab75fd9bf2ff4867e78624d378439112a7ddf0",
+    "diff_stat": " .../workflows/Test-AgentInstructions.SelfTest.ps1  | 142 ++++++++++++++++++---\n .github/workflows/Test-AgentInstructions.ps1       |  34 ++++-\n .gitignore                                         |   4 +\n .pre-commit-config.yaml                            |   9 ++\n 4 files changed, 169 insertions(+), 20 deletions(-)\n"
+  },
+  "configuration_preservation": {
+    "old_configuration_exact_prefix": true,
+    "all_eleven_existing_hook_bodies_and_pins_unchanged": true,
+    "hook_append_equals_selected_proposal": true,
+    "old_ignore_exact_prefix": true,
+    "ignore_append_equals_selected_proposal": true,
+    "venv_and_other_ignored_rules_unchanged": true
+  },
+  "source_regions": {
+    ".pre-commit-config.yaml": {
+      "- id: no-tracked-compiled-python": 166
+    },
+    ".gitignore": {
+      "# Local compiled Python artifacts": 21
+    },
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "function Get-AgentSetupInputSpec": 327,
+      "function Get-AgentSetupContractFailure": 561,
+      "- id: no-tracked-compiled-python": 689
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "function Assert-AgentSetupSelfTest": 2474,
+      "- id: no-tracked-compiled-python": 2574
+    }
+  },
+  "references": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/execution-state.json",
+      "sha256": "2a88421074ee02aeb579857cb9c71f623cb9669c296c7a5fc68aa731ebde5a57",
+      "bytes": 10079
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-B99-source-boundary-20261006/REPORT.md",
+      "sha256": "f71cd88431dc8014657aab4aa9f052abcf4256a0fbc6e03f4cfc18c33633fcba",
+      "bytes": 15835
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-B99-source-boundary-20261006/ROOT-DECISION.json",
+      "sha256": "081cab5af9a042674d18d793079e6d5e8d8839d05a272822b8565f2ea12032f0",
+      "bytes": 1070
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/hook-block.proposed.yaml",
+      "sha256": "b682208d3aa19ff2f4d700f75953ea1bdb2e1cf6ff2ac02910bcd2450ee2c248",
+      "bytes": 441
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A18-research-readiness-20261005/hook-applicability/selected-B99-native-readiness/ignore-lines.proposed.txt",
+      "sha256": "b6908aa83aef57866e683fdf92a2e5b4786aecb4e0df9ea08405755a91827d3c",
+      "bytes": 80
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/STYLE_GUIDE.md",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/powershell.instructions.md",
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    {
+      "path": "C:/Users/flesniak/.codex/worktrees/governance-push-exit/PSStyleGuide/.github/instructions/yaml.instructions.md",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "bytes": 54645
+    }
+  ],
+  "constructed_controls": {
+    "contract_mutations": [
+      "missing/duplicate/case-alias hook",
+      "wrong language/name/corrective entry",
+      "case flag/d suffix/cache alternative removal",
+      "duplicate field",
+      "exclude/types/types_or/stages/always_run/pass_filenames/second files selector",
+      "global selectors/default stages/install-hook-types",
+      "missing/duplicate ignore lines"
+    ],
+    "reader_controls": [
+      "inherited full per-input immutable equality loop now includes required .gitignore",
+      "inherited per-input accepted staged data/partial staging refusal/worktree data loop now includes .gitignore",
+      "missing local .gitignore diagnostic",
+      "missing immutable .gitignore regular-100644-blob diagnostic",
+      "65536-byte local positive and 65537-byte refusal for workflow and .gitignore",
+      "65536-byte immutable .gitignore positive and 65537-byte refusal"
+    ]
+  },
+  "execution": {
+    "tests_run": false,
+    "parser_or_PSSA_run": false,
+    "dependencies_used": false,
+    "native_profile_bound": false,
+    "staging_commits_publication": false,
+    "source_construction_only": true
+  },
+  "pending": [
+    "Genuine PS235 acceptance and current accepted-main binding",
+    "Root-owned semantic delta integration preserving all landed optional-input/security/parser/metadata changes",
+    "Actual-date metadata finalization and final source/index/dependency binding",
+    "Parser/PSSA, changed-contract Windows/Linux integration, assembled native-hook/profile qualification and one current full aggregate",
+    "Accepted-B/current-H endpoint modes, current ordinary audit, independent quality and normal review/CI lifecycle"
+  ],
+  "transfers_unchanged": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6,
+    "cap": 12
+  },
+  "handoff": {
+    "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/implementation/HANDOFF.md",
+    "sha256": "66f1f7b2264c60d3854fc36edb94a501ee20a5c200a1b5c47f2f730c70b5d51f",
+    "bytes": 4401
+  }
+}
