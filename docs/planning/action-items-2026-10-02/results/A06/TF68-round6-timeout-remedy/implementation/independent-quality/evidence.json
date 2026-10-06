@@ -1,0 +1,193 @@
+{
+  "schema": 1,
+  "reviewed_at_utc": "2026-10-06T16:58:53.2405066+00:00",
+  "reviewer": "/root/a06_conversion_quality",
+  "status": "NO_MATERIAL_SOURCE_FINDINGS_CONDITIONAL_NOT_FINAL_ACCEPTANCE",
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "branch": "codex/a06-generator-convergence",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "head_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "supplied_candidate_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "candidate_tree_independently_reconstructed": false,
+  "catalog_files_hashed": 80,
+  "catalog_mismatches": [],
+  "staged_diff_empty": true,
+  "unstaged_paths": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "whole_pr_scope_inventory": {
+    "paths": 19,
+    "insertions": 5477,
+    "deletions": 1480,
+    "full_prior_diff_rereview": false
+  },
+  "findings": [],
+  "source_inputs": [
+    {
+      "path": "AGENTS.md",
+      "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f",
+      "catalog_blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "catalog_blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+      "catalog_blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "catalog_blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "catalog_blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "catalog_blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "catalog_blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "mode": "100644"
+    },
+    {
+      "path": "package.json",
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "catalog_blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "catalog_blob": "670083e767627cfed90a61f788021dba88de1091",
+      "mode": "100644"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "catalog_blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "mode": "100644"
+    }
+  ],
+  "dependency_inputs": [
+    {
+      "path": "package-lock.json",
+      "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "inspection": "hash identity only; no fresh whole-lockfile audit"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "inspection": "hash identity only; no fresh whole-lockfile audit"
+    },
+    {
+      "path": "node_modules/markdown-it/package.json",
+      "sha256": "67038287f4a8fee121160931df00e584a51318b4bb4848450752c712deac97f6",
+      "inspection": "package entry or parse entry inspected; no full dependency audit"
+    },
+    {
+      "path": "node_modules/markdown-it/dist/index.cjs.js",
+      "sha256": "9762a9a5a4cdc120c542122ac8f5627fc4666897b088ac706fad87ab910f0384",
+      "inspection": "package entry or parse entry inspected; no full dependency audit"
+    },
+    {
+      "path": "node_modules/markdown-it/index.mjs",
+      "sha256": "a112fad9f779e8e4d58a76586ec54b5b9fe134d92a670a96749bcb676be2c62b",
+      "inspection": "package entry or parse entry inspected; no full dependency audit"
+    },
+    {
+      "path": "node_modules/markdown-it/lib/index.mjs",
+      "sha256": "840746264c1655558e80752c663d745e4336e806978f74d4c678c5e21bab5158",
+      "inspection": "package entry or parse entry inspected; no full dependency audit"
+    }
+  ],
+  "reused_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\REPORT.md",
+      "sha256": "62b53b47d31a0faeff85cfb58d8b83bd80ab0da47c031076c3612adc49651494"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\ROOT-FOCUSED-VERIFICATION.json",
+      "sha256": "0d38b68e5ead4c6ab05ab01f9d34e26731ed8ab9dc20ad9ad87739d8b7d58d12"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\source-catalog.json",
+      "sha256": "06283ddd2dcd87c33dbc0e38fcaa17114034c6fcc04ff4dea037af1da4972cff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\controls.ps1",
+      "sha256": "b105310bda583403dbfa116f3127359a6e2388d284f11d845fc754606cb02a65"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\initialization-controls.ps1",
+      "sha256": "bc4c2ebe159776ff64d79d97d01ab1832cc13b34a74256a7bbf1856584a7e474"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\load-functions.ps1",
+      "sha256": "8308eb8a2f7c9e3f96f1d088524045f249220034938c94fce1c52077b75f65cf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\REPORT.md",
+      "sha256": "b784e9254b382e661e539d3fd81062ea6b2392adb38293e6f40c4377f4ff07d2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "e30f7f2c776b8cace81d509b353d59e48ce2766f6a1e30650e5b8da127922480"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\repair-proposal\\REPORT.md",
+      "sha256": "14fa2885104e0961329a9c98e927ae668c8a19de6d67604526635858dfa9562b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-focused\\manifest.json",
+      "sha256": "4187a9b26d4b611bed00750af64def7178920d8c8db2a299446945368cdab2bd"
+    }
+  ],
+  "reviewed_contracts": [
+    "strict size depth root JSON admission",
+    "native object array scalar construction",
+    "full-root special-name fallback and failure ordering",
+    "literal source lazy compile identity and stateless lifetime",
+    "all four decoder callers",
+    "fresh parser before reuse",
+    "seven schema families",
+    "deep-copy and eight-slot retention",
+    "persistent strict differential oracle",
+    "prechange oracle native-path and seven mutant controls",
+    "compiler and wrong-identity type failures",
+    "maintenance classification and full SelfTest wiring"
+  ],
+  "tests_executed_by_reviewer": [],
+  "product_edits": false,
+  "git_writes": false,
+  "remote_operations": false,
+  "installs": false,
+  "cleanup_executed": false,
+  "cold_packet_whole_pass": false,
+  "validation_gaps": [
+    "mandatory complete all-files/final SelfTest and affected classifier/local-validation binding",
+    "required current-input reviews and current-head passing CI",
+    "final independent quality reconciliation against final input",
+    "earlier PowerShell 7 releases not empirically tested",
+    "cold packet adopted-descendant source/state unresolved here",
+    "accepted-main paired raw blob/mode convergence still pending"
+  ],
+  "pair_implication": "Common converter and tests belong in conditional PS carryback after TF acceptance; no language-specific converter exception found."
+}

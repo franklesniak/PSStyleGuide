@@ -129,3 +129,19 @@ Original worker model capacity failed after Linux analysis completed. Root recon
 The [one cold comparison](TF68-round6-timeout-remedy/implementation/cold-comparison/REPORT.md) completed both actual commands correctly:11.407920466s original,8.074512943s changed, including0.3080119s first compilation. Outputs,59 parser calls,51 conversions and8 reuse hits match. Root verified25 artifacts and complete80-source/1,914-dependency guards. Both selected child groups were empty.
 
 The overall packet failed because parent cleanup found two adopted descendants, which it removed. Saved records lack state/command, so their cause remains unproved. Container absence and unchanged host state are verified. Root assigned read-only investigation/proposal only; no repeated pair, full suite, product/native write or merge is released. Historical failed status and valid partial evidence remain distinct. Existing counters/deadline unchanged.
+
+## 2026-10-06 cleanup evidence decision D93 selected
+
+Root validated [D93](TF68-round6-timeout-remedy/implementation/cold-comparison/cleanup-investigation/REPORT.md), checked35 artifact hashes and11 scores, and displayed options/rubric/table/choice before preparation. Preserve the failed packet and valid partial pair evidence. One bounded worker prepares only a phased current actual fixture prefix plus four process-ownership controls; zero comparison children, fresh B/H/clock, actual Git identity, state/phase/wait receipts, unchanged ordinary setup semantics. Git maintenance remains a hypothesis. Product/detector acceptance repair, parser check, execution and full suite are not released by this selection. No owner input is needed.
+
+## 2026-10-06 independent C88.5 source quality
+
+The [independent source review](TF68-round6-timeout-remedy/implementation/independent-quality/REPORT.md) found no actionable material finding on e2a7767f/dd2aaf7f. It inspected the actual two-file diff, all decoder callers, seven schema families, fresh-parser/snapshot/deep-copy boundaries, meaningful control/mutant source and current complete-SelfTest wiring. Root read the full report and verified26 evidence/source/dependency hashes plus all80 catalog files. This is conditional source quality only: complete final validation, actual final-input reconciliation, new reviews, passing CI and paired acceptance remain pending. The failed cold packet retains its failed status; no repeated product tests or native writes occurred.
+
+## 2026-10-06 cleanup observation verified
+
+The [D93 observation](TF68-round6-timeout-remedy/implementation/cleanup-observation/REPORT.md) completed once:15 phase receipts show successful exited Git children, exact waits return0 without signals, and4 ownership controls pass. Root verified source/dependency/Git guards and container absence. The original cold packet remains failed because its historical state is unknown. The five-line scratch-runner correction selects successful-exit collection before residue judgment, while retaining failures for live/failed/unknown children and preserving primary failures. One final-byte validation packet is being prepared; product bytes remain frozen, full suite/native actions unreleased, counters and deadline unchanged.
+
+## 2026-10-06 final C88.5 validation running
+
+Root reviewed the final packet, retained all three original command blocks and qualified runtime, and verified80 source/1,914 dependency inputs. Ten pure cleanup-receipt controls pass in addition to the four real D93 controls. One final-byte staged preflight,13-test affected classifier suite and11-hook aggregate is running with unchanged300/300/3000-second stage budgets. The current native PR remains Hed9/B e21,20resolved threads,13ordinary successful workflows and one cancelled dynamic run. Commit/endpoints/audit/new-input reviews/current CI remain pending; no merge or CI retry is authorized by a local test pass.

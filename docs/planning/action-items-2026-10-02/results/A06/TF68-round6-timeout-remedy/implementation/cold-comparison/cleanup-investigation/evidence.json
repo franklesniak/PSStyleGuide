@@ -1,0 +1,563 @@
+{
+  "state": "READ_ONLY_INVESTIGATION_AND_PROPOSAL_NOT_IMPLEMENTED",
+  "created_at": "2026-10-06T16:48:26.578692+00:00",
+  "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\cleanup-investigation\\REPORT.md",
+  "report_sha256": "befc3d30bdd31cf2b3325f20989eadd7ec0dfc238e35f0a0cfee5cff5734b89e",
+  "completed_run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one",
+  "authorized_manifest_sha256": "785471e3a5f528f57247194ddf27ea5f4291a5b49f0119a702f152e97ad5d92e",
+  "full_packet_state": "failed",
+  "partial_pair_state": "passed",
+  "pair": {
+    "state": "passed",
+    "role": "cold-original-changed-case-comparison-not-acceptance",
+    "case": {
+      "Role": "cold reconstructed first current-date actual author case",
+      "Baseline": "65bb1cadfc31d32f0b9f4afc0c94c14aaeabee3f",
+      "Candidate": "2d62832374cd562b61e4fd958b0b71d2b70447dc",
+      "Clock": "2026-10-06T16:39:42.1553826+00:00",
+      "ExpectedDate": "2026-10-06",
+      "ExpectedExit": 0,
+      "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=65bb1cadfc31d32f0b9f4afc0c94c14aaeabee3f H=2d62832374cd562b61e4fd958b0b71d2b70447dc",
+      "PriorEphemeralIdentityReplayed": false
+    },
+    "counts": {
+      "control": {
+        "generic": 4,
+        "native": 59,
+        "native-attempt": 59,
+        "structural": 51,
+        "legacy-structural": 51,
+        "reuse": 8
+      },
+      "profile": {
+        "generic": 4,
+        "native": 59,
+        "native-attempt": 59,
+        "structural": 51,
+        "compile": 1,
+        "reuse": 8
+      }
+    },
+    "equal_argv_cwd_clock_outputs": true,
+    "cold_original_seconds": 11.407920466,
+    "cold_changed_seconds": 8.074512943000002,
+    "changed_faster": true,
+    "native_count_unchanged": true,
+    "changed_native_initializations": 1,
+    "selected_children": 2,
+    "helper_compile_seconds": 0.3080119,
+    "first_structural_call_seconds": 0.3428981,
+    "native_exits_equal": true,
+    "schema_and_snapshot_checks_unchanged": true,
+    "limits": [
+      "One ordered cold pair, not stable benchmark or hosted20m acceptance.",
+      "Counters are symmetric except changed-only compilation count; all marker removal must recover exact source.",
+      "Generic decoder count is recorded separately; no preprocessing warm-up in either child."
+    ]
+  },
+  "children": {
+    "control": {
+      "pid": 5344,
+      "started_utc": "2026-10-06T16:40:01.981326+00:00",
+      "finished_utc": "2026-10-06T16:40:13.389300+00:00",
+      "elapsed_seconds": 11.407920466,
+      "exit": 0,
+      "owned_group_cleanup": {
+        "group": 5344,
+        "session": 5344,
+        "members_before": [],
+        "members_after": [],
+        "direct_exit": 0,
+        "empty_after": true
+      }
+    },
+    "profile": {
+      "pid": 5965,
+      "started_utc": "2026-10-06T16:40:13.473199+00:00",
+      "finished_utc": "2026-10-06T16:40:21.547760+00:00",
+      "elapsed_seconds": 8.074512943000002,
+      "exit": 0,
+      "owned_group_cleanup": {
+        "group": 5965,
+        "session": 5965,
+        "members_before": [],
+        "members_after": [],
+        "direct_exit": 0,
+        "empty_after": true
+      }
+    }
+  },
+  "adopted_cleanup": {
+    "members_before": [
+      {
+        "pid": 5331,
+        "ppid": 1,
+        "group": 5331,
+        "session": 5331,
+        "start_ticks": 3806
+      },
+      {
+        "pid": 5339,
+        "ppid": 1,
+        "group": 5339,
+        "session": 5339,
+        "start_ticks": 3811
+      }
+    ],
+    "members_after": [],
+    "empty_after": true
+  },
+  "live_vs_exited": "unknown_not_established_by_saved_fields",
+  "creator": "unknown_Git_fixture_commit_auto_maintenance_is_hypothesis_only",
+  "git_version": "not_recorded_in_saved_runtime",
+  "cleanup_data_gap": [
+    "descendants omits state/comm/cmdline/executable",
+    "reap_group discards returned PID and wait status",
+    "cleanup sends TERM before its first reap",
+    "phase/process creation receipts absent"
+  ],
+  "container_absent": true,
+  "host_guard_equal": true,
+  "root_verification_sha256": "e30f7f2c776b8cace81d509b353d59e48ce2766f6a1e30650e5b8da127922480",
+  "sources": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\status.json",
+      "bytes": 3046,
+      "sha256": "f480e3b56a50bcc1f0474d4aacd625c80196904caa04ccfbffb9b64460d345ec"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\container.log",
+      "bytes": 733,
+      "sha256": "5d32dc7e82a7442d3a099edf9c37a8ba34e95c7e769c7fd906ad90352fdf1ffa"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\ROOT-RESULT-VERIFICATION.json",
+      "bytes": 10138,
+      "sha256": "e30f7f2c776b8cace81d509b353d59e48ce2766f6a1e30650e5b8da127922480"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\manifest.json",
+      "bytes": 3639,
+      "sha256": "785471e3a5f528f57247194ddf27ea5f4291a5b49f0119a702f152e97ad5d92e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\payload-hashes.json",
+      "bytes": 1421,
+      "sha256": "8dfa9055b604b1e532b20756860eac49b46814f52eb3ab0f7cadc08cd82123c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\owned-group.py",
+      "bytes": 3530,
+      "sha256": "30ebb9621da59cbdaacaa8a4289979f0420419ec8619585b1d5a83c8b6d34c0d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\inside.py",
+      "bytes": 12701,
+      "sha256": "2cfa409c8bdd8ef72314ee16157ab2d49ad99ba32af362bca6fd995a71d99438"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\pair-driver.ps1",
+      "bytes": 2338,
+      "sha256": "adcdd47a1937d325bb0337d4830a9b7dbd0949ffe6e5bf7b9be141fba49079be"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\author-one-case.ps1",
+      "bytes": 38164,
+      "sha256": "698ca9dceb018cde696ee2e8fac923d58f09a5243b37a1870143d62d1c241a34"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\run-child.py",
+      "bytes": 3510,
+      "sha256": "a34302f8f8f80ada204f440f10a5372bfaf75f2d8aa7127051f36c6093a09a7d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\common.py",
+      "bytes": 3597,
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\profile.ps1",
+      "bytes": 511681,
+      "sha256": "d087f1a057ed5dc06e9f6e0e3cb3f333626d0d21221a446bd72cb7be6313605d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\control.ps1",
+      "bytes": 503737,
+      "sha256": "f13b789b236559b4b27892ed79b205b64288af1041592fdb4b1ed8b050147dc3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\profile-catalog.json",
+      "bytes": 5597,
+      "sha256": "e3b8c71a04d1e26875cbfc33ce1695bc1701c2492b7bed0b351a6dfd4413151d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\inputs\\validate-cold-pair.py",
+      "bytes": 4013,
+      "sha256": "d7a5bec4de4b168e6ca72226535eeb02a6ea2849569b6ff1946c10b803dcf052"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\before.json",
+      "bytes": 414074,
+      "sha256": "376b12e2ab15477e6a47645eb9dd3afda1bed438d58331306e09a0113a9c1ef5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\bootstrap-output.txt",
+      "bytes": 194,
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\bootstrap.json",
+      "bytes": 153,
+      "sha256": "ff3c2a13e97d6d474fd6f15904e2806f32cc7fa54b214638364deaee4a287de4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\case.json",
+      "bytes": 494,
+      "sha256": "38deeefcc4ad569ea32b59bedca0b5dd1d986852eea8ef398d56197846a085f8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\cold-original-changed-pair-after.json",
+      "bytes": 414074,
+      "sha256": "376b12e2ab15477e6a47645eb9dd3afda1bed438d58331306e09a0113a9c1ef5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\cold-original-changed-pair.log",
+      "bytes": 59,
+      "sha256": "ea6b1485bddeeadf0f94e5a587f63f238b403be1dec2eeeea2cf54959b7d5631"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\control-child.json",
+      "bytes": 14512,
+      "sha256": "76fc2b5507ea266a2e775c2ca2a0a6ce9f7dee7812d77a5b284c013e100626b5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\control-stderr.txt",
+      "bytes": 5826,
+      "sha256": "47e8a26c611729038a3b184e46f3177041759c7f3ca3d064fe73c43ba04fe047"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\control-stdout.txt",
+      "bytes": 225,
+      "sha256": "2e0aa1c08ce9b8aa1f64481b16f239c3cee01716bf8ecd42cb89e48ebd811aba"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\control.spec.json",
+      "bytes": 8071,
+      "sha256": "a18412068840b61f277d80ca38d710fb61c513988482b3df8aa707f8d93ae7f3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\fixture-adaptation.json",
+      "bytes": 328,
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\host-source-after.json",
+      "bytes": 402147,
+      "sha256": "d4429225f5afd07798f014c30693de705e5d0fb9a7de04e2cef6eec8d0cea89f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\pair-result.json",
+      "bytes": 1666,
+      "sha256": "2391666a38deaf1f521c2bb981ae99558ffce834921f527c0015bf2c2336fecd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\profile-child.json",
+      "bytes": 13728,
+      "sha256": "51e879748f0a23346038d9f0daae205ffb918081c79f37a697496c1689bc3d96"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\profile-stderr.txt",
+      "bytes": 5034,
+      "sha256": "ba7b0fc525a2c7fe6b93e939d3c855532d182391c8274a5037d7375e8603bb06"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\profile-stdout.txt",
+      "bytes": 225,
+      "sha256": "2e0aa1c08ce9b8aa1f64481b16f239c3cee01716bf8ecd42cb89e48ebd811aba"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\profile.spec.json",
+      "bytes": 8071,
+      "sha256": "8b1a03da3d0e797b2793cf5c95b7b84d2ce806c89f2fbc942260cc247dc674fc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\result.json",
+      "bytes": 2008,
+      "sha256": "76835d102af47892f39b416e0af598bde39a724d8fce2063966c891c88b8edd5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\runtime.json",
+      "bytes": 453,
+      "sha256": "fef10df00c701849b90b04bc607f3778b87835de384360d155503c961e5d426c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\cold-comparison\\runs\\tf68-ed9-cold-original-changed-one\\output\\terminal-after.json",
+      "bytes": 414074,
+      "sha256": "376b12e2ab15477e6a47645eb9dd3afda1bed438d58331306e09a0113a9c1ef5"
+    }
+  ],
+  "payload_hashes_unchanged": true,
+  "selected_option": "D",
+  "selected_total": 93.0,
+  "rubric": {
+    "criteria": [
+      "truth_evidence_fidelity",
+      "ownership_recovery",
+      "attribution_precision",
+      "product_caller_fidelity",
+      "evidence_efficiency",
+      "change_review_burden"
+    ],
+    "weights": [
+      30,
+      25,
+      20,
+      10,
+      10,
+      5
+    ],
+    "scores": [
+      {
+        "option": "A",
+        "vector": [
+          8,
+          10,
+          1,
+          10,
+          4,
+          10
+        ],
+        "total": 70.0
+      },
+      {
+        "option": "B",
+        "vector": [
+          2,
+          1,
+          1,
+          4,
+          10,
+          10
+        ],
+        "total": 29.5
+      },
+      {
+        "option": "C",
+        "vector": [
+          5,
+          9,
+          4,
+          9,
+          2,
+          8
+        ],
+        "total": 60.5
+      },
+      {
+        "option": "D",
+        "vector": [
+          9,
+          10,
+          9,
+          10,
+          9,
+          8
+        ],
+        "total": 93.0
+      },
+      {
+        "option": "E",
+        "vector": [
+          8,
+          10,
+          5,
+          10,
+          10,
+          9
+        ],
+        "total": 83.5
+      },
+      {
+        "option": "F",
+        "vector": [
+          5,
+          5,
+          2,
+          10,
+          8,
+          8
+        ],
+        "total": 53.5
+      },
+      {
+        "option": "G",
+        "vector": [
+          7,
+          9,
+          5,
+          6,
+          7,
+          6
+        ],
+        "total": 69.5
+      },
+      {
+        "option": "H",
+        "vector": [
+          5,
+          9,
+          2,
+          4,
+          7,
+          7
+        ],
+        "total": 56.0
+      },
+      {
+        "option": "I",
+        "vector": [
+          4,
+          8,
+          2,
+          2,
+          2,
+          3
+        ],
+        "total": 41.5
+      },
+      {
+        "option": "J",
+        "vector": [
+          7,
+          9,
+          4,
+          7,
+          6,
+          5
+        ],
+        "total": 67.0
+      },
+      {
+        "option": "K",
+        "vector": [
+          5,
+          9,
+          3,
+          9,
+          1,
+          5
+        ],
+        "total": 56.0
+      }
+    ],
+    "score_calculation": "sum(weight*score)/10",
+    "hard_constraint_violations_immediate": [
+      "B",
+      "I",
+      "H_silent_suppression_or_removed_controls",
+      "F_zombie_ignorance"
+    ],
+    "no_score_is_empirical_probability": true
+  },
+  "next_preparation_proposal": {
+    "status": "root_display_and_preparation_release_required",
+    "actual_prefix_runs": 1,
+    "selected_comparison_children": 0,
+    "preserve_current_bootstrap_clock_inquiry_snapshots_modes_B_H_commit_commands": true,
+    "fresh_B_H_clock_required": true,
+    "no_frozen_detector_acceptance_change": true,
+    "controls": [
+      "direct_exited_reaped",
+      "adopted_exited_new_session",
+      "adopted_live_escaped_session",
+      "primary_failure_plus_owned_live_residue"
+    ],
+    "prefix_timeout_seconds": 60,
+    "control_timeout_seconds": 5,
+    "parent_timeout_seconds": 100,
+    "container_timeout_seconds": 180,
+    "maximum_task_children": 5,
+    "maximum_selected_comparison_children": 0,
+    "stream_and_trace_bytes": 2097152,
+    "maximum_receipt_events": 2000,
+    "maximum_output_bytes": 33554432,
+    "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "network": "none",
+    "pull": "never",
+    "fields_required": [
+      "phase_utc_monotonic",
+      "raw_proc_stat",
+      "state",
+      "pid_ppid_pgrp_session_start_ticks",
+      "bounded_comm_cmdline",
+      "exe_identity_or_unreadable",
+      "owned_identity_ledger",
+      "wait_pid_exit_signal_receipts",
+      "git_version_binary_hash_exec_path",
+      "finite_maintenance_config_values_origins_unset",
+      "B_H_commit_trace2_events"
+    ],
+    "execution_authorized": false
+  },
+  "verified_primary_references": [
+    {
+      "url": "https://man7.org/linux/man-pages/man2/wait.2.html",
+      "supports": "Unreaped exited child versus running child; wait result required."
+    },
+    {
+      "url": "https://man7.org/linux/man-pages/man2/PR_SET_CHILD_SUBREAPER.2const.html",
+      "supports": "Subreaper adoption/reaping; adoption alone does not prove exited state."
+    },
+    {
+      "url": "https://www.kernel.org/doc/html/latest/filesystems/proc.html",
+      "supports": "Process state and identity fields can be captured."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/git/git/v2.43.0/builtin/commit.c",
+      "supports": "Commit invokes automatic maintenance."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/git/git/v2.43.0/run-command.c",
+      "supports": "Version2.43 automatic maintenance invocation lacks current explicit detach choice."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/git/git/v2.43.0/builtin/gc.c",
+      "supports": "Auto-GC can detach only after its need check."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/git/git/v2.56.0/run-command.c",
+      "supports": "Version2.56 chooses automatic maintenance detach through relevant config."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/git/git/v2.56.0/builtin/gc.c",
+      "supports": "Version2.56 maintenance task runner can daemonize."
+    },
+    {
+      "url": "https://git-scm.com/docs/git-maintenance",
+      "supports": "Current default auto/autoDetach semantics; not proof of the unrecorded installed Git version."
+    }
+  ],
+  "new_execution": {
+    "product_code": 0,
+    "tests": 0,
+    "parsers": 0,
+    "containers": 0,
+    "profiles": 0,
+    "git_commands": 0,
+    "product_edits": 0,
+    "frozen_packet_edits": 0,
+    "native_mutations": 0,
+    "planning_edits": 0,
+    "network_read_only_primary_research": true
+  },
+  "round": 6,
+  "round_cap": 80,
+  "deadline": "2026-10-13T23:47:31Z",
+  "transfers": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "cap": 12
+  }
+}
