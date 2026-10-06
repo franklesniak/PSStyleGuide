@@ -1,0 +1,606 @@
+{
+  "captured_utc": "2026-10-06T07:56:06.400610+00:00",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "source_rows": [
+    {
+      "repository": "TF-current",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059
+    },
+    {
+      "repository": "TF-current",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+      "bytes": 36081
+    },
+    {
+      "repository": "TF-current",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "bytes": 25744
+    },
+    {
+      "repository": "PS-accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "bytes": 123582
+    },
+    {
+      "repository": "PS-accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "bytes": 36090
+    },
+    {
+      "repository": "PS-accepted",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "bytes": 25715
+    }
+  ],
+  "comments": [
+    {
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192817999",
+      "pull_request_review_id": 5425350909,
+      "id": 4192817999,
+      "node_id": "PRRC_kwDOSAZRhc756VNP",
+      "diff_hunk": "@@ -20,6 +20,271 @@ const read = name => fs.readFileSync(path.join(directory, name), 'utf8');\n const artifactVerifier = readContract().roles.artifactVerifier;\n const quote = value => `'${value.replaceAll(\"'\", \"''\")}'`;\n \n+// Private fixture discovery follows the contributor's required PowerShell7 PATH.\n+// Production acquisition keeps its fixed Git application paths unchanged.\n+function discoverFixtureGit({ env = process.env, run = spawnSync } = {}) {\n+  const result = run('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command',\n+    \"$ErrorActionPreference = 'Stop'; if ($PSVersionTable.PSVersion.Major -lt 7) { throw 'PowerShell7 is required.' }; \" +\n+    \"(Get-Command git -CommandType Application -All -TotalCount 1 -ErrorAction Stop).Source | ConvertTo-Json -Compress\"],\n+  { env, encoding: 'utf8', timeout: 30000, windowsHide: true });\n+  assert.equal(result.error, undefined, 'The fixture requires PowerShell7 on PATH.');\n+  assert.equal(result.status, 0, `Required Git application discovery failed: ${result.stderr}`);\n+  let application;\n+  try { application = JSON.parse(result.stdout); }\n+  catch (error) { assert.fail(`Git discovery did not return one JSON application path: ${error.message}`); }\n+  assert.equal(typeof application, 'string', 'Git discovery must return one application path.');\n+  assert.ok(path.isAbsolute(application), 'The fixture Git application path must be absolute.');\n+  assert.ok(fs.statSync(application).isFile(), 'The fixture Git application must be a file.');\n+  return application;\n+}\n+\n+test('fixture Git discovery requires native success and one absolute application', () => {\n+  const application = discoverFixtureGit();\n+  for (const result of [{ error: new Error('missing pwsh') }, { status: 1, stdout: '', stderr: 'missing git' },\n+    { status: 0, stdout: '{' }, { status: 0, stdout: 'null' }, { status: 0, stdout: JSON.stringify([application]) },\n+    { status: 0, stdout: JSON.stringify('git') }, { status: 0, stdout: JSON.stringify(directory) }]) {\n+    assert.throws(() => discoverFixtureGit({ run: () => result }));\n+  }\n+  assert.equal(discoverFixtureGit({ run: () => ({ status: 0, stdout: JSON.stringify(application) }) }), application);\n+});\n+\n+test('generator proof preserves each child exit before revision publication', t => {\n+  // Actual proof bodies launch a fixture harness in a real current-host process.\n+  // Only foreign fixed Git paths are adapted; this does not simulate hosted\n+  // Windows5.1 or native-ext4 generator execution.\n+  const jobs = parse(read('build.yml')).jobs;\n+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-proof-exit-'));\n+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));\n+  const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows');\n+  fs.mkdirSync(scripts, { recursive: true });\n+  const git = discoverFixtureGit();\n+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null',\n+    GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1' };\n+  for (const name of Object.keys(env)) if (/^GIT_(?:CONFIG_(?:COUNT|KEY_|VALUE_|PARAMETERS)|DIR$|WORK_TREE$|INDEX_FILE$|OBJECT_DIRECTORY$|ALTERNATE_OBJECT_DIRECTORIES$)/u.test(name)) delete env[name];\n+  fs.writeFileSync(path.join(scripts, 'Test-StyleGuideGenerator.ps1'), `\n+param([string]$ExpectedHost)\n+$intPass = if ([IO.File]::Exists($env:GENERATOR_PROOF_LOG)) { [IO.File]::ReadAllLines($env:GENERATOR_PROOF_LOG).Count + 1 } else { 1 }\n+[IO.File]::AppendAllText($env:GENERATOR_PROOF_LOG, ($ExpectedHost + \"\\n\"))\n+if ($env:GENERATOR_PROOF_MODE -eq ('pass' + $intPass)) { exit 7 }\n+if ($env:GENERATOR_PROOF_MODE -eq 'exception') { throw 'Fixture terminating exception.' }\n+exit 0\n+`);\n+  for (const args of [['init', '--quiet'], ['add', '--all'],\n+    ['-c', 'core.hooksPath=', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--quiet', '-m', 'Fixture']]) {\n+    const result = spawnSync(git, args, { cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true });\n+    assert.equal(result.status, 0, result.stderr);\n+  }\n+  const revision = spawnSync(git, ['rev-parse', 'HEAD'], { cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true });\n+  assert.equal(revision.status, 0, revision.stderr);\n+  const sha = revision.stdout.trim();\n+  for (const [id, host] of [['generator_windows_51', 'WindowsPowerShell51'], ['generator_windows_7', 'WindowsPowerShell7'],\n+    ['generator_linux_7', 'LinuxPowerShell7']]) {\n+    const source = jobs[id].steps.find(step => step.id === 'proof').run\n+      .replace(\"'C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe'\", quote(git)).replace(\"'/usr/bin/git'\", quote(git));\n+    const script = path.join(root, `${id}.ps1`);\n+    fs.writeFileSync(script, \"$ErrorActionPreference = 'Stop'\\n\" + source +\n+      \"\\nif (Test-Path -LiteralPath variable:\\\\LASTEXITCODE) { exit $LASTEXITCODE }\\n\");\n+    for (const mode of ['success', 'pass1', 'pass2', 'exception']) {\n+      const output = path.join(root, `${id}-${mode}.output`), log = path.join(root, `${id}-${mode}.calls`);\n+      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {\n+        cwd: work, env: { ...env, GITHUB_SHA: sha, GITHUB_OUTPUT: output, GENERATOR_PROOF_MODE: mode, GENERATOR_PROOF_LOG: log },\n+        encoding: 'utf8', timeout: 30000, windowsHide: true,\n+      });\n+      assert.equal(result.error, undefined, `${id}:${mode}`);\n+      assert.equal(result.status === 0, mode === 'success', `${id}:${mode}: ${result.stderr}`);\n+      const calls = fs.readFileSync(log, 'utf8').trim().split('\\n');\n+      assert.deepEqual(calls, Array(mode === 'success' || mode === 'pass2' ? 2 : 1).fill(host));\n+      if (mode === 'success') assert.equal(fs.readFileSync(output, 'utf8'), `revision=${sha}\\n`);\n+      else {\n+        assert.equal(fs.existsSync(output), false, `${id}:${mode} must not publish revision`);\n+        assert.match(result.stderr, /Generator pass [12] failed\\./u);\n+      }\n+    }",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "commit_id": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "original_commit_id": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "user": {
+        "login": "Copilot",
+        "id": 175728472,
+        "node_id": "BOT_kgDOCnlnWA",
+        "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/Copilot",
+        "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+        "followers_url": "https://api.github.com/users/Copilot/followers",
+        "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+        "organizations_url": "https://api.github.com/users/Copilot/orgs",
+        "repos_url": "https://api.github.com/users/Copilot/repos",
+        "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/Copilot/received_events",
+        "type": "Bot",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "The `exception` mode intentionally throws from the fixture `Test-StyleGuideGenerator.ps1`, which means the proof body will terminate before it can emit the controlled `Generator pass 1/2 failed.` diagnostics. As written, the test expects the pass-failure message for all non-`success` modes, so the `exception` case will fail. Fix by handling `exception` separately (e.g., assert non-zero exit + no revision publication, and match the exception text), or remove `exception` from the modes list if it\u2019s not a supported/meaningful behavior to validate.",
+      "created_at": "2026-10-06T07:49:53Z",
+      "updated_at": "2026-10-06T07:49:54Z",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4192817999",
+      "pull_request_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/68",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192817999"
+        },
+        "html": {
+          "href": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4192817999"
+        },
+        "pull_request": {
+          "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/68"
+        }
+      },
+      "reactions": {
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192817999/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "start_line": 87,
+      "original_start_line": 87,
+      "start_side": "RIGHT",
+      "line": 102,
+      "original_line": 102,
+      "side": "RIGHT",
+      "author_association": "NONE",
+      "original_position": 83,
+      "position": 83,
+      "subject_type": "line"
+    },
+    {
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192818069",
+      "pull_request_review_id": 5425350909,
+      "id": 4192818069,
+      "node_id": "PRRC_kwDOSAZRhc756VOV",
+      "diff_hunk": "@@ -220,28 +255,38 @@ function Assert-AllowedPathSet {\n     # surface. Parameters, return shape, and positional contract may change\n     # without notice.\n     #\n-    # Version: 1.0.20260818.2\n+    # Version: 2.0.20261005.0\n     #\n     # This function supports positional parameters\n     # (internal-caller contract only; subject to change):\n     #\n     #   Position 0: PathRecords\n     #   Position 1: AllowedPaths\n     #   Position 2: SurfaceName\n+    [CmdletBinding(PositionalBinding = $true)]\n+    [OutputType([string])]\n     param([byte[][]]$PathRecords, [string[]]$AllowedPaths, [string]$SurfaceName)\n     $objUtf8 = [System.Text.UTF8Encoding]::new($false, $true)\n     $listObservedPaths = [System.Collections.Generic.List[string]]::new()\n     foreach ($arrRecord in $PathRecords) {\n-        try { $strPath = $objUtf8.GetString($arrRecord) } catch { throw \"git-paths: undecodable $SurfaceName record\" }\n+        try {\n+            $strPath = $objUtf8.GetString($arrRecord)\n+        } catch {\n+            throw \"git-paths: undecodable $SurfaceName record\"\n+        }\n         $arrRoundTrip = $objUtf8.GetBytes($strPath)\n         if ([Convert]::ToBase64String($arrRecord) -cne [Convert]::ToBase64String($arrRoundTrip)) {\n             throw \"git-paths: ambiguous $SurfaceName record\"\n         }\n-        if ($listObservedPaths -ccontains $strPath) { throw \"git-paths: duplicate $SurfaceName record\" }\n-        if ($AllowedPaths -cnotcontains $strPath) { throw \"git-paths: unexpected $SurfaceName path\" }\n+        if ($listObservedPaths -ccontains $strPath) {\n+            throw \"git-paths: duplicate $SurfaceName record\"\n+        }\n+        if ($AllowedPaths -cnotcontains $strPath) {\n+            throw \"git-paths: unexpected $SurfaceName path\"\n+        }\n         $listObservedPaths.Add($strPath)\n     }\n-    return @($listObservedPaths | Sort-Object -CaseSensitive)\n+    return $listObservedPaths | Sort-Object -CaseSensitive",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "commit_id": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "original_commit_id": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "user": {
+        "login": "Copilot",
+        "id": 175728472,
+        "node_id": "BOT_kgDOCnlnWA",
+        "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/Copilot",
+        "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+        "followers_url": "https://api.github.com/users/Copilot/followers",
+        "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+        "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+        "organizations_url": "https://api.github.com/users/Copilot/orgs",
+        "repos_url": "https://api.github.com/users/Copilot/repos",
+        "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/Copilot/received_events",
+        "type": "Bot",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "body": "Assert-AllowedPathSet\u2019s return shape changed from a forced array (`@(...)`) to a pipeline return. This can return a scalar string when exactly one path is observed, which is easy to mis-handle at call sites (e.g., `.Count` semantics differ between `string` and `string[]`). If callers rely on consistent array semantics, return an explicit array (e.g., `return @($listObservedPaths | Sort-Object -CaseSensitive)`).",
+      "created_at": "2026-10-06T07:49:54Z",
+      "updated_at": "2026-10-06T07:49:54Z",
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4192818069",
+      "pull_request_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/68",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192818069"
+        },
+        "html": {
+          "href": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4192818069"
+        },
+        "pull_request": {
+          "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/68"
+        }
+      },
+      "reactions": {
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments/4192818069/reactions",
+        "total_count": 0,
+        "+1": 0,
+        "-1": 0,
+        "laugh": 0,
+        "hooray": 0,
+        "confused": 0,
+        "heart": 0,
+        "rocket": 0,
+        "eyes": 0
+      },
+      "start_line": null,
+      "original_start_line": null,
+      "start_side": null,
+      "line": 289,
+      "original_line": 289,
+      "side": "RIGHT",
+      "author_association": "NONE",
+      "original_position": 192,
+      "position": 192,
+      "subject_type": "line"
+    }
+  ],
+  "findings": [
+    {
+      "id": "TF68-R14",
+      "comment": 4192817999,
+      "validated": false,
+      "disposition": "No change; native child exception becomes status checked by parent",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "criteria": [
+        "Runtime correctness",
+        "Regression sensitivity",
+        "Diagnostic usability",
+        "Cross-platform evidence",
+        "Maintenance cost"
+      ],
+      "scores": [
+        {
+          "id": "A",
+          "name": "Retain current assertion and reply with actual evidence",
+          "scores": [
+            10,
+            10,
+            10,
+            9,
+            10
+          ],
+          "total": 99.0
+        },
+        {
+          "id": "B",
+          "name": "Also require fixture exception text",
+          "scores": [
+            9,
+            9,
+            7,
+            7,
+            7
+          ],
+          "total": 83.0
+        },
+        {
+          "id": "C",
+          "name": "Special-case exception; remove controlled-message assertion",
+          "scores": [
+            7,
+            5,
+            6,
+            8,
+            7
+          ],
+          "total": 63.0
+        },
+        {
+          "id": "D",
+          "name": "Remove exception mode",
+          "scores": [
+            6,
+            2,
+            5,
+            8,
+            9
+          ],
+          "total": 49.5
+        },
+        {
+          "id": "E",
+          "name": "Change production proof error transport",
+          "scores": [
+            5,
+            5,
+            5,
+            4,
+            2
+          ],
+          "total": 47.5
+        }
+      ],
+      "selection": "A"
+    },
+    {
+      "id": "TF68-R15",
+      "comment": 4192818069,
+      "validated": false,
+      "disposition": "No change; documented string stream and actual Count consumers collect output",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "criteria": [
+        "Caller and stream correctness",
+        "Refusal/security preservation",
+        "Reader/contributor clarity",
+        "Evidence and compatibility",
+        "Maintenance cost"
+      ],
+      "scores": [
+        {
+          "id": "A",
+          "name": "Retain documented stream and existing caller collection",
+          "scores": [
+            10,
+            10,
+            9,
+            10,
+            10
+          ],
+          "total": 98.0
+        },
+        {
+          "id": "B",
+          "name": "Add redundant inner @() to return",
+          "scores": [
+            10,
+            10,
+            6,
+            9,
+            7
+          ],
+          "total": 89.0
+        },
+        {
+          "id": "C",
+          "name": "Return one array object with unary comma/NoEnumerate",
+          "scores": [
+            4,
+            6,
+            4,
+            3,
+            3
+          ],
+          "total": 43.0
+        },
+        {
+          "id": "D",
+          "name": "Remove return output",
+          "scores": [
+            4,
+            8,
+            4,
+            3,
+            5
+          ],
+          "total": 49.0
+        },
+        {
+          "id": "E",
+          "name": "Add comment or redundant shape-only regression",
+          "scores": [
+            10,
+            10,
+            8,
+            8,
+            5
+          ],
+          "total": 90.5
+        }
+      ],
+      "selection": "A"
+    }
+  ],
+  "prior_identical_disposition_found": false,
+  "tests_executed_this_task": 0,
+  "product_writes": 0,
+  "native_actions": 0,
+  "source_guard": {
+    "head_equal": true,
+    "tracked_clean_before": true,
+    "tracked_clean_after": true,
+    "source_bytes_equal": true
+  },
+  "existing_windows_run": {
+    "name": "ci-helpers",
+    "command": [
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "--test",
+      "--test-name-pattern=fixture Git discovery|generator proof preserves|dedicated review setup preserves|actual workflows cover",
+      ".github/workflows/Test-CiHelpers.test.mjs"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:32:27.155134+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 0,
+    "finished_utc": "2026-10-06T06:32:41.823991+00:00",
+    "log_sha256": "22a3d0e4612f67c58b7b51ba8caec9d5280d3ba22a0f09c56dddd3162936e497",
+    "retained_log": "ci-helpers-windows.log"
+  },
+  "existing_linux_commands": [
+    {
+      "name": "yaml-parse",
+      "command": [
+        "python",
+        "-m",
+        "pre_commit_hooks.check_yaml",
+        ".github/workflows/copilot-code-review.yml",
+        ".github/workflows/agent-instructions.yml"
+      ],
+      "started_utc": "2026-10-06T06:43:50.960081+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:43:51.028881+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "yaml-style",
+      "command": [
+        "python",
+        "-m",
+        "yamllint",
+        "--config-data",
+        "extends: default\nrules:\n  line-length:\n    level: warning\n  truthy:\n    check-keys: false\n",
+        ".github/workflows/copilot-code-review.yml",
+        ".github/workflows/agent-instructions.yml"
+      ],
+      "started_utc": "2026-10-06T06:43:51.072374+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:43:51.196898+00:00",
+      "log_sha256": "9060d685f19d02a59833681c98c7df13da1d7838cf6b3e26f13f867e4b6b0a1d"
+    },
+    {
+      "name": "actionlint",
+      "command": [
+        "/opt/psstyleguide-runtime/pre-commit-cache/repoghosj9tg/golangenv-system/bin/actionlint",
+        ".github/workflows/copilot-code-review.yml",
+        ".github/workflows/agent-instructions.yml"
+      ],
+      "started_utc": "2026-10-06T06:43:51.233901+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:43:51.358161+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "setup-reader",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/setup-focus.ps1",
+        "-RepositoryRootPath",
+        "/work/tf68-setup-focus-5fuv9whl/repository"
+      ],
+      "started_utc": "2026-10-06T06:43:51.395899+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:44:01.896859+00:00",
+      "log_sha256": "88cbaccaa707125673c0017a594bdd1fac5be953b05c29e8fd05800a370730d8"
+    },
+    {
+      "name": "metadata-controls",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/metadata-controls.ps1",
+        "-RepositoryRootPath",
+        "/work/tf68-setup-focus-5fuv9whl/repository"
+      ],
+      "started_utc": "2026-10-06T06:44:01.937463+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:44:02.718865+00:00",
+      "log_sha256": "ff465da3b832c45196de54797b1e234028bc2a7f709019c24d5be38e2097affd"
+    },
+    {
+      "name": "extra-reader-controls",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/extra-reader-controls.ps1",
+        "-RepositoryRootPath",
+        "/work/tf68-setup-focus-5fuv9whl/repository"
+      ],
+      "started_utc": "2026-10-06T06:44:02.843591+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:44:05.778308+00:00",
+      "log_sha256": "ca7005096a3175dac9b19fbe314d78e9ab7a057bc3c4f85e081771825ca4e882"
+    },
+    {
+      "name": "discovery-controls",
+      "command": [
+        "node",
+        "/input/discovery-controls.mjs",
+        "/work/tf68-setup-focus-5fuv9whl/repository"
+      ],
+      "started_utc": "2026-10-06T06:44:05.816737+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:44:24.190386+00:00",
+      "log_sha256": "27dff6902b5cdbe0394071523e9f0c9009ba2c715cbff93f0293311441ba7c72"
+    },
+    {
+      "name": "affected-ci-helpers",
+      "command": [
+        "node",
+        "--test",
+        "--test-name-pattern=Copilot|dedicated review|fixture Git discovery|generator proof preserves|actual workflows cover",
+        ".github/workflows/Test-CiHelpers.test.mjs"
+      ],
+      "started_utc": "2026-10-06T06:44:24.231582+00:00",
+      "native_exit": 0,
+      "finished_utc": "2026-10-06T06:45:48.908710+00:00",
+      "log_sha256": "1668b95fd499da834ea9fdeb87774fa725e77124ba71dc3517003c53f1ac0d39"
+    }
+  ],
+  "existing_linux_state": "passed",
+  "existing_linux_source_equal": true,
+  "existing_full_suite": {
+    "tests": 600,
+    "pass_count": 600,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "artifacts": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-observation-0750.json",
+      "sha256": "7e6ba1b27ac398f41c6832046f088e04ad25ec6d117fc8bbf0ca29e4187c354d",
+      "bytes": 886373
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\evidence.json",
+      "sha256": "0d757d426cab263f193b198fd6692a57a0b7e43714dd96b2474fa674c26614dd",
+      "bytes": 31119
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\source-final.json",
+      "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+      "bytes": 19655
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\ci-helpers-windows.log",
+      "sha256": "22a3d0e4612f67c58b7b51ba8caec9d5280d3ba22a0f09c56dddd3162936e497",
+      "bytes": 499
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-output-attempt2\\affected-ci-helpers.log",
+      "sha256": "1668b95fd499da834ea9fdeb87774fa725e77124ba71dc3517003c53f1ac0d39",
+      "bytes": 13806
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-output-attempt2\\result.json",
+      "sha256": "75adb6af80784ea70a4caeaef3b908cdc0da83f50c2779a4f428bea3bce34cbc",
+      "bytes": 4378
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-output-attempt2\\host-result.json",
+      "sha256": "2069f9eddaa1a6bf655b649b9c77cdd5daa88e5d424b5ab645c15b369ca2697e",
+      "bytes": 1213
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair\\runs\\a06-tf-peer-20261006-round4-repair\\output\\full-node.log",
+      "sha256": "d5515665a6660a7ca985428d1b30ebd9794f4801b794db0c2f02f205c794ef0d",
+      "bytes": 50678
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-5ec4bdc\\platform-proof.json",
+      "sha256": "d82614882081381d0c3fde88c20a516c3b7423be493b63465fb58a3890046b5d",
+      "bytes": 11581
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round1\\REPORT.md",
+      "sha256": "85efb366521834bfe15ec3dfe118b6fe4d0ea6ca0794acd868db8036e3a12f38",
+      "bytes": 4727
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round3\\R8-output-type.md",
+      "sha256": "cf739d8b36f6d7a0e76bec03f29f79b51de51637fb0d5532fe08fddbc0eb7298",
+      "bytes": 8346
+    }
+  ],
+  "primary_sources": [
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.5",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_preference_variables?view=powershell-7.5",
+    "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_return?view=powershell-7.5"
+  ],
+  "report_sha256": "e2614c555eb35c8f36b0ec7d73158ca772b5d3bbf8887a961edcb8fa4543b786",
+  "limitations": [
+    "Existing fixture test executes each proof body using the current host, not Windows5.1 locally.",
+    "Platform156x2 proof is separate from the four-mode exception fixture.",
+    "No new output-shape probe was needed; actual collected callers and primary enumeration semantics resolve R15.",
+    "No CI/service acceptance or merge authority follows these no-change dispositions."
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "selected_at": "2026-10-06T07:49:48.120381+00:00",
+  "decision": "S1 activation sequence B93.5, conditional",
+  "basis": "Root read full proposal, verified all18 Git source rows and historical hashes, checked all14 weighted totals, independently consulted the two primary GitHub pages, then displayed validation/options/rubric/table/selected procedure in order.",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "report_sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def",
+  "evidence_sha256": "951617290ad677dcb5f797249d08eace6be32f330bac613a36a588919250047a",
+  "condition": "Every applicable current-input CI result, including the dynamic review setup, must succeed; both required reviews and final code/security/quality gates must pass. Any current failure/cancellation makes this route unavailable.",
+  "selected_procedure": "Only after all-green native readiness, normal source landing may precede actual dedicated-service activation proof. S1/task and affected paired acceptance remain incomplete until actual selected dedicated setup and successful terminal service completion on legitimate current input. No dummy product change, bypass, direct main write, or historical CI waiver.",
+  "fallback": "Inspect any actual terminal failure; no automatic bootstrap, unsupported configuration, paid runner, or CI retry released. Complete decision on concrete remedy before new implementation.",
+  "owner_input_needed_now": false,
+  "merge_released_now": false,
+  "counters_changed": false,
+  "deadline": "2026-10-13T23:47:31+00:00"
+}

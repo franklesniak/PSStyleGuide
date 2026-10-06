@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A04 current result
 
+**Dedicated review setup impact checked,2026-10-06:** [The conditional addendum](TF68-round4-impact/REPORT.md) compares accepted PS9817762, published TF5ec4bdc and accepted TFe21b74f. Root verified all60 raw Git identities and retained evidence hashes. The new review setup adds a Copilot installer consumer with the same complete6,318-byte runtime step; it adds no ordinary initializer call. The four ordinary callers per repository and the611-byte download segment are unchanged. D04-1/2/3 and A03-D6 remain applicable; no new material finding or product-scope change. Actual whole-helper tests and implementation remain due after accepted prerequisites and current-main rebinding. No test, destination edit or counter increment occurred; A04 remains0/8 with no review clock.
+
 **Post-A06 readiness refreshed,2026-10-05:** [The current report](postA06/REPORT.md) confirms D04-1 R93, D04-2 Q99 and D04-3 C93 against accepted PSd7b206a/TFe21b74f and prospective A06treefd66ed6. All four unchanged611-byte initializer segments preserve the existing findings. Actual ordinary fixture and asynchronous loopback regions remain unchanged through A06; integrate into the current complete test file. Root read the report, independently sampled four raw Git objects/modes and checked four retained evidence hashes. No tests were rerun. After serialized A06/A07 acceptance, implement first-argument disable/retry-max300 and actual Linux whole-helper controls, preserving independent runtime proof and paired lifecycle. A04 remains0/8 with an unstarted clock; no new owner decision.
 
 State: validating. Readiness is current; implementation and acceptance remain due.

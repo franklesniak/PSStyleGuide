@@ -1,0 +1,750 @@
+{
+  "status": "conditional read-only A04 addendum; TF published not accepted",
+  "captured_utc": "2026-10-06T07:36:23.709967+00:00",
+  "PS_accepted": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "TF_published_candidate": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "TF_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "TF_accepted": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "native_status_source": "coordinator supplied; no new native action",
+  "catalog": [
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+      "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      "bytes": 5844
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "bytes": 123582
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "bytes": 17625
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "bytes": 26216
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "bytes": 1517
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "bytes": 91
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "bytes": 3081
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "bytes": 6095
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "bytes": 25715
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+      "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+      "bytes": 6686
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+      "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      "bytes": 12837
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "bytes": 51809
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "bytes": 13541
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+      "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "bytes": 816
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+      "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "bytes": 3552
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+      "bytes": 844
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      "bytes": 38822
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "bytes": 26191
+    },
+    {
+      "snapshot": "PS",
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "absent": true
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "blob": "906460d818674199b32294185ed6525c143b48bb",
+      "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+      "bytes": 5706
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "bytes": 17625
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "bytes": 26216
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "bytes": 1496
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "bytes": 91
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+      "bytes": 3088
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "bytes": 6095
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "bytes": 25744
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+      "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+      "bytes": 6714
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "bytes": 12893
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "bytes": 51830
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+      "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+      "bytes": 13470
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "bytes": 837
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+      "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "bytes": 3566
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "670083e767627cfed90a61f788021dba88de1091",
+      "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "bytes": 994
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "bytes": 38834
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "bytes": 26191
+    },
+    {
+      "snapshot": "TFcandidate",
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "blob": "906460d818674199b32294185ed6525c143b48bb",
+      "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+      "bytes": 5706
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea",
+      "bytes": 100007
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+      "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0",
+      "bytes": 26228
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "bytes": 17320
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda",
+      "bytes": 17621
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "bytes": 1496
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "bytes": 91
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+      "bytes": 3088
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+      "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae",
+      "bytes": 6063
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+      "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+      "bytes": 4348
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+      "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+      "bytes": 6714
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+      "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+      "bytes": 12865
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "bytes": 51830
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+      "sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97",
+      "bytes": 13086
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "bytes": 837
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "package-lock.json",
+      "mode": "100644",
+      "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+      "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "bytes": 3566
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+      "bytes": 902
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "bytes": 38836
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+      "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5",
+      "bytes": 25554
+    },
+    {
+      "snapshot": "TFaccepted",
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "absent": true
+    }
+  ],
+  "ordinary_segments": [
+    {
+      "snapshot": "PS",
+      "start_line": 58,
+      "segment_sha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "segment_bytes": 611,
+      "text": "& /usr/bin/curl --silent --show-error --fail --location --proto '=https' `\n    --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 `\n    --retry 2 --output $strArchive $strUrl\nif ($LASTEXITCODE -ne 0) { throw \"Runtime download failed: $LASTEXITCODE\" }\nif ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne\n    $objPin.linuxX64Sha256) { throw \"The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration.\" }\n",
+      "has_first_disable": false,
+      "has_retry_max_time": false
+    },
+    {
+      "snapshot": "TFcandidate",
+      "start_line": 57,
+      "segment_sha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "segment_bytes": 611,
+      "text": "& /usr/bin/curl --silent --show-error --fail --location --proto '=https' `\n    --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 `\n    --retry 2 --output $strArchive $strUrl\nif ($LASTEXITCODE -ne 0) { throw \"Runtime download failed: $LASTEXITCODE\" }\nif ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne\n    $objPin.linuxX64Sha256) { throw \"The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration.\" }\n",
+      "has_first_disable": false,
+      "has_retry_max_time": false
+    },
+    {
+      "snapshot": "TFaccepted",
+      "start_line": 57,
+      "segment_sha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "segment_bytes": 611,
+      "text": "& /usr/bin/curl --silent --show-error --fail --location --proto '=https' `\n    --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 `\n    --retry 2 --output $strArchive $strUrl\nif ($LASTEXITCODE -ne 0) { throw \"Runtime download failed: $LASTEXITCODE\" }\nif ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne\n    $objPin.linuxX64Sha256) { throw \"The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration.\" }\n",
+      "has_first_disable": false,
+      "has_retry_max_time": false
+    }
+  ],
+  "copilot_runtime_steps": [
+    {
+      "snapshot": "PS",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "step_start_line": 450,
+      "step_bytes": 6318,
+      "step_sha256": "412d19aaadd0e8f7855a2707c673de66b99284b6cb431965be0ed03dfaa92520",
+      "curl_line": "          & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+      "curl_line_sha256": "0c7d75a110ad1b98eb0ef3b544a8be5bdd8d694414f015b378b21269c6dcd4cc",
+      "ordinary_initializer_calls": 0
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "step_start_line": 450,
+      "step_bytes": 6318,
+      "step_sha256": "412d19aaadd0e8f7855a2707c673de66b99284b6cb431965be0ed03dfaa92520",
+      "curl_line": "          & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+      "curl_line_sha256": "0c7d75a110ad1b98eb0ef3b544a8be5bdd8d694414f015b378b21269c6dcd4cc",
+      "ordinary_initializer_calls": 0
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "step_start_line": 452,
+      "step_bytes": 6318,
+      "step_sha256": "412d19aaadd0e8f7855a2707c673de66b99284b6cb431965be0ed03dfaa92520",
+      "curl_line": "          & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+      "curl_line_sha256": "0c7d75a110ad1b98eb0ef3b544a8be5bdd8d694414f015b378b21269c6dcd4cc",
+      "ordinary_initializer_calls": 0
+    }
+  ],
+  "ordinary_callers": [
+    {
+      "snapshot": "PS",
+      "path": ".github/workflows/markdownlint.yml",
+      "job": "policy",
+      "line": 63,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies"
+    },
+    {
+      "snapshot": "PS",
+      "path": ".github/workflows/markdownlint.yml",
+      "job": "markdownlint",
+      "line": 124,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies"
+    },
+    {
+      "snapshot": "PS",
+      "path": ".github/workflows/agent-instructions.yml",
+      "job": "accepted-policy",
+      "line": 72,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies"
+    },
+    {
+      "snapshot": "PS",
+      "path": ".github/workflows/agent-instructions.yml",
+      "job": "candidate-tests",
+      "line": 162,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies"
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/markdownlint.yml",
+      "job": "policy",
+      "line": 63,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies"
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/markdownlint.yml",
+      "job": "markdownlint",
+      "line": 124,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies"
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/agent-instructions.yml",
+      "job": "accepted-policy",
+      "line": 72,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies"
+    },
+    {
+      "snapshot": "TFcandidate",
+      "path": ".github/workflows/agent-instructions.yml",
+      "job": "candidate-tests",
+      "line": 162,
+      "call": "./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies"
+    }
+  ],
+  "retained_async_curl_test": [
+    {
+      "snapshot": "PS",
+      "name": "actual curl default-file contamination",
+      "start_line": 1302,
+      "bytes": 2482,
+      "sha256": "f7f8d205dd3594fc972dbd6ecc58d7adec4786b6573f4dba4c07d63b58355e47"
+    },
+    {
+      "snapshot": "TFcandidate",
+      "name": "actual curl default-file contamination",
+      "start_line": 1332,
+      "bytes": 2482,
+      "sha256": "f7f8d205dd3594fc972dbd6ecc58d7adec4786b6573f4dba4c07d63b58355e47"
+    }
+  ],
+  "new_review_parity_test": {
+    "start_line": 1909,
+    "bytes": 912,
+    "sha256": "c416747fac5d54ba46d74999b370f84d2dd35a66b05b1b212a0694585034a43e",
+    "text": "test('dedicated review setup preserves every preparation guard and omits only the aggregate', () => {\n  const coding = parse(read('copilot-setup-steps.yml'));\n  assert.deepEqual(Object.keys(reviewSetup.jobs), ['copilot-setup-steps']);\n  assert.deepEqual(reviewSetup.on, coding.on);\n  assert.deepEqual(reviewSetup.permissions, {});\n  assert.deepEqual(reviewJob.permissions, {});\n  assert.equal(reviewJob.env, undefined);\n  assert.equal(reviewJob['runs-on'], copilotJob['runs-on']);\n  assert.equal(reviewJob['timeout-minutes'], copilotJob['timeout-minutes']);\n  const complete = copilotStep('Run complete repository validation');\n  assert.ok(complete);\n  assert.match(complete.run, /-m pre_commit run --all-files/u);\n  assert.deepEqual(reviewJob.steps, copilotJob.steps.filter(step => step !== complete));\n  assert.equal(reviewJob.steps.some(step => step.run.includes('-m pre_commit run --all-files')), false);\n});"
+  },
+  "historical_inputs": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A04.md",
+      "sha256": "e8f69fffac8a3f1dfc4e76e8e2eeef205af2cf502789603bc1be314bfd07abc9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A04\\postA06\\REPORT.md",
+      "sha256": "0d0f2089cd508148a3589f3f487a889ed515fcfee72497ab471f53b8ac55eca1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A04\\postA06\\identity-change-catalog.json",
+      "sha256": "80168eb219aa85a3809b02c37f99d6a433bf43af814035b996903b8e31814359"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A04\\design.md",
+      "sha256": "3ce4a86710b9a4ef80bd0cce38a695b444dbbc2664253640998ab8a21377e057"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A04\\RESULT.md",
+      "sha256": "121c655f21b06aca11520af463552a89195bce05050eed933f332a09952992d1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A04\\threat-map.md",
+      "sha256": "671ed1b9dc0605e85c02b962a133ed072da5f5459fd36c3903ba4e90a9962270"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\copilot-curl-decision.md",
+      "sha256": "b99460a2a27ac7f2726c4717b3241c9554d05784089f6507bf0f804d537bb95b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\evidence.json",
+      "sha256": "0d757d426cab263f193b198fd6692a57a0b7e43714dd96b2474fa674c26614dd"
+    }
+  ],
+  "guards_before_after_equal": {
+    "PS": {
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "index_sha256": "afd03ca8e17f7360099508048edb11ebc79aee1bd708e8907d125c6587c5c0b8",
+      "config_sha256": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "refs_sha256": "4ebc3c1fd637231494715599102a1baf641397df51cc069383cec1c01cb29c0d"
+    },
+    "TF": {
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "index_sha256": "cd4559b02dd014524049008598b7bffdfc503bf2eb5fcbfd0ddc9227995a446b",
+      "config_sha256": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+      "refs_sha256": "a5426a5469c38c71cfa99e594cca624dc58d15fafda41dba2961bf730037a46a"
+    }
+  },
+  "decisions_reused": [
+    "D04-1 R93",
+    "D04-2 Q99",
+    "D04-3 C93",
+    "A03-D6 B98"
+  ],
+  "A04_product_scope_change": false,
+  "census_addition": ".github/workflows/copilot-code-review.yml is a separate Copilot installer consumer, not a new ordinary initializer caller",
+  "new_material_finding": false,
+  "tests_executed": false,
+  "product_or_planning_mutation": false,
+  "counters_changed": false,
+  "A04_transfers": "0/8",
+  "A04_review_clock": "not started",
+  "retained_async_boundary_note": "The recorded test span excludes one trailing LF (2482 bytes); the historical postA06 2483-byte span includes that LF. Both pinned current inputs use the same raw span; this is an extraction-boundary difference, not source normalization.",
+  "report_sha256": "11828087cdcbff841b67e1db39aea08a962166df86759e7c3e228ec86444e804"
+}

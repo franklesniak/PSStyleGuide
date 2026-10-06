@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-06T07:59:10.253606+00:00",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "report_sha256": "52c92e57fefc1545d8890810edeb85e7e36662f3781c981d4f0a013c7a95b44f",
+  "evidence_sha256": "9ec4360aaf689f5d256b3d792b42022dafacae537c3ec25d34b408257c2811e1",
+  "sources_verified": 6,
+  "artifact_hashes_verified": 13,
+  "score_rows_verified": 10,
+  "decisions": [
+    "R14 A99 no change",
+    "R15 A98 no change"
+  ],
+  "root_evidence": "Read full corrected report, actual native-child proof and all three path consumers. Verified immutable sources, matching executed test logs and arithmetic. Read Microsoft process/preference/return documentation. All options, separate rubrics and scoring tables were displayed before selected no-change procedures. Preserved rejected draft and explicit correction.",
+  "limitations": "No new tests. No service or merge acceptance. Native replies remain pending."
+}

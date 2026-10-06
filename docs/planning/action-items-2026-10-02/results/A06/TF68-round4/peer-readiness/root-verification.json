@@ -1,0 +1,11 @@
+{
+  "status": "root_verified_conditional_only",
+  "checked_at": "2026-10-06T07:09:24.344742+00:00",
+  "report_sha256": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845",
+  "evidence_sha256": "f237d0e817445e5da9857cebae78808bbd41fbaa983024fd33d012dc911cfbc5",
+  "raw_blob_mode_size_sha_rows_verified": 60,
+  "paths": 10,
+  "implementation_started": false,
+  "counters_changed": false,
+  "prior_coordinator_attempt": "All raw rows checked, then postcondition mistakenly expected new_material_finding=null. Actual schema is false. Corrected reader expectation only; no evidence or product edits."
+}

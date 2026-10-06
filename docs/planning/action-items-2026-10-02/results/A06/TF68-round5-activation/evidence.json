@@ -1,0 +1,697 @@
+{
+  "status": "read-only activation proposal; not selected/released",
+  "captured_utc": "2026-10-06T07:45:25.944135+00:00",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "raw_sources": [
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "bytes": 51830
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "absent": true
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "bytes": 482175
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
+      "bytes": 229955
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea",
+      "bytes": 100007
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+      "bytes": 902
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "bytes": 38836
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+      "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654",
+      "bytes": 9874
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "bytes": 5405
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "bytes": 51830
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "b41dbf43f0bc67fd73d406b5d297f384e94ff4bd",
+      "sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "bytes": 484458
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "afbc01b4ae103cc660fc28ac1e3bf28a9d885eeb",
+      "sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "bytes": 247937
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "670083e767627cfed90a61f788021dba88de1091",
+      "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "bytes": 994
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "bytes": 38834
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+      "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+      "bytes": 10453
+    },
+    {
+      "commit": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "bytes": 5405
+    }
+  ],
+  "observed_job": {
+    "snapshot_captured_at": "2026-10-06T07:34:39.967783+00:00",
+    "id": 112159069361,
+    "run_id": 37430212759,
+    "head_sha": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "status": "in_progress",
+    "conclusion": null,
+    "started_at": "2026-10-06T07:31:44Z",
+    "actual_user_steps": [
+      {
+        "name": "Acquire triggering revision without an action",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 12,
+        "started_at": "2026-10-06T07:32:01Z",
+        "completed_at": "2026-10-06T07:32:09Z"
+      },
+      {
+        "name": "Verify checkout credential cleanup",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 17,
+        "started_at": "2026-10-06T07:32:10Z",
+        "completed_at": "2026-10-06T07:32:11Z"
+      },
+      {
+        "name": "Acquire published main reference",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 22,
+        "started_at": "2026-10-06T07:32:11Z",
+        "completed_at": "2026-10-06T07:32:13Z"
+      },
+      {
+        "name": "Reject alternate npm install inputs",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 27,
+        "started_at": "2026-10-06T07:32:14Z",
+        "completed_at": "2026-10-06T07:32:14Z"
+      },
+      {
+        "name": "Detect locked validation-tool layout",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 32,
+        "started_at": "2026-10-06T07:32:15Z",
+        "completed_at": "2026-10-06T07:32:16Z"
+      },
+      {
+        "name": "Verify acquired immutable setup inputs",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 37,
+        "started_at": "2026-10-06T07:32:16Z",
+        "completed_at": "2026-10-06T07:32:16Z"
+      },
+      {
+        "name": "Set up verified official Node.js runtime",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 42,
+        "started_at": "2026-10-06T07:32:17Z",
+        "completed_at": "2026-10-06T07:32:21Z"
+      },
+      {
+        "name": "Verify selected Node.js runtime",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 47,
+        "started_at": "2026-10-06T07:32:22Z",
+        "completed_at": "2026-10-06T07:32:22Z"
+      },
+      {
+        "name": "Install locked Node.js validation tools",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 52,
+        "started_at": "2026-10-06T07:32:23Z",
+        "completed_at": "2026-10-06T07:32:25Z"
+      },
+      {
+        "name": "Verify locked dependency trees and immutable manifests",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 57,
+        "started_at": "2026-10-06T07:32:25Z",
+        "completed_at": "2026-10-06T07:32:26Z"
+      },
+      {
+        "name": "Set up isolated Python 3.12",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 62,
+        "started_at": "2026-10-06T07:32:27Z",
+        "completed_at": "2026-10-06T07:32:30Z"
+      },
+      {
+        "name": "Install locked Python validation tools",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 67,
+        "started_at": "2026-10-06T07:32:31Z",
+        "completed_at": "2026-10-06T07:32:35Z"
+      },
+      {
+        "name": "Activate repository hooks",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 72,
+        "started_at": "2026-10-06T07:32:36Z",
+        "completed_at": "2026-10-06T07:32:36Z"
+      },
+      {
+        "name": "Run complete repository validation",
+        "status": "in_progress",
+        "conclusion": null,
+        "number": 77,
+        "started_at": "2026-10-06T07:32:37Z",
+        "completed_at": null
+      },
+      {
+        "name": "Verify final immutable setup inputs",
+        "status": "pending",
+        "conclusion": null,
+        "number": 82,
+        "started_at": null,
+        "completed_at": null
+      }
+    ]
+  },
+  "coding_step_names": [
+    "Acquire triggering revision without an action",
+    "Verify checkout credential cleanup",
+    "Acquire published main reference",
+    "Reject alternate npm install inputs",
+    "Detect locked validation-tool layout",
+    "Verify acquired immutable setup inputs",
+    "Set up verified official Node.js runtime",
+    "Verify selected Node.js runtime",
+    "Install locked Node.js validation tools",
+    "Verify locked dependency trees and immutable manifests",
+    "Set up isolated Python 3.12",
+    "Install locked Python validation tools",
+    "Activate repository hooks",
+    "Run complete repository validation",
+    "Verify final immutable setup inputs"
+  ],
+  "dedicated_step_names": [
+    "Acquire triggering revision without an action",
+    "Verify checkout credential cleanup",
+    "Acquire published main reference",
+    "Reject alternate npm install inputs",
+    "Detect locked validation-tool layout",
+    "Verify acquired immutable setup inputs",
+    "Set up verified official Node.js runtime",
+    "Verify selected Node.js runtime",
+    "Install locked Node.js validation tools",
+    "Verify locked dependency trees and immutable manifests",
+    "Set up isolated Python 3.12",
+    "Install locked Python validation tools",
+    "Activate repository hooks",
+    "Verify final immutable setup inputs"
+  ],
+  "coding_bytes_equal_B_H": true,
+  "exact_workflow_source_branch_proved": false,
+  "leading_inference": "Default-branch registration/configuration activation is consistent with docs and observed fallback, but exact dedicated-file revision lookup is not explicit in the inspected primary docs and the service job cannot distinguish identical B/H coding bytes.",
+  "state_snapshot": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\execution-state.json",
+    "sha256": "7303efee4695640d9c2d8ef66ee9fcaa8ef8955788279e134d2e51c8964ae2f4",
+    "status": "round5_reviews_pending",
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "service_activation_limit": "A PR file or ordinary workflow success does not prove Copilot selected the dedicated setup. Require actual service selection/completion on final input; default-branch activation remains unverified.",
+    "ci_retry_policy": {
+      "minimum_interval_seconds": 3600,
+      "last_relaunch_at": null,
+      "restriction": "No merge while CI is failing. No automatic retry schedule. Reconcile all native operations before a permitted relaunch. A new-input review cannot silently waive a cancelled/failed current workflow; acceptance of historical TF67/PS224 is not a blanket exemption."
+    },
+    "round5": {
+      "round": 5,
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+      "started_at": "2026-10-06T07:31:20.150063+00:00",
+      "deadline": "2026-10-13T23:47:31+00:00",
+      "first_request_basis": "Pre-issue timestamp for one supported Balanced UI Copilot request on the new commit/body. Original PR clock and transfers retained. Complete baseline excludes automatic reviewer activity.",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-current-head-baseline.json",
+      "baseline_sha256": "0e3eccb4ae08fa6c3f00ec79e56e5c1a5c76e319af9ce869f1964195986f0c01",
+      "copilot": {
+        "status": "confirmed_pending",
+        "requested_at": "2026-10-06T07:31:20.150063+00:00",
+        "effort_selected": "Balanced",
+        "observed_effort": null,
+        "channel_attempt": 1,
+        "channel": "supported GitHub Reviewers UI",
+        "selection_evidence": "Fresh new-head page, Reviewers Copilot effort menu showed Balanced checked; explicitly selected Balanced; fresh control reads Balanced. No request submitted before this record.",
+        "request_event_id": 32577067098,
+        "native_requested_at": "2026-10-06T07:31:29Z",
+        "confirmation": "round5-after-copilot.json",
+        "ui_submission": "One click on Re-request Copilot review after explicit Balanced selection; authenticated event and exact-head dynamic run confirm acceptance.",
+        "workflow_run": 37430212759
+      },
+      "codex": {
+        "status": "completed_clean",
+        "automatic_reconciled": true,
+        "manual_trigger_issued": true,
+        "channel": "GitHub connector PR comment",
+        "requested_at": "2026-10-06T07:32:28.771571+00:00",
+        "baseline": "round5-after-copilot.json",
+        "trigger_comment": 6011580691,
+        "native_requested_at": "2026-10-06T07:32:29Z",
+        "trigger_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6011580691",
+        "result_comment": 6011648718,
+        "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6011648718",
+        "completed_at": "2026-10-06T07:37:09Z",
+        "result_body_sha256": "9fc28d0093d6dd0838a7e57e32374f7158b5f4b7a48d94065646d4ca016a567c",
+        "summary_comment": 6005735493,
+        "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-observation-0740.json",
+        "attribution": "Authenticated bot/app; result absent from complete pretrigger baseline; sole recorded trigger; later result explicitly identifies exact current commit prefix and terminal manual-request summary; no new inline findings."
+      },
+      "request_set_terminal": false,
+      "clean": false,
+      "findings": []
+    },
+    "deadline": "2026-10-13T23:47:31+00:00",
+    "transfers": {
+      "A06": {
+        "used": 1,
+        "cap": 12
+      },
+      "A03": {
+        "used": 3,
+        "cap": 12
+      },
+      "A21": {
+        "used": 5,
+        "cap": 12
+      },
+      "A07": {
+        "used": 5,
+        "cap": 12
+      }
+    }
+  },
+  "weights": {
+    "truthful_admission": 30,
+    "activation_effectiveness": 25,
+    "security_fidelity": 20,
+    "operator_usability": 15,
+    "verification": 7,
+    "churn": 3
+  },
+  "options": [
+    {
+      "id": "A",
+      "option": "Wait for the current requests only; retain the unresolved activation gate",
+      "scores": [
+        10,
+        4,
+        10,
+        8,
+        6,
+        10
+      ],
+      "total": 79.2,
+      "eligible_as_described": true
+    },
+    {
+      "id": "B",
+      "option": "Wait; if all current gates are green, explicitly revise delivery sequencing, land normally, then prove dedicated activation before task completion",
+      "scores": [
+        10,
+        8,
+        10,
+        9,
+        10,
+        10
+      ],
+      "total": 93.5,
+      "eligible_as_described": true
+    },
+    {
+      "id": "C",
+      "option": "After pending results, prepare a separate green activation/bootstrap prerequisite, then rebind TF68 and prove dedicated setup",
+      "scores": [
+        10,
+        6,
+        10,
+        7,
+        9,
+        4
+      ],
+      "total": 83.0,
+      "eligible_as_described": true
+    },
+    {
+      "id": "D",
+      "option": "Split/bootstrap immediately before pending outcomes are known",
+      "scores": [
+        8,
+        6,
+        10,
+        4,
+        8,
+        3
+      ],
+      "total": 71.5,
+      "eligible_as_described": true
+    },
+    {
+      "id": "E",
+      "option": "Profile and optimize the actual full-validation bottleneck without dropping coverage",
+      "scores": [
+        10,
+        6,
+        9,
+        6,
+        8,
+        4
+      ],
+      "total": 78.8,
+      "eligible_as_described": true
+    },
+    {
+      "id": "F",
+      "option": "Retry unchanged legacy service at most hourly after terminal failure",
+      "scores": [
+        9,
+        3,
+        10,
+        5,
+        5,
+        10
+      ],
+      "total": 68.5,
+      "eligible_as_described": true
+    },
+    {
+      "id": "G",
+      "option": "Obtain provider confirmation or a supported service-side activation fix",
+      "scores": [
+        10,
+        6,
+        10,
+        7,
+        7,
+        8
+      ],
+      "total": 82.8,
+      "eligible_as_described": true
+    },
+    {
+      "id": "H",
+      "option": "Use a supported larger runner after verifying availability, cost and actual timing",
+      "scores": [
+        9,
+        6,
+        8,
+        5,
+        6,
+        2
+      ],
+      "total": 70.3,
+      "eligible_as_described": true
+    },
+    {
+      "id": "I",
+      "option": "Use a supported isolated ARC runner",
+      "scores": [
+        9,
+        6,
+        7,
+        3,
+        6,
+        1
+      ],
+      "total": 65.0,
+      "eligible_as_described": true
+    },
+    {
+      "id": "J",
+      "option": "Rename the head-only workflow/job or dispatch ordinary CI to force activation",
+      "scores": [
+        7,
+        2,
+        8,
+        4,
+        4,
+        8
+      ],
+      "total": 53.2,
+      "eligible_as_described": false
+    },
+    {
+      "id": "K",
+      "option": "Use an undocumented workflow-source/branch-selection setting",
+      "scores": [
+        7,
+        2,
+        8,
+        4,
+        3,
+        8
+      ],
+      "total": 52.5,
+      "eligible_as_described": false
+    },
+    {
+      "id": "L",
+      "option": "Switch default branch, direct-push main, or self-accept bootstrap to activate it",
+      "scores": [
+        0,
+        8,
+        1,
+        2,
+        2,
+        8
+      ],
+      "total": 28.8,
+      "eligible_as_described": false
+    },
+    {
+      "id": "M",
+      "option": "Ignore current cancelled/failed CI because a Lite review or ordinary run passes",
+      "scores": [
+        0,
+        8,
+        1,
+        5,
+        1,
+        10
+      ],
+      "total": 33.2,
+      "eligible_as_described": false
+    },
+    {
+      "id": "N",
+      "option": "Remove/soften full validation in shared coding setup or disable review to avoid failure",
+      "scores": [
+        2,
+        6,
+        3,
+        5,
+        6,
+        7
+      ],
+      "total": 40.8,
+      "eligible_as_described": false
+    }
+  ],
+  "selected_proposal": "B93.5 conditional green-legacy delivery sequence; C is a separate unproved fallback, not an implementation release",
+  "minimum_bootstrap_paths": [
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/package.json",
+    ".github/workflows/package-lock.json",
+    "docs/dependency-maintenance.md"
+  ],
+  "bootstrap_limit": "Seven-path design lower bound if selected override/security closure is retained and narrow edits are integrated with accepted B. Not an apply-ready patch; no test-duration claim. Include independent current-audit findings if any, and review any further dependency before scope expansion.",
+  "accepted_base_timing_limit": "TF67 final-head service37338466878 that preceded accepted merge e21 was itself cancelled during full validation at 20 minutes; accepted B does not establish a fast/bootstrap-success baseline.",
+  "historical_inputs": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-copilot-jobs-first.json",
+      "sha256": "a477dda7ea997f757fcf4cf4b01438f2741d9f6d967e9e42d26437365039a4b5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-observation-0740.json",
+      "sha256": "8dc6b08a01dbc80efbd27f0383d11eaea8a699b6d667acfcdc3eea85ad627d56"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-progress-checkpoint.json",
+      "sha256": "3e7951b65f03bde390b46449bb4d5f4610d8fe498ed9a77f4b6d1f353b5109c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\REPORT.md",
+      "sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\SECURITY-SCOPE.md",
+      "sha256": "8f04e055b9403ed3d11427b2f8ae00462f0430c9f46db61ff801cbe58034d28b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\IMPLEMENTATION.md",
+      "sha256": "7c4306926d0fd04ee35b1fb8179a379e58748ffa9b5ed75709d79aa32d36a949"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\owner-ci-audit-2026-10-06\\REPORT.md",
+      "sha256": "430b83a7ef20fa3527cff204edbf0ff110ce052efa94f88e8624af5772988d48"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\TF66-R18-timeout-applicability.md",
+      "sha256": "18d0bdbc039b03bacd0b065c8cc3261a1eadda8c448d063380cf03c4c84b9551"
+    }
+  ],
+  "guards_before_after_equal": {
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "index_sha256": "cd4559b02dd014524049008598b7bffdfc503bf2eb5fcbfd0ddc9227995a446b",
+    "refs_sha256": "a5426a5469c38c71cfa99e594cca624dc58d15fafda41dba2961bf730037a46a",
+    "config_sha256": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b"
+  },
+  "tests_or_ci_started": false,
+  "product_or_planning_mutations": false,
+  "native_actions": false,
+  "counters_changed": false,
+  "primary_research": [
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-code-review",
+      "claim": "Dedicated setup has precedence over coding setup. Head-branch guidance expressly concerns instructions and skills, not workflow revision selection.",
+      "read_utc_date": "2026-10-06",
+      "source_type": "official GitHub documentation or changelog"
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment",
+      "claim": "Coding setup must exist on the default branch to trigger. Ordinary Actions validation and agent execution are distinct. Dedicated-file exact lookup revision is not stated explicitly in the inspected text.",
+      "read_utc_date": "2026-10-06",
+      "source_type": "official GitHub documentation or changelog"
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners",
+      "claim": "Supports larger runners and ARC; no inspected control selects a PR-head setup revision. Account-specific availability is unverified.",
+      "read_utc_date": "2026-10-06",
+      "source_type": "official GitHub documentation or changelog"
+    },
+    {
+      "url": "https://github.blog/changelog/2026-07-17-copilot-code-review-customization-and-configurability-improvements/",
+      "claim": "Official July17 feature announcement confirms dedicated file and fallback. Organization runner configuration descriptions differ from current runner page; no setting is assumed.",
+      "read_utc_date": "2026-10-06",
+      "source_type": "official GitHub documentation or changelog"
+    },
+    {
+      "url": "https://docs.github.com/en/billing/concepts/product-billing/github-actions",
+      "claim": "Standard public runner minutes are free. Larger runners are charged. No billing failure is established here.",
+      "read_utc_date": "2026-10-06",
+      "source_type": "official GitHub documentation or changelog"
+    }
+  ],
+  "current_local_timing": {
+    "full_node_log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair\\runs\\a06-tf-peer-20261006-round4-repair\\output\\full-node.log",
+    "sha256": "d5515665a6660a7ca985428d1b30ebd9794f4801b794db0c2f02f205c794ef0d",
+    "tests": 600,
+    "milliseconds": 219394.7,
+    "aggregate_11_hooks_elapsed": "22m31s as coordinator supplied",
+    "limit": "Final instruction mutation hook dominates but per-case timing is absent. No internal hotspot or CPU scaling benefit is proved."
+  },
+  "report_sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+}

@@ -1,0 +1,263 @@
+{
+  "status": "PASS_LOCAL_FINAL_BINDING",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "parent": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body-round4-repair-final.md",
+  "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+  "title": "Converge generator validation and make review setup reliable",
+  "material_findings": [],
+  "created_at_utc": "2026-10-06T07:25:09.0274812Z",
+  "report_sha256": "0833add05438638f914dc790f911c72437ad54e2ff13bc82d5620c6729f27efa",
+  "source_catalog_sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+  "scope": {
+    "committed_files_verified": 80,
+    "repair_paths": 5,
+    "whole_pr_paths": 19,
+    "unchanged_generated_outputs": [
+      "STYLE_GUIDE_FULL.md",
+      "STYLE_GUIDE_CHAT.md",
+      "copilot-instructions.md",
+      "terraform.instructions.md"
+    ],
+    "worktree_clean": true
+  },
+  "aggregate": {
+    "session": 80671,
+    "terminal_exit": 0,
+    "manifest_sha256": "6d9436558041243826d1018ff846de34603540c83048a574dcf654591c2c8fc7",
+    "result_sha256": "2cccef5df96690f038b2ff2edd28f3796a5bc552455673d72e10209840fb6fb0",
+    "status_sha256": "691a27b18f660bb48346e0862f89e71441299d09d53d06c42224118c476f1b1f",
+    "payload_hashes_verified": 7,
+    "command_identity_guards_verified": 3,
+    "host_identity_equal": true,
+    "node_counts": {
+      "tests": 600,
+      "pass": 600,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
+    "source_dependency_index_ref_config_guards": "passed"
+  },
+  "normal_commit": {
+    "status": "committed",
+    "expected_parent": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "expected_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+    "requested_at": "2026-10-06T02:19:46.472488-05:00",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-round4-repair-commit.log",
+    "log_sha256": "35e5c5b744b24b3e6ab71962373cb146b094010c4cbef01e8fa10014e4459f7d",
+    "observed_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "parent": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+    "completed_at": "2026-10-06T02:19:51.002575-05:00"
+  },
+  "actual_endpoints": [
+    {
+      "mode": "AcceptedMaintenance",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "5ec4bdc06431de05e93067b0e52f0dfbb1631392"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+      "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "started_at": "2026-10-06T02:20:15.18201-05:00",
+      "finished_at": "2026-10-06T02:20:15.626066-05:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-AcceptedMaintenance-5ec4bdc.log",
+      "log_sha256": "0a4e041c90c49a2d13886ec1c45c0b948a5b9bc84854046fc1fd6495f76d1e77"
+    },
+    {
+      "mode": "AcceptedContent",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+        "-PublishedBaselineRevision",
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+      "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "started_at": "2026-10-06T02:20:18.456405-05:00",
+      "finished_at": "2026-10-06T02:20:51.634643-05:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-AcceptedContent-5ec4bdc.log",
+      "log_sha256": "eb71445f9b2036d6bb8a388b44eaf3e03d1cc9dd978b056505b0377569369fc6"
+    },
+    {
+      "mode": "FinalizeMetadataNow",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+        "-PublishedBaselineRevision",
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "-FinalizeMetadataNow"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+      "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "started_at": "2026-10-06T02:20:54.706429-05:00",
+      "finished_at": "2026-10-06T02:21:29.088337-05:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-FinalizeMetadataNow-5ec4bdc.log",
+      "log_sha256": "a96fde59002daf891c13c9841c03c1e1913ebb45c5b2281f83e6723573bbc4da"
+    },
+    {
+      "mode": "MetadataClassificationOnly",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+        "-PublishedBaselineRevision",
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "-MetadataClassificationOnly"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+      "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "started_at": "2026-10-06T02:21:32.146531-05:00",
+      "finished_at": "2026-10-06T02:21:34.485561-05:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-MetadataClassificationOnly-5ec4bdc.log",
+      "log_sha256": "3720557dbc315e7f2bc9f676db915f2d6d54af5a3f1f8391859f3f96d7d3a4f3"
+    },
+    {
+      "mode": "ProposedPolicy",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+        "-PublishedBaselineRevision",
+        "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "-ProposedPolicy"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "baseline": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "accepted_policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "started_at": "2026-10-06T02:21:37.500715-05:00",
+      "finished_at": "2026-10-06T02:22:12.597445-05:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-ProposedPolicy-5ec4bdc.log",
+      "log_sha256": "700266510aeb8d62c2e3ad190f796af4c73f4a4585893e0af2d75d8420aff38b"
+    }
+  ],
+  "endpoint_session": 41041,
+  "endpoint_terminal_exit": 0,
+  "accepted_policy_graph": {
+    "source_files_verified": 78,
+    "dependency_files_verified": 1910,
+    "distinct_from_candidate_dependencies": 1914
+  },
+  "current_audit": {
+    "exit": 0,
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-06T02:22:15.869809-05:00",
+    "finished_at": "2026-10-06T02:22:33.604207-05:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R4-repair-current-audit-5ec4bdc.log",
+    "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9"
+  },
+  "audit_result": {
+    "status": "CLEAN",
+    "findings": 0,
+    "unresolved": 0,
+    "exceptions": 0,
+    "unused_exceptions": 0,
+    "roots": [
+      ".",
+      ".github/workflows"
+    ],
+    "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "reused_quality": [
+    {
+      "path": "final-quality/round4-repair-implementation.md",
+      "sha256": "f1d4336b27d3b09a5b79d5515e170449627f3bf037a135889b006a1b6ef298ac"
+    },
+    {
+      "path": "final-quality/round4-repair-implementation-addendum.md",
+      "sha256": "9f883941ba82764a66bef6e4aa9e23e3a8db0e14430aae82b122b2108c31692c"
+    },
+    {
+      "path": "final-quality/R8-final-binding.md",
+      "sha256": "0799303e45cbd0546e08a33e5ac0d4b01c9ef940611fef52823867709d7ceb68"
+    }
+  ],
+  "peer_readiness": {
+    "report_sha256": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845",
+    "evidence_sha256": "f237d0e817445e5da9857cebae78808bbd41fbaa983024fd33d012dc911cfbc5",
+    "conditional_path_count": 10,
+    "immutable_source_identities_verified": 28,
+    "implementation_authorized": false
+  },
+  "native_context": {
+    "new_input": "prepared_local_not_published",
+    "saved_prior_head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "saved_prior_body_sha256": "b7ba5f1c9908f7afd4df1ba44462c98de881556747ffe6c0103419dc684c7dd7",
+    "prior_reviews_accept_new_input": false
+  },
+  "remaining_gates": [
+    "Exact head/title/body publication and readback",
+    "Fresh exact-input remote Codex and Copilot reviews and dispositions",
+    "All required hosted CI with no failing or cancelled-CI waiver",
+    "Actual dedicated Copilot workflow selection and successful completion",
+    "Normal landing and landed-workflow verification",
+    "Accepted-source/current-PS rebinding and conditional ten-path carryback",
+    "Final paired convergence and human gates"
+  ],
+  "authority": {
+    "review_round_history": 4,
+    "original_deadline": "2026-10-13T23:47:31Z",
+    "transfers": {
+      "A06": 1,
+      "A03": 3,
+      "A21": 5,
+      "A07": 5
+    },
+    "counter_limit": 12,
+    "minimum_ci_retry_interval_minutes": 60,
+    "no_failing_ci_merge": true,
+    "no_generalized_historical_exception": true,
+    "no_ps_repair_before_tf_acceptance": true
+  },
+  "reviewer_tests_executed": [],
+  "product_planning_native_changes": false
+}
