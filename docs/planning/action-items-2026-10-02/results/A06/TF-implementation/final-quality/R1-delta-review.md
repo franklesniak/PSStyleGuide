@@ -1,0 +1,27 @@
+# TF68-R1 bounded delta quality
+
+**Code review: no demonstrated defect. Validation pending; no final repair PASS.** Reviewed 2026-10-06T00:29:06.389003+00:00. This reuses the valid original 12-path port review and inspects only the midnight SelfTest repair above published H`6c0c987799425b60c0e7b76650aa5ec7946811e2`.
+
+The sole changed file is `.github/workflows/Test-AgentInstructions.SelfTest.ps1`, SHA256 `2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d`, 241436 bytes. All 78 other tracked raw files match H, including the production validator and original generator-port postimages. Its public interface and production date rules are unchanged. No Git/source mutation or test execution was performed by this reader.
+
+Read current STATUS and the full C97 decision, and recomputed all eight option totals (N52/R52/W56/D80/P77/I73/S70/C97). The implementation stays within the selected one-file scope. Oct6 version bumps apply to the changed SelfTest and two changed helpers; earlier Oct5 files remain historical inputs. The real reverse PowerShell repair obligation remains, preserving the P1/T1 provenance-path exception.
+
+## Delta assessment
+
+The private clock helper finds one exact supported initialization block and one local-date block in the actual checker file. It places breakpoints immediately after the real assignments, uses one selected UTC anchor for captured timestamp/date/commit bound, and explicitly writes/readbacks the function-local expected date using caller scope. The unchanged-path empty-date branch stays empty. Completed readback receipts are compared to breakpoint hits outside the debugger, so a swallowed debugger exception cannot silently qualify a hit. Required missing/inactive anchors fail closed; an actual primary failure remains a failure even when initialization is not reached.
+
+The helper removes both breakpoints and the unique runspace receipt in finally. Cleanup/control errors remain visible; where they coexist with a primary error, the diagnostic includes its message. Otherwise the original ErrorRecord is rethrown. The in-process capacity call uses LocalOnly and its supplied MaximumMetadataUtcDate, so it does not reset the enclosing validator clock.
+
+The dispatcher launches a private -Command wrapper around the actual checker, captures child exit immediately, retains escaped B/H and mode arguments, and rejects clock-infrastructure diagnostics before consumer-specific expectations. This is explicitly documented as a launch-level change from literal -File. The current checker communicates failures through terminating exceptions; the wrapper converts these to nonzero child exits and preserved messages. The documented-worktree route still selects the real accepted-B checker path and location, not a stub. Exact installed-source/mode/raw identity guards, source snapshot checks, existing negative payloads, and bounded fixture cleanup remain intact.
+
+Current, delayed, proposed, Unicode/versioned, local staged and capacity paths use the selected fixture clock. Prior local metadata and invalid modes now also require their intended diagnostic. Existing stale/future/calendar, authority/mode, delayed-policy and installed-source mutation oracles were retained. The synthetic fixed-2000 probe meaningfully checks current/local scope, unchanged local branch, missing/duplicate/inactive anchors, primary error and cleanup. Separate controls mutate actual helper bodies. The focused driver independently replaces exactly one private fixture-anchor expression in memory with the prior-day timestamp; installed checker bytes stay exact, avoiding a circular proof by another clock breakpoint. Its SHA256 `e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5` matches the frozen Linux input. The original SelfTest control copy matches H exactly. The new boundary driver independently targets original current-date failure and bypass of the documented-worktree dispatcher, requiring both the caller-specific failure and real metadata-date diagnostic.
+
+## Evidence limits requiring follow-up
+
+**R1-QV1 — coverage distinction:** the persistent ordinary-after-cleanup invocation currently executes the synthetic clock probe. It checks real host dates and absence of leaked breakpoints/receipt variables, but is not the decision-required actual ordinary uninstrumented validator invocation. Supply that bounded actual-validator/current-UTC receipt before final acceptance; no production change is implied.
+
+**R1-QV2 — execution pending:** at inspection, Linux focus/result remained running, Windows focus log was incomplete, and original-byte boundary log had only the selected anchor. The actual Windows/Linux fixture passes, original-byte refusal, documented-worktree bypass mutant and source guards are not credited from driver source alone. No full aggregate or final-native acceptance is credited. Completed evidence can close these observations through a bounded follow-up without repeating unchanged code review.
+
+Remaining acceptance also requires final-source full SelfTest/aggregate, committed checks/audit, published head/base/body binding, new exact-head CI/reviews, normal landed proof and the reverse PS repair. The earlier H's passing generator/build evidence remains history and cannot accept the newly changed SelfTest by itself.
+
+Only this report and its JSON were written; earlier quality artifacts remain immutable.

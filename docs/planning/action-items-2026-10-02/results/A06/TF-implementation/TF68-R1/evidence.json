@@ -1,0 +1,1173 @@
+{
+  "finding": "TF68-R1",
+  "captured_at_utc": "2026-10-06T01:04:19.578494+00:00",
+  "decision": "C97 selected/displayed/released by root; no duplicate rubric",
+  "weights": [
+    30,
+    25,
+    20,
+    15,
+    5,
+    5
+  ],
+  "scores": {
+    "N": [
+      2,
+      5,
+      0,
+      3,
+      1,
+      5
+    ],
+    "R": [
+      1,
+      4,
+      5,
+      0,
+      2,
+      4
+    ],
+    "W": [
+      2,
+      5,
+      1,
+      4,
+      1,
+      2
+    ],
+    "D": [
+      4,
+      5,
+      3,
+      5,
+      2,
+      2
+    ],
+    "P": [
+      5,
+      1,
+      5,
+      5,
+      4,
+      3
+    ],
+    "I": [
+      4,
+      2,
+      5,
+      4,
+      4,
+      3
+    ],
+    "S": [
+      3,
+      5,
+      2,
+      4,
+      3,
+      4
+    ],
+    "C": [
+      5,
+      5,
+      5,
+      5,
+      4,
+      3
+    ]
+  },
+  "totals": {
+    "N": 52.0,
+    "R": 52.0,
+    "W": 56.0,
+    "D": 80.0,
+    "P": 77.0,
+    "I": 73.0,
+    "S": 70.0,
+    "C": 97.0
+  },
+  "status": "Component-attributed Windows focus and combined Linux focus complete; root accepted driver limitation. Final aggregate/acceptance remain separate.",
+  "committed_inputs": [
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+      "bytes": 229936
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "bytes": 482175
+    },
+    {
+      "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
+      "bytes": 229955
+    },
+    {
+      "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "bytes": 482175
+    }
+  ],
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/scripts-README.md"
+  ],
+  "raw_path_verification": [
+    {
+      "path": ".claude/commands/review-loop.md",
+      "mode": "100644",
+      "head_blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+      "head_sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437",
+      "worktree_sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437",
+      "unchanged": true
+    },
+    {
+      "path": ".codex/config.toml",
+      "mode": "100644",
+      "head_blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+      "head_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      "worktree_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      "unchanged": true
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "head_blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+      "head_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "worktree_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "unchanged": true
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "mode": "100644",
+      "head_blob": "5de5474c3e2125d1f0171a305b094d514cc37ff5",
+      "head_sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+      "worktree_sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+      "unchanged": true
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "mode": "100644",
+      "head_blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+      "head_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      "worktree_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      "unchanged": true
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "mode": "100644",
+      "head_blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+      "head_sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+      "worktree_sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+      "unchanged": true
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "mode": "100644",
+      "head_blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+      "head_sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+      "worktree_sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+      "unchanged": true
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "head_blob": "924d12c833d07def47d05137b532e622db622fa4",
+      "head_sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "worktree_sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/.markdownlint.jsonc",
+      "mode": "100644",
+      "head_blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+      "head_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      "worktree_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "mode": "100644",
+      "head_blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+      "head_sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322",
+      "worktree_sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "mode": "100644",
+      "head_blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+      "head_sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "worktree_sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "head_blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "head_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "worktree_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "head_blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "head_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "worktree_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "head_blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+      "head_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "worktree_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "mode": "100644",
+      "head_blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+      "head_sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+      "worktree_sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "mode": "100644",
+      "head_blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+      "head_sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+      "worktree_sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "head_blob": "906460d818674199b32294185ed6525c143b48bb",
+      "head_sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+      "worktree_sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "mode": "100644",
+      "head_blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+      "head_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      "worktree_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "mode": "100644",
+      "head_blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+      "head_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      "worktree_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "mode": "100644",
+      "head_blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+      "head_sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      "worktree_sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "mode": "100644",
+      "head_blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "head_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "worktree_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "mode": "100644",
+      "head_blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+      "head_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "worktree_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "head_blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "head_sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
+      "worktree_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "unchanged": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "head_blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "head_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "worktree_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "head_blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "head_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+      "worktree_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "head_blob": "3a62fde67925bc99285f8a0c3c74b53ac7f7f109",
+      "head_sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9",
+      "worktree_sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "head_blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "head_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "worktree_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "mode": "100644",
+      "head_blob": "7965b2476cf022e6efea355d438162937bef04b3",
+      "head_sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "worktree_sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "mode": "100644",
+      "head_blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "head_sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+      "worktree_sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "head_blob": "b3c9ad4caa86919ac1b66c457493f7d6b9d9b813",
+      "head_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+      "worktree_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "mode": "100644",
+      "head_blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "head_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "worktree_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "head_blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "head_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "worktree_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "head_blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "head_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "worktree_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "head_blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+      "head_sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+      "worktree_sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "head_blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "head_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "worktree_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "head_blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "head_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "worktree_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "head_blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "head_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "worktree_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "mode": "100644",
+      "head_blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+      "head_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      "worktree_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/historical-supply-profile.json",
+      "mode": "100644",
+      "head_blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+      "head_sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+      "worktree_sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "mode": "100644",
+      "head_blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+      "head_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      "worktree_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "mode": "100644",
+      "head_blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "head_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "worktree_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "mode": "100644",
+      "head_blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+      "head_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "worktree_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "mode": "100644",
+      "head_blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+      "head_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      "worktree_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "mode": "100644",
+      "head_blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+      "head_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      "worktree_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "head_blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+      "head_sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+      "worktree_sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "mode": "100644",
+      "head_blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+      "head_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      "worktree_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "head_blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "head_sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "worktree_sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "head_blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "head_sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+      "worktree_sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "head_blob": "1e5ef49883c2317b4401759c5348a7d88e42a006",
+      "head_sha256": "8f4fcd5c26992a73270501e64501d2f0d038907e549a4adb6a6bd2dfad0a2869",
+      "worktree_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+      "unchanged": false
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "head_blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "head_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "worktree_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "head_blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "head_sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "worktree_sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "unchanged": true
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "head_blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+      "head_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "worktree_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "unchanged": true
+    },
+    {
+      "path": ".husky/pre-commit",
+      "mode": "100644",
+      "head_blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+      "head_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "worktree_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "unchanged": true
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "head_blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "head_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "worktree_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "unchanged": true
+    },
+    {
+      "path": ".vscode/settings.json",
+      "mode": "100644",
+      "head_blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+      "head_sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da",
+      "worktree_sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da",
+      "unchanged": true
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "mode": "100644",
+      "head_blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+      "head_sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42",
+      "worktree_sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42",
+      "unchanged": true
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "head_blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+      "head_sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f",
+      "worktree_sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f",
+      "unchanged": true
+    },
+    {
+      "path": "CLAUDE.md",
+      "mode": "100644",
+      "head_blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+      "head_sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1",
+      "worktree_sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1",
+      "unchanged": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "head_blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+      "head_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d",
+      "worktree_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d",
+      "unchanged": true
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "head_blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+      "head_sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb",
+      "worktree_sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb",
+      "unchanged": true
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "head_blob": "98f936f0dd1d2101dccf62ebf5f81b3e5f738453",
+      "head_sha256": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3",
+      "worktree_sha256": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3",
+      "unchanged": true
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "head_blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "head_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "worktree_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "unchanged": true
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "mode": "100644",
+      "head_blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+      "head_sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+      "worktree_sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+      "unchanged": true
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "mode": "100644",
+      "head_blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+      "head_sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+      "worktree_sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+      "unchanged": true
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "head_blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+      "head_sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+      "worktree_sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+      "unchanged": true
+    },
+    {
+      "path": "copilot-instructions.md",
+      "mode": "100644",
+      "head_blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "head_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "worktree_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "mode": "100644",
+      "head_blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+      "head_sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "worktree_sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "mode": "100644",
+      "head_blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+      "head_sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+      "worktree_sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "head_blob": "9e04225a355997850e4817f9163868089a773332",
+      "head_sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+      "worktree_sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+      "unchanged": true
+    },
+    {
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "mode": "100644",
+      "head_blob": "8e8d56ea567eab0f252916804b49b866cafeabc6",
+      "head_sha256": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94",
+      "worktree_sha256": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94",
+      "unchanged": true
+    },
+    {
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "mode": "100644",
+      "head_blob": "71ab82286d05e83ec83d66eb1ebd666d0d19386b",
+      "head_sha256": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16",
+      "worktree_sha256": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16",
+      "unchanged": true
+    },
+    {
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "mode": "100644",
+      "head_blob": "d44dba86a66f6dfc126247c97d81bfeeee8f3763",
+      "head_sha256": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec",
+      "worktree_sha256": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec",
+      "unchanged": true
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "head_blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+      "head_sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654",
+      "worktree_sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654",
+      "unchanged": true
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "head_blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+      "head_sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "worktree_sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+      "unchanged": true
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "head_blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "head_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "worktree_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "unchanged": true
+    },
+    {
+      "path": "requirements-dev.txt",
+      "mode": "100644",
+      "head_blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+      "head_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "worktree_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "unchanged": true
+    },
+    {
+      "path": "samples/test-nested-markdown-linting.md",
+      "mode": "100644",
+      "head_blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+      "head_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "worktree_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "unchanged": true
+    },
+    {
+      "path": "samples/test-recursive-nested-markdown.md",
+      "mode": "100644",
+      "head_blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+      "head_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+      "worktree_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+      "unchanged": true
+    },
+    {
+      "path": "terraform.instructions.md",
+      "mode": "100644",
+      "head_blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "head_sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "worktree_sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "unchanged": true
+    }
+  ],
+  "artifacts": {
+    "TF68-R1-actual-clock-final.log": {
+      "sha256": "10add6d429b0797d2d1cdb15bbbc9d7f0acda48caf5b22d5028ab6fabe8fd0c7",
+      "bytes": 1035
+    },
+    "TF68-R1-actual-clock.log": {
+      "sha256": "c5158a30e78dc44a59540d7b762333277a6fa1e53f55d3a68241b54fdf6f03c8",
+      "bytes": 972
+    },
+    "TF68-R1-actual-clock.ps1": {
+      "sha256": "8eef7af44d578d14ad18d92f47047168b2b4900245f2460145ec939166396417",
+      "bytes": 1759
+    },
+    "TF68-R1-anchor-probe.ps1": {
+      "sha256": "bc81de8f9061c3c0c75329047d076bd5841136993cc6997f273dac2f981c6454",
+      "bytes": 885
+    },
+    "TF68-R1-anchor-target.ps1": {
+      "sha256": "f8e0f136cd78cc8329b3416f05fdc48c99a15fcd36a338aaeed0402e66ec5815",
+      "bytes": 151
+    },
+    "TF68-R1-boundary.ps1": {
+      "sha256": "0ac9ff16476584468dc163205927a78816d928bcfcd3698b57f2a83f739584c7",
+      "bytes": 5322
+    },
+    "TF68-R1-capacity-check.log": {
+      "sha256": "10bb335ce0ff7d960ee0e0ad39da15a4dca3165787b657d7fea258a50802d1da",
+      "bytes": 423
+    },
+    "TF68-R1-capacity-check.ps1": {
+      "sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9",
+      "bytes": 2409
+    },
+    "TF68-R1-capacity-native-cleanup.log": {
+      "sha256": "9c31775418eeade9e1cfea36eae3882efba5fac1f7ae865f57bcdadbc1813c88",
+      "bytes": 187
+    },
+    "TF68-R1-capacity-native-path.log": {
+      "sha256": "428ca9dacc108c61ccd56e73dd46bc337940262df444fb593a950c9d1887b7ef",
+      "bytes": 132
+    },
+    "TF68-R1-capacity-native.ps1": {
+      "sha256": "a32f888143c2d268b11ef088227850018a19c89b8637b13d9cc039e96330d805",
+      "bytes": 697
+    },
+    "TF68-R1-clock-helper.ps1": {
+      "sha256": "dadd1f9517624594591a69201fbccd3f94cb7a2f40a467a4949329828d520dd9",
+      "bytes": 6625
+    },
+    "TF68-R1-controls.log": {
+      "sha256": "3b579af88736d6e67e0b51c71d2db80578e96599ab7c2c45aca0eae052e58f3b",
+      "bytes": 331
+    },
+    "TF68-R1-controls.ps1": {
+      "sha256": "88a94184fb1a82ece1f39fac21c2eb6570fe1dcdce92671543a411a1e9827c09",
+      "bytes": 4128
+    },
+    "TF68-R1-entry-path.json": {
+      "sha256": "8dac61b94578b382089ae893b7cf396cde6bdbbbc971895215b2633e4a977492",
+      "bytes": 1745
+    },
+    "TF68-R1-entry-path.py": {
+      "sha256": "23d29d00e606fcc61951be7ab9be2da4c0e0577307c97887828c0bab0e824790",
+      "bytes": 1627
+    },
+    "TF68-R1-entry-plain.stderr": {
+      "sha256": "04693ed4345c504e1f31fba6298e31427452c332b837886d37c34e42721a7430",
+      "bytes": 402
+    },
+    "TF68-R1-entry-plain.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "TF68-R1-entry-xml.stderr": {
+      "sha256": "8c2600355942386b7fec67ca0de756f3b01021dc6cc7fc4432d457b8516bd589",
+      "bytes": 5469
+    },
+    "TF68-R1-entry-xml.stdout": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "TF68-R1-evidence.py": {
+      "sha256": "77fe59e5857648e73847c6fe9b4814d3c57310d85d4fc098ab8fde1900eb91ff",
+      "bytes": 13380
+    },
+    "TF68-R1-focus-final-windows.log": {
+      "sha256": "7838bf7785f0481e58db47765c17671c00f0b5056e2d7233a12cdf446d7d83bb",
+      "bytes": 999
+    },
+    "TF68-R1-focus-windows.log": {
+      "sha256": "2eaa3e975219362afe63ecde485b564c256e1e5bae44255ea74eac3f528539af",
+      "bytes": 750
+    },
+    "TF68-R1-focus.ps1": {
+      "sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+      "bytes": 3898
+    },
+    "TF68-R1-helper-probe.ps1": {
+      "sha256": "04b24edd58c6dddfb29a3942b90a0f53da7f3d83bff17919b7a617266eb8d0d1",
+      "bytes": 1218
+    },
+    "TF68-R1-helper-target.ps1": {
+      "sha256": "9f9faccb5b9774b7d3039cdfca0005dac072e5ae439863c59be4ab2a4acc5ba0",
+      "bytes": 547
+    },
+    "TF68-R1-helper-throw-probe.ps1": {
+      "sha256": "5fe0dcd125d241baafa4b2291a34cca45c03b17f0325c18482cd7aac35eec6d7",
+      "bytes": 1483
+    },
+    "TF68-R1-implement.py": {
+      "sha256": "66df0af64b4fdd37f1f8dcde3b579c80d35086fcbd25aa386513afdaa3dd9360",
+      "bytes": 7259
+    },
+    "TF68-R1-make-boundary-driver.py": {
+      "sha256": "422f93e5009b8c7344e048629c100a3ee958bbca704bc06202862efa456d1b42",
+      "bytes": 3261
+    },
+    "TF68-R1-midnight-selftest.md": {
+      "sha256": "6726f7fa788e302a64802bb17ddfe8731376acbc862b533169d33c1f1252c558",
+      "bytes": 17602
+    },
+    "TF68-R1-original-boundary.log": {
+      "sha256": "08cfdf18edb358de9c6ee3d884c47120345b2ce243209838d4fc2d1c7e2b226a",
+      "bytes": 348
+    },
+    "TF68-R1-original-SelfTest.ps1": {
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
+      "bytes": 229955
+    },
+    "TF68-R1-production-file-entry.log": {
+      "sha256": "b682306bb627bfbd67083b6db78ba10188f880f6f17d780ed7725324659d8e21",
+      "bytes": 272
+    },
+    "TF68-R1-regression-block.ps1": {
+      "sha256": "52cb8e6f16997b5e18f7b39d84d548f375b58d072935b1764e4d7cc5176640e0",
+      "bytes": 4167
+    },
+    "TF68-R1-worktree-bypass.log": {
+      "sha256": "ef51c448ea649546461ef6bee20e204295ff72847a3d2950c1c77b98c854b95c",
+      "bytes": 692
+    }
+  },
+  "hosted_failures": [
+    {
+      "run": "37390495694",
+      "attempt": 1,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495694\\attempt-1\\log.txt",
+      "sha256": "d77edf49b69f44d9a9c14b21f28a2c502b2c1ab9afa3f914bed5358954fb9281",
+      "diagnostic_lines": [
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T00:01:12.3178604Z \u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m1163 | \u001b[0m             \u001b[36;1mthrow \"Author finalization caller failed (Now=$Now Later=\u001b[0m …\u001b[0m",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T00:01:12.3182590Z \u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mAuthor finalization caller failed (Now=True Later=False Accept=True\u001b[0m"
+      ]
+    },
+    {
+      "run": "37390664560",
+      "attempt": 1,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\log.txt",
+      "sha256": "b7dcc2987dc6e6d971ac4fc243f365d76b035b9f46414707a381da05e111a8bc",
+      "diagnostic_lines": [
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T00:02:39.7260378Z \u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m1163 | \u001b[0m             \u001b[36;1mthrow \"Author finalization caller failed (Now=$Now Later=\u001b[0m …\u001b[0m",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T00:02:39.7265900Z \u001b[31;1m\u001b[0m\u001b[36;1m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[0m\u001b[36;1m\u001b[31;1m\u001b[31;1m\u001b[36;1m     | \u001b[31;1mAuthor finalization caller failed (Now=True Later=False Accept=True\u001b[0m",
+        "copilot-pull-request-reviewer\tFinished User Configured Setup Step (Linux)\t2026-10-06T00:02:39.9392636Z \\u001b[31;1m\\u001b[0m\\u001b[36;1m\\u001b[36;1m1163 | \\u001b[0m             \\u001b[36;1mthrow \\\"Author finalization caller failed (Now=$Now Later=\\u001b[0m …\\u001b[0m",
+        "copilot-pull-request-reviewer\tFinished User Configured Setup Step (Linux)\t2026-10-06T00:02:39.9395674Z \\u001b[31;1m\\u001b[0m\\u001b[36;1m\\u001b[36;1m\\u001b[0m\\u001b[36;1m\\u001b[0m\\u001b[36;1m\\u001b[31;1m\\u001b[31;1m\\u001b[36;1m     | \\u001b[31;1mAuthor finalization caller failed (Now=True Later=False Accept=True\\u001b[0m"
+      ]
+    }
+  ],
+  "original_precontrol_windows_input_sha256": "a276645a3aaac9fbf99706eb4fc905af710138422d57df37549242a457bf8942",
+  "original_precontrol_windows_limit": "Not final-byte evidence; outer debugger fixture-day pin was unqualified. Final driver uses one finite private-fixture expression substitution.",
+  "freeze": {
+    "SelfTest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "focus_driver_sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+    "SelfTest_git_blob": "a976b7f224b4e9df0064493e3ec2c5514e9b8046",
+    "SelfTest_mode": "100644"
+  },
+  "preserved_exception": "PS docs/P1-SUPPLY-FREEZE-v1.md vs TF docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+  "remaining": "Root aggregate/index/current audit/commit/CI/reviews/acceptance and reverse PS A21 repair are separate gates; consult root state. No TF acceptance implied.",
+  "counters": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "maximum_each": 12
+  },
+  "original_round1_deadline": "2026-10-13T23:47:31Z",
+  "focused_results": {
+    "historical_precontrol_windows_attempt": {
+      "status": "disqualified historical driver attempt",
+      "exit_code": 1,
+      "log": "TF68-R1-focus-windows.log",
+      "source_selftest_sha256": "a276645a3aaac9fbf99706eb4fc905af710138422d57df37549242a457bf8942",
+      "driver_binding": "Superseded outer-breakpoint driver, not the frozen e4de final driver; no claim of a captured historical driver hash",
+      "diagnostic": "Focused prior-day anchor did not fire once.",
+      "limit": "Excluded from passing final-byte and deterministic-midnight evidence; not a production failure"
+    },
+    "final_parse_analyzer": {
+      "exit_code": 0,
+      "parser_errors": 0,
+      "analyzer_warnings_errors": 0,
+      "analyzer_version": "1.24.0",
+      "input_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-focus.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\" -AnalyzeOnly",
+      "driver_sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed"
+    },
+    "controls": {
+      "exit_code": 0,
+      "log": "TF68-R1-controls.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-controls.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "cases": [
+        "persistent fixed-date/anchor/cleanup controls",
+        "omitted initialization mutant",
+        "wrong local-scope mutant",
+        "swallowed debugger-readback mutant",
+        "primary error plus forced cleanup failure"
+      ],
+      "driver_sha256": "88a94184fb1a82ece1f39fac21c2eb6570fe1dcdce92671543a411a1e9827c09",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "3b579af88736d6e67e0b51c71d2db80578e96599ab7c2c45aca0eae052e58f3b",
+      "regression_block_sha256": "52cb8e6f16997b5e18f7b39d84d548f375b58d072935b1764e4d7cc5176640e0"
+    },
+    "original_boundary": {
+      "exit_code": 0,
+      "underlying_checker_exit_code": 1,
+      "log": "TF68-R1-original-boundary.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-boundary.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\" -Case Original",
+      "private_fixture_timestamp": "2026-10-05T00:26:47.7763046+00:00",
+      "diagnostic_date": "2026-10-06",
+      "driver_sha256": "0ac9ff16476584468dc163205927a78816d928bcfcd3698b57f2a83f739584c7",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "08cfdf18edb358de9c6ee3d884c47120345b2ce243209838d4fc2d1c7e2b226a",
+      "original_selftest_sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+    },
+    "worktree_bypass": {
+      "exit_code": 0,
+      "underlying_checker_exit_code": 1,
+      "log": "TF68-R1-worktree-bypass.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-boundary.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\" -Case WorktreeBypass",
+      "private_fixture_timestamp": "2026-10-05T00:29:19.2484229+00:00",
+      "diagnostic_date": "2026-10-06",
+      "driver_sha256": "0ac9ff16476584468dc163205927a78816d928bcfcd3698b57f2a83f739584c7",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "ef51c448ea649546461ef6bee20e204295ff72847a3d2950c1c77b98c854b95c"
+    },
+    "ordinary_actual_clock_after_cleanup": {
+      "exit_code": 0,
+      "log": "TF68-R1-actual-clock-final.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-actual-clock.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "before_utc": "2026-10-06T00:36:37.3366366+00:00",
+      "captured_utc": "2026-10-06T00:36:37.4931172+00:00",
+      "after_utc": "2026-10-06T00:37:03.8864601+00:00",
+      "maximum_metadata_utc_date": "2026-10-06",
+      "instrumentation_remaining": 0,
+      "driver_sha256": "8eef7af44d578d14ad18d92f47047168b2b4900245f2460145ec939166396417",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "10add6d429b0797d2d1cdb15bbbc9d7f0acda48caf5b22d5028ab6fabe8fd0c7",
+      "controls_driver_sha256": "88a94184fb1a82ece1f39fac21c2eb6570fe1dcdce92671543a411a1e9827c09"
+    },
+    "final_windows_focus": {
+      "status": "Author component passed; combined scratch driver failed in mixed-path capacity tail",
+      "exit_code": 1,
+      "log": "TF68-R1-focus-final-windows.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-focus.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "input_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "driver_sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+      "private_fixture_timestamp": "2026-10-05T00:27:24.5240359+00:00",
+      "limit": "Not a combined Windows native-exit-zero claim; root accepted component-attributed author pass plus identical native-path capacity/cleanup.",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "failed (driver limitation retained)",
+      "log_sha256": "7838bf7785f0481e58db47765c17671c00f0b5056e2d7233a12cdf446d7d83bb"
+    },
+    "windows_capacity_mixed_path": {
+      "exit_code": 1,
+      "status": "Expected fail-closed scratch AST filename mismatch",
+      "log": "TF68-R1-capacity-check.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-capacity-check.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "driver_sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "failed (driver limitation retained)",
+      "log_sha256": "10bb335ce0ff7d960ee0e0ad39da15a4dca3165787b657d7fea258a50802d1da"
+    },
+    "windows_capacity_native_spelling": {
+      "exit_code": 0,
+      "status": "Identical capacity driver passed with only native argument spelling",
+      "log": "TF68-R1-capacity-native-path.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-capacity-check.ps1\" -RepositoryRootPath \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "driver_sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "428ca9dacc108c61ccd56e73dd46bc337940262df444fb593a950c9d1887b7ef"
+    },
+    "windows_capacity_native_path": {
+      "exit_code": 0,
+      "status": "Actual capacity and cleanup passed with canonical native AST filename",
+      "log": "TF68-R1-capacity-native-cleanup.log",
+      "command": "& \"C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe\" -NoLogo -NoProfile -NonInteractive -File \"C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R1-capacity-native.ps1\" -RepositoryRootPath \"C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003\"",
+      "driver_sha256": "a32f888143c2d268b11ef088227850018a19c89b8637b13d9cc039e96330d805",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "outcome": "passed",
+      "log_sha256": "9c31775418eeade9e1cfea36eae3882efba5fac1f7ae865f57bcdadbc1813c88",
+      "capacity_driver_sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9"
+    },
+    "linux_focus": {
+      "owner": "root",
+      "status": "passed (root reported and source-guard verified)",
+      "exit_code": 0,
+      "source_equal": true,
+      "host_source_equal": true,
+      "result_path": "R1-linux-focused/output/result.json",
+      "result_sha256": "82ea3e49ad3bd596b5bcbfe97b2d2ff2e7a9cd5e0258a88bc33e4732347d91da",
+      "log_sha256": "d29956415ac91d99986558f4b53848ed0f7726d6c1fe568ce1d21f5e279cda48",
+      "private_candidate_tree": "29e7f3f30cb9a1df0686be6a3e77234fe0186f57",
+      "finished_utc": "2026-10-06T00:37:57Z",
+      "host_guard_utc": "2026-10-06T00:38:00Z",
+      "source_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+      "driver_sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/TF68-R1-focus.ps1",
+        "-RepositoryRootPath",
+        "/work/focused-repository"
+      ],
+      "pwsh_version": "7.6.3"
+    },
+    "actual_file_entry_path": {
+      "supplied_forward_slash_path": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003/.github/workflows/Test-AgentInstructions.ps1",
+      "canonical_native_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "runs": [
+        {
+          "label": "plain",
+          "command": [
+            "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003/.github/workflows/Test-AgentInstructions.ps1",
+            "-FinalizeMetadataNow"
+          ],
+          "native_exit": 1,
+          "entry_fields": [],
+          "diagnostic_present": true
+        },
+        {
+          "label": "xml",
+          "command": [
+            "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-OutputFormat",
+            "XML",
+            "-File",
+            "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003/.github/workflows/Test-AgentInstructions.ps1",
+            "-FinalizeMetadataNow"
+          ],
+          "native_exit": 0,
+          "entry_fields": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1",
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1"
+          ],
+          "diagnostic_present": true
+        }
+      ],
+      "driver_sha256": "23d29d00e606fcc61951be7ab9be2da4c0e0577307c97887828c0bab0e824790",
+      "source_validator_sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    }
+  },
+  "verified_runtimes": [
+    {
+      "path": "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+      "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+    }
+  ],
+  "focused_source_catalog": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1\\pre-refresh-evidence.json",
+    "sha256": "2bb331b5f071ecd7b702ce520169712810bddd544db09f5b5164623652443fb4",
+    "limit": "Focused fixtures ran before the separate README date refresh; no whole-final-candidate focused-run claim."
+  },
+  "metadata_refresh": {
+    "path": ".github/workflows/scripts-README.md",
+    "head_sha256": "8f4fcd5c26992a73270501e64501d2f0d038907e549a4adb6a6bd2dfad0a2869",
+    "final_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+    "git_blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+    "mode": "100644",
+    "only_substitution": "Last Updated: 2026-10-05 -> 2026-10-06",
+    "authority": "Root explicit conditional release after current Windows termination and source guard; existing current-date/D07 policy",
+    "whole_PR_baseline": "Accepted B must remain the publication baseline; previous head P is not a substitute",
+    "accepted_B_H_failure_log_sha256": "77d6e04e5e6a6793be62b9b302475847fb50f004ff9162d2321143096d90cf07",
+    "final_validation_owner": "Root final aggregate and real whole-PR B/H finalization"
+  }
+}

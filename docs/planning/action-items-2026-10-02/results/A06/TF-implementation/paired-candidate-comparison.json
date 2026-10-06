@@ -1,0 +1,1772 @@
+{
+  "status": "candidate_pair_raw_comparison_complete_not_final_accepted_main",
+  "captured_at": "2026-10-06T00:02:00.620554+00:00",
+  "source_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "source_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "target_candidate_commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+  "target_candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+  "target_accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "scope": "13 delivered plus12 coupled rows; not A18 full union or final accepted-main comparison",
+  "counts": {
+    "rows": 25,
+    "raw_equal": 8,
+    "finite_mixed_exceptions": 9,
+    "necessary_language_content": 8,
+    "unclassified": 0
+  },
+  "rows": [
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "bytes": 6095,
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "bytes": 6095,
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "166d137206aff8f503911be9a569efbd204e023b",
+        "bytes": 26191,
+        "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "166d137206aff8f503911be9a569efbd204e023b",
+        "bytes": 26191,
+        "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+        "bytes": 90995,
+        "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+        "bytes": 91158,
+        "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Shared prefix/suffix byte-identical; independent exact finite descriptor verified.",
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Marked descriptor only: eleven fixed data fields select scoped ID/path, selector/description/title/anchors/summary placement/composition/standalone append.",
+        "supported_need_and_common_boundary": "Different normative source forms and consumer selectors require these literal values; one identical parser/composition/publication engine plus this finite descriptor suffices.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              23,
+              33
+            ],
+            "target_lines": [
+              23,
+              33
+            ],
+            "source_byte_span": [
+              586,
+              1083
+            ],
+            "target_byte_span": [
+              586,
+              1246
+            ],
+            "source_exact": "    ScopedId = 'powershell-instructions'\n    ScopedPath = 'powershell.instructions.md'\n    Selector = '**/*.ps1'\n    Description = 'PowerShell coding standards'\n    ChatTitle = '# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat'\n    GuideAnchor = 'powershell-writing-style'\n    SummaryHeading = 'Executive Summary: Author Profile'\n    SummaryAnchor = 'executive-summary-author-profile'\n    SummaryBefore = ''\n    Composition = 'HeadingLinked'\n    AppendStandalone = $false\n",
+            "target_exact": "    ScopedId = 'terraform-instructions'\n    ScopedPath = 'terraform.instructions.md'\n    Selector = '**/*.tf,**/*.tfvars,**/*.tftest.hcl,**/*.tf.json,**/*.tftpl,**/*.tfbackend'\n    Description = 'Terraform coding standards: secure, modular, and well-documented infrastructure as code.'\n    ChatTitle = '# Terraform Writing Style Guide - Formatted for Copy-Paste Into LLM Chat'\n    GuideAnchor = 'terraform-writing-style'\n    SummaryHeading = 'Executive Summary: Terraform Philosophy'\n    SummaryAnchor = 'executive-summary-terraform-philosophy'\n    SummaryBefore = 'Terraform Version Requirements'\n    Composition = 'ExplicitBody'\n    AppendStandalone = $true\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "bytes": 123582,
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3a62fde67925bc99285f8a0c3c74b53ac7f7f109",
+        "bytes": 123638,
+        "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Only exact approved repository identity/verifier/scoped filename substitutions.",
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Eight exact franklesniak/PSStyleGuide to franklesniak/TerraformStyleGuide repository identity substitutions, including negative origin.",
+        "supported_need_and_common_boundary": "Acquisition tests bind the actual repository identity; all test algorithms, both explicit semantic-role fixture loops and16TF modes remain identical.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              147,
+              147
+            ],
+            "target_lines": [
+              147,
+              147
+            ],
+            "source_byte_span": [
+              9003,
+              9116
+            ],
+            "target_byte_span": [
+              9003,
+              9123
+            ],
+            "source_exact": "        if ($strMode -eq 'origin-credentials') { 'https://fixture-secret@github.com/franklesniak/PSStyleGuide' }\n",
+            "target_exact": "        if ($strMode -eq 'origin-credentials') { 'https://fixture-secret@github.com/franklesniak/TerraformStyleGuide' }\n"
+          },
+          {
+            "source_lines": [
+              149,
+              149
+            ],
+            "target_lines": [
+              149,
+              149
+            ],
+            "source_byte_span": [
+              9203,
+              9267
+            ],
+            "target_byte_span": [
+              9210,
+              9281
+            ],
+            "source_exact": "        else { 'https://github.com/franklesniak/PSStyleGuide' }\n",
+            "target_exact": "        else { 'https://github.com/franklesniak/TerraformStyleGuide' }\n"
+          },
+          {
+            "source_lines": [
+              151,
+              151
+            ],
+            "target_lines": [
+              151,
+              151
+            ],
+            "source_byte_span": [
+              9273,
+              9364
+            ],
+            "target_byte_span": [
+              9287,
+              9385
+            ],
+            "source_exact": "    if ($strMode -eq 'origin-multiple') { 'https://github.com/franklesniak/PSStyleGuide' }\n",
+            "target_exact": "    if ($strMode -eq 'origin-multiple') { 'https://github.com/franklesniak/TerraformStyleGuide' }\n"
+          },
+          {
+            "source_lines": [
+              184,
+              184
+            ],
+            "target_lines": [
+              184,
+              184
+            ],
+            "source_byte_span": [
+              11254,
+              11369
+            ],
+            "target_byte_span": [
+              11275,
+              11397
+            ],
+            "source_exact": "      GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };\n",
+            "target_exact": "      GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide', GITHUB_SHA: head };\n"
+          },
+          {
+            "source_lines": [
+              233,
+              233
+            ],
+            "target_lines": [
+              233,
+              233
+            ],
+            "source_byte_span": [
+              14530,
+              14647
+            ],
+            "target_byte_span": [
+              14558,
+              14682
+            ],
+            "source_exact": "        GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };\n",
+            "target_exact": "        GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide', GITHUB_SHA: head };\n"
+          },
+          {
+            "source_lines": [
+              392,
+              392
+            ],
+            "target_lines": [
+              392,
+              392
+            ],
+            "source_byte_span": [
+              23450,
+              23568
+            ],
+            "target_byte_span": [
+              23485,
+              23610
+            ],
+            "source_exact": "if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/PSStyleGuide');\n",
+            "target_exact": "if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/TerraformStyleGuide');\n"
+          },
+          {
+            "source_lines": [
+              400,
+              400
+            ],
+            "target_lines": [
+              400,
+              400
+            ],
+            "source_byte_span": [
+              24097,
+              24169
+            ],
+            "target_byte_span": [
+              24139,
+              24218
+            ],
+            "source_exact": "      GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,\n",
+            "target_exact": "      GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide', GITHUB_SHA: head,\n"
+          },
+          {
+            "source_lines": [
+              1469,
+              1469
+            ],
+            "target_lines": [
+              1469,
+              1469
+            ],
+            "source_byte_span": [
+              95693,
+              95821
+            ],
+            "target_byte_span": [
+              95742,
+              95877
+            ],
+            "source_exact": "    const env = { GITHUB_SHA: event, GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide' };\n",
+            "target_exact": "    const env = { GITHUB_SHA: event, GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide' };\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "bytes": 36090,
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b3c9ad4caa86919ac1b66c457493f7d6b9d9b813",
+        "bytes": 36087,
+        "sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Shared prefix/suffix byte-identical; independent exact finite descriptor verified.",
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Independent marked descriptor only: ScopedId, ScopedPath, SemanticRole.",
+        "supported_need_and_common_boundary": "The gate must independently authorize the language output and dispatch its actual semantic child. One identical gate plus three fixed values suffices; deriving its allowlist from generator output is not allowed.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              37,
+              39
+            ],
+            "target_lines": [
+              37,
+              39
+            ],
+            "source_byte_span": [
+              1219,
+              1346
+            ],
+            "target_byte_span": [
+              1219,
+              1343
+            ],
+            "source_exact": "    ScopedId = 'powershell-instructions'\n    ScopedPath = 'powershell.instructions.md'\n    SemanticRole = 'PowerShellExamples'\n",
+            "target_exact": "    ScopedId = 'terraform-instructions'\n    ScopedPath = 'terraform.instructions.md'\n    SemanticRole = 'TerraformRecovery'\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "bytes": 31176,
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "bytes": 31176,
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+        "bytes": 17625,
+        "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+        "bytes": 17625,
+        "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/build.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+        "bytes": 25715,
+        "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/build.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+        "bytes": 25744,
+        "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Only exact approved repository identity/verifier/scoped filename substitutions.",
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Ten repository identity substitutions, two verify_generated_artifacts to verify job/dependency occurrences, one powershell.instructions.md to terraform.instructions.md upload path.",
+        "supported_need_and_common_boundary": "Each workflow acquires its own repository, preserves the native required-check context and publishes the correct scoped artifact. All executable acquisition, platform and admission bodies otherwise match.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A03/foundation-dependency-decision.md (C98)",
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              24,
+              24
+            ],
+            "target_lines": [
+              24,
+              24
+            ],
+            "source_byte_span": [
+              705,
+              778
+            ],
+            "target_byte_span": [
+              705,
+              785
+            ],
+            "source_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              62,
+              62
+            ],
+            "target_lines": [
+              62,
+              62
+            ],
+            "source_byte_span": [
+              3095,
+              3184
+            ],
+            "target_byte_span": [
+              3102,
+              3198
+            ],
+            "source_exact": "          & $strGitPath remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n",
+            "target_exact": "          & $strGitPath remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n"
+          },
+          {
+            "source_lines": [
+              88,
+              88
+            ],
+            "target_lines": [
+              88,
+              88
+            ],
+            "source_byte_span": [
+              4809,
+              4892
+            ],
+            "target_byte_span": [
+              4823,
+              4913
+            ],
+            "source_exact": "              $arrOrigin[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $arrOrigin[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              152,
+              152
+            ],
+            "target_lines": [
+              152,
+              152
+            ],
+            "source_byte_span": [
+              8243,
+              8316
+            ],
+            "target_byte_span": [
+              8264,
+              8344
+            ],
+            "source_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              190,
+              190
+            ],
+            "target_lines": [
+              190,
+              190
+            ],
+            "source_byte_span": [
+              10633,
+              10722
+            ],
+            "target_byte_span": [
+              10661,
+              10757
+            ],
+            "source_exact": "          & $strGitPath remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n",
+            "target_exact": "          & $strGitPath remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n"
+          },
+          {
+            "source_lines": [
+              216,
+              216
+            ],
+            "target_lines": [
+              216,
+              216
+            ],
+            "source_byte_span": [
+              12347,
+              12430
+            ],
+            "target_byte_span": [
+              12382,
+              12472
+            ],
+            "source_exact": "              $arrOrigin[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $arrOrigin[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              278,
+              278
+            ],
+            "target_lines": [
+              278,
+              278
+            ],
+            "source_byte_span": [
+              15679,
+              15752
+            ],
+            "target_byte_span": [
+              15721,
+              15801
+            ],
+            "source_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              301,
+              301
+            ],
+            "target_lines": [
+              301,
+              301
+            ],
+            "source_byte_span": [
+              17031,
+              17121
+            ],
+            "target_byte_span": [
+              17080,
+              17177
+            ],
+            "source_exact": "          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n",
+            "target_exact": "          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n"
+          },
+          {
+            "source_lines": [
+              347,
+              347
+            ],
+            "target_lines": [
+              347,
+              347
+            ],
+            "source_byte_span": [
+              19939,
+              19969
+            ],
+            "target_byte_span": [
+              19995,
+              20005
+            ],
+            "source_exact": "  verify_generated_artifacts:\n",
+            "target_exact": "  verify:\n"
+          },
+          {
+            "source_lines": [
+              384,
+              384
+            ],
+            "target_lines": [
+              384,
+              384
+            ],
+            "source_byte_span": [
+              21528,
+              21601
+            ],
+            "target_byte_span": [
+              21564,
+              21644
+            ],
+            "source_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n",
+            "target_exact": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n"
+          },
+          {
+            "source_lines": [
+              407,
+              407
+            ],
+            "target_lines": [
+              407,
+              407
+            ],
+            "source_byte_span": [
+              22880,
+              22970
+            ],
+            "target_byte_span": [
+              22923,
+              23020
+            ],
+            "source_exact": "          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n",
+            "target_exact": "          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n"
+          },
+          {
+            "source_lines": [
+              436,
+              436
+            ],
+            "target_lines": [
+              436,
+              436
+            ],
+            "source_byte_span": [
+              24487,
+              24525
+            ],
+            "target_byte_span": [
+              24537,
+              24555
+            ],
+            "source_exact": "    needs: verify_generated_artifacts\n",
+            "target_exact": "    needs: verify\n"
+          },
+          {
+            "source_lines": [
+              461,
+              461
+            ],
+            "target_lines": [
+              461,
+              461
+            ],
+            "source_byte_span": [
+              25429,
+              25468
+            ],
+            "target_byte_span": [
+              25459,
+              25497
+            ],
+            "source_exact": "            powershell.instructions.md\n",
+            "target_exact": "            terraform.instructions.md\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "bytes": 13541,
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e5ef49883c2317b4401759c5348a7d88e42a006",
+        "bytes": 13470,
+        "sha256": "8f4fcd5c26992a73270501e64501d2f0d038907e549a4adb6a6bd2dfad0a2869"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Only exact source harness row inserted; accepted TF README preserved.",
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Four line regions: T1 versus P1 provenance link; semantic-child description; actual semantic-helper table row; native verifier context. Common new-harness row is identical.",
+        "supported_need_and_common_boundary": "Documentation names each live provenance target, semantic child and required check. Identical common prose plus narrow references suffices; copying the whole PS README would remove supported TF guidance.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)",
+          "results/A03/foundation-dependency-decision.md (C98)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              23,
+              23
+            ],
+            "target_lines": [
+              23,
+              23
+            ],
+            "source_byte_span": [
+              1511,
+              1885
+            ],
+            "target_byte_span": [
+              1511,
+              1904
+            ],
+            "source_exact": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+            "target_exact": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n"
+          },
+          {
+            "source_lines": [
+              34,
+              34
+            ],
+            "target_lines": [
+              34,
+              34
+            ],
+            "source_byte_span": [
+              3722,
+              3908
+            ],
+            "target_byte_span": [
+              3741,
+              3924
+            ],
+            "source_exact": "| `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+            "target_exact": "| `Test-StyleGuideArtifacts.ps1` | Runs the recovery-example child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n"
+          },
+          {
+            "source_lines": [
+              36,
+              36
+            ],
+            "target_lines": [
+              36,
+              36
+            ],
+            "source_byte_span": [
+              4292,
+              4512
+            ],
+            "target_byte_span": [
+              4308,
+              4461
+            ],
+            "source_exact": "| `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |\n",
+            "target_exact": "| `Test-StateRecoveryExamples.mjs` | Checks the published Terraform state-recovery examples. | `node .github/workflows/Test-StateRecoveryExamples.mjs` |\n"
+          },
+          {
+            "source_lines": [
+              40,
+              40
+            ],
+            "target_lines": [
+              40,
+              40
+            ],
+            "source_byte_span": [
+              5073,
+              5699
+            ],
+            "target_byte_span": [
+              5022,
+              5628
+            ],
+            "source_exact": "The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+            "target_exact": "The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+        "bytes": 26216,
+        "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+        "bytes": 26216,
+        "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": false,
+      "root_port_verification": "Exact source blob bytes retained.",
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "delivered",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "powershell.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+        "bytes": 148831,
+        "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "terraform.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "bytes": 153067,
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "roles.artifactVerifier and one scoped filename inside uploadArtifact.inputs.path.",
+        "supported_need_and_common_boundary": "Retain independent reviewed admission policy and existing native check names/output paths. Shared validator/cases consume this small fixed contract without algorithm divergence.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A03/foundation-dependency-decision.md (C98)",
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              4,
+              4
+            ],
+            "target_lines": [
+              4,
+              4
+            ],
+            "source_byte_span": [
+              67,
+              120
+            ],
+            "target_byte_span": [
+              67,
+              100
+            ],
+            "source_exact": "    \"artifactVerifier\": \"verify_generated_artifacts\"\n",
+            "target_exact": "    \"artifactVerifier\": \"verify\"\n"
+          },
+          {
+            "source_lines": [
+              34,
+              34
+            ],
+            "target_lines": [
+              34,
+              34
+            ],
+            "source_byte_span": [
+              1192,
+              1307
+            ],
+            "target_byte_span": [
+              1172,
+              1286
+            ],
+            "source_exact": "        \"path\": \"copilot-instructions.md\\npowershell.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n",
+            "target_exact": "        \"path\": \"copilot-instructions.md\\nterraform.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "bytes": 3088,
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "One exact HTTPS origin literal.",
+        "supported_need_and_common_boundary": "Anonymous checkout must bind to the repository being validated; one common checker plus its exact origin literal suffices.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              40,
+              40
+            ],
+            "target_lines": [
+              40,
+              40
+            ],
+            "source_byte_span": [
+              1958,
+              2035
+            ],
+            "target_byte_span": [
+              1958,
+              2042
+            ],
+            "source_exact": "if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n",
+            "target_exact": "if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+        "present": false
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+        "bytes": 22102,
+        "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole necessary language-only semantic helper; absent in the other repository. These are not renamed equivalents.",
+        "supported_need_and_common_boundary": "The actual PS blank-line and TF state-recovery examples require distinct executable semantic oracles; the common gate selects their fixed roles without copying an irrelevant helper.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-BlankLineExamples.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "068c7139a9e6a9276073211f48eca88464204362",
+        "bytes": 15201,
+        "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/Test-BlankLineExamples.ps1",
+        "present": false
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole necessary language-only semantic helper; absent in the other repository. These are not renamed equivalents.",
+        "supported_need_and_common_boundary": "The actual PS blank-line and TF state-recovery examples require distinct executable semantic oracles; the common gate selects their fixed roles without copying an irrelevant helper.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d3-share-the-artifact-gate-without-losing-semantic-admission (C96.6)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "raw_equal": true,
+      "target_equal_accepted_base": true,
+      "classification": "raw-identical",
+      "exception": null
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "bytes": 816,
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "bytes": 837,
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Root: name, description and repository.url. Workflow package: name, repository.url, first keyword, author, bugs.url and homepage. Exact applicable fields are in per-path regions.",
+        "supported_need_and_common_boundary": "Package ownership/language metadata differs; runtime versions, dependency declarations and scripts are unchanged common operational fields.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              2,
+              2
+            ],
+            "target_lines": [
+              2,
+              2
+            ],
+            "source_byte_span": [
+              2,
+              45
+            ],
+            "target_byte_span": [
+              2,
+              52
+            ],
+            "source_exact": "  \"name\": \"psstyleguide-agent-governance\",\n",
+            "target_exact": "  \"name\": \"terraformstyleguide-agent-governance\",\n"
+          },
+          {
+            "source_lines": [
+              5,
+              5
+            ],
+            "target_lines": [
+              5,
+              5
+            ],
+            "source_byte_span": [
+              86,
+              159
+            ],
+            "target_byte_span": [
+              93,
+              173
+            ],
+            "source_exact": "  \"description\": \"Locked agent-governance validation for PSStyleGuide.\",\n",
+            "target_exact": "  \"description\": \"Locked agent-governance validation for TerraformStyleGuide.\",\n"
+          },
+          {
+            "source_lines": [
+              20,
+              20
+            ],
+            "target_lines": [
+              20,
+              20
+            ],
+            "source_byte_span": [
+              688,
+              754
+            ],
+            "target_byte_span": [
+              702,
+              775
+            ],
+            "source_exact": "    \"url\": \"git+https://github.com/franklesniak/PSStyleGuide.git\"\n",
+            "target_exact": "    \"url\": \"git+https://github.com/franklesniak/TerraformStyleGuide.git\"\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "bytes": 844,
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+        "bytes": 902,
+        "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "finite-mixed-file-exception",
+      "exception": {
+        "region": "Root: name, description and repository.url. Workflow package: name, repository.url, first keyword, author, bugs.url and homepage. Exact applicable fields are in per-path regions.",
+        "supported_need_and_common_boundary": "Package ownership/language metadata differs; runtime versions, dependency declarations and scripts are unchanged common operational fields.",
+        "canonical_decisions": [
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)"
+        ],
+        "exact_regions": [
+          {
+            "source_lines": [
+              2,
+              2
+            ],
+            "target_lines": [
+              2,
+              2
+            ],
+            "source_byte_span": [
+              2,
+              28
+            ],
+            "target_byte_span": [
+              2,
+              35
+            ],
+            "source_exact": "  \"name\": \"psstyleguide\",\n",
+            "target_exact": "  \"name\": \"terraformstyleguide\",\n"
+          },
+          {
+            "source_lines": [
+              13,
+              13
+            ],
+            "target_lines": [
+              13,
+              13
+            ],
+            "source_byte_span": [
+              310,
+              376
+            ],
+            "target_byte_span": [
+              317,
+              390
+            ],
+            "source_exact": "    \"url\": \"git+https://github.com/franklesniak/PSStyleGuide.git\"\n",
+            "target_exact": "    \"url\": \"git+https://github.com/franklesniak/TerraformStyleGuide.git\"\n"
+          },
+          {
+            "source_lines": [
+              16,
+              16
+            ],
+            "target_lines": [
+              16,
+              16
+            ],
+            "source_byte_span": [
+              397,
+              415
+            ],
+            "target_byte_span": [
+              411,
+              428
+            ],
+            "source_exact": "    \"powershell\",\n",
+            "target_exact": "    \"terraform\",\n"
+          },
+          {
+            "source_lines": [
+              20,
+              20
+            ],
+            "target_lines": [
+              20,
+              20
+            ],
+            "source_byte_span": [
+              462,
+              491
+            ],
+            "target_byte_span": [
+              475,
+              535
+            ],
+            "source_exact": "  \"author\": \"Frank Lesniak\",\n",
+            "target_exact": "  \"author\": \"Frank Lesniak, Blake Cherry, and Danny Stutz\",\n"
+          },
+          {
+            "source_lines": [
+              23,
+              23
+            ],
+            "target_lines": [
+              23,
+              23
+            ],
+            "source_byte_span": [
+              523,
+              588
+            ],
+            "target_byte_span": [
+              567,
+              639
+            ],
+            "source_exact": "    \"url\": \"https://github.com/franklesniak/PSStyleGuide/issues\"\n",
+            "target_exact": "    \"url\": \"https://github.com/franklesniak/TerraformStyleGuide/issues\"\n"
+          },
+          {
+            "source_lines": [
+              25,
+              25
+            ],
+            "target_lines": [
+              25,
+              25
+            ],
+            "source_byte_span": [
+              593,
+              662
+            ],
+            "target_byte_span": [
+              644,
+              720
+            ],
+            "source_exact": "  \"homepage\": \"https://github.com/franklesniak/PSStyleGuide#readme\",\n",
+            "target_exact": "  \"homepage\": \"https://github.com/franklesniak/TerraformStyleGuide#readme\",\n"
+          }
+        ],
+        "common_regions": "All equal byte spans inspected directly; no normalization, token stripping or case folding.",
+        "evidence": [
+          "Immutable raw blob comparison",
+          "root-port-verification.json for delivered paths; accepted-base identity for coupled paths"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "STYLE_GUIDE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "bytes": 148759,
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "STYLE_GUIDE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "bytes": 152868,
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "STYLE_GUIDE_RATIONALE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+        "bytes": 135295,
+        "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "STYLE_GUIDE_RATIONALE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+        "bytes": 73953,
+        "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "bytes": 148759,
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "bytes": 152868,
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "556538c7664327652bc42875b63a5bf6bc16783f",
+        "bytes": 148852,
+        "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "bytes": 152962,
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    },
+    {
+      "group": "coupled",
+      "source": {
+        "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+        "bytes": 257290,
+        "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d"
+      },
+      "target": {
+        "commit": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "bytes": 222292,
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+      },
+      "raw_equal": false,
+      "target_equal_accepted_base": true,
+      "classification": "necessary-language-content",
+      "exception": {
+        "region": "Whole normative language source, rationale, or generated derivative; scoped outputs use named counterpart paths.",
+        "supported_need_and_common_boundary": "PowerShell and Terraform rules/content are intentionally different. The common engine plus fixed language descriptors preserves each actual source and its four generated outputs; identical guide bytes would lose supported language content.",
+        "canonical_decisions": [
+          "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content (C96)",
+          "LOOP-POLICY.md#exact-byte-comparison-and-necessary-exceptions (D07 approved classes)",
+          "results/A06/frontmatter-spacing-decision.md (C98)"
+        ],
+        "exact_regions": "Whole file as identified by raw blob/bytes; absent counterpart recorded explicitly.",
+        "evidence": [
+          "Raw Git object and accepted-TF-base preservation",
+          "Root current TF semantic/golden/hosted evidence; no new test execution"
+        ]
+      }
+    }
+  ],
+  "generated_outputs": [
+    {
+      "path": "copilot-instructions.md",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "accepted_base_equal": true,
+      "two_pass_evidence_equal": true
+    },
+    {
+      "path": "terraform.instructions.md",
+      "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "accepted_base_equal": true,
+      "two_pass_evidence_equal": true
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+      "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+      "accepted_base_equal": true,
+      "two_pass_evidence_equal": true
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+      "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+      "accepted_base_equal": true,
+      "two_pass_evidence_equal": true
+    }
+  ],
+  "reverse_source_repair_indicated": false,
+  "conclusion": "No reverse source repair is indicated by this bounded exact candidate comparison. All shared algorithm/test bytes converge; remaining differences are the approved finite configuration/identity and necessary language-content boundaries.",
+  "remaining_gates": [
+    "TF68 remote review/current ordinary CI, normal merge and actual landed acceptance; root must rebind this table to actual merge commit/tree and fresh native refs.",
+    "A06 actual future recovery/new-harness and Node22 caller integration plus affected integrity tests remain; generator platform proof is not recovery proof.",
+    "A03 R5/B1 credential/schema consumers and later TF D2 jobs/policy/cases/publication wiring remain.",
+    "A07 R5/B1 independently usable runtime/acquisition qualification and coordinated consumers remain prerequisites; later actual recovery runtime/platform cells remain.",
+    "A21 later actual seven-loader closure and recovery admission integration remain; this batch covers only the finite generator-harness selector/test.",
+    "A16 Gate A real same-revision recovery platform proof, zero-mutation requirements and real operator plus independent-peer approval remain; A17 Gate B and its fresh applicable human approvals remain.",
+    "A14/issue155 named live-filesystem residuals remain; this comparison establishes no hostile competing-writer guarantee.",
+    "A18 full tracked union/capability/exception audit and A19 issue/all402disposition closure remain."
+  ],
+  "evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\merged-source-peer-comparison.json",
+      "sha256": "99bbfbbf3f67917dc221566bc7340d3459531be99dca35c55dd095524935e903"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-port-verification.json",
+      "sha256": "a45b7d0add01af947af8f3efee0768368a559fa5724903d62cda0384ba6346e7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\implementation-evidence.json",
+      "sha256": "6218238f22e7346e3065d49ca2ab72279ea7505c5e91d559116a605a3e05e606"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\tf-golden-outputs.json",
+      "sha256": "5d48dbb21969bf1317a56c77316a4e8303f184d045340db4e78c57112bbea417"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\platform-proof.json",
+      "sha256": "2e395d039c2b99faa5956bcec0fc144e1adcfd9e695d818fec4ee5732182b89e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\final-binding.json",
+      "sha256": "d20f8419e1e3d669ad55de1fd0487528028a96f952de4ebf904c3714455e271b"
+    }
+  ],
+  "method": "Replacement-disabled and no-optional-locks immutable ls-tree/cat-file/rev-parse reads. Compare raw bytes and modes/types first; line/byte regions only describe actual differences. No normalization, tests, native calls, product/index/ref/config/planning writes or descendants."
+}

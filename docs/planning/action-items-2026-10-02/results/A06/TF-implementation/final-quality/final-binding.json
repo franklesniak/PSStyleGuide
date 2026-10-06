@@ -1,0 +1,605 @@
+{
+  "status": "PASS_FINAL_INPUT_BINDING",
+  "observed_at": "2026-10-05T23:56:50.481078+00:00",
+  "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+  "body_sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab",
+  "native_pr": {
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/68",
+    "state": "open",
+    "merged": false,
+    "merge_commit_sha": "9bf58b1572474ad3fb2bf885e46ca184b909d514",
+    "head": {
+      "label": "franklesniak:codex/a06-generator-convergence",
+      "ref": "codex/a06-generator-convergence",
+      "sha": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "user": {
+        "login": "franklesniak",
+        "id": 11204406,
+        "node_id": "MDQ6VXNlcjExMjA0NDA2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/franklesniak",
+        "html_url": "https://github.com/franklesniak",
+        "followers_url": "https://api.github.com/users/franklesniak/followers",
+        "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+        "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+        "repos_url": "https://api.github.com/users/franklesniak/repos",
+        "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": {
+        "id": 1208373637,
+        "node_id": "R_kgDOSAZRhQ",
+        "name": "TerraformStyleGuide",
+        "full_name": "franklesniak/TerraformStyleGuide",
+        "private": false,
+        "owner": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+        "fork": false,
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+        "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+        "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+        "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+        "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+        "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+        "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+        "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+        "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+        "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+        "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+        "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+        "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+        "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+        "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments",
+        "created_at": "2026-04-12T07:25:06Z",
+        "updated_at": "2026-10-05T17:00:47Z",
+        "pushed_at": "2026-10-05T23:47:04Z",
+        "git_url": "git://github.com/franklesniak/TerraformStyleGuide.git",
+        "ssh_url": "git@github.com:franklesniak/TerraformStyleGuide.git",
+        "clone_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+        "svn_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "homepage": null,
+        "size": 7655,
+        "stargazers_count": 2,
+        "watchers_count": 2,
+        "language": "Shell",
+        "has_issues": true,
+        "has_projects": true,
+        "has_downloads": false,
+        "has_wiki": true,
+        "has_pages": false,
+        "has_discussions": false,
+        "forks_count": 0,
+        "mirror_url": null,
+        "archived": false,
+        "disabled": false,
+        "open_issues_count": 2,
+        "license": {
+          "key": "mit",
+          "name": "MIT License",
+          "spdx_id": "MIT",
+          "url": "https://api.github.com/licenses/mit",
+          "node_id": "MDc6TGljZW5zZTEz"
+        },
+        "allow_forking": true,
+        "is_template": false,
+        "web_commit_signoff_required": false,
+        "has_pull_requests": true,
+        "pull_request_creation_policy": "all",
+        "topics": [],
+        "visibility": "public",
+        "forks": 0,
+        "open_issues": 2,
+        "watchers": 2,
+        "default_branch": "main"
+      }
+    },
+    "base": {
+      "label": "franklesniak:main",
+      "ref": "main",
+      "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "user": {
+        "login": "franklesniak",
+        "id": 11204406,
+        "node_id": "MDQ6VXNlcjExMjA0NDA2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/franklesniak",
+        "html_url": "https://github.com/franklesniak",
+        "followers_url": "https://api.github.com/users/franklesniak/followers",
+        "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+        "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+        "repos_url": "https://api.github.com/users/franklesniak/repos",
+        "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": {
+        "id": 1208373637,
+        "node_id": "R_kgDOSAZRhQ",
+        "name": "TerraformStyleGuide",
+        "full_name": "franklesniak/TerraformStyleGuide",
+        "private": false,
+        "owner": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+        "fork": false,
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+        "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+        "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+        "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+        "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+        "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+        "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+        "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+        "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+        "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+        "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+        "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+        "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+        "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+        "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments",
+        "created_at": "2026-04-12T07:25:06Z",
+        "updated_at": "2026-10-05T17:00:47Z",
+        "pushed_at": "2026-10-05T23:47:04Z",
+        "git_url": "git://github.com/franklesniak/TerraformStyleGuide.git",
+        "ssh_url": "git@github.com:franklesniak/TerraformStyleGuide.git",
+        "clone_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+        "svn_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "homepage": null,
+        "size": 7655,
+        "stargazers_count": 2,
+        "watchers_count": 2,
+        "language": "Shell",
+        "has_issues": true,
+        "has_projects": true,
+        "has_downloads": false,
+        "has_wiki": true,
+        "has_pages": false,
+        "has_discussions": false,
+        "forks_count": 0,
+        "mirror_url": null,
+        "archived": false,
+        "disabled": false,
+        "open_issues_count": 2,
+        "license": {
+          "key": "mit",
+          "name": "MIT License",
+          "spdx_id": "MIT",
+          "url": "https://api.github.com/licenses/mit",
+          "node_id": "MDc6TGljZW5zZTEz"
+        },
+        "allow_forking": true,
+        "is_template": false,
+        "web_commit_signoff_required": false,
+        "has_pull_requests": true,
+        "pull_request_creation_policy": "all",
+        "topics": [],
+        "visibility": "public",
+        "forks": 0,
+        "open_issues": 2,
+        "watchers": 2,
+        "default_branch": "main"
+      }
+    },
+    "body": "## Problem and behavior\n\nThe Terraform generator, exact-path verifier and artifact gate still use separate implementations from the accepted PowerShell foundation. This change ports the shared implementation from [PSStyleGuide PR234](https://github.com/franklesniak/PSStyleGuide/pull/234), accepted at `98177628b7bc02c646724bfc8aa0fd73fed0cd24` (tree `fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6`). Terraform keeps its own language descriptors and current recovery checks.\n\nThe generator builds complete payloads before publication and uses common versioned result contracts. The artifact gate checks the actual Terraform semantic child, its native status and its integrity effects before generation. It retains the first resolved Node executable, bounded child wait, independent output allowlist, exact-path verification and final byte checks. The shared tests retain all 16 Terraform semantic modes and the candidate/final identity and primary-error/cleanup controls accepted in PR234.\n\nThe build now runs the actual generator suite twice on Windows PowerShell 5.1, Windows PowerShell 7 and native-ext4 Linux PowerShell 7. Verification requires successful results from all three jobs for the same revision before artifact publication. Both Linux acquisition callers retain early Git-selector refusal and checked byte configuration. The finite workflow policy, mutation cases and instruction-maintenance classifier recognize these consumers.\n\n## Scope and retained decisions\n\nExactly 12 files under `.github/workflows` change. The shared source bytes are identical to the accepted PowerShell source except for these bounded differences:\n\n- Generator: one marked Terraform language descriptor.\n- Artifact gate: a separate Terraform descriptor with `TerraformRecovery` semantics.\n- CI-helper tests: eight exact repository identity substitutions.\n- Build: ten repository identity substitutions, the existing Terraform verifier role `verify` at two sites, and the Terraform scoped output path.\n- Script index: one common harness row is added; the current Terraform semantic entry, verifier role and T1 provenance link remain.\n\nThe independent Terraform workflow-policy contract, actual `Test-StateRecoveryExamples.mjs`, guides, four generated documents, dependencies and other 67 existing tracked files retain their accepted bytes. The source's D1/D2/D3/D4 selections and R2\u2013R11 dispositions apply to the identical shared regions; this mechanical transfer introduces no new product design choice. The accepted source review and this PR's own validation remain separate evidence.\n\nThis preserves the current filesystem threat-model limits. The identity controls and injected mutation tests do not establish protection against every hostile competing writer. [PS issue155](https://github.com/franklesniak/PSStyleGuide/issues/155) remains open. Generator platform proof does not count as recovery-harness platform proof or a human recovery gate.\n\n## Validation\n\nThe candidate is commit `6c0c987799425b60c0e7b76650aa5ec7946811e2`, based on Terraform main `e21b74fe0b56551008f78f9f2946cd2a0f9c19ce`, with tree `ced4bb594a121b6c1ead983242ce2967032edd96`.\n\n- Four PowerShell files: zero parser errors and zero PSScriptAnalyzer 1.24.0 warnings/errors.\n- Actual local Windows PowerShell 7.6.5 generator suite: 156 assertions passed twice.\n- Isolated local Linux PowerShell 7.6.3 generator suite: 156 assertions passed twice in `Current` mode. This is not the required hosted native-ext4 cell.\n- Actual Terraform generation on Linux: two `NoChange` results; all four accepted output byte sequences remain identical.\n- Actual Linux Terraform recovery examples: passed.\n- Seven Node 24.18.1 suites: 567 tests passed, zero failures/cancellations/skips.\n- Root raw comparison: all 12 postimages match the selected source port, all 67 unchanged files retain accepted bytes, and all 1,910 dependency files match their verified catalog.\n\nAll 11 repository hooks and the final source/dependency/ref/config guard passed on the final candidate. Normal commit hooks, all four actual committed endpoint checks (accepted maintenance classification, metadata finalization, metadata classification and proposed policy) and the current ordinary two-root dependency audit passed. Independent candidate quality found no material defect. Final published head/base/body binding, this PR's remote reviews, hosted Windows5.1/Windows7/native-ext4Linux7 results and clean-commit artifact gate remain required. Local Windows5.1 execution is restricted and was not bypassed.\n\nAfter normal reviewed landing and landed validation, compare the actual merged Terraform bytes and coupled contracts back to current PowerShell main. This PR alone does not declare full paired-plan completion.\n",
+    "changed_files": 12
+  },
+  "native_head_commit": {
+    "sha": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "node_id": "C_kwDOSAZRhdoAKDZjMGM5ODc3OTk0MjViNjBjMGU3Yjc2NjUwYWE1ZWM3OTQ2ODExZTI",
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-05T23:44:35Z"
+    },
+    "committer": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-05T23:44:35Z"
+    },
+    "tree": {
+      "sha": "ced4bb594a121b6c1ead983242ce2967032edd96",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/ced4bb594a121b6c1ead983242ce2967032edd96"
+    },
+    "message": "Converge Terraform generator and artifact platform proof",
+    "parents": [
+      {
+        "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+      }
+    ],
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null,
+      "verified_at": null
+    }
+  },
+  "native_synthetic_commit": {
+    "sha": "9bf58b1572474ad3fb2bf885e46ca184b909d514",
+    "node_id": "C_kwDOSAZRhdoAKDliZjU4YjE1NzI0NzRhZDNmYjJiZjg4NWU0NmNhMTg0YjkwOWQ1MTQ",
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/9bf58b1572474ad3fb2bf885e46ca184b909d514",
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/9bf58b1572474ad3fb2bf885e46ca184b909d514",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-05T23:47:32Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-05T23:47:32Z"
+    },
+    "tree": {
+      "sha": "ced4bb594a121b6c1ead983242ce2967032edd96",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/ced4bb594a121b6c1ead983242ce2967032edd96"
+    },
+    "message": "Merge 6c0c987799425b60c0e7b76650aa5ec7946811e2 into e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "parents": [
+      {
+        "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+      },
+      {
+        "sha": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/6c0c987799425b60c0e7b76650aa5ec7946811e2"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxDcUCRC1aQ7uu5UhlAAA2k8QACLb/yd5NO1jnegKMW6uwKsb\n3OFO68sXLmKbK1CBIAC4piIn/RPmrIGc9xMBdmNpnT0qphjB/9whT3CPK8GxpN/S\nebEhsMBr400Np0RoQDYCFNODapLm3JPqz0YphWuSfwdJTmH67XOec535U2UPQDO6\nfUczU6zImfzPq4wtn97I1WFvbIH28OqNH5WYcY9zALH5e7CqlsamIs8OpS+QK6oO\n9X/yXevr1wWmvrlNtIfLd9BamaDuLIiEuH3ws74mJtXwCXSNdKHw9X5HB+63Gl47\n3+3GX3FRIncz8TSqtRgoOe/LN/KIZ3EJPMpCvyXmD2VODq55g4AS1vWuqEfo8bcW\nM0dZt5UNIGiKtUs36hx02aA/oDJx35zhRieppYki0YtvPo+DitnuefaLkmY0XIsH\ncrdvJmWThqZI/QTtEQOdDuyBeG+F1m8n1tJSVliw3okfN4kAPYpJIFGVk0FidvDE\nHK2jnenJdj5d3igpcIwcUaLYJzAS9z5FY9zO+JzqlUXNbHZ3YMR5ruIAQbl9X4QO\n2gvsdzkopshrRoOc2uiKFNon3CtS2JHs/q2dxXTKsahdQlnJ9lFj7g9Ss/om18Mi\n9+6/BD7vIZq48nzTh2bOQkTbJVqESS9I8vB2Iw74sku7y5Bfoc2JtvMVIQOF0gla\npafQ0rEwTV0ZxSCS2XrF\n=YDh1\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree ced4bb594a121b6c1ead983242ce2967032edd96\nparent e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\nparent 6c0c987799425b60c0e7b76650aa5ec7946811e2\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791244052 -0500\ncommitter GitHub <noreply@github.com> 1791244052 -0500\n\nMerge 6c0c987799425b60c0e7b76650aa5ec7946811e2 into e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\n",
+      "verified_at": "2026-10-05T23:47:32Z"
+    }
+  },
+  "local_commit": "tree ced4bb594a121b6c1ead983242ce2967032edd96\nparent e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791243875 -0500\ncommitter Frank Lesniak <franklesniak@hotmail.com> 1791243875 -0500\n\nConverge Terraform generator and artifact platform proof",
+  "verified_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\REPORT.md",
+      "sha256": "b5a1f68e77c1080f0a0ce5d0bd07198dd704d42ea525cf433d0e8760768ade72"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\evidence.json",
+      "sha256": "95fd47ebbeb5a1714e85f668163edb2d27a655205486331958efb944f267eee6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body.md",
+      "sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\result.json",
+      "sha256": "a081f6d0f31e5c092f052bba9baa21b697346413eb6f8493335c0c22665c1060"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\status.json",
+      "sha256": "d72b8e624abcf0f10f743b67b8974750a7d6417a55f32b139c2e871710f0cbe5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-v1.json",
+      "sha256": "1cf9c36a40f2fc3d5bf7de7316511eb736c322ab089f12c14bb75a156624dad4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\inputs\\source-before.json",
+      "sha256": "3bf7e61d497642446d09542b904128805ae25a5328566bccd7c3969b8b7b7fee"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\host-source-after.json",
+      "sha256": "3bf7e61d497642446d09542b904128805ae25a5328566bccd7c3969b8b7b7fee"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\generator-linux-current-1.log",
+      "sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\generator-linux-current-2.log",
+      "sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\actual-tf-generator-1.log",
+      "sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\actual-tf-generator-2.log",
+      "sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\tf-semantic.log",
+      "sha256": "81ca4e911d0cb8784687f16af01ffad57b9cde869a2970d16af40dba96c1c8fe"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\full-node.log",
+      "sha256": "d4dc79f7a7c0357839729fb88d0391dd234827fb0cbd1e98a81dfc41e198c8b8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-product-commit.log",
+      "sha256": "3995696f0497d7017f9da2e3d6c27ebb7d44a27b1575eace5cb06d52d537dd8d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\AcceptedMaintenance-6c0c987.log",
+      "sha256": "b129351f9cbbe1408b79e5c1c863a647ec03f80ebead44c6abd207e553a050a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\FinalizeMetadataNow-6c0c987.log",
+      "sha256": "ab67b12f7f220877d7e679e492d1346a8d4aedb703e69c08473958570048f7b6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\MetadataClassificationOnly-6c0c987.log",
+      "sha256": "6e6a45928e02d4845c88acdca8773086d8d19a600ecc26b4e442a5dc8538d2c3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\ProposedPolicy-6c0c987.log",
+      "sha256": "4a4f571a0662eaeedbbf754e92a27328a8e8b1f7b54b4eb3772bc392459609ec"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\current-audit-6c0c987.log",
+      "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\topic-push.log",
+      "sha256": "6ac693ff1ba8bf93e5024bb188eb560392d76cf7bde5d4be289a53091d25a950"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495634\\attempt-1\\log.txt",
+      "sha256": "98e0a9c1a0578c52548565df7dd85a5a1ea9487c7c65c83360ed7baf71166619"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495634\\attempt-1\\summary.json",
+      "sha256": "b0377ca7244ea8847707d0fba536ea83c1748300d0cfbb8db5616bdd4dd9e5e2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495634\\attempt-1\\run.json",
+      "sha256": "acd290425773e6d1da7e35a625a65976df869e533ce9031d7f064a09f0be7b3d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495634\\attempt-1\\jobs.json",
+      "sha256": "8c5e79860a1b8b33cab025a6a365544f5ff313ee4ce60feedf1d4b99258ee356"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452570\\attempt-1\\log.txt",
+      "sha256": "6a3f41fee164f87cf1c5776953ea449c9fa844636f90ca9a723771ec155311f6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452570\\attempt-1\\summary.json",
+      "sha256": "de9bd12aaaa3a892620350881918622212aed084476033c7f27d88a7fee4ccef"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452570\\attempt-1\\run.json",
+      "sha256": "ed8b2ae3ba688e296890931d0d09fe50686f4c92ae410346cfe5183c6b0a86d0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452570\\attempt-1\\jobs.json",
+      "sha256": "f3fcdfed2cafc69b734851a1dd9bdbe7c143e98e705cd7dc73c0c615a93e1a76"
+    }
+  ],
+  "hosted": [
+    {
+      "run": 37390495634,
+      "attempt": 1,
+      "event": "pull_request",
+      "revision": "9bf58b1572474ad3fb2bf885e46ca184b909d514",
+      "tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+      "log_sha256": "98e0a9c1a0578c52548565df7dd85a5a1ea9487c7c65c83360ed7baf71166619",
+      "proof": [
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T23:48:15.7197382Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T23:48:34.9239333Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T23:48:13.0040207Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T23:48:38.1938557Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T23:48:10.8374916Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T23:48:28.4654077Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+      ],
+      "jobs": [
+        {
+          "id": 112034141975,
+          "name": "generator_windows_51",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034142366,
+          "name": "generator_linux_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034142488,
+          "name": "generator_windows_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034468165,
+          "name": "verify",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034646525,
+          "name": "publish_committed_artifacts",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "run": 37390452570,
+      "attempt": 1,
+      "event": "push",
+      "revision": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+      "log_sha256": "6a3f41fee164f87cf1c5776953ea449c9fa844636f90ca9a723771ec155311f6",
+      "proof": [
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T23:47:40.1160367Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T23:48:03.3512783Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T23:47:37.4254294Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T23:47:55.9586529Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T23:47:40.0950440Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T23:47:58.7593543Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+      ],
+      "jobs": [
+        {
+          "id": 112034002929,
+          "name": "generator_linux_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034003210,
+          "name": "generator_windows_51",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034003287,
+          "name": "generator_windows_7",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034294689,
+          "name": "verify",
+          "conclusion": "success"
+        },
+        {
+          "id": 112034449991,
+          "name": "publish_committed_artifacts",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "local_validation": {
+    "node_pass": 567,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "hooks": 11,
+    "skipped_hooks": 0,
+    "guard_equal": true,
+    "normal_commit": true,
+    "committed_endpoint_modes": 4,
+    "ordinary_two_root_audit": "CLEAN"
+  },
+  "findings": [],
+  "uncredited_gates": [
+    "Remote review acceptance/reconciliation remains root-owned",
+    "Ordinary setup/Node CI and other required checks not accepted by this bounded reader",
+    "Immediate premerge native recheck",
+    "Actual merge, landed validation and reverse paired comparison",
+    "Broader recovery platform/human gates and issue155 remain outside scope"
+  ],
+  "commands_inspected": [
+    "Replacement-disabled/no-optional-locks Git rev-parse,cat-file commit,working/index diff",
+    "Authenticated GitHub connector get_pr_info PR68",
+    "gh api repos/franklesniak/TerraformStyleGuide/pulls/68",
+    "gh api repos/franklesniak/TerraformStyleGuide/git/commits/6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "gh api repos/franklesniak/TerraformStyleGuide/git/commits/9bf58b1572474ad3fb2bf885e46ca184b909d514",
+    "Raw hashlib SHA256,JSON and log inspection for enumerated evidence"
+  ],
+  "limits": "No native/product/planning mutations, tests, descendants or repeated whole-source audit. Hosted upload success checked; archive bytes not independently downloaded/rehashed. Prior report/evidence preserved."
+}

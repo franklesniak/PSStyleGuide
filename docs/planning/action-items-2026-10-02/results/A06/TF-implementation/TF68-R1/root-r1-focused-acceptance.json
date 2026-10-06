@@ -1,0 +1,224 @@
+{
+  "status": "focused_accepted_ready_for_aggregate",
+  "coordinator": "root",
+  "checked_at": "2026-10-06T01:06:47.712047+00:00",
+  "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "delta_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/scripts-README.md"
+  ],
+  "selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+  "metadata_sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+  "unchanged_files": 77,
+  "independent_code_findings": [],
+  "checks": {
+    "windows_author_fixture": "passed",
+    "windows_native_capacity_cleanup": "passed",
+    "windows_real_entry_path": "passed",
+    "linux_focus": "passed",
+    "regression_controls": "passed",
+    "original_byte_refusal": "passed",
+    "worktree_dispatch_mutant": "passed",
+    "uninstrumented_validator": "passed",
+    "parser_analyzer": "passed"
+  },
+  "windows_full_driver": {
+    "exit": 1,
+    "session_id": 13807,
+    "classification": "scratch_mixed_path_capacity_breakpoint_failure",
+    "log_sha256": "7838bf7785f0481e58db47765c17671c00f0b5056e2d7233a12cdf446d7d83bb"
+  },
+  "windows_coverage": "composed_from_author_fixture_and_native_path_capacity_cleanup",
+  "limits": "Focused code proof used the pre-refresh README fixture. Final aggregate and actual accepted-B/new-H whole-PR current-date finalization remain required. No passing combined Windows driver, Windows5.1 local execution, hosted new-head result, commit or product acceptance is claimed.",
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-actual-clock-final.log",
+      "sha256": "10add6d429b0797d2d1cdb15bbbc9d7f0acda48caf5b22d5028ab6fabe8fd0c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-actual-clock.log",
+      "sha256": "c5158a30e78dc44a59540d7b762333277a6fa1e53f55d3a68241b54fdf6f03c8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-actual-clock.ps1",
+      "sha256": "8eef7af44d578d14ad18d92f47047168b2b4900245f2460145ec939166396417"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-anchor-probe.ps1",
+      "sha256": "bc81de8f9061c3c0c75329047d076bd5841136993cc6997f273dac2f981c6454"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-anchor-target.ps1",
+      "sha256": "f8e0f136cd78cc8329b3416f05fdc48c99a15fcd36a338aaeed0402e66ec5815"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-boundary.ps1",
+      "sha256": "0ac9ff16476584468dc163205927a78816d928bcfcd3698b57f2a83f739584c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-check.log",
+      "sha256": "10bb335ce0ff7d960ee0e0ad39da15a4dca3165787b657d7fea258a50802d1da"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-check.ps1",
+      "sha256": "f6584be8d5ebefca8c989dd2d0df511ac0a7dbde5bc50bc74823d128d0996fe9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-native-cleanup.log",
+      "sha256": "9c31775418eeade9e1cfea36eae3882efba5fac1f7ae865f57bcdadbc1813c88"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-native-path.log",
+      "sha256": "428ca9dacc108c61ccd56e73dd46bc337940262df444fb593a950c9d1887b7ef"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-capacity-native.ps1",
+      "sha256": "a32f888143c2d268b11ef088227850018a19c89b8637b13d9cc039e96330d805"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-clock-helper.ps1",
+      "sha256": "dadd1f9517624594591a69201fbccd3f94cb7a2f40a467a4949329828d520dd9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-controls.log",
+      "sha256": "3b579af88736d6e67e0b51c71d2db80578e96599ab7c2c45aca0eae052e58f3b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-controls.ps1",
+      "sha256": "88a94184fb1a82ece1f39fac21c2eb6570fe1dcdce92671543a411a1e9827c09"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-path.json",
+      "sha256": "8dac61b94578b382089ae893b7cf396cde6bdbbbc971895215b2633e4a977492"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-path.py",
+      "sha256": "23d29d00e606fcc61951be7ab9be2da4c0e0577307c97887828c0bab0e824790"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-plain.stderr",
+      "sha256": "04693ed4345c504e1f31fba6298e31427452c332b837886d37c34e42721a7430"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-plain.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-xml.stderr",
+      "sha256": "8c2600355942386b7fec67ca0de756f3b01021dc6cc7fc4432d457b8516bd589"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-entry-xml.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-evidence.py",
+      "sha256": "77fe59e5857648e73847c6fe9b4814d3c57310d85d4fc098ab8fde1900eb91ff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-focus-final-windows.log",
+      "sha256": "7838bf7785f0481e58db47765c17671c00f0b5056e2d7233a12cdf446d7d83bb"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-focus-windows.log",
+      "sha256": "2eaa3e975219362afe63ecde485b564c256e1e5bae44255ea74eac3f528539af"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-focus.ps1",
+      "sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-helper-probe.ps1",
+      "sha256": "04b24edd58c6dddfb29a3942b90a0f53da7f3d83bff17919b7a617266eb8d0d1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-helper-target.ps1",
+      "sha256": "9f9faccb5b9774b7d3039cdfca0005dac072e5ae439863c59be4ab2a4acc5ba0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-helper-throw-probe.ps1",
+      "sha256": "5fe0dcd125d241baafa4b2291a34cca45c03b17f0325c18482cd7aac35eec6d7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-implement.py",
+      "sha256": "66df0af64b4fdd37f1f8dcde3b579c80d35086fcbd25aa386513afdaa3dd9360"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-make-boundary-driver.py",
+      "sha256": "422f93e5009b8c7344e048629c100a3ee958bbca704bc06202862efa456d1b42"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-midnight-selftest.md",
+      "sha256": "6726f7fa788e302a64802bb17ddfe8731376acbc862b533169d33c1f1252c558"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-original-boundary.log",
+      "sha256": "08cfdf18edb358de9c6ee3d884c47120345b2ce243209838d4fc2d1c7e2b226a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-original-SelfTest.ps1",
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-production-file-entry.log",
+      "sha256": "b682306bb627bfbd67083b6db78ba10188f880f6f17d780ed7725324659d8e21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-regression-block.ps1",
+      "sha256": "52cb8e6f16997b5e18f7b39d84d548f375b58d072935b1764e4d7cc5176640e0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1-worktree-bypass.log",
+      "sha256": "ef51c448ea649546461ef6bee20e204295ff72847a3d2950c1c77b98c854b95c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1\\evidence.json",
+      "sha256": "bad6c75ebd3cae16bb983b6d0d1b98e020c6d1519d0302c2ff80fa95f71b038f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1\\IMPLEMENTATION.md",
+      "sha256": "6d4901b044f428e0e23d7dc8413fc3cc157ff96996c044a34563f4e3c08b799f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R1\\pre-refresh-evidence.json",
+      "sha256": "2bb331b5f071ecd7b702ce520169712810bddd544db09f5b5164623652443fb4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-linux-focused\\output\\result.json",
+      "sha256": "82ea3e49ad3bd596b5bcbfe97b2d2ff2e7a9cd5e0258a88bc33e4732347d91da"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-linux-focused\\output\\focused.log",
+      "sha256": "d29956415ac91d99986558f4b53848ed0f7726d6c1fe568ce1d21f5e279cda48"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-linux-focused\\status.json",
+      "sha256": "ed2eeb101368830579d940e942e01c5fbf398cd7214f11e722430bae46760528"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R1-delta-review.md",
+      "sha256": "cf9aa1768c6d947cca78652906c7032fd6e383ac6d11988e0993591aa0ebc7a7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R1-delta-review.json",
+      "sha256": "18ed8ce8c6d41bf4a1cabea37e453035c9bd4f2e60830933f3e9ed28c8565d8f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R1-focused-binding.md",
+      "sha256": "b60b247ef722050eacbe4c0770121d75dfe0c157e7613b914ecdabd4ed15ae62"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\R1-focused-binding.json",
+      "sha256": "35e5e9c22fcb0256780f13993eaffa00a45c50103701cfd3e5826b9d84b57f21"
+    }
+  ]
+}

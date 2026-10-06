@@ -1,5 +1,5 @@
 {
-  "status": "round1_reviews_and_ci_pending",
+  "status": "round1_midnight_repair_aggregate_running",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -83,7 +83,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits.",
-  "next_action": "Collect pending Copilot and ordinary CI; finish independent final binding; then recheck normal merge gates.",
+  "next_action": "Collect existing aggregate58929 terminal result and final host source guard; if passed, normal scoped commit, actual accepted-B/new-H finalization/classification/proposed checks and current audit, then final native publication/round2.",
   "checkout_exit": 0,
   "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
   "implementation": {
@@ -431,27 +431,30 @@
     ],
     "session_state": "completed_exit_0"
   },
-  "local_operations": "Local aggregate, normal commit, four committed endpoint modes and current dependency audit passed. No local process or source freeze remains. Candidate quality conditional pass; final native binding pending.",
-  "pending_native_operations": [
-    {
-      "kind": "Copilot review",
-      "run": 37390664560,
-      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2"
-    },
-    {
-      "kind": "ordinary CI",
-      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2"
-    }
-  ],
+  "local_operations": "One final R1 aggregate requested on staged treeee79a77e. Preserve TF product bytes/index/refs/config/dependencies until final host guard completes. No pending remote request.",
+  "pending_native_operations": [],
   "final_quality": {
-    "status": "final_binding_running",
+    "status": "passed",
     "worker": "/root/ps234_final_quality",
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality",
     "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
     "limits": "Candidate review first; final validation, commit/body/native binding and hosted platform/artifact proof remain separate gates.",
     "report_sha256": "b5a1f68e77c1080f0a0ce5d0bd07198dd704d42ea525cf433d0e8760768ade72",
     "evidence_sha256": "95fd47ebbeb5a1714e85f668163edb2d27a655205486331958efb944f267eee6",
-    "root_read": "Complete report read; source/candidate identities and no-findings/limits checked. Actual final commit/body/native/hosted binding remains."
+    "root_read": "Complete report read; source/candidate identities and no-findings/limits checked. Actual final commit/body/native/hosted binding remains.",
+    "final_binding": {
+      "status": "passed",
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+      "body_sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\final-binding.md",
+      "report_sha256": "c3de8599bbf4ad7f360bc44bb72f9cce9e66c4c74742a669de8cf30e5c2b6536",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\final-binding.json",
+      "evidence_sha256": "d20f8419e1e3d669ad55de1fd0487528028a96f952de4ebf904c3714455e271b",
+      "root_review": "Read complete report; checked exact candidate/body/native synthetic parent/tree and both final report hashes. Full port review is reused. Remote reviews/ordinary CI/landed and paired gates remain separately required."
+    },
+    "later_finding": "Earlier PASS remains historical candidate evidence; new CI finding requires disposition and bounded final reassessment before merge."
   },
   "accepted_base_policy": {
     "status": "accepted_base_ready",
@@ -463,7 +466,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-candidate-readiness.json",
     "sha256": "b364b7ebcbd57484ad386336e53e7ba75576889a18ffedd31bc0547cc4e17d96"
   },
-  "planning_checkpoint": "68d335f840f30aaab0faf6c15584827fd37e87ec",
+  "planning_checkpoint": "3bf9556e11c77d173f5f98015ae5bf077260650a",
   "commit": {
     "status": "committed",
     "expected_parent": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -649,16 +652,25 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-baseline.json",
       "baseline_sha256": "f4e02890bee80cd8d4714fcd43ebf8f2344484ad1589ab1ba3b859186ee9a0b7",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_no_findings_with_setup_failure",
         "requested_at": "2026-10-05T23:48:46.151528+00:00",
         "effort_selected": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Balanced",
         "channel_attempt": 1,
         "request_event_id": 32554473645,
         "native_requested_at": "2026-10-05T23:49:15Z",
         "channel": "supported GitHub Reviewers UI",
         "confirmation": "round1-after-copilot.json",
-        "workflow_run": 37390664560
+        "workflow_run": 37390664560,
+        "observed_effort_source": "Authenticated completed overview5422208600 explicit field",
+        "review_id": 5422208600,
+        "review_body_sha256": "776ee4239416084c2d1f52dc1e7fe8023feb06ba77eb5b06eff9e2779d2bb8ab",
+        "submitted_at": "2026-10-06T00:06:38Z",
+        "workflow_status": "completed",
+        "workflow_conclusion": "failure",
+        "setup_failure_comment": 6006079247,
+        "setup_failure_cause": "Same confirmed TF68-R1 midnight SelfTest fixture failure at00:02:39Z",
+        "terminal_snapshot": "round1-progress-6.json"
       },
       "codex": {
         "status": "completed_clean",
@@ -679,10 +691,45 @@
         "terminal_summary_body_sha256": "565132c692903a341fe89a1125ead8089544ff5ee893db3dd29329b233df8490",
         "attribution": "Authenticated automatic PR-open summary changed from Running to Completed on exact head; authenticated post-completion +1 and full empty finding inventory. No duplicate manual trigger."
       },
-      "findings": []
+      "findings": [
+        {
+          "id": "TF68-R1",
+          "source": "Hosted ordinary CI37390495694 attempt1",
+          "status": "selected_C97_implementation_released",
+          "file": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "line": 1163,
+          "failure_at": "2026-10-06T00:01:12.3175197Z",
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390495694\\attempt-1\\log.txt",
+          "log_sha256": "d77edf49b69f44d9a9c14b21f28a2c502b2c1ab9afa3f914bed5358954fb9281",
+          "finding": "Author-finalization fixture captured October5 dates before midnight; real child current-date validation ran October6 and rejected the expected-success fixture. Validate complete root cause and owner decision before tracked SelfTest repair.",
+          "owner": "A21; coordinated same PR validation repair",
+          "common_source_and_peer": true,
+          "source_blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+          "peer_blob": "7275b050ca3067706d646412a7f751138073e5bb",
+          "additional_boundary_evidence": "Worker identified documented worktree, proposed-mode and staged-input fixture child callers; production has initial UtcNow and local changed-parent UtcNow. Full selected repair must handle all supported fixture boundaries.",
+          "decision_status": "proposal_in_preparation",
+          "additional_reproduction": {
+            "run": 37390664560,
+            "attempt": 1,
+            "failure_at": "2026-10-06T00:02:39Z",
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\log.txt",
+            "sha256": "b7dcc2987dc6e6d971ac4fc243f365d76b035b9f46414707a381da05e111a8bc"
+          },
+          "decision": "docs/planning/action-items-2026-10-02/results/A21/TF68-R1-midnight-selftest.md"
+        }
+      ],
+      "request_set_terminal": true,
+      "clean": false,
+      "status": "terminal_current_input_requires_ci_repair",
+      "body_inventory": {
+        "declared_findings": 0,
+        "inline_findings": 0,
+        "body_only_defects": [],
+        "advisory": "General recommendation for final human review of security-sensitive changes; no specific defect or authority grant. Independent quality and actual owner/native gates remain required. Current CI failure independently prevents merge."
+      }
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-progress-2.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-progress-6.json",
   "hosted_platform_progress": {
     "status": "passed",
     "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
@@ -697,5 +744,166 @@
     ],
     "tree_equal": true
   },
-  "next_poll_not_before": "2026-10-05T23:58:26.824234+00:00"
+  "next_poll_not_before": "2026-10-06T00:07:32.377660+00:00",
+  "live_remote_observation": {
+    "captured_at": "2026-10-05T23:58:47.344149+00:00",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-live-jobs-2358.json",
+    "status": "verified_wait",
+    "active_runs": [
+      37390495694,
+      37390496063,
+      37390452073,
+      37390452169,
+      37390664560
+    ],
+    "stage": "Four ordinary CI and one Copilot run are performing real repository validation; no failure or stalled state is inferred."
+  },
+  "paired_candidate_comparison": {
+    "status": "root_verified_candidate_only",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\paired-candidate-comparison.md",
+    "report_sha256": "462d6aa670f5b799cf2165ca2c5e9506ec374f9bc4fba7d4040e6227fef18d41",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\paired-candidate-comparison.json",
+    "sha256": "03ae2734e87ab08ea0e6d6af5ae8366507a88b9737267a51527fad5417f0aee0",
+    "counts": {
+      "rows": 25,
+      "raw_equal": 8,
+      "finite_mixed_exceptions": 9,
+      "necessary_language_content": 8,
+      "unclassified": 0
+    },
+    "reverse_repair_indicated": false,
+    "root_review": "Read report and sampled14raw commit/blob/mode identities. Actual TF landing/native-ref binding still required; not A18 full union."
+  },
+  "repair": {
+    "id": "TF68-R1",
+    "status": "staged_aggregate_ready",
+    "released_at": "2026-10-06T00:12:53.412544+00:00",
+    "worker": "/root/a06_tf_generator_owner",
+    "decision": "docs/planning/action-items-2026-10-02/results/A21/TF68-R1-midnight-selftest.md",
+    "selected_option": "C97",
+    "displayed_options_rubric_scores_before_implementation": true,
+    "parent_head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "published_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+    "delta_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/scripts-README.md"
+    ],
+    "published_scope": [
+      ".github/workflows/Classify-InstructionMaintenance.mjs",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-ExactGitPathSet.ps1",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-StyleGuideGenerator.ps1",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/build.yml",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/workflow-policy-cases.json"
+    ],
+    "candidate_scope": [
+      ".github/workflows/Classify-InstructionMaintenance.mjs",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-ExactGitPathSet.ps1",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-StyleGuideGenerator.ps1",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/build.yml",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/workflow-policy-cases.json",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "preimage": {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "mode": "100644",
+      "bytes": 229955,
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+    },
+    "preserve": "All11 original non-README generator-port postimages, README body, all4outputs, production validator bytes, provenance exception, all negative tests, native failure handling and original clocks/counters. README current date must refresh once after active focused run guard.",
+    "reverse_obligation": "After TF acceptance, compare current native PS and increment only actually affected outcome counters before actual opposite repair. A21 clock fix will require source repair; original25path A06 comparison itself showed no reverse delta.",
+    "linux_focused_preparation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-linux-focused\\preparation.json",
+    "frozen_selftest_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+    "focus_driver_sha256": "e4de65682fa609ba9a5a79b6f441376de21962eea0955c1f3023ce4ff5bc00a5",
+    "linux_focus": {
+      "status": "passed",
+      "session_id": 85975,
+      "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-linux-focused",
+      "manifest_sha256": "ce1d26aaf04369b70cb5f8061687d0cd3e053dbaf7b7d6bea953eaf1bfd6d2dc",
+      "started_at": "2026-10-06T00:26:06.223362+00:00",
+      "private_candidate_tree": "29e7f3f30cb9a1df0686be6a3e77234fe0186f57",
+      "scope": "Prior-day actual author-finalization and capacity fixtures; no aggregate acceptance.",
+      "exit": 0,
+      "source_equal": true,
+      "host_source_equal": true,
+      "finished_at": "2026-10-06T00:38:00.470876+00:00",
+      "result_sha256": "82ea3e49ad3bd596b5bcbfe97b2d2ff2e7a9cd5e0258a88bc33e4732347d91da",
+      "log_sha256": "d29956415ac91d99986558f4b53848ed0f7726d6c1fe568ce1d21f5e279cda48"
+    },
+    "independent_delta_review": {
+      "worker": "/root/ps234_final_quality",
+      "status": "code_no_findings_validation_pending",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality",
+      "report_sha256": "cf9aa1768c6d947cca78652906c7032fd6e383ac6d11988e0993591aa0ebc7a7",
+      "evidence_sha256": "18ed8ce8c6d41bf4a1cabea37e453035c9bd4f2e60830933f3e9ed28c8565d8f"
+    },
+    "aggregate_runner_preparation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-runner-preparation.json",
+    "prepared_not_executed": {
+      "prepare-r1-final-validation.py": "b890db3f0496af001fa3dba587ab7845aeaf729da43a582dd031d4bc0c170bb3",
+      "commit-r1-candidate.py": "4a522ccbe505bc5e0a86c47d43f14d7a4d6d67125b3e371d638a548d43df6823",
+      "validate-r1-endpoints.py": "81a7d2b7c7fb8510a570ee157a30f561f37e6225464d49cf204ff3b7b77bf883",
+      "pr-body-r1-draft.md": "fefce1c0aa7072cb83c5178b5d1040430a66312b43517f4327a074dc599348fe"
+    },
+    "validation_notes": [
+      "Linux focused code proof passed with all79 pre-refresh inputs unchanged. Windows full driver remains running; mixed-path capacity driver boundary has separate native-path passing proof and production -File path-normalization evidence.",
+      "Windows coverage will be explicitly composed from actual author fixture and same-code native-path capacity/cleanup. Preserve full mixed-path driver failure; never call its aggregate exit a pass. Root final hash binding awaits stable writer artifacts.",
+      "Actual accepted-B/old-H author finalization at real Oct6 failed solely because README Last Updated remained Oct5 (log77d6e04e). The previously prepared parent-H-only finalization strategy was NOT executed and is withdrawn. Current whole PR needs genuine accepted-B/new-H finalization after the date refresh.",
+      "Corrected helpers are syntax-compiled only; no staging, commit, push, review or aggregate has begun. Final aggregate covers final79bytes. Existing focused results remain bounded unchanged-code proof with their original valid document fixture."
+    ],
+    "metadata_finalization": {
+      "status": "one_field_refresh_applied_pending_actual_new_head_finalization",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R1-existing-whole-pr-finalization-current-day.json",
+      "sha256": "2346e88ceed73bd261bf2e8a07fbc80d734f6c35dcd59e64b41ae15b1d77acae",
+      "observed_exit": 1,
+      "path": ".github/workflows/scripts-README.md",
+      "old_date": "2026-10-05",
+      "new_date": "2026-10-06",
+      "scope": "Exactly one Last Updated field under existing current-date policy/D07. No body or policy change. Actual accepted-B/whole-new-H finalization remains required."
+    },
+    "focused_acceptance": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r1-focused-acceptance.json",
+      "sha256": "586e0723811930b125e47dfe22ff856182fc86c350b33eddf6d24768a07a009f"
+    },
+    "windows_focus": {
+      "exit": 1,
+      "session_id": 13807,
+      "classification": "scratch_mixed_path_capacity_breakpoint_failure",
+      "log_sha256": "7838bf7785f0481e58db47765c17671c00f0b5056e2d7233a12cdf446d7d83bb",
+      "coverage": "composed_from_author_fixture_and_native_path_capacity_cleanup",
+      "author_fixture": "passed",
+      "native_capacity_cleanup": "passed"
+    },
+    "independent_focused_review": {
+      "status": "FOCUSED_READY_FOR_FINAL_AGGREGATE",
+      "report_sha256": "b60b247ef722050eacbe4c0770121d75dfe0c157e7613b914ecdabd4ed15ae62",
+      "evidence_sha256": "35e5e9c22fcb0256780f13993eaffa00a45c50103701cfd3e5826b9d84b57f21"
+    },
+    "candidate_tree": "ee79a77e117d26f995008d2def0983bf879b7fc1",
+    "root_readiness": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r1-candidate-readiness.json",
+      "sha256": "524e7097fb58d6f94b299ea0fdab9132b7724328663980fcba6b09a772f6a9a6"
+    },
+    "aggregate": {
+      "status": "running",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-r1.json",
+      "manifest_sha256": "1916348adbe6d0d89aaacc166f3fe4c6c387dbf1e8b2009e87c7fc20d1263bf8",
+      "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1\\runs\\a06-tf-peer-20261006-r1",
+      "requested_at": "2026-10-06T01:07:30.168361+00:00",
+      "session_id": 58929
+    }
+  }
 }
