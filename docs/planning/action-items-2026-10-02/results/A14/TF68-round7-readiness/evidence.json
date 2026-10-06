@@ -1,0 +1,376 @@
+{
+  "created_utc": "2026-10-06T17:52:06.160111+00:00",
+  "result": "applicable prior A14 assessment; no new material filesystem finding",
+  "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "accepted_TF_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "accepted_PS": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "raw_objects": [
+    {
+      "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+      "bytes": 285263,
+      "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+    },
+    {
+      "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "bytes": 510470,
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7fc19eb68200935eb8909b64c2a3caa5aece76e5",
+      "bytes": 277358,
+      "sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "296c31173cfbc38156e44669d5585b3e6c627be3",
+      "bytes": 503244,
+      "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "bytes": 229936,
+      "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+    },
+    {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "bytes": 482175,
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    }
+  ],
+  "unchanged_caller_and_primitive_objects": [
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+        "bytes": 91158,
+        "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+        "bytes": 91158,
+        "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "bytes": 36081,
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "bytes": 36081,
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+        "bytes": 25744,
+        "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+        "bytes": 25744,
+        "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "bytes": 45016,
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "bytes": 45016,
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "bytes": 12893,
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "bytes": 12893,
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+      },
+      "raw_mode_blob_equal": true
+    },
+    {
+      "parent": {
+        "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+        "path": "CONTRIBUTING.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+        "bytes": 9117,
+        "sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+      },
+      "candidate": {
+        "commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "CONTRIBUTING.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+        "bytes": 9117,
+        "sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+      },
+      "raw_mode_blob_equal": true
+    }
+  ],
+  "unchanged_functions": [
+    {
+      "function": "Read-RepositoryInputData",
+      "bytes": 9237,
+      "sha256": "a2d01f2673cb0b9ffe04e397c45c067dc7749bd4e60b9b57bcf7cc8365a46021",
+      "byte_equal": true
+    },
+    {
+      "function": "Get-NodeApplicationContext",
+      "bytes": 4970,
+      "sha256": "56348bd228457560ed222eb65315da9247ac286579c974f24b191f2509dfead3",
+      "byte_equal": true
+    },
+    {
+      "function": "Invoke-MarkdownParserProcess",
+      "bytes": 8799,
+      "sha256": "15c3c25a3eff543d3dd00d320337735029a003a2528a220990b61796d1014511",
+      "byte_equal": true
+    },
+    {
+      "function": "Get-MarkdownParseReuseSlot",
+      "bytes": 989,
+      "sha256": "4207f3e5108a8698b688c3bfb4fb1641917573dd0bc5560abc7811ec94320030",
+      "byte_equal": true
+    },
+    {
+      "function": "Clear-MarkdownParseReuseSlot",
+      "bytes": 1213,
+      "sha256": "64b6920d7cc82eaf0a83f2b9ce427244603cf76e0620d97de9b50fc922756b98",
+      "byte_equal": true
+    },
+    {
+      "function": "Copy-MarkdownParseReuseContext",
+      "bytes": 5834,
+      "sha256": "2ae7863ec1ed17015e0e87003c4175be078f3ad2afe9868abaa122a39cbb7f40",
+      "byte_equal": true
+    }
+  ],
+  "diff_sha256": "97fdc9643e3a2e0533bcd7037a6acde7fec78cb689e6bdae43b1e06d16b37495",
+  "diff_hunks": [
+    "@@ -53,0 +54,153 @@ $hashtableRuntimeContext = $RuntimeContext",
+    "@@ -84 +237 @@ function Assert-MarkdownParseReuseSelfTest {",
+    "@@ -99 +252 @@ function Assert-MarkdownParseReuseSelfTest {",
+    "@@ -101,0 +255 @@ function Assert-MarkdownParseReuseSelfTest {",
+    "@@ -105 +259,2 @@ function Assert-MarkdownParseReuseSelfTest {",
+    "@@ -130 +285 @@ function Assert-MarkdownParseReuseSelfTest {",
+    "@@ -3825,0 +3981 @@ if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont",
+    "@@ -245,0 +246,4 @@ function ConvertFrom-ParserJsonContext {",
+    "@@ -261 +265 @@ function ConvertFrom-ParserJsonContext {",
+    "@@ -266 +270,2 @@ function ConvertFrom-ParserJsonContext {",
+    "@@ -321,0 +327,131 @@ function ConvertFrom-ParserJsonContext {",
+    "@@ -3646 +3782 @@ function Get-MarkdownParseContext {"
+  ],
+  "input_hashes": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "bytes": 10832,
+      "sha256": "07c2b2bf759438c40be59b0d35a25851c7fcc2eeefc4abed0eaa7d7698422120"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\A14-TF68-runtime-impact\\REPORT.md",
+      "bytes": 9811,
+      "sha256": "2c1a398f8905ef31d5a64285b86d2f50d6d152a625cfe94cf8222f1d410d04c4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\A14-TF68-runtime-impact\\evidence.json",
+      "bytes": 102679,
+      "sha256": "97320a39978f58ab14d80bf7082220a32b02d61c70fc16fb19bf952ab3b04c97"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-peer-readiness\\REPORT.md",
+      "bytes": 10228,
+      "sha256": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845"
+    }
+  ],
+  "native_helper_scope": "fixed C# source template via Add-Type, digest-derived in-process type; current JSON values become per-call graphs, never compiler source; no added output assembly path, P/Invoke, file publication/deletion or external download primitive",
+  "new_material_finding": false,
+  "conditional_carryback": {
+    "existing_paths": 10,
+    "new_paths": 0,
+    "changed_existing_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1"
+    ],
+    "status": "defer implementation until actual TF acceptance; carry common native converter and differential/freshness tests together; rebind final source and PS"
+  },
+  "retained_decisions": [
+    "A14 D92 B96: PS155 remains open",
+    "A14 D93 B100: PS156 retirement and historical limits retained"
+  ],
+  "limits": [
+    "Read-only immutable source assessment; no runtime tests",
+    "Add-Type identity fields/type-shape checks are not an adversarial same-process assembly authentication guarantee",
+    "No new hosted-platform/review/acceptance claim; prior exact-head evidence is historical for its named input",
+    "STATUS read first is older than coordinator round7 handoff; current H/round supplied by coordinator and immutable parent/tree verified",
+    "No fresh remote issue/runner census or review polling"
+  ],
+  "remaining_gates": [
+    "Current-head CI and required reviews",
+    "Actual dedicated activation/TF landing and landed evidence",
+    "Accepted-source/current-PS carryback and reverse comparison",
+    "Recheck changed filesystem caller/authority/runtime/recovery inputs and final A18/A19"
+  ],
+  "counters": {
+    "A14": "0/8 unchanged",
+    "TF_round": "7 per coordinator",
+    "deadline": "2026-10-13T23:47:31Z unchanged",
+    "A06_A03_A21_A07": "1/3/5/5 of12 unchanged; root owns updates"
+  },
+  "tests_run": [],
+  "native_actions": [],
+  "writes": [
+    "REPORT.md",
+    "evidence.json"
+  ],
+  "next_action": "After actual TF acceptance, rebind landed source/current PS and carry the converter with its tests within the existing ten-path scope; reassess changed A14 predicates."
+}

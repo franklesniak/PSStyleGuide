@@ -110,3 +110,7 @@ Validation passed for pinned native identities, all five unchanged PS blobs, fou
 A03 workflow/authority changes, A06 generator/verifier changes, A07 host/runtime changes, A12/A13 protection changes and A16/A17 new consumer designs can invalidate this assessment. Reassess only the changed inputs. A18/A19 must compare final refs and revalidate every retained trigger predicate. A01 baseline acceptance and coordinator source-hash/absence validation are complete.
 
 Next action: retain PS155 as an open maintainer-owned risk and recheck the named inputs after relevant product changes. No issue update, new framework, recurring automation or general test matrix is needed now.
+
+## 2026-10-06 TF68 round7 candidate rebind
+
+The [current assessment](TF68-round7-readiness/REPORT.md) retains D92/D93 with no new material filesystem finding for89bf392/treee71b812. Root read the report and verified15 raw Git object/mode bindings, including both changed converter files and nine unchanged callers/primitives. The ten-path prospective PS repair remains conditional; no new language exception or filesystem safety guarantee is asserted. TF acceptance/current CI and actual landed/currentPS rebind remain pending. A14 stays0/8.

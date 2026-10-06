@@ -1,0 +1,980 @@
+{
+  "status": "CONDITIONAL_TEN_PATH_COMMITTED_SOURCE_REFRESH_ONLY",
+  "captured_start_utc": "2026-10-06T17:55:44.462487+00:00",
+  "captured_end_utc": "2026-10-06T17:55:54.284505+00:00",
+  "TF_published_commit": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+  "TF_published_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "TF_published_parent": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "TF_unaccepted": true,
+  "PS_native_main_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "PS_native_main_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "TF_native_main_commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "native_refs_before": {
+    "PS": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TF": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "native_refs_after": {
+    "PS": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TF": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "guards_before": {
+    "PS": {
+      "HEAD": "bc41f10539c84e5d78bf00bda3d7d4f0cc04d9db",
+      "refs_sha256": "32846905e6bc7c83edf8b8025f6225c9f7a12bb80865dc61f67a6236d0a2538a",
+      "metadata_sha256": {
+        "HEAD": "3a6f35aabd853cbb6e930aadbc5be04be0e1995df805afb3b2c0f80e0586383a",
+        "index": "de439013188b3857a06dcdce7aa94511184acd49bfd3693c463517b71206fe0a",
+        "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+        "config.worktree": null
+      }
+    },
+    "TF": {
+      "HEAD": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "refs_sha256": "1d9c17c83127163b5b9c6780f923cf62d3571fc56eca3a0778734439ccc24bc9",
+      "metadata_sha256": {
+        "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+        "index": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+        "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+        "config.worktree": null
+      }
+    }
+  },
+  "guards_after": {
+    "PS": {
+      "HEAD": "bc41f10539c84e5d78bf00bda3d7d4f0cc04d9db",
+      "refs_sha256": "32846905e6bc7c83edf8b8025f6225c9f7a12bb80865dc61f67a6236d0a2538a",
+      "metadata_sha256": {
+        "HEAD": "3a6f35aabd853cbb6e930aadbc5be04be0e1995df805afb3b2c0f80e0586383a",
+        "index": "de439013188b3857a06dcdce7aa94511184acd49bfd3693c463517b71206fe0a",
+        "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+        "config.worktree": null
+      }
+    },
+    "TF": {
+      "HEAD": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "refs_sha256": "1d9c17c83127163b5b9c6780f923cf62d3571fc56eca3a0778734439ccc24bc9",
+      "metadata_sha256": {
+        "HEAD": "c638faf0f35d0f6fc826d3f38ae83dbc5f7c397fb0080ca42d386addb0bb5d24",
+        "index": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+        "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+        "config.worktree": null
+      }
+    }
+  },
+  "guards_equal": true,
+  "rows": [
+    {
+      "path": ".github/workflows/package.json",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+        "bytes": 844
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "https://github.com/franklesniak/TerraformStyleGuide",
+          "ps": "https://github.com/franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "\"terraform\"",
+          "ps": "\"powershell\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        },
+        {
+          "tf": "\"author\": \"Frank Lesniak, Blake Cherry, and Danny Stutz\"",
+          "ps": "\"author\": \"Frank Lesniak\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+        "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        "bytes": 936
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196",
+        "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+        "bytes": 38822
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 2,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+        "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        "bytes": 38820
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+        "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+        "bytes": 9867
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+        "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+        "bytes": 10446
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "7fc19eb68200935eb8909b64c2a3caa5aece76e5",
+        "sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+        "bytes": 277358
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "mode": "100644",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": false,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+        "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+        "bytes": 285244
+      },
+      "prospective_postimage_written": false,
+      "delta_since_previous_prospective_candidate": "--- previous-prospective-PS:.github/workflows/Test-AgentInstructions.SelfTest.ps1\n+++ current-prospective-PS:.github/workflows/Test-AgentInstructions.SelfTest.ps1\n@@ -51,6 +51,159 @@\n \n $hashtableRuntimeContext = $RuntimeContext\n \n+function Assert-ParserJsonConversionSelfTest {\n+    # .SYNOPSIS\n+    # Checks native Markdown conversion against the original strict decoder.\n+    #\n+    # .DESCRIPTION\n+    # Compares exact types, ordered properties, type names and array elements.\n+    # Refusal cases require no partial output from either conversion path.\n+    #\n+    # .EXAMPLE\n+    # Assert-ParserJsonConversionSelfTest\n+    #\n+    # # Throws if the structural opt-in changes the JSON contract.\n+    #\n+    # .INPUTS\n+    # None. No pipeline input.\n+    #\n+    # .OUTPUTS\n+    # None. A failed contract throws.\n+    #\n+    # .NOTES\n+    # PRIVATE/INTERNAL HELPER - Not a public interface.\n+    # Positional parameters are disabled for internal callers.\n+    # Version: 1.0.20261006.0\n+    [CmdletBinding(PositionalBinding = $false)]\n+    [OutputType([void])]\n+    param()\n+\n+    $scriptBlockCompare = {\n+        param($Expected, $Actual)\n+        if ($null -eq $Expected) {\n+            if ($null -ne $Actual) { throw 'JSON conversion changed a null value.' }\n+            return\n+        }\n+        if ($null -eq $Actual -or $Expected.GetType() -ne $Actual.GetType()) {\n+            throw 'JSON conversion changed a value type.'\n+        }\n+        if ($Expected -is [array]) {\n+            if ($Expected.Count -ne $Actual.Count) { throw 'JSON conversion changed array cardinality.' }\n+            for ($intIndex = 0; $intIndex -lt $Expected.Count; $intIndex++) {\n+                & $scriptBlockCompare -Expected $Expected[$intIndex] -Actual $Actual[$intIndex]\n+            }\n+        } elseif ($Expected -is [pscustomobject]) {\n+            $arrExpectedProperties = @($Expected.PSObject.Properties)\n+            $arrActualProperties = @($Actual.PSObject.Properties)\n+            if ($arrExpectedProperties.Count -ne $arrActualProperties.Count -or\n+                ($Expected.PSObject.TypeNames -join \"`0\") -cne ($Actual.PSObject.TypeNames -join \"`0\")) {\n+                throw 'JSON conversion changed object properties or type names.'\n+            }\n+            for ($intIndex = 0; $intIndex -lt $arrExpectedProperties.Count; $intIndex++) {\n+                if ($arrExpectedProperties[$intIndex].Name -cne $arrActualProperties[$intIndex].Name) {\n+                    throw 'JSON conversion changed property order or spelling.'\n+                }\n+                & $scriptBlockCompare -Expected $arrExpectedProperties[$intIndex].Value `\n+                    -Actual $arrActualProperties[$intIndex].Value\n+            }\n+        } elseif ($Expected -is [double]) {\n+            if ([BitConverter]::DoubleToInt64Bits($Expected) -ne [BitConverter]::DoubleToInt64Bits($Actual)) {\n+                throw 'JSON conversion changed a floating-point value.'\n+            }\n+        } elseif ($Expected -cne $Actual) {\n+            throw 'JSON conversion changed a scalar value.'\n+        }\n+    }\n+    $arrValidJson = @(\n+        '{}',\n+        '{\"z\":[],\"a\":[null],\"nested\":[[1],[],[null]],\"object\":{\"b\":true,\"a\":false}}',\n+        '{\"a\":null,\"b\":1,\"c\":1.0,\"d\":-0.0,\"e\":-9223372036854775808,\"f\":9223372036854775807,\"g\":9223372036854775808,\"h\":1e-300}',\n+        '{\"value\":\"2026-10-29T23:59:59.123456789+05:45\",\"newline\":\"a\\nb\",\"unicode\":\"\\u00e9\\ud83d\\ude03\"}',\n+        '{\"PSTypeName\":\"StyleGuide.JsonFixture\",\"value\":1}',\n+        '{\"nested\":[{\"pstypename\":\"StyleGuide.NestedFixture\",\"value\":null}]}',\n+        '{\"PSTypeName\":null}', '{\"PSTypeName\":17}', '{\"PSTypeName\":[1,2]}',\n+        '{\"Count\":1,\"Length\":2,\"value\":3}',\n+        ('{\"a\":' + ('[' * 63) + '1' + (']' * 63) + '}')\n+    )\n+    foreach ($strContent in $arrValidJson) {\n+        $objExpected = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 16384\n+        $objActual = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 16384 `\n+            -UseNativeStructuralConversion\n+        & $scriptBlockCompare -Expected $objExpected -Actual $objActual\n+    }\n+    $strBoundaryContent = '{\"text\":\"' + [char]0x00e9 + '\"}'\n+    $intExactBytes = [Text.Encoding]::UTF8.GetByteCount($strBoundaryContent)\n+    foreach ($boolNative in @($false, $true)) {\n+        $objBoundary = ConvertFrom-ParserJsonContext -Content $strBoundaryContent `\n+            -MaximumBytes $intExactBytes -UseNativeStructuralConversion:$boolNative\n+        if ($objBoundary.text -cne [string][char]0x00e9) {\n+            throw 'JSON conversion changed exact-boundary Unicode text.'\n+        }\n+        $objBoundaryFailure = $null\n+        try {\n+            $null = ConvertFrom-ParserJsonContext -Content $strBoundaryContent `\n+                -MaximumBytes ($intExactBytes - 1) -UseNativeStructuralConversion:$boolNative\n+        } catch { $objBoundaryFailure = $_ }\n+        if ($null -eq $objBoundaryFailure -or\n+            $objBoundaryFailure.Exception.Message -cne 'The parser returned oversized JSON context.') {\n+            throw 'JSON conversion lost its exact UTF-8 byte bound.'\n+        }\n+    }\n+    # Some reserved names are rejected by PowerShell itself. Preserve that result,\n+    # as well as successful special-name casts, without inventing an admission rule.\n+    foreach ($strName in @('PSObject', 'PSBase', 'PSAdapted', 'PSExtended', 'PSTypeNames')) {\n+        $strContent = '{\"first\":1,\"nested\":{\"' + $strName + '\":\"value\"},\"last\":2}'\n+        $objExpected = $null\n+        $objExpectedFailure = $null\n+        $objActual = $null\n+        $objActualFailure = $null\n+        try { $objExpected = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 } catch {\n+            $objExpectedFailure = $_\n+        }\n+        try {\n+            $objActual = ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 `\n+                -UseNativeStructuralConversion\n+        } catch { $objActualFailure = $_ }\n+        if (($null -eq $objExpectedFailure) -ne ($null -eq $objActualFailure)) {\n+            throw 'JSON conversion changed reserved-name acceptance.'\n+        }\n+        if ($null -ne $objExpectedFailure) {\n+            if ($objExpectedFailure.Exception.Message -cne $objActualFailure.Exception.Message) {\n+                throw 'JSON conversion changed reserved-name failure.'\n+            }\n+        } else { & $scriptBlockCompare -Expected $objExpected -Actual $objActual }\n+    }\n+    foreach ($strContent in @(\n+            '', '[]', 'null', 'true', '1', '\"text\"',\n+            '{\"\":1}', '{\"a\":1,\"a\":2}', '{\"a\":1,\"A\":2}', '{\"a\":1,\"\\u0061\":2}',\n+            '{\"items\":[{\"a\":1,\"A\":2}]}', '{\"items\":[{\"\":1}]}',\n+            '{\"first\":1,\"nested\":{\"PSTypeName\":\"Fixture\",\"a\":1,\"A\":2}}',\n+            '{\"first\":1,\"last\":1e400}', '{\"first\":1,\"last\":-1e400}',\n+            '{\"a\":NaN}', '{\"a\":Infinity}', '{\"a\":1,}', '{\"a\":/*comment*/1}',\n+            ('{\"a\":' + ('[' * 64) + '1' + (']' * 64) + '}'),\n+            ('{\"a\":\"' + ('x' * 4096) + '\"}')\n+        )) {\n+        $strExpectedFailure = $null\n+        foreach ($boolNative in @($false, $true)) {\n+            $listOutput = [Collections.Generic.List[object]]::new()\n+            $objFailure = $null\n+            try {\n+                ConvertFrom-ParserJsonContext -Content $strContent -MaximumBytes 4096 `\n+                    -UseNativeStructuralConversion:$boolNative | ForEach-Object { $listOutput.Add($_) }\n+            } catch { $objFailure = $_ }\n+            if ($null -eq $objFailure -or $listOutput.Count -ne 0) {\n+                throw 'JSON conversion accepted invalid input or emitted partial output.'\n+            }\n+            if (-not $boolNative) {\n+                $strExpectedFailure = $objFailure.Exception.Message\n+            } elseif ($objFailure.Exception.Message -cne $strExpectedFailure) {\n+                throw 'JSON conversion changed a strict decoder failure.'\n+            }\n+        }\n+    }\n+}\n+\n+\n function Assert-MarkdownParseReuseSelfTest {\n     # .SYNOPSIS\n     # Tests isolated structural reuse without skipping the real parser.\n@@ -81,7 +234,7 @@\n     $scriptBlockActualNode = ${function:Get-NodeApplicationContext}\n     $scriptBlockActualCopy = ${function:Copy-MarkdownParseReuseContext}\n     $scriptBlockActualContext = ${function:Get-MarkdownParseContext}\n-    $hashtableProbe = @{ Processes = 0; Decodes = 0; RuntimeDecodes = 0; NodeChecks = 0; Mode = ''; OverrideCalls = 0 }\n+    $hashtableProbe = @{ Processes = 0; Decodes = 0; NativeDecodes = 0; RuntimeDecodes = 0; NodeChecks = 0; Mode = ''; OverrideCalls = 0 }\n     function Invoke-MarkdownParserProcess {\n         param($StartInfo, $Content)\n         $hashtableProbe.Processes++\n@@ -96,13 +249,15 @@\n         return $objResult\n     }\n     function ConvertFrom-ParserJsonContext {\n-        param($Content, $MaximumBytes)\n+        param($Content, $MaximumBytes, [switch] $UseNativeStructuralConversion)\n         if ($MaximumBytes -eq 16777216) {\n             $hashtableProbe.Decodes++\n+            if ($UseNativeStructuralConversion) { $hashtableProbe.NativeDecodes++ }\n         } else {\n             $hashtableProbe.RuntimeDecodes++\n         }\n-        return & $scriptBlockActualDecoder -Content $Content -MaximumBytes $MaximumBytes\n+        return & $scriptBlockActualDecoder -Content $Content -MaximumBytes $MaximumBytes `\n+            -UseNativeStructuralConversion:$UseNativeStructuralConversion\n     }\n     function Get-NodeApplicationContext {\n         $hashtableProbe.NodeChecks++\n@@ -127,7 +282,7 @@\n         $strExpected = $objFirst | ConvertTo-Json -Depth 12 -Compress\n         $objSecond = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount -ReuseSlot $objSlot\n         if ($hashtableProbe.Processes -ne 2 -or $hashtableProbe.NodeChecks -ne 2 -or\n-            $hashtableProbe.Decodes -ne 1 -or\n+            $hashtableProbe.Decodes -ne 1 -or $hashtableProbe.NativeDecodes -ne 1 -or\n             ($objSecond | ConvertTo-Json -Depth 12 -Compress) -cne $strExpected) {\n             throw 'Structural reuse must retain two real parser calls and one interpretation.'\n         }\n@@ -3823,6 +3978,7 @@\n }\n \n \n+Assert-ParserJsonConversionSelfTest\n Assert-MarkdownParseReuseSelfTest\n Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath\n \n"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+        "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        "bytes": 13470
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+        "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        "bytes": 13470
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "bytes": 13541
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "ps": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "| `Test-StyleGuideArtifacts.ps1` | Runs the recovery-example child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "ps": "| `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "| `Test-StateRecoveryExamples.mjs` | Checks the published Terraform state-recovery examples. | `node .github/workflows/Test-StateRecoveryExamples.mjs` |\n",
+          "ps": "| `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        },
+        {
+          "tf": "The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "ps": "The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+        "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        "bytes": 13541
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        "bytes": 36081
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        "bytes": 36081
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "bytes": 36090
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "    ScopedId = 'terraform-instructions'\n    ScopedPath = 'terraform.instructions.md'\n    SemanticRole = 'TerraformRecovery'",
+          "ps": "    ScopedId = 'powershell-instructions'\n    ScopedPath = 'powershell.instructions.md'\n    SemanticRole = 'PowerShellExamples'",
+          "occurrences": 1,
+          "need": "Scoped artifact destination and semantic role select the actual repository language. Both semantic branches remain common code; PS must run its blank-line child and TF its state-recovery child."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+        "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        "bytes": 36084
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "296c31173cfbc38156e44669d5585b3e6c627be3",
+        "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        "bytes": 503244
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      "exact_retained_exceptions": [],
+      "previous_candidate_raw_bytes_and_mode_unchanged": false,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "prospective_postimage_written": false,
+      "delta_since_previous_prospective_candidate": "--- previous-prospective-PS:.github/workflows/Test-AgentInstructions.ps1\n+++ current-prospective-PS:.github/workflows/Test-AgentInstructions.ps1\n@@ -243,6 +243,10 @@\n     # .PARAMETER MaximumBytes\n     # The maximum permitted UTF-8 output size.\n     #\n+    # .PARAMETER UseNativeStructuralConversion\n+    # Uses the installed-runtime walker for Markdown context only. Name-sensitive\n+    # objects retain the original PowerShell cast and all its failure behavior.\n+    #\n     # .EXAMPLE\n     # ConvertFrom-ParserJsonContext -Content '{\"value\":\"2026-10-02T00:00:00Z\"}' -MaximumBytes 4096\n     #\n@@ -258,12 +262,13 @@\n     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.0.20261002.0\n+    # Version: 1.1.20261006.0\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([pscustomobject])]\n     param(\n         [Parameter(Mandatory)][AllowEmptyString()][string] $Content,\n-        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes\n+        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes,\n+        [Parameter()][switch] $UseNativeStructuralConversion\n     )\n \n     if ([Text.Encoding]::UTF8.GetByteCount($Content) -gt $MaximumBytes) {\n@@ -318,6 +323,137 @@\n         $objDocument = [System.Text.Json.JsonDocument]::Parse($Content, $objOptions)\n         if ($objDocument.RootElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {\n             throw 'The parser JSON context root must be an object.'\n+        }\n+        if ($UseNativeStructuralConversion) {\n+            # Only code is retained by the process. Every graph belongs to this call.\n+            # The payload digest identifies the exact implementation, including on\n+            # repeated script loads; a same-name type is not accepted on name alone.\n+            $strNativeTemplate = @'\n+using System;\n+using System.Collections.Generic;\n+using System.Management.Automation;\n+using System.Text.Json;\n+\n+namespace StyleGuide.AgentJson {\n+    public static class StructuralDecoder_IDENTITY_ {\n+        public const string SourceIdentity = \"_IDENTITY_\";\n+\n+        public sealed class Result {\n+            public readonly int Kind;\n+            public readonly object Value;\n+            public Result(int kind, object value) { Kind = kind; Value = value; }\n+        }\n+\n+        public static Result DecodeRoot(JsonElement root) {\n+            int kind = 0;\n+            object value = Decode(root, ref kind);\n+            return new Result(kind, kind == 0 ? value : null);\n+        }\n+\n+        private static object Decode(JsonElement element, ref int kind) {\n+            switch (element.ValueKind) {\n+                case JsonValueKind.Object:\n+                    var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);\n+                    var result = new PSObject();\n+                    foreach (JsonProperty property in element.EnumerateObject()) {\n+                        string name = property.Name;\n+                        if (String.IsNullOrEmpty(name) || !names.Add(name)) {\n+                            kind = 2;\n+                            return null;\n+                        }\n+                        // Preserve the complete PowerShell cast for these names.\n+                        // Do not approximate PSTypeName or reserved member behavior.\n+                        if (String.Equals(name, \"PSTypeName\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSObject\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSBase\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSAdapted\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSExtended\", StringComparison.OrdinalIgnoreCase) ||\n+                            String.Equals(name, \"PSTypeNames\", StringComparison.OrdinalIgnoreCase)) {\n+                            kind = 1;\n+                            return null;\n+                        }\n+                        object value = Decode(property.Value, ref kind);\n+                        if (kind != 0) { return null; }\n+                        result.Properties.Add(new PSNoteProperty(name, value));\n+                    }\n+                    return result;\n+                case JsonValueKind.Array:\n+                    var values = new object[element.GetArrayLength()];\n+                    int index = 0;\n+                    foreach (JsonElement child in element.EnumerateArray()) {\n+                        values[index++] = Decode(child, ref kind);\n+                        if (kind != 0) { return null; }\n+                    }\n+                    return values;\n+                case JsonValueKind.String:\n+                    return element.GetString();\n+                case JsonValueKind.Number:\n+                    long integer;\n+                    if (element.TryGetInt64(out integer)) { return integer; }\n+                    double number = element.GetDouble();\n+                    if (Double.IsNaN(number) || Double.IsInfinity(number)) {\n+                        kind = 3;\n+                        return null;\n+                    }\n+                    return number;\n+                case JsonValueKind.True:\n+                    return true;\n+                case JsonValueKind.False:\n+                    return false;\n+                case JsonValueKind.Null:\n+                    return null;\n+                default:\n+                    kind = 4;\n+                    return null;\n+            }\n+        }\n+    }\n+}\n+'@\n+            $objSourceHash = [Security.Cryptography.SHA256]::Create()\n+            try {\n+                $strSourceIdentity = [BitConverter]::ToString(\n+                    $objSourceHash.ComputeHash([Text.Encoding]::UTF8.GetBytes($strNativeTemplate))\n+                ).Replace('-', '').ToLowerInvariant()\n+            } finally {\n+                $objSourceHash.Dispose()\n+            }\n+            $strNativeTypeName = 'StyleGuide.AgentJson.StructuralDecoder' + $strSourceIdentity\n+            $objNativeType = $strNativeTypeName -as [type]\n+            if ($null -eq $objNativeType) {\n+                $strNativeSource = $strNativeTemplate.Replace('_IDENTITY_', $strSourceIdentity)\n+                $arrCompiledTypes = @(Add-Type -TypeDefinition $strNativeSource -PassThru -ErrorAction Stop)\n+                $objNativeType = $strNativeTypeName -as [type]\n+                if ($null -eq $objNativeType -or\n+                    @($arrCompiledTypes | Where-Object {\n+                            [object]::ReferenceEquals($_, $objNativeType)\n+                        }).Count -ne 1) {\n+                    throw 'The structural JSON converter type could not be verified.'\n+                }\n+            }\n+            $objIdentityField = $objNativeType.GetField('SourceIdentity')\n+            $objResultType = $objNativeType.GetNestedType('Result')\n+            $objDecodeMethod = $objNativeType.GetMethod('DecodeRoot', [type[]]@([System.Text.Json.JsonElement]))\n+            if (-not $objNativeType.IsPublic -or -not $objNativeType.IsAbstract -or\n+                -not $objNativeType.IsSealed -or $null -eq $objIdentityField -or\n+                -not $objIdentityField.IsLiteral -or $objIdentityField.FieldType -ne [string] -or\n+                $objIdentityField.GetRawConstantValue() -cne $strSourceIdentity -or\n+                $null -eq $objResultType -or $null -eq $objDecodeMethod -or\n+                -not $objDecodeMethod.IsStatic -or\n+                -not [object]::ReferenceEquals($objDecodeMethod.DeclaringType, $objNativeType) -or\n+                -not [object]::ReferenceEquals($objDecodeMethod.ReturnType, $objResultType) -or\n+                $objNativeType.GetFields([Reflection.BindingFlags]'Static,Public,NonPublic').Count -ne 1) {\n+                throw 'The structural JSON converter type could not be verified.'\n+            }\n+            $objNativeResult = $objDecodeMethod.Invoke($null, [object[]]@($objDocument.RootElement))\n+            switch ($objNativeResult.Kind) {\n+                0 { return $objNativeResult.Value }\n+                1 { break }\n+                2 { throw 'The parser returned ambiguous JSON properties.' }\n+                3 { throw 'The parser returned an unsupported JSON number.' }\n+                4 { throw 'The parser returned an unsupported JSON type.' }\n+                default { throw 'The structural JSON converter returned an invalid result.' }\n+            }\n         }\n         return & $scriptBlockDecode -Element $objDocument.RootElement\n     } finally {\n@@ -3643,7 +3779,7 @@\n \n         try {\n             $objRawContext = ConvertFrom-ParserJsonContext `\n-                -Content $strParserOutput -MaximumBytes 16777216\n+                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion\n         } catch {\n             throw [System.IO.InvalidDataException]::new(\n                 'The locked Markdown parser returned invalid context data.',\n"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+        "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        "bytes": 130059
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+        "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        "bytes": 130059
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "bytes": 123582
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 8,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        "bytes": 130003
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        "bytes": 12893
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        "bytes": 12893
+      },
+      "PS_native_main": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+        "bytes": 12837
+      },
+      "exact_retained_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 4,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+        "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        "bytes": 12865
+      },
+      "prospective_postimage_written": false
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "TF_published": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "bytes": 45016
+      },
+      "TF_previous_candidate": {
+        "revision_or_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "mode": "100644",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "bytes": 45016
+      },
+      "PS_native_main": null,
+      "exact_retained_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common."
+        }
+      ],
+      "previous_candidate_raw_bytes_and_mode_unchanged": true,
+      "prospective_PS_at_TF_metadata": {
+        "mode": "100644",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "bytes": 44995
+      },
+      "prospective_postimage_written": false
+    }
+  ],
+  "changed_source_paths_since_repaired_candidate": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "remaining_eight_rows_bytes_modes_and_projected_hashes_unchanged": true,
+  "exact_prior_exceptions_preserved": true,
+  "caller_bindings": {
+    "native_opt_in": "Get-MarkdownParseContext -> ConvertFrom-ParserJsonContext -UseNativeStructuralConversion",
+    "native_opt_in_line": 3782,
+    "one_production_opt_in": true,
+    "legacy_recursive_decoder_byte_identical": true,
+    "legacy_recursive_decoder_sha256": "a675218594eff11beb3371e36f4cf1b635cca7898d01f587cbcc919cf802fa87",
+    "generic_package_and_native_identity_callers_retain_default_path": true,
+    "special_property_names_use_original_full_root_conversion": true,
+    "strict_JSON_root_schema_fresh_parser_owned_reuse_and_deep_copy_retained": true,
+    "converter_language_exception": false
+  },
+  "metadata_inspection": {
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "source_script_versions": [
+        "1.11.20261006.0"
+      ],
+      "destination_metadata_not_rebased": true,
+      "changed_function_text_blocks": [
+        {
+          "function": "Assert-ParserJsonConversionSelfTest",
+          "source_line": 54,
+          "source_notes_versions": [
+            "1.0.20261006.0"
+          ],
+          "new_function": true
+        },
+        {
+          "function": "Assert-MarkdownParseReuseSelfTest",
+          "source_line": 207,
+          "source_notes_versions": [
+            "1.0.20261006.0"
+          ],
+          "new_function": false
+        },
+        {
+          "function": "Assert-ApplicationRuntimeSelfTest",
+          "source_line": 3771,
+          "source_notes_versions": [
+            "1.0.20261003.0"
+          ],
+          "new_function": false,
+          "text_range_includes_file_trailer": true,
+          "body_change_not_asserted": true,
+          "limit": "The text range runs to EOF and includes the new final SelfTest invocation; no AST was executed and no function-body change is inferred."
+        }
+      ]
+    },
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "source_script_versions": [
+        "1.20.20261006.0"
+      ],
+      "destination_metadata_not_rebased": true,
+      "changed_function_text_blocks": [
+        {
+          "function": "ConvertFrom-ParserJsonContext",
+          "source_line": 232,
+          "source_notes_versions": [
+            "1.1.20261006.0"
+          ],
+          "new_function": false
+        },
+        {
+          "function": "Get-MarkdownParseContext",
+          "source_line": 3515,
+          "source_notes_versions": [
+            "1.2.20261006.0"
+          ],
+          "new_function": false
+        }
+      ]
+    }
+  },
+  "coupled_read_only_checks": [
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        "bytes": 51809
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+        "bytes": 51830
+      },
+      "raw_equal": false,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "raw_equal": true,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "raw_equal": true,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/NpmTools.mjs",
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/NpmTools.mjs",
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "raw_equal": true,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/ci-toolchain.json",
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/ci-toolchain.json",
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "raw_equal": true,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": "package.json",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "package.json",
+        "mode": "100644",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+        "bytes": 816
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "package.json",
+        "mode": "100644",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+        "bytes": 837
+      },
+      "raw_equal": false,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        "bytes": 5405
+      },
+      "raw_equal": false,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".husky/pre-commit",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".husky/pre-commit",
+        "mode": "100644",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".husky/pre-commit",
+        "mode": "100644",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "raw_equal": true,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/document-metadata-classification.json",
+        "mode": "100644",
+        "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        "bytes": 388
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/document-metadata-classification.json",
+        "mode": "100644",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        "bytes": 387
+      },
+      "raw_equal": false,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "PS": {
+        "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        "bytes": 1517
+      },
+      "TF": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        "bytes": 1496
+      },
+      "raw_equal": false,
+      "unchanged_from_prior_evidence": true,
+      "additional_edit_required": false
+    }
+  ],
+  "language_only_targets": [
+    {
+      "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+      "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "bytes": 57610
+    },
+    {
+      "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "mode": "100644",
+      "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+      "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+      "bytes": 65689
+    },
+    {
+      "revision_or_tree": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "mode": "100644",
+      "blob": "068c7139a9e6a9276073211f48eca88464204362",
+      "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      "bytes": 15201
+    },
+    {
+      "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "mode": "100644",
+      "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+      "bytes": 22102
+    }
+  ],
+  "TF_generated_outputs": [
+    {
+      "path": "copilot-instructions.md",
+      "candidate": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "copilot-instructions.md",
+        "mode": "100644",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "bytes": 152868
+      },
+      "accepted": {
+        "revision_or_tree": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "path": "copilot-instructions.md",
+        "mode": "100644",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "bytes": 152868
+      },
+      "raw_and_mode_equal": true
+    },
+    {
+      "path": "terraform.instructions.md",
+      "candidate": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "terraform.instructions.md",
+        "mode": "100644",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+        "bytes": 153067
+      },
+      "accepted": {
+        "revision_or_tree": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "path": "terraform.instructions.md",
+        "mode": "100644",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+        "bytes": 153067
+      },
+      "raw_and_mode_equal": true
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "candidate": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "mode": "100644",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+        "bytes": 152962
+      },
+      "accepted": {
+        "revision_or_tree": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "mode": "100644",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+        "bytes": 152962
+      },
+      "raw_and_mode_equal": true
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "candidate": {
+        "revision_or_tree": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+        "path": "STYLE_GUIDE_FULL.md",
+        "mode": "100644",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+        "bytes": 222292
+      },
+      "accepted": {
+        "revision_or_tree": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "path": "STYLE_GUIDE_FULL.md",
+        "mode": "100644",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+        "bytes": 222292
+      },
+      "raw_and_mode_equal": true
+    }
+  ],
+  "references": {
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md": "b88f90baa9641615814f58c8de2ec71c62adf24374148fe033d074336938762f",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A06.md": "332e538613bd227564932a2ec10889f797959495f7580c343324b85509c1f1e7",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\evidence.json": "f237d0e817445e5da9857cebae78808bbd41fbaa983024fd33d012dc911cfbc5",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\peer-readiness\\REPORT.md": "b36d156b0e2f72a533fed003a1e212a36172ae1d62e42c3eb69ac5f600f48845",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\PEER-READINESS-REPAIRED.json": "50caddf4b1fdf39f331654045fec79f4a8e1ec33fc38dc402157426898b6b14d",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\refresh-runtime-C-repaired-peer-readiness.py": "27b17e3edb8232035ef07dd1245adc0c9c7f87cdc06242ec9be92681c29deff8",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\final-binding\\REPORT.md": "9559bdf4e9959196e170368dd2757f384a7ca9b5de521c8a812f44fcd5229dbd",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\implementation\\final-binding\\evidence.json": "797c56fa54b2e3d321af60aa33a85f63641a0d435411f58bb5809628d753ca11"
+  },
+  "metadata_limit": "Prospective postimages use committed TF metadata only, not actual destination metadata. Rebind genuine PS UTC edit day, baseline version increments and actual landed TF/current PS commits/trees before destination writes.",
+  "test_limits": [
+    "No tests or parser/analysis execution in this refresh.",
+    "Existing final TF 13-test/11-hook, actual B/H and audit evidence binds the TF tree; it does not qualify a later PS projection.",
+    "Converter execution evidence is Windows PowerShell 7.6.5 and Linux 7.6.3; other 7.x support is source-level only.",
+    "A later PS transfer must bind current Node/npm, parser and dependency identities to actual destination manifests/catalog; the TF 1914-file archive is not a PS dependency qualification.",
+    "Retain R1/R5/R2/R8/R11/S1/R13 destination checks and actual PS blank-line semantics from prior canonical readiness.",
+    "Hosted round7 reviews/CI/service activation and actual accepted landing are outside this read-only refresh.",
+    "Old cold packet remains failed and old adopted-process states remain unknown."
+  ],
+  "product_edits": false,
+  "dependency_changes": false,
+  "tests_executed": false,
+  "Git_writes_or_fetches": false,
+  "native_requests_or_writes": false,
+  "canonical_planning_edits": false,
+  "counter_change": false,
+  "existing_counters": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "cap": 12
+  },
+  "prospective_after_accepted_TF_single_PS_transfer": {
+    "A06": 2,
+    "A03": 4,
+    "A21": 6,
+    "A07": 6
+  },
+  "restriction": "TF89bf392 is published but unaccepted. Do not transfer until actual TF acceptance/landing and current native PS refs, dates, versions and coupled inputs are rebound. Root alone increments counters before actual destination work.",
+  "report_sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef",
+  "metadata_inspection_limits": "Read-only textual declaration/NOTES inspection, not PowerShell AST execution. The final declared SelfTest function text range includes post-function invocations."
+}
