@@ -1,0 +1,806 @@
+{
+  "status": "proposal only; no execution or implementation release",
+  "created_utc": "2026-10-06T12:00:53.812616+00:00",
+  "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+  "tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "observed_runs": [
+    {
+      "id": 37456500523,
+      "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "id": 112245306404,
+          "name": "copilot-pull-request-reviewer",
+          "conclusion": "cancelled",
+          "started_at": "2026-10-06T11:27:20Z",
+          "completed_at": "2026-10-06T11:47:37Z",
+          "steps": [
+            {
+              "name": "Run complete repository validation",
+              "status": "completed",
+              "conclusion": "cancelled",
+              "number": 77,
+              "started_at": "2026-10-06T11:28:12Z",
+              "completed_at": "2026-10-06T11:47:34Z",
+              "elapsed_seconds": 1162.0
+            },
+            {
+              "name": "Verify final immutable setup inputs",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 82,
+              "started_at": "2026-10-06T11:47:34Z",
+              "completed_at": "2026-10-06T11:47:34Z",
+              "elapsed_seconds": 0.0
+            }
+          ]
+        }
+      ],
+      "annotations": [
+        {
+          "job_id": 112245306404,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/ed9eea201cfd70a88a6b982b29904e2f6206a692/.github",
+                "start_line": 1,
+                "start_column": null,
+                "end_line": 1,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The job has exceeded the maximum execution time of 20m0s",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/ed9eea201cfd70a88a6b982b29904e2f6206a692/.github",
+                "start_line": 152,
+                "start_column": null,
+                "end_line": 152,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The operation was canceled.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ],
+      "log_sha256": "f5ecad9765f5b66d42b157e8c3f6cd3477898aed35b3a6a3e945624cb75bfe2d",
+      "log_hash_match": true
+    },
+    {
+      "id": 37456293051,
+      "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 112244615714,
+          "name": "Install locked repository validation tools",
+          "conclusion": "success",
+          "started_at": "2026-10-06T11:25:26Z",
+          "completed_at": "2026-10-06T11:50:48Z",
+          "steps": [
+            {
+              "name": "Run complete repository validation",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-06T11:25:53Z",
+              "completed_at": "2026-10-06T11:50:46Z",
+              "elapsed_seconds": 1493.0
+            },
+            {
+              "name": "Verify final immutable setup inputs",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-06T11:50:46Z",
+              "completed_at": "2026-10-06T11:50:46Z",
+              "elapsed_seconds": 0.0
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "log_sha256": "4e234b691dc8a8ebebe5ee17f9d44e4c3d5960b7c76245fdc2f9b8d648e662b1",
+      "log_hash_match": true
+    },
+    {
+      "id": 37456283745,
+      "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "id": 112244584623,
+          "name": "Install locked repository validation tools",
+          "conclusion": "success",
+          "started_at": "2026-10-06T11:25:22Z",
+          "completed_at": "2026-10-06T11:52:44Z",
+          "steps": [
+            {
+              "name": "Run complete repository validation",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 15,
+              "started_at": "2026-10-06T11:25:45Z",
+              "completed_at": "2026-10-06T11:52:42Z",
+              "elapsed_seconds": 1617.0
+            },
+            {
+              "name": "Verify final immutable setup inputs",
+              "status": "completed",
+              "conclusion": "success",
+              "number": 16,
+              "started_at": "2026-10-06T11:52:42Z",
+              "completed_at": "2026-10-06T11:52:42Z",
+              "elapsed_seconds": 0.0
+            }
+          ]
+        }
+      ],
+      "annotations": [],
+      "log_sha256": "6792cd846cdf6a9c297f4e93db98351054d237d65a013689000abac441549974",
+      "log_hash_match": true
+    }
+  ],
+  "raw_sources": [
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "bytes": 482175,
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "296c31173cfbc38156e44669d5585b3e6c627be3",
+      "bytes": 503244,
+      "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "bytes": 229955,
+      "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7fc19eb68200935eb8909b64c2a3caa5aece76e5",
+      "bytes": 277358,
+      "sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "present": false
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "bytes": 45016,
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+    },
+    {
+      "commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".pre-commit-config.yaml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "bytes": 5405,
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+    },
+    {
+      "commit": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+      "path": ".pre-commit-config.yaml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "bytes": 5405,
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+    }
+  ],
+  "current_inspected_regions": [
+    {
+      "name": "generic decoder byte bound and options",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        269,
+        276
+      ],
+      "sha256": "d9c3d4c690f20650a0a23b9f9a7063e0d22748866a746951d8b35c3fa9a416ef"
+    },
+    {
+      "name": "recursive PowerShell conversion",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        277,
+        315
+      ],
+      "sha256": "a675218594eff11beb3371e36f4cf1b635cca7898d01f587cbcc919cf802fa87"
+    },
+    {
+      "name": "native JsonDocument Parse and root gate",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        316,
+        321
+      ],
+      "sha256": "a2a69d3453567a280bab8cd91b20a03ad96aaf1ffb51684903e37c76a10ab771"
+    },
+    {
+      "name": "recursive entry and document disposal",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        322,
+        325
+      ],
+      "sha256": "53a52fbf730c16d5b2469a46fa95e3aa1ea6fa8d406723568c22c43aa1399c8a"
+    },
+    {
+      "name": "fresh parser and reuse lookup",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        3597,
+        3642
+      ],
+      "sha256": "9b72f6d9c979367c1a4f007164d416c93c85ec6ddbb2de5c4088ef6ad0b7a316"
+    },
+    {
+      "name": "structural decoding call",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        3644,
+        3651
+      ],
+      "sha256": "47c99331e2915ec0807f19e72b7b7792dccf802f36a7f38bc254c125e0659712"
+    },
+    {
+      "name": "schema and output construction",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        3653,
+        3918
+      ],
+      "sha256": "85516145c3f790837f4bb485069aae5ca43fd999a1903855aa8305d465dc14a5"
+    },
+    {
+      "name": "snapshot copy and retention",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "lines": [
+        3919,
+        3943
+      ],
+      "sha256": "e7e73ccfe7fdb3951e0eebf5da9b98ca341ea05acfc7a76870c9caf4aaa7ef84"
+    }
+  ],
+  "input_hashes": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "bytes": 11125,
+      "sha256": "5967979b2ed192e56446d9b3f36abd76e4101ccecede935fdd4593213940f01b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "bytes": 5582,
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "bytes": 16434,
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "bytes": 16997,
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\evidence.json",
+      "bytes": 26047,
+      "sha256": "951617290ad677dcb5f797249d08eace6be32f330bac613a36a588919250047a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\pair\\REPORT.md",
+      "bytes": 15774,
+      "sha256": "24fb8a9192be444010e9c8e7d2ebe523468bd32bc77347127e29d95c20c239fd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\pair\\EVIDENCE.json",
+      "bytes": 9725,
+      "sha256": "9b6d4f94720dd4f6689e54e160008c33bdaacd835cf812cca70eac3c5e0a286a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\REPORT.md",
+      "bytes": 5221,
+      "sha256": "df66228cad8ce76b61484b288115d63cf6133a5ac70ef4a2b3a869b3e1db79e5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\REPORT.md",
+      "bytes": 23451,
+      "sha256": "5a169d34421dc85cf9014020749919a2a52e562d51bdb6b5573ae4894781b2fd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\EVIDENCE.json",
+      "bytes": 18797,
+      "sha256": "9d6f4c8307670830b0394d233d818e3830ad62e516480c6327cdfeea77fb5025"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\timing-final.json",
+      "bytes": 130887,
+      "sha256": "24989fea7ba0f30602726eb2d3304e188041c2ef0a63f0732156bfe34425852a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\pair-result.json",
+      "bytes": 407,
+      "sha256": "4dc9795dbf2bf17e4e1d545e569db586a42e19021d577d5e44361ef89e317f6e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\comparison-counts.json",
+      "bytes": 286,
+      "sha256": "a69ce3d05d846afc443e2b395856c45b8bd10f2e44b36b109cfe6555602da4cf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\profile-stderr.txt",
+      "bytes": 22256,
+      "sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\control-stderr.txt",
+      "bytes": 18290,
+      "sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\inputs\\profile-catalog.json",
+      "bytes": 5552,
+      "sha256": "345179e1b4fe9ba011b541c5c9d258062906a255539d2016013985d8b51d9a9e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\run.json",
+      "bytes": 15628,
+      "sha256": "b4f37ce6474171104cc5826f57ac9798370c55b18900f3cc567c5e5518939a7e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\jobs.json",
+      "bytes": 29686,
+      "sha256": "97fb103c9f8dcda593480d47c27d9d7e843aaf5d6829da1986414def63c626e0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\annotations.json",
+      "bytes": 989,
+      "sha256": "b985c0e7f46e183073badb5041a6b223f36ee63b4c3c264c94a1b7812e8e91d3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\summary.json",
+      "bytes": 12169,
+      "sha256": "63f472e6686b2c2f669bd183df1dda51b17fe2a7d65e9b8a768f2f5c5f124aca"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456500523\\attempt-1\\log.txt",
+      "bytes": 340159,
+      "sha256": "f5ecad9765f5b66d42b157e8c3f6cd3477898aed35b3a6a3e945624cb75bfe2d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\run.json",
+      "bytes": 15733,
+      "sha256": "20578b98417be1f9be48c826a9e0257f19215f522c0996056605571ef5c4cc6a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\jobs.json",
+      "bytes": 6103,
+      "sha256": "583d9a201d236808c0b05b5d06642ac378f3697e376a13ca50790f57492bb9bd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\annotations.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\summary.json",
+      "bytes": 2611,
+      "sha256": "d8b6bdf7e99f7d2cefbbe6f8b63b83629ec81d727a82e22d19acd4a2630391ba"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456293051\\attempt-1\\log.txt",
+      "bytes": 206849,
+      "sha256": "4e234b691dc8a8ebebe5ee17f9d44e4c3d5960b7c76245fdc2f9b8d648e662b1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\run.json",
+      "bytes": 15731,
+      "sha256": "3e4fb959a67d11637ffaf31027b42cde90364d6dc9fcd378b4a9ba0cbf19915a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\jobs.json",
+      "bytes": 6103,
+      "sha256": "a5977e24ee140a273dba548493123fe1e806b1a695409025d108fce71c3b3ddf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\annotations.json",
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\summary.json",
+      "bytes": 2603,
+      "sha256": "57d8a8a08276a4a625028a87222b748de381926c133320a7c0017c0896737790"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-ed9eea2\\37456283745\\attempt-1\\log.txt",
+      "bytes": 206849,
+      "sha256": "6792cd846cdf6a9c297f4e93db98351054d237d65a013689000abac441549974"
+    }
+  ],
+  "prior_evidence_reuse": {
+    "broad_profile": {
+      "source": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "command_seconds": 778.038,
+      "author_seconds": 563.754,
+      "immutable_dispatch_count": 41,
+      "immutable_dispatch_seconds": 478.28,
+      "limitation": "historical source and host; nested intervals overlap; no need repeat broad profile"
+    },
+    "inner_pair": {
+      "context_calls": 59,
+      "context_seconds": 10.39649,
+      "native_parser_seconds": 2.849129,
+      "other_context_seconds": 7.547361,
+      "events": 812,
+      "limitation": "did not split JSON parsing, recursive conversion and schema"
+    },
+    "C_comparison": {
+      "case_control_seconds": 13.564239010999927,
+      "case_changed_seconds": 12.47501529100009,
+      "fresh_native_parser_calls": [
+        59,
+        59
+      ],
+      "decoder_calls": [
+        59,
+        51
+      ],
+      "observed_hit_count": 8,
+      "changed_decoder_seconds": 5.169265,
+      "changed_parser_seconds": 2.739442,
+      "copy_calls": 33,
+      "copy_seconds": 0.496878,
+      "limitation": "one case; instrumentation; old then new ordering; not stable speedup or hosted margin"
+    }
+  },
+  "weights": {
+    "Failure/security fidelity": 28,
+    "Attribution and current-input fit": 24,
+    "Credible completion progress": 20,
+    "Contributor/operator usability": 15,
+    "Verification and falsifiability": 9,
+    "Scope/cost": 4
+  },
+  "options": [
+    {
+      "id": "A",
+      "option": "Keep code and wait",
+      "scores": [
+        10,
+        3,
+        1,
+        3,
+        4,
+        10
+      ],
+      "total": 49.3,
+      "eligibility": "eligible but no remedy"
+    },
+    {
+      "id": "B",
+      "option": "One current-head per-context control/timed case pair",
+      "scores": [
+        10,
+        10,
+        7,
+        9,
+        10,
+        9
+      ],
+      "total": 92.1,
+      "eligibility": "proposed diagnostic; no product release"
+    },
+    {
+      "id": "C",
+      "option": "Replace generic recursive conversion with native helper now",
+      "scores": [
+        8,
+        8,
+        8,
+        7,
+        7,
+        5
+      ],
+      "total": 76.4,
+      "eligibility": "conditional; affects other decoder callers; semantics unproved"
+    },
+    {
+      "id": "D",
+      "option": "Fuse structural decoding and schema validation now",
+      "scores": [
+        7,
+        7,
+        8,
+        5,
+        6,
+        3
+      ],
+      "total": 66.5,
+      "eligibility": "conditional; broader security boundary"
+    },
+    {
+      "id": "E",
+      "option": "Queue two independent immutable author-case checkouts",
+      "scores": [
+        9,
+        7,
+        7,
+        7,
+        8,
+        5
+      ],
+      "total": 75.7,
+      "eligibility": "conditional; mapping/isolation/CPU benefit unproved"
+    },
+    {
+      "id": "F",
+      "option": "Shard whole fixtures into independent workers",
+      "scores": [
+        9,
+        6,
+        6,
+        5,
+        7,
+        3
+      ],
+      "total": 66.6,
+      "eligibility": "conditional; duplicates fixture setup"
+    },
+    {
+      "id": "G",
+      "option": "Provider clarification and supported activation correction",
+      "scores": [
+        10,
+        7,
+        5,
+        7,
+        7,
+        9
+      ],
+      "total": 75.2,
+      "eligibility": "draft now; sending requires authority; answer unavailable"
+    },
+    {
+      "id": "H",
+      "option": "Separate green bootstrap with dedicated setup",
+      "scores": [
+        10,
+        4,
+        4,
+        4,
+        6,
+        3
+      ],
+      "total": 58.2,
+      "eligibility": "conditional; legacy bootstrap may also time out"
+    },
+    {
+      "id": "I",
+      "option": "Supported larger hosted runner",
+      "scores": [
+        8,
+        5,
+        6,
+        5,
+        6,
+        2
+      ],
+      "total": 60.1,
+      "eligibility": "conditional on actual availability/cost/activation authority"
+    },
+    {
+      "id": "J",
+      "option": "Supported ARC Ubuntu x64 runner",
+      "scores": [
+        7,
+        4,
+        5,
+        2,
+        5,
+        1
+      ],
+      "total": 47.1,
+      "eligibility": "conditional; infrastructure and security qualification"
+    },
+    {
+      "id": "K",
+      "option": "One reconciled unchanged retry no faster than hourly",
+      "scores": [
+        10,
+        2,
+        2,
+        5,
+        3,
+        9
+      ],
+      "total": 50.6,
+      "eligibility": "eligible only under root retry rules; no causal fix"
+    },
+    {
+      "id": "L",
+      "option": "Normal all-green landing then dedicated activation",
+      "scores": [
+        10,
+        6,
+        3,
+        8,
+        8,
+        8
+      ],
+      "total": 70.8,
+      "eligibility": "unavailable while current CI cancelled"
+    },
+    {
+      "id": "M",
+      "option": "Repeat broad full instruction or aggregate profile",
+      "scores": [
+        10,
+        4,
+        3,
+        3,
+        6,
+        4
+      ],
+      "total": 55.1,
+      "eligibility": "not selected; repeats known boundary"
+    },
+    {
+      "id": "N",
+      "option": "Persistent parser/runspace or global cache",
+      "scores": [
+        6,
+        4,
+        6,
+        4,
+        5,
+        3
+      ],
+      "total": 50.1,
+      "eligibility": "conditional; freshness/protocol/isolation redesign"
+    },
+    {
+      "id": "O",
+      "option": "Raise YAML timeout or rely on undiscovered lookup setting",
+      "scores": [
+        10,
+        1,
+        1,
+        2,
+        2,
+        9
+      ],
+      "total": 40.8,
+      "eligibility": "unsupported as remedy"
+    },
+    {
+      "id": "P",
+      "option": "Skip tests/checks, accept failed CI, or manipulate default branch",
+      "scores": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        8
+      ],
+      "total": 7.1,
+      "eligibility": "ineligible"
+    },
+    {
+      "id": "Q",
+      "option": "B plus prepared provider question; separate data-driven repair decision",
+      "scores": [
+        10,
+        10,
+        8,
+        9,
+        10,
+        8
+      ],
+      "total": 93.7,
+      "eligibility": "selected proposal; no run/edit/message released"
+    }
+  ],
+  "selected": "Q",
+  "selected_total": 93.7,
+  "proposed_run_limits": {
+    "aggregate_runs": 0,
+    "full_instruction_sweeps": 0,
+    "author_cases": 1,
+    "children": [
+      "unchanged control",
+      "diagnostic current-head"
+    ],
+    "max_child_seconds": 120,
+    "max_container_seconds": 600,
+    "retries": 0,
+    "product_writes": 0,
+    "provider_messages": 0,
+    "diagnostic_output_cap_bytes": 2097152,
+    "timing_event_cap": 2000
+  },
+  "primary_sources": [
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/use-copilot-agents/use-code-review",
+      "read_date": "2026-10-06",
+      "claim": "Dedicated setup takes precedence; exact setup lookup revision not specified by inspected text. Head-branch instruction/skill guidance is not a workflow lookup rule."
+    },
+    {
+      "url": "https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners",
+      "read_date": "2026-10-06",
+      "claim": "Larger hosted runners and ARC Ubuntu x64 supported; actual account availability, authority, pricing and lookup activation are unverified."
+    }
+  ],
+  "counters": {
+    "TF68_round": 6,
+    "TF68_original_deadline": "2026-10-13T23:47:31Z",
+    "A06_A03_A21_A07_transfers": "1/3/5/5 of 12"
+  },
+  "next_action": "Root displays/selects proposal Q; prepare exact current-head paired-case instrumentation manifest for root release. Do not run a suite or edit product source.",
+  "tests_run": [],
+  "native_mutations": [],
+  "writes": [
+    "REPORT.md",
+    "evidence.json"
+  ]
+}

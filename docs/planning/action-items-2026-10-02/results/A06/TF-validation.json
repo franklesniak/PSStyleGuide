@@ -1,5 +1,5 @@
 {
-  "status": "round6_findings_and_setup_timeout_under_decision",
+  "status": "round6_dispositions_complete_timeout_diagnostic_preparing",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -94,7 +94,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Publish bounded R16/R17/R18 no-change decisions and post one disposition per thread. Finish separate targeted runtime-remedy proposal; no merge while dynamic CI cancelled.",
+  "next_action": "Verify the sole writer diagnostic packet for one current-head control/timed author case, then launch the bounded offline pair. Select an exact repair only from measured results. Merge remains prohibited by cancelled dynamic CI.",
   "checkout_exit": 0,
   "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
   "implementation": {
@@ -196,7 +196,7 @@
     ],
     "historical_full_node_scope": "600 tests at parent only; current candidate selected13 tests and complete11 hooks."
   },
-  "local_operations": "No local tests or Git writes active. R16-R18 worker stopped. a14_tf68_runtime_impact prepares read-only timeout remedy. All remote review/CI operations terminal; no relaunch.",
+  "local_operations": "Sole a06 writer prepares private diagnostic files only; no local test/container/Git write or native review/CI request active. All remote requests and runs terminal. No relaunch or merge.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "current_input_native_binding_pending",
@@ -467,7 +467,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-READINESS.json",
     "sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1"
   },
-  "planning_checkpoint": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
+  "planning_checkpoint": "78428786c3d0866d511793d358e4452986928371",
   "commit": {
     "status": "committed",
     "expected_parent": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
@@ -2722,12 +2722,24 @@
           "thread": "PRRT_kwDOSAZRhc6pchUt",
           "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
           "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835328",
-          "status": "no_change_selected_pending_native_disposition",
-          "resolved": false,
+          "status": "closed_no_change_evidence_based",
+          "resolved": true,
           "body_sha256": "3b39d6ecaa1d7b5cf17ce4bad40530017576a4bb244f20e19790234946e31f34",
           "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
           "decision_id": "TF68-R16",
-          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json",
+          "native_disposition": {
+            "status": "resolved",
+            "body": "R16: keep both scans. Complete structural validation must precede output. On bytes61 00 00, the exact function emits zero records; the proposed streaming variant emits61 before rejecting the empty record. Both scans are linear. Buffering is viable but adds state without a demonstrated material benefit.\n[Options, rubric, scores and exact-byte evidence](https://github.com/franklesniak/PSStyleGuide/blob/78428786c3d0866d511793d358e4452986928371/docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/REPORT.md)\nGenerated with Codex",
+            "body_sha256": "009a9baa91553a031a090a4b2281737aaf8696fba77fd0c8090c691f271458a1",
+            "requested_at": "2026-10-06T12:08:11.269051+00:00",
+            "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+            "round": 6,
+            "reply_id": 4195031200,
+            "reply_review_id": 5428064174,
+            "native_created_at": "2026-10-06T12:08:12Z",
+            "verified_at": "2026-10-06T12:08:17.483801+00:00"
+          }
         },
         {
           "finding": "TF68-R17",
@@ -2735,12 +2747,24 @@
           "thread": "PRRT_kwDOSAZRhc6pchVa",
           "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
           "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835388",
-          "status": "no_change_selected_pending_native_disposition",
-          "resolved": false,
+          "status": "closed_no_change_evidence_based",
+          "resolved": true,
           "body_sha256": "3ec6eb391ce0abbd1579a6c8a804a0a4eb60b5e186bc9271dec62b6079f5ea87",
           "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
           "decision_id": "TF68-R17",
-          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json",
+          "native_disposition": {
+            "status": "resolved",
+            "body": "R17: retain the current loop. The two comments describe one nonmaterial optimization. Exact-function inspection/probe found64 visits to63objects: only the23-line summary repeats, with identical221502-character output. Cleanup is deterministic and linear; a set adds state without a demonstrated material gain. This is not the prior quadratic cursor defect.\n[Options, rubric, scores and exact-byte evidence](https://github.com/franklesniak/PSStyleGuide/blob/78428786c3d0866d511793d358e4452986928371/docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/REPORT.md)\nGenerated with Codex",
+            "body_sha256": "6d4a3c4edc15ec37c19a669d0a5cf8a06d7be13929ea2b516a24f7c403beaa95",
+            "requested_at": "2026-10-06T12:08:19.842792+00:00",
+            "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+            "round": 6,
+            "reply_id": 4195032376,
+            "reply_review_id": 5428065532,
+            "native_created_at": "2026-10-06T12:08:20Z",
+            "verified_at": "2026-10-06T12:08:24.932836+00:00"
+          }
         },
         {
           "finding": "TF68-R17",
@@ -2748,12 +2772,24 @@
           "thread": "PRRT_kwDOSAZRhc6pchV0",
           "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
           "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835424",
-          "status": "no_change_selected_pending_native_disposition",
-          "resolved": false,
+          "status": "closed_no_change_evidence_based",
+          "resolved": true,
           "body_sha256": "3ec6eb391ce0abbd1579a6c8a804a0a4eb60b5e186bc9271dec62b6079f5ea87",
           "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
           "decision_id": "TF68-R17",
-          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json",
+          "native_disposition": {
+            "status": "resolved",
+            "body": "R17: retain the current loop. The two comments describe one nonmaterial optimization. Exact-function inspection/probe found64 visits to63objects: only the23-line summary repeats, with identical221502-character output. Cleanup is deterministic and linear; a set adds state without a demonstrated material gain. This is not the prior quadratic cursor defect.\n[Options, rubric, scores and exact-byte evidence](https://github.com/franklesniak/PSStyleGuide/blob/78428786c3d0866d511793d358e4452986928371/docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/REPORT.md)\nGenerated with Codex",
+            "body_sha256": "6d4a3c4edc15ec37c19a669d0a5cf8a06d7be13929ea2b516a24f7c403beaa95",
+            "requested_at": "2026-10-06T12:08:27.396906+00:00",
+            "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+            "round": 6,
+            "reply_id": 4195033523,
+            "reply_review_id": 5428066813,
+            "native_created_at": "2026-10-06T12:08:27Z",
+            "verified_at": "2026-10-06T12:08:32.556201+00:00"
+          }
         },
         {
           "finding": "TF68-R18",
@@ -2761,17 +2797,32 @@
           "thread": "PRRT_kwDOSAZRhc6pchWS",
           "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
           "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#discussion_r4194835467",
-          "status": "no_change_selected_pending_native_disposition",
-          "resolved": false,
+          "status": "closed_no_change_evidence_based",
+          "resolved": true,
           "body_sha256": "3854c20901a70e1b7590310526dc29a79288dd0e88ba4838a1388827f9dcff97",
           "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\REPORT.md",
           "decision_id": "TF68-R18",
-          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json"
+          "root_verification": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-findings\\ROOT-VERIFICATION.json",
+          "native_disposition": {
+            "status": "resolved",
+            "body": "R18: retain the complete comparison. Common keys are checked twice in memory; filesystem enumeration and hashing are not repeated here. The exact-function probe preserves changed/added/removed/case-distinct rejection and the artifact switch. An ordinal set is viable, but no material runtime benefit is established.\n[Options, rubric, scores and exact-byte evidence](https://github.com/franklesniak/PSStyleGuide/blob/78428786c3d0866d511793d358e4452986928371/docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/REPORT.md)\nGenerated with Codex",
+            "body_sha256": "d59d1c850b61f4a4d58477e7ebbf99b56be75cdebffbe2ced99699be5cdb8525",
+            "requested_at": "2026-10-06T12:08:34.765090+00:00",
+            "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
+            "round": 6,
+            "reply_id": 4195034517,
+            "reply_review_id": 5428068048,
+            "native_created_at": "2026-10-06T12:08:35Z",
+            "verified_at": "2026-10-06T12:08:40.186908+00:00"
+          }
         }
-      ]
+      ],
+      "dispositions_complete": true,
+      "material_findings_remaining": [],
+      "clean_limit": "Copilot submitted findings, all dispositioned as nonmaterial/refuted; raw review is preserved. Current dynamic setup is cancelled, so no all-green acceptance."
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-observation-1201.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-dispositions.json",
   "hosted_platform_progress": {
     "status": "passed",
     "head": "ed9eea201cfd70a88a6b982b29904e2f6206a692",
@@ -6635,7 +6686,7 @@
       }
     }
   ],
-  "updated_at": "2026-10-06T11:59:52.868062+00:00",
+  "updated_at": "2026-10-06T12:11:42.516371+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
     "status": "All older round2/round3 acceptance and merge helpers are stale; do not execute. New input3b/round4 and strict owner no-failing-CI rule must be bound before any future acceptance.",
@@ -6652,7 +6703,7 @@
       "accept-landed-tf68-r2.py": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
     }
   },
-  "last_goal_turn_classification": "Progress: new exact-head Copilot Lite review reconciled terminal with four comments/three findings; actual20-minute CI cancellation established. Both ordinary setup workflows passed. Bounded finding proposals active.",
+  "last_goal_turn_classification": "Progress: all four round6 review threads resolved with verified no-change decisions; all13ordinary workflows passed; Q93.7 specific inner-attribution diagnostic selected and preparation released. No blocker/CI waiver.",
   "partial_hosted_r2": {
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
     "push_behavior": {
@@ -9054,47 +9105,40 @@
     }
   },
   "planning_publication": {
-    "head": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
-    "published_at": "2026-10-06T11:41:29.263669+00:00",
-    "owned_files": 11,
-    "unrelated_preserved": 2693,
-    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-round6-evidence-planning-publication.json",
+    "head": "78428786c3d0866d511793d358e4452986928371",
+    "parent": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
+    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-findings-ci-planning-publication.json",
+    "files": 10,
+    "preserved_other_files": 2693,
     "normalizations": [
       {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.json",
-        "source_sha256": "df50e5df89992ca1a27cf1afbee43143032ca2e7d0a8abb5bc46767e13ae9307",
-        "published_sha256": "5e121e0c92f65bba9d4871d8d64846eca0f1e2b1259227390b10d41126384f11",
-        "relationship": "Git CRLF-to-LF normalization only"
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/evidence.json",
+        "source_sha256": "b80ae079cd344c013185324157313f28b6ea5ae7e05e28c716d37f9a0538511b",
+        "published_blob_sha256": "2b1794a8b995351c41df8edb53dba1a1daca6ad656b068fe317ea695956f961c",
+        "reason": "Git CRLF-to-LF normalization only"
       },
       {
-        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.md",
-        "source_sha256": "b512849a07437e1a2f68467ad9a6e773ecdf6580a0cf41b4391189482a31d6b5",
-        "published_sha256": "d7259b6a2e3b95b70b1612475be0613b29db28d9a29e3431880060d51de526b7",
-        "relationship": "Git CRLF-to-LF normalization only"
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/probe-result.json",
+        "source_sha256": "d98a5cdd3f75c5fc4e0e77dadd7c4c00b9296eeb7aeac13c6d2bd341cb1e057c",
+        "published_blob_sha256": "c9fed655f30cd96718c490cb9db0d3c8ccae0b4646ceb27b1faa9bf2abcbdc0b",
+        "reason": "Git CRLF-to-LF normalization only"
       },
       {
-        "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/REPORT.md",
-        "source_sha256": "2c1a398f8905ef31d5a64285b86d2f50d6d152a625cfe94cf8222f1d410d04c4",
-        "published_sha256": "0c8f23a80aaf58a991b84011209b4af035b5c24ba54e028a39f42a2056b6ac4f",
-        "relationship": "Git CRLF-to-LF normalization only"
-      },
-      {
-        "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/evidence.json",
-        "source_sha256": "97320a39978f58ab14d80bf7082220a32b02d61c70fc16fb19bf952ab3b04c97",
-        "published_sha256": "e33a8b158e54a39251c27cc535484f40a6d257868d0ef8855359994e26e2fb4c",
-        "relationship": "Git CRLF-to-LF normalization only"
+        "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-round6-findings/source-evidence.json",
+        "source_sha256": "292064bdc7bb07f6e1be181aae12e985389143546aa830438a9eb35b1a3223fc",
+        "published_blob_sha256": "2794d1531b3311f96d55bcd23ba4a20a6f134baf9bb4053228e63d606647481e",
+        "reason": "Git CRLF-to-LF normalization only"
       }
     ]
   },
   "last_read_only_native_observation": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-runtime-C-prevalidation-native.json",
-    "sha256": "ccd2d23bd18abc87ecc45c2b359e0319b1ebfb5ac399c16ca41dc7dad258543d",
-    "captured_at": "2026-10-06T09:59:02.040530+00:00",
-    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
-    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
-    "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
-    "pr_open_unmerged": true,
-    "ci": "13 ordinary successes; dynamic37430212759 cancelled; no retry or native write"
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round6-after-dispositions.json",
+    "sha256": "6a4f785117c31b06e57910ef0b023e2dd1f2245fd118416bf9629dce4f28522c",
+    "captured_at": "2026-10-06T12:11:41.928461+00:00",
+    "open_unmerged": true,
+    "all20threads_resolved": true,
+    "ordinary13success": true,
+    "dynamic_cancelled": true
   },
   "runtime_fixture_repair": {
     "released_at": "2026-10-06T10:27:27.244572+00:00",
@@ -9315,6 +9359,39 @@
       "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-repaired-evidence-planning-publication.json",
       "immutable_binding": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\PUBLICATION-BINDING-REPAIRED.json",
       "binding_sha256": "f140973f2587301562960949347db42d184196f7fc88cf029ce36127ee1226d6"
+    },
+    {
+      "head": "50e20abe298c04b4d07375ad9f70e78b1c62cd4a",
+      "published_at": "2026-10-06T11:41:29.263669+00:00",
+      "owned_files": 11,
+      "unrelated_preserved": 2693,
+      "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-round6-evidence-planning-publication.json",
+      "normalizations": [
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.json",
+          "source_sha256": "df50e5df89992ca1a27cf1afbee43143032ca2e7d0a8abb5bc46767e13ae9307",
+          "published_sha256": "5e121e0c92f65bba9d4871d8d64846eca0f1e2b1259227390b10d41126384f11",
+          "relationship": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/final-binding/REPORT.md",
+          "source_sha256": "b512849a07437e1a2f68467ad9a6e773ecdf6580a0cf41b4391189482a31d6b5",
+          "published_sha256": "d7259b6a2e3b95b70b1612475be0613b29db28d9a29e3431880060d51de526b7",
+          "relationship": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/REPORT.md",
+          "source_sha256": "2c1a398f8905ef31d5a64285b86d2f50d6d152a625cfe94cf8222f1d410d04c4",
+          "published_sha256": "0c8f23a80aaf58a991b84011209b4af035b5c24ba54e028a39f42a2056b6ac4f",
+          "relationship": "Git CRLF-to-LF normalization only"
+        },
+        {
+          "path": "docs/planning/action-items-2026-10-02/results/A14/TF68-runtime-impact/evidence.json",
+          "source_sha256": "97320a39978f58ab14d80bf7082220a32b02d61c70fc16fb19bf952ab3b04c97",
+          "published_sha256": "e33a8b158e54a39251c27cc535484f40a6d257868d0ef8855359994e26e2fb4c",
+          "relationship": "Git CRLF-to-LF normalization only"
+        }
+      ]
     }
   ],
   "live_remote_observation": {
@@ -9446,7 +9523,7 @@
     "reason": "Job exceeded external 20-minute service limit while complete repository validation was running. Ten earlier hooks passed; instruction-contract hook unfinished. No billing/outage cause established.",
     "merge_blocked": true
   },
-  "next_poll_not_before": "2026-10-06T12:00:00+00:00",
+  "next_poll_not_before": null,
   "A14_current_candidate_impact": {
     "status": "root_verified_conditional_no_trigger_candidate_only",
     "worker": "a14_tf68_runtime_impact",
@@ -9583,5 +9660,47 @@
     "displayed_before_disposition": true,
     "product_changes": false,
     "scope_limit": "Private extracted functions and source inspection, not a new full-suite or platform run."
+  },
+  "round6_timeout_remedy": {
+    "status": "selected_diagnostic_preparation_released",
+    "selected": "Q",
+    "score": 93.7,
+    "selected_at": "2026-10-06T12:11:42.516371+00:00",
+    "report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\REPORT.md",
+    "report_sha256": "4157c2c8833e6e1e4b719312281f17e34805b227a1db907981d8e3b2ff52bbbd",
+    "evidence": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round6-timeout-remedy\\evidence.json",
+    "evidence_sha256": "a5827ea43709d3462d34893fd5df68fce8cf93554d389e2f90a8ede0a86ef82e",
+    "root_verification": {
+      "raw_git_rows": 10,
+      "code_regions": 8,
+      "input_hashes": 31,
+      "score_rows": 17,
+      "actual_logs_checked": 3
+    },
+    "displayed_options_rubric_table_choice_before_release": true,
+    "preparation_owner": "/root/a06_tf_generator_owner",
+    "preparation_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\diagnostic",
+    "execution_released": false,
+    "product_edits_released": false,
+    "provider_question_prepared": true,
+    "provider_message_sent": false,
+    "owner_input_needed_for_local_diagnostic": false,
+    "limits": {
+      "child_seconds": 120,
+      "container_seconds": 600,
+      "events": 2000,
+      "diagnostic_bytes": 2097152,
+      "pairs": 1,
+      "automatic_repeat": false
+    },
+    "next_action": "Review exact current-head diagnostic manifest, source recovery and complete guards; root launch only after those checks. No speculative product repair.",
+    "source_report_sha256": "0d39f48d7dca7dcfff5c1cf2de84a96c65461819dac9732464e78df1081019a9",
+    "canonical_adjustment": "Table cell whitespace only for required Markdown lint; frozen worker report retained."
+  },
+  "prepared_round6_body_update": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body-round6-dispositions-prepared.md",
+    "sha256": "0f3ada01586c40dcc7407dd18aa98abe201bc4f19ff7479fb025ccc5742a0c84",
+    "issued": false,
+    "reason": "Editorial result/disposition update only; body edited event triggers accepted-policy CI. Queue with next necessary publication or after permitted interval; do not cause an unnecessary early CI launch. Current native body unchanged."
   }
 }
