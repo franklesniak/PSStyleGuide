@@ -1,0 +1,22 @@
+{
+  "verified_at": "2026-10-06T10:48:30.954829+00:00",
+  "state": "root_reviewed_one_focused_run",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "source_count": 80,
+  "dependency_count": 1914,
+  "native_main_topic_unchanged": true,
+  "review": "Root read concrete extraction/driver/child code and launcher/container deltas. Actual setup, commit/caller/clock/finally retained; six original caller assertions; bounded raw native output; original cross-stream ordering is not retained. Draft-to-final difference is only the accepted-baseline metadata correction.",
+  "source_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-mutation-review.json",
+  "source_review_sha256": "fe0d16baf28acd95ca3bfe0f422dfa2a4f088556f65e092a60b0ea59a743348c",
+  "constructor_sha256": "423df2caa92d13bf8f5b4861d4d9d3749372a24546c030c1792d7f74c25b9b54",
+  "quality_sha256": "db73f1729fc734485dc93a390d00dd6aa7eb3556b695701d8ed64614b0fc9541",
+  "guard_scope": "All source/dependency bytes and full host/private Git identities; no host stage; qualified offline image.",
+  "not_acceptance": true,
+  "remaining": [
+    "Six actual cases",
+    "Final aggregate",
+    "Normal commit, actual endpoints and current audit",
+    "Final quality/current reviews and successful CI",
+    "Normal landing and peer acceptance"
+  ]
+}

@@ -1,0 +1,228 @@
+{
+  "captured_at": "2026-10-06T10:48:11.517645+00:00",
+  "state": "implementation_frozen_focused_real_caller_prepared_not_executed",
+  "release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\ROOT-MUTATION-REPAIR-RELEASE.json",
+    "sha256": "bc159e42f5209def665b2839f008f3cef5b462edd720b1eef982723261f11452"
+  },
+  "main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "selftest_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "validation": [
+    {
+      "name": "final_constructor",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\constructor.ps1",
+        "-SourceRoot",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "-OutputDirectory",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair"
+      ],
+      "native_exit": 0,
+      "outcome": "passed",
+      "result": "constructor-result.json",
+      "stdout": "Constructor correctness, refusal and resilience checks passed.",
+      "main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "selftest_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9"
+    },
+    {
+      "name": "final_full_file_quality",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\quality.ps1",
+        "-SourceRoot",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "-OutputPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\quality-final.json"
+      ],
+      "native_exit": 0,
+      "session": 43427,
+      "outcome": "passed",
+      "result": "quality-final.json",
+      "parser_errors": 0,
+      "analyzer_diagnostics": 0,
+      "analyzer_version": "1.24.0"
+    },
+    {
+      "name": "prepared_driver_parse",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\check-prepared.ps1",
+        "-Directory",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair"
+      ],
+      "native_exit": 0,
+      "outcome": "passed",
+      "result": "prepared-parser.json",
+      "fixture_executed": false
+    }
+  ],
+  "prepared_manifest_sha256": "546852cbf34175121d90b51451c061927b37f4124fe595694b32e8ae64a4c4a6",
+  "execution_authorized": false,
+  "actual_fixture_executed": false,
+  "limits": [
+    "Six-case proof needs separate root release.",
+    "Complete SelfTest/final mandatory all-files validation pending.",
+    "Old failed aggregate and diagnostic evidence retained.",
+    "No host Git/native/CI/peer mutation."
+  ],
+  "artifacts": {
+    "application-attempt1-failure.json": {
+      "sha256": "5775fe19223867f74f2e74ecc16a7cf530f919829bc1233af0693e527a8ba132",
+      "bytes": 415
+    },
+    "apply-repair-attempt1.py": {
+      "sha256": "df8977a261dab0418cac4a5b97112288be48c0381bb7e158ec1b7ee83209a7ed",
+      "bytes": 2561
+    },
+    "apply-repair.py": {
+      "sha256": "657a0f84eafd6c17bd98e667ad928f199e3214ddaa5ce2c44b9d8487368c51fa",
+      "bytes": 2563
+    },
+    "author-catalog.json": {
+      "sha256": "094c151fe495acc1f0a8fb7f3751016ff5ae55bd8c46a93955cbc99dcef6fbe5",
+      "bytes": 8372
+    },
+    "author-six-cases.ps1": {
+      "sha256": "b8adf9375e17ab44c00b9fe4767f6c850628f449bcf48dd3bbe97d9d461952fa",
+      "bytes": 39823
+    },
+    "bind-evidence.py": {
+      "sha256": "0db23b377e63fc01f628a714a73e4ef51db808a12d1bb0f6593f90bf589c4f24",
+      "bytes": 4771
+    },
+    "check-prepared.ps1": {
+      "sha256": "e32bf22fd15b57e76b0fc73625c8016b1d0a8823f9bafa651cf328f06a9b5092",
+      "bytes": 687
+    },
+    "common.py": {
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    "constructor-result.json": {
+      "sha256": "423df2caa92d13bf8f5b4861d4d9d3749372a24546c030c1792d7f74c25b9b54",
+      "bytes": 840
+    },
+    "constructor.ps1": {
+      "sha256": "e994a9a92419f440cc3230140e53de7ad11780ee4a7400b784859a82cce64a56",
+      "bytes": 3113
+    },
+    "draft-author-catalog.json": {
+      "sha256": "fe2c338f59fb68d9e42dc1543368ec65fbf058617f7eb64fff699bd931a9f34a",
+      "bytes": 8372
+    },
+    "draft-author-six-cases.ps1": {
+      "sha256": "af3f932d1bb7f1ec23bffc54634720a556ce4fa8aeb0d67c4573bf351bbc4f12",
+      "bytes": 39823
+    },
+    "draft-constructor-result.json": {
+      "sha256": "be05fb71347259dd6c1295f4b798e01df748056b04703bdcb69563526ba719d7",
+      "bytes": 840
+    },
+    "draft-quality.json": {
+      "sha256": "df1ec2abd933c412f91a37f00d89a30e9626d51704a960cccf4d8804d8749a72",
+      "bytes": 687
+    },
+    "draft-SelfTest.ps1": {
+      "sha256": "d4726cd0b6be9655518ababe919aa3071f52fc6c94603fd6664b65da352616dc",
+      "bytes": 277358
+    },
+    "edit.json": {
+      "sha256": "5e378b1e619865a5b802de1ece0ef58743cdeaf4646bfc1ca0d79cbed007ae5b",
+      "bytes": 431
+    },
+    "finalize-metadata.py": {
+      "sha256": "fd0a66de3de1a2354d90fa04fa338d7bafbbd43541f2cf7346a1ff4f59946aa0",
+      "bytes": 1395
+    },
+    "helpers.ps1": {
+      "sha256": "1cc5ffa26c8dfee7542dc13764a4054e0bf375559c3af45cb0c478ce30c797cb",
+      "bytes": 10373
+    },
+    "IMPLEMENTATION.md": {
+      "sha256": "d5f98ca13ffb2ebdafd60a2dc5f39b284e783cfeea5b9657c0b78a1597f3bdeb",
+      "bytes": 6039
+    },
+    "initial-coverage-mutant.ps1": {
+      "sha256": "34c062acbb7dc55d982c37a4c6b3ee178cc8a05bab3f4cabf58e53f492d41178",
+      "bytes": 503348
+    },
+    "inside.py": {
+      "sha256": "0b1bfbc2f0e902614ae1080ea7c662c618980699f30ee3c0a705f390fe118668",
+      "bytes": 10992
+    },
+    "launch.py": {
+      "sha256": "3e73c8a931173c9135cc3f13600c5a2611ac69d4a236ec31308c08d7be43db10",
+      "bytes": 8262
+    },
+    "manifest.prepared.json": {
+      "sha256": "546852cbf34175121d90b51451c061927b37f4124fe595694b32e8ae64a4c4a6",
+      "bytes": 2597
+    },
+    "metadata-disposition.json": {
+      "sha256": "f5d32148da23308158fdb403b197a9aad8c9f7694bce090756d8db42e31135dd",
+      "bytes": 508
+    },
+    "preimage-SelfTest.ps1": {
+      "sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+      "bytes": 266925
+    },
+    "prepare-packet.py": {
+      "sha256": "4c2d08d3347e349283487ae3b61663d5892f3fe6d15e05e50227b995d9844bcf",
+      "bytes": 4902
+    },
+    "prepare-six.ps1": {
+      "sha256": "ab63262f10ef90d4a358513c2bc9da2c0299dfc6392cb88355c5a2cb6566f223",
+      "bytes": 6715
+    },
+    "prepared-parser.json": {
+      "sha256": "aa9713602f1ef87a0e03c440c92dad8efc64f738d7a1c4c19fb9f380d928157c",
+      "bytes": 585
+    },
+    "quality-final.json": {
+      "sha256": "db73f1729fc734485dc93a390d00dd6aa7eb3556b695701d8ed64614b0fc9541",
+      "bytes": 687
+    },
+    "quality.json": {
+      "sha256": "df1ec2abd933c412f91a37f00d89a30e9626d51704a960cccf4d8804d8749a72",
+      "bytes": 687
+    },
+    "require-date-mutant.ps1": {
+      "sha256": "c3eb786a6e8d99ae9fcc6e8f79c9a77fa03dbdccbd61bfc7eea3f4e088c1b553",
+      "bytes": 503170
+    },
+    "run-child.py": {
+      "sha256": "2bc56cbc5495322666c433ecbefdea9dbe11ac69c983efb6d61011d34530a979",
+      "bytes": 2804
+    },
+    "SelfTest.patch": {
+      "sha256": "62b589809f5f9ab922cb066638065661bed3df62055ad00b86236ec3e3a03c6a",
+      "bytes": 13738
+    },
+    "six-driver.ps1": {
+      "sha256": "8344e1d10919ca321bba4a520d03c2b1badbe0439c79a46e2d265de290dfed7c",
+      "bytes": 3144
+    },
+    "source-catalog.json": {
+      "sha256": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675",
+      "bytes": 19093
+    },
+    "source-guard.json": {
+      "sha256": "e0e85e8affd4daf5683e6b71049da1a1208e5cf855116a1c75ab825cd8c8f524",
+      "bytes": 18012
+    }
+  }
+}

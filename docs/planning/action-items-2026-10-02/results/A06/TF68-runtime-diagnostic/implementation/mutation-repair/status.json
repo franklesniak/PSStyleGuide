@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f",
+  "started_at": "2026-10-06T10:49:02.935715+00:00",
+  "run_id": "tf68-20261006-mutation-six-one",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "mutation-construction-six-case-focused",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "tf68-mutation-proof-tf68-20261006-mutation-six-one",
+    "--label",
+    "psstyleguide.validation-manifest=762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T10:51:49.627145+00:00"
+}

@@ -1,0 +1,125 @@
+{
+  "source_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation",
+  "files": [
+    {
+      "path": "ROOT-READINESS.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-READINESS.json",
+      "sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1"
+    },
+    {
+      "path": "ROOT-RELEASE.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-RELEASE.json",
+      "sha256": "f11e72034f1f007ef62462f07191ca9095809d04e3213b39853a981d0e828e68"
+    },
+    {
+      "path": "ROOT-RESULT-VERIFICATION.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "b0323fead8c91cff6cda167847b3f4f252f885ca88eb64233c1a41963f030f42"
+    },
+    {
+      "path": "manifest.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\manifest.authorized.json",
+      "sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d"
+    },
+    {
+      "path": "status.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\status.json",
+      "sha256": "4e7aa9ffec53197e51923bef717e2c4ee3c3e925c180dd43b17a556c0cb08f5f"
+    },
+    {
+      "path": "host-source-before.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\inputs\\source-before.json",
+      "sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf"
+    },
+    {
+      "path": "result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\result.json",
+      "sha256": "ad05b828c12a04e698a59b2923941771ed771db507f77cfb3f9cf8fc310feb6b"
+    },
+    {
+      "path": "runtime.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\runtime.json",
+      "sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11"
+    },
+    {
+      "path": "fixture-adaptation.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\fixture-adaptation.json",
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4"
+    },
+    {
+      "path": "before.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\before.json",
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95"
+    },
+    {
+      "path": "host-source-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\host-source-after.json",
+      "sha256": "8c3063179716713903aa6a1a4245df961834f0d2bd94973d0aae02eabbae17bf"
+    },
+    {
+      "path": "staged-preflight.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "staged-preflight-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\staged-preflight-after.json",
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95"
+    },
+    {
+      "path": "affected-node.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\affected-node.log",
+      "sha256": "b5d8ff09a15d9aa87280a2072743acc90f99496e361166e380926f0f897a630f"
+    },
+    {
+      "path": "affected-node-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\affected-node-after.json",
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95"
+    },
+    {
+      "path": "aggregate.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    {
+      "path": "aggregate-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output\\aggregate-after.json",
+      "sha256": "01d857d20bb0cf9acefdcaad001087e609122c2cdde8c5f5d712463932eafc95"
+    },
+    {
+      "path": "normal-commit.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-runtime-C-repaired-commit.log",
+      "sha256": "c9a2721ba26333df4aef7610fa4f7aed7a98f76f6f5b4d2aed4078f472fe33b9"
+    },
+    {
+      "path": "current-audit.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-current-audit-ed9eea2.log",
+      "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9"
+    },
+    {
+      "path": "AcceptedMaintenance.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-AcceptedMaintenance-ed9eea2.log",
+      "sha256": "e94398dd6ad5d76ae4a5a68bc050757414c53915330608eb17321e9ef0927589"
+    },
+    {
+      "path": "AcceptedContent.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-AcceptedContent-ed9eea2.log",
+      "sha256": "70ad4866dd6af503b663812a16067caa4d8307a872418c9d7cc82db74371c6ca"
+    },
+    {
+      "path": "FinalizeMetadataNow.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-FinalizeMetadataNow-ed9eea2.log",
+      "sha256": "b3c79d5079ed967278538390701230b41fe5add436cd91d91e625c9ea6d7755e"
+    },
+    {
+      "path": "MetadataClassificationOnly.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-MetadataClassificationOnly-ed9eea2.log",
+      "sha256": "78a6880134bdc645f7d2f8c6d1fb78608b63a7e8607decab2df46f67328067d7"
+    },
+    {
+      "path": "ProposedPolicy.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-C-ProposedPolicy-ed9eea2.log",
+      "sha256": "81e36b7f9203c372dfacea16058e0004aafedfb8b6431b7da312daef3d40edcb"
+    }
+  ]
+}

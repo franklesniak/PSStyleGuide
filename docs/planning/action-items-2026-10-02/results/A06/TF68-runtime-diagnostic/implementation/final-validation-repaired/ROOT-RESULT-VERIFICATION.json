@@ -1,0 +1,44 @@
+{
+  "status": "PASS_FINAL_CANDIDATE_VALIDATION",
+  "verified_at": "2026-10-06T11:10:31.044826+00:00",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "manifest_sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+  "readiness_sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1",
+  "result_sha256": "ad05b828c12a04e698a59b2923941771ed771db507f77cfb3f9cf8fc310feb6b",
+  "status_sha256": "4e7aa9ffec53197e51923bef717e2c4ee3c3e925c180dd43b17a556c0cb08f5f",
+  "payloads_verified": 7,
+  "source_files": 80,
+  "dependencies": 1914,
+  "complete_host_private_guards_equal": true,
+  "node_counts": {
+    "tests": 13,
+    "pass": 13,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "mandatory_hooks_passed": 11,
+  "mandatory_hooks_skipped": 0,
+  "aggregate_elapsed_seconds": 789.023305,
+  "runtime": {
+    "versions": {
+      "node": "v24.18.1",
+      "npm": "11.16.0",
+      "python": "Python 3.12.3",
+      "pwsh": "7.6.3"
+    },
+    "path": "/opt/psstyleguide-runtime/venv/bin:/opt/psstyleguide-runtime/node/bin:/opt/research-misc/pre-commit-cache/repokhj4agnw/golangenv-default/.go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "pyflakes": "absent in qualified image",
+    "network": "none",
+    "role": "proposed-staged-candidate-against-accepted-base"
+  },
+  "limitations": [
+    "One proposed staged candidate pass, not acceptance by the accepted-base/new-commit checks or hosted CI.",
+    "The historical600 Node results are retained only for unchanged inputs. This run executed the selected13 tests.",
+    "No stable-speedup or service-timeout-margin claim from comparison with prior runs.",
+    "Normal commit, actual endpoints/current audit, final binding, native review and successful CI, landing/activation and peer work remain."
+  ]
+}

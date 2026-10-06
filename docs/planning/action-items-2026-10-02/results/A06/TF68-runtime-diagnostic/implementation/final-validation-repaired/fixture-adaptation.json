@@ -1,0 +1,7 @@
+{
+  "path": ".github/workflows/node_modules/husky/bin.js",
+  "sha256": "c6965589a83667d43c4dc22f90dccfa91c133f8ed23629b896ce326f0a6c5cc8",
+  "before_mode": "0o644",
+  "mode": "0o755",
+  "scope": "Disposable Linux fixture only; package-declared executable; bytes unchanged. Mode is included in each subsequent identity guard."
+}

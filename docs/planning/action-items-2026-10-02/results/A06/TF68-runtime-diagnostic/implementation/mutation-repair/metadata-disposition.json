@@ -1,0 +1,9 @@
+{
+  "draft_sha256": "d4726cd0b6be9655518ababe919aa3071f52fc6c94603fd6664b65da352616dc",
+  "final_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "accepted_function_version": "1.0.20261003.0",
+  "final_function_version": "1.1.20261006.0",
+  "policy": "C:/Users/flesniak/GitHub/PSStyleGuide/STYLE_GUIDE.md:1025,1038",
+  "reason": "Landing-branch previously published version, not cumulative WIP commits."
+}

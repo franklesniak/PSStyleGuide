@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "execution_authorized": true,
+  "authorizing_coordinator": "root",
+  "replaces_current_run": false,
+  "policy_role": "proposed-staged-candidate-against-accepted-base",
+  "run_id": "tf68-20261006-runtime-repaired-final-validation",
+  "source_repository": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+  "finalization_utc_date": "2026-10-06",
+  "dependency_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+  "dependency_catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+  "dependency_count": 1914,
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "whole_container_timeout_seconds": 3900,
+  "prepared_files": {
+    "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "launch.py": "22d3e86e5a3fc1ee3e486a638ceee697363a04ff4903e5ededde1d147a69059f",
+    "inside.py": "5e3cab5a437d297f85eeb6b1b15a9490e814cbb1b60008668dad8bce46169368",
+    "source-catalog.json": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675"
+  },
+  "source_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "source_catalog_sha256": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675",
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "root_readiness_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\ROOT-READINESS.json",
+  "root_readiness_evidence_sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1",
+  "root_confirmed_current_accepted_base": true,
+  "root_confirmed_candidate_policy_and_dependency_compatibility": true,
+  "expected_hook_count": 11,
+  "local_parent_revision": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "preflight_timeout_seconds": 300,
+  "node_timeout_seconds": 300,
+  "aggregate_timeout_seconds": 3000
+}

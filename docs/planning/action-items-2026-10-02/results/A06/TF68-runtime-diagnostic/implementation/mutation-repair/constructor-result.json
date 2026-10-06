@@ -1,0 +1,25 @@
+{
+  "source_equal": true,
+  "main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "selftest_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "actual_fixture_executed": false,
+  "native_exit": 0,
+  "old_textual_mutation_is_noop": true,
+  "pwsh": "7.6.5",
+  "actual_mutants": [
+    {
+      "only_expected_spans_changed": true,
+      "changed_arguments": 2,
+      "name": "require-date",
+      "sha256": "c3eb786a6e8d99ae9fcc6e8f79c9a77fa03dbdccbd61bfc7eea3f4e088c1b553"
+    },
+    {
+      "only_expected_spans_changed": true,
+      "changed_arguments": 2,
+      "name": "initial-coverage",
+      "sha256": "34c062acbb7dc55d982c37a4c6b3ee178cc8a05bab3f4cabf58e53f492d41178"
+    }
+  ],
+  "state": "passed",
+  "persistent_constructor_controls_passed": true
+}

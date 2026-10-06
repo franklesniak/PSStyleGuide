@@ -1,0 +1,24 @@
+check json...............................................................Passed
+check yaml...............................................................Passed
+fix end of files.........................................................Passed
+trim trailing whitespace.................................................Passed
+yamllint.................................................................Passed
+Lint GitHub Actions workflow files.......................................Passed
+Validate Dependabot Config (v2)..........................................Passed
+Validate GitHub Workflows................................................Passed
+staged Markdown..........................................................Passed
+workflow policy contract.................................................Passed
+agent instruction contract and mutation tests............................Failed
+- hook id: agent-instruction-contract
+- exit code: 1
+
+Agent-instruction content contract passed; maintenance authority is checked separately.
+Finalization date not verified for committed input; local changed-worktree date checks remain applicable.
+[31;1mException: [0m/work/validation-tf68-20261006-runtime-final-validation-bkn640r5/repository/.github/workflows/Test-AgentInstructions.SelfTest.ps1:1646[0m
+[31;1m[0m[36;1mLine |[0m
+[31;1m[0m[36;1m[36;1m1646 | [0m             [36;1mthrow "Author finalization caller failed (Now=$Now Later=[0m …[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m     | [31;1m             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m     | [31;1mAuthor finalization caller failed (Now=True Later=False Accept=True[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mexit=1): Agent-instruction contract failed: - STYLE_GUIDE.md Last[0m
+[31;1m[0m[36;1m[36;1m[0m[36;1m[0m[36;1m[31;1m[31;1m[36;1m[31;1m[36;1m[31;1m[36;1m     | [31;1mUpdated must be 2026-10-06 after a rendered-content change.[0m
+

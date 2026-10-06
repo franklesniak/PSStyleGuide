@@ -1,0 +1,15 @@
+{
+  "status": "CLEAN",
+  "unresolved": [],
+  "acceptedPackages": 0,
+  "unusedExceptions": [],
+  "proposedState": false,
+  "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "authoritySource": "local-origin-main",
+  "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+  "installedGraphRoots": [
+    ".",
+    ".github/workflows"
+  ],
+  "findings": []
+}

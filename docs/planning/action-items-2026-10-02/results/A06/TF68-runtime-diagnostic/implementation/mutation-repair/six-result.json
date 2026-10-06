@@ -1,0 +1,92 @@
+{
+  "prior_ephemeral_identity_replayed": false,
+  "state": "passed",
+  "clock_unchanged": true,
+  "cases": [
+    {
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "number": 1,
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "3fe4eebd5882cd6290335fb2cb5ea7d72c5f819d",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "seconds": 17.844001915999797,
+      "exit": 0
+    },
+    {
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "number": 2,
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "seconds": 16.755175788000088,
+      "exit": 1
+    },
+    {
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "number": 3,
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "seconds": 17.47467474699988,
+      "exit": 0
+    },
+    {
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "number": 4,
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "64d30eedcce94b5749c19af0390bdb078d62d0ef",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "seconds": 17.870148718000564,
+      "exit": 0
+    },
+    {
+      "checker_sha256": "c3eb786a6e8d99ae9fcc6e8f79c9a77fa03dbdccbd61bfc7eea3f4e088c1b553",
+      "number": 5,
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "seconds": 15.444980072999897,
+      "exit": 0
+    },
+    {
+      "checker_sha256": "34c062acbb7dc55d982c37a4c6b3ee178cc8a05bab3f4cabf58e53f492d41178",
+      "number": 6,
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "arguments": [
+        "-InputRevision",
+        "3fe4eebd5882cd6290335fb2cb5ea7d72c5f819d",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "seconds": 16.499754221999865,
+      "exit": 1
+    }
+  ],
+  "selected_children": 6,
+  "parent_breakpoint_count_equal": true,
+  "actual_oracles_retained": true,
+  "role": "focused real-caller repair evidence, not full aggregate or acceptance"
+}

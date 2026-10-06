@@ -1,0 +1,24 @@
+{
+  "released_at": "2026-10-06T10:56:03.174144+00:00",
+  "state": "one_final_candidate_validation_released_launch_pending",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\manifest.authorized.json",
+  "manifest_sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+  "readiness_sha256": "7685c42b79a8b010cd43287aeac941188260de2a80714c37e1ebdc4e3416d4f1",
+  "focused_proof_sha256": "a46fd209fbb40d10a9a0fe82d73fb0046de6a1579d15480fc3ecb482cd4781b7",
+  "run_id": "tf68-20261006-runtime-repaired-final-validation",
+  "writer": "a06_tf_generator_owner",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "runs_authorized": 1,
+  "constraints": [
+    "No source edit, dependency installation or retry.",
+    "No host Git/index/ref/config mutation, native operation, CI relaunch, merge or PS carryback.",
+    "Preserve failures and reconcile before further action.",
+    "Use actual UTC date and original fixture clocks."
+  ],
+  "timeouts": {
+    "preflight": 300,
+    "node": 300,
+    "aggregate": 3000,
+    "container": 3900
+  }
+}

@@ -1,0 +1,2 @@
+Agent-instruction contract failed:
+- STYLE_GUIDE.md Last Updated must be 2026-10-06 after a rendered-content change.

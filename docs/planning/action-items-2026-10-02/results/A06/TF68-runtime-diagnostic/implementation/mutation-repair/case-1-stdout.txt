@@ -1,0 +1,2 @@
+Agent-instruction content contract passed; maintenance authority is checked separately.
+Finalization date not verified by this invocation; structural, calendar, baseline and version checks passed: B=5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4 H=3fe4eebd5882cd6290335fb2cb5ea7d72c5f819d.

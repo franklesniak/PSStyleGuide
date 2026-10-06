@@ -1,0 +1,166 @@
+{
+  "state": "static_read_only_no_test_executed",
+  "captured_utc": "2026-10-06T10:23:39.792557+00:00",
+  "original_main_sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+  "candidate_main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "candidate_selftest_sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+  "author_checker_code_mutations": [
+    {
+      "name": "require-date",
+      "anchors": [
+        {
+          "needle": "$objDocumentContext.RequireFinalizationDate))",
+          "replacement": "$false))",
+          "original_occurrences": 2,
+          "candidate_occurrences": 0,
+          "candidate_lines": []
+        }
+      ],
+      "original": {
+        "changed": true,
+        "mutant_sha256": "4fe7d736692862ca7fdb759c8b314cdf454942223b395d327ed7b2d28f61cc78",
+        "source_sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+      },
+      "candidate": {
+        "changed": false,
+        "mutant_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        "source_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+      }
+    },
+    {
+      "name": "initial-coverage",
+      "anchors": [
+        {
+          "needle": "$objDocumentContext.RequireFinalizationDate))",
+          "replacement": "($objDocumentContext.RequireFinalizationDate -or $objDocumentContext.IsInitialMetadataCoverage)))",
+          "original_occurrences": 2,
+          "candidate_occurrences": 0,
+          "candidate_lines": []
+        }
+      ],
+      "original": {
+        "changed": true,
+        "mutant_sha256": "818a07e823ca0601352cd08ebbbab0dec597d5a6d598fcf430086b6ced47a9c8",
+        "source_sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+      },
+      "candidate": {
+        "changed": false,
+        "mutant_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        "source_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+      }
+    },
+    {
+      "name": "delayed-current-clock",
+      "anchors": [
+        {
+          "needle": "if ($FinalizeMetadataNow) {",
+          "replacement": "if ($FinalizeMetadataNow -or $boolPublishedEndpointsRequested) {",
+          "original_occurrences": 2,
+          "candidate_occurrences": 2,
+          "candidate_lines": [
+            8425,
+            8622
+          ]
+        },
+        {
+          "needle": "RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)",
+          "replacement": "RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow -or $boolPublishedEndpointsRequested)",
+          "original_occurrences": 1,
+          "candidate_occurrences": 1,
+          "candidate_lines": [
+            8466
+          ]
+        }
+      ],
+      "original": {
+        "changed": true,
+        "mutant_sha256": "3e83f35a91d7420a4bc8f3c1b77abbae324f347783b0f38383bede09f370b882",
+        "source_sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+      },
+      "candidate": {
+        "changed": true,
+        "mutant_sha256": "d080f77ed6b481d3b5954cea4eac31150bb7fa1d3e7c894c2196f15b4197df1d",
+        "source_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+      }
+    },
+    {
+      "name": "missing-status-message",
+      "anchors": [
+        {
+          "needle": "Finalization date not verified by this invocation",
+          "replacement": "No explicit date status",
+          "original_occurrences": 1,
+          "candidate_occurrences": 1,
+          "candidate_lines": [
+            8626
+          ]
+        }
+      ],
+      "original": {
+        "changed": true,
+        "mutant_sha256": "7f1cab67fbf4fe8a5ec14901b7fb84b5c16862edd1bfe3559d876ea8743a3f28",
+        "source_sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e"
+      },
+      "candidate": {
+        "changed": true,
+        "mutant_sha256": "e1ed39af5596251a646ad4ac6dc16018221971847b2b9e218f579e8c8f4214fd",
+        "source_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011"
+      }
+    }
+  ],
+  "unchanged_actual_functions": [
+    {
+      "name": "Invoke-AgentInstructionFixtureClock",
+      "unchanged": true,
+      "sha256": "09905dcfa51ec9ea9f2dbff87f677cb74cae27ebef8cee062f36184fba068202",
+      "bytes": 6725
+    },
+    {
+      "name": "Assert-AuthorFinalizationGitFixture",
+      "unchanged": true,
+      "sha256": "b166a6015cbba096723639ef64438f5b663b6a33a0e64a72143ad564ec4b4cf3",
+      "bytes": 66140
+    }
+  ],
+  "matching_accept_now_calls": [
+    {
+      "line": 1857,
+      "source": "& $scriptblockCheck $strCurrentCandidate $true $false $true \"Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate\""
+    },
+    {
+      "line": 1921,
+      "source": "& $scriptblockCheck $strOptionalVersionCandidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 1934,
+      "source": "& $scriptblockCheck $strOptionalRemovalCandidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 1955,
+      "source": "& $scriptblockCheck $strGeneratedToTier2Candidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 1996,
+      "source": "& $scriptblockCheck $strUpperValidCandidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 2143,
+      "source": "& $scriptblockCheck $strValidUnicodeHead $true $false $true 'content contract passed'"
+    },
+    {
+      "line": 2157,
+      "source": "& $scriptblockCheck $strPromotionCandidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 2182,
+      "source": "& $scriptblockCheck $strVersionedCurrentCandidate $true $false $true 'Author finalization UTC date checked'"
+    },
+    {
+      "line": 2210,
+      "source": "& $scriptblockCheck $strVersionedEarlierCandidate $true $false $true 'Author finalization UTC date checked'"
+    }
+  ],
+  "finding": "Two original two-occurrence mutation anchors now have zero occurrences. Both generated mutants are exact unmodified candidate bytes. Other three distinct author checker-source anchors remain live.",
+  "failure_attribution": "Late require-date mutant at candidate SelfTest line2210 is the exact supported explanation; aggregate log did not record caller B/H or outer callsite, so direct per-case tracing is not claimed.",
+  "scope_limit": "This inventory covers every author-fixture replacement that produces checker code from strValidatorContent. Document data, setup YAML and synthetic clock-probe mutations are different input families."
+}

@@ -1,0 +1,32 @@
+{
+  "released_at": "2026-10-06T10:27:27.244572+00:00",
+  "state": "selftest_only_mutation_construction_repair_released",
+  "selected": "Parsed named arguments, option2",
+  "score": 94.5,
+  "decision_path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-runtime-diagnostic\\implementation\\MUTATION-REPAIR.md",
+  "decision_sha256": "d76fd085ca0aefc5b9c014091135384c58be2e271f55253d56c8ce2841b0cd98",
+  "worktree": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+  "input_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "allowed_path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+  "preimage_sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+  "unchanged_main_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+  "allowed_checks": "Final-file PowerShell parser/analyzer and bounded constructor-only correctness/refusal/resilience tests; no actual author fixture or aggregate launch until concrete driver/manifest root review.",
+  "fixture_preparation": "At most six actual promotion/stale/current/mutant cases using actual retained construction/commit/caller/clock/cleanup; corrected mutants only, no redundant negative-only replay. Proposed45sec/child,210secparent,240seccontainer reviewed when concrete.",
+  "constraints": [
+    "No main validator/clock/source guide/workflow/dependency change.",
+    "No dropped oracles, bypass or weaker date checks.",
+    "No product stage/commit/push/native/CI/peer operation.",
+    "Preserve prior failed run and unchanged main timing evidence; previous cf9416 commit/endpoint helpers are obsolete until rebound.",
+    "Metadata follows actual accepted-endpoint rules, not cumulative WIP increments."
+  ],
+  "round": 5,
+  "deadline": "2026-10-13T23:47:31Z",
+  "transfers": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "cap": 12
+  },
+  "owner_input_needed": false
+}

@@ -1,0 +1,73 @@
+{
+  "state": "passed",
+  "role": "proposed-staged-candidate-against-accepted-base",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "workspace": "/work/validation-tf68-20261006-runtime-repaired-final-validation-2rc5o3pm",
+  "started_at": "2026-10-06T10:56:21.525080+00:00",
+  "commands": [
+    {
+      "name": "staged-preflight",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-06T10:56:23.330678+00:00",
+      "timeout_seconds": 300,
+      "state": "passed",
+      "pid": 83,
+      "exit": 0,
+      "finished_at": "2026-10-06T10:56:33.741418+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "name": "affected-node",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+      ],
+      "started_at": "2026-10-06T10:56:33.965321+00:00",
+      "timeout_seconds": 300,
+      "state": "passed",
+      "pid": 687,
+      "exit": 0,
+      "finished_at": "2026-10-06T10:56:52.489466+00:00",
+      "log_sha256": "b5d8ff09a15d9aa87280a2072743acc90f99496e361166e380926f0f897a630f",
+      "node_summary": {
+        "tests": 13,
+        "pass": 13,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "name": "aggregate",
+      "command": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-06T10:56:52.699190+00:00",
+      "timeout_seconds": 3000,
+      "state": "passed",
+      "pid": 2360,
+      "exit": 0,
+      "finished_at": "2026-10-06T11:10:01.722495+00:00",
+      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "passed_hooks": 11,
+      "skipped_hooks": 0
+    }
+  ],
+  "finished_at": "2026-10-06T11:10:01.991590+00:00"
+}

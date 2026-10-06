@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: push transition caller binds event endpoints and preserves proposed-code provenance
+ok 1 - push transition caller binds event endpoints and preserves proposed-code provenance
+  ---
+  duration_ms: 16803.921735
+  type: 'test'
+  ...
+# Subtest: ordinary documentation needs no maintenance authorization
+ok 2 - ordinary documentation needs no maintenance authorization
+  ---
+  duration_ms: 0.459455
+  type: 'test'
+  ...
+# Subtest: new platform-discovered workflows require maintenance; sample YAML and notes do not
+ok 3 - new platform-discovered workflows require maintenance; sample YAML and notes do not
+  ---
+  duration_ms: 0.202773
+  type: 'test'
+  ...
+# Subtest: checker, helper, workflow and dependency-only changes require maintenance
+ok 4 - checker, helper, workflow and dependency-only changes require maintenance
+  ---
+  duration_ms: 0.163587
+  type: 'test'
+  ...
+# Subtest: metadata classification table-only changes require maintenance
+ok 5 - metadata classification table-only changes require maintenance
+  ---
+  duration_ms: 0.167354
+  type: 'test'
+  ...
+# Subtest: candidate authority data cannot change classification
+ok 6 - candidate authority data cannot change classification
+  ---
+  duration_ms: 0.074465
+  type: 'test'
+  ...
+# Subtest: missing, invalid or ambiguous paths and revisions fail closed
+ok 7 - missing, invalid or ambiguous paths and revisions fail closed
+  ---
+  duration_ms: 0.317676
+  type: 'test'
+  ...
+# Subtest: classification stays bound to its base, head and accepted policy
+ok 8 - classification stays bound to its base, head and accepted policy
+  ---
+  duration_ms: 0.170591
+  type: 'test'
+  ...
+# Subtest: Git endpoints detect maintenance without executing proposed files
+ok 9 - Git endpoints detect maintenance without executing proposed files
+  ---
+  duration_ms: 48.72668
+  type: 'test'
+  ...
+# Subtest: shared callable closure covers helper-only paths and aliases without absorbing lookalikes
+ok 10 - shared callable closure covers helper-only paths and aliases without absorbing lookalikes
+  ---
+  duration_ms: 0.579473
+  type: 'test'
+  ...
+# Subtest: real helper-only Git changes, removals and ambient redirection retain accepted-base classification
+ok 11 - real helper-only Git changes, removals and ambient redirection retain accepted-base classification
+  ---
+  duration_ms: 188.308343
+  type: 'test'
+  ...
+# Subtest: accepted data admission precedes shared-helper classification and ordinary validation
+ok 12 - accepted data admission precedes shared-helper classification and ordinary validation
+  ---
+  duration_ms: 1357.028543
+  type: 'test'
+  ...
+# Subtest: generator harness classifier selector is exact
+ok 13 - generator harness classifier selector is exact
+  ---
+  duration_ms: 0.27862
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 18450.370807

@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "execution_authorized": true,
+  "authorizing_coordinator": "root",
+  "replaces_current_run": false,
+  "policy_role": "mutation-construction-six-case-focused",
+  "run_id": "tf68-20261006-mutation-six-one",
+  "source_repository": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+  "finalization_utc_date": "2026-10-06",
+  "dependency_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+  "dependency_catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+  "dependency_count": 1914,
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "whole_container_timeout_seconds": 240,
+  "non_acceptance": true,
+  "parent_timeout_seconds": 210,
+  "selected_child_timeout_seconds": 45,
+  "maximum_selected_children": 6,
+  "bootstrap_is_separate": true,
+  "prepared_files": {
+    "common.py": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+    "inside.py": "0b1bfbc2f0e902614ae1080ea7c662c618980699f30ee3c0a705f390fe118668",
+    "launch.py": "3e73c8a931173c9135cc3f13600c5a2611ac69d4a236ec31308c08d7be43db10",
+    "run-child.py": "2bc56cbc5495322666c433ecbefdea9dbe11ac69c983efb6d61011d34530a979",
+    "six-driver.ps1": "8344e1d10919ca321bba4a520d03c2b1badbe0439c79a46e2d265de290dfed7c",
+    "author-six-cases.ps1": "b8adf9375e17ab44c00b9fe4767f6c850628f449bcf48dd3bbe97d9d461952fa",
+    "author-catalog.json": "094c151fe495acc1f0a8fb7f3751016ff5ae55bd8c46a93955cbc99dcef6fbe5",
+    "prepare-six.ps1": "ab63262f10ef90d4a358513c2bc9da2c0299dfc6392cb88355c5a2cb6566f223",
+    "source-catalog.json": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675"
+  },
+  "source_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "source_catalog_sha256": "551a3629620dafb74b8f5428e17c046062b66d658aa6b0fc948426936b14a675",
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "scope": "Six actual finalization fixture callers; normal setup/clock/oracles retained; reconstructed B/H, not prior ephemeral identity replay."
+}

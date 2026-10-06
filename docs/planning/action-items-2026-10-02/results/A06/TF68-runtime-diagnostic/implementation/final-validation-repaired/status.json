@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+  "started_at": "2026-10-06T10:56:17.343290+00:00",
+  "run_id": "tf68-20261006-runtime-repaired-final-validation",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "proposed-staged-candidate-against-accepted-base",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "psstyleguide-future-validation-tf68-20261006-runtime-repaired-final-validation",
+    "--label",
+    "psstyleguide.validation-manifest=9ef539bc65d7ad1c0a50ac2e9d016e6b8f411df107cb4da22e01ad39f16f647d",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation-repaired\\runs\\tf68-20261006-runtime-repaired-final-validation\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T11:10:04.661614+00:00"
+}

@@ -1,0 +1,117 @@
+{
+  "status": "PASS_SIX_ACTUAL_CALLERS",
+  "verified_at": "2026-10-06T10:53:11.300622+00:00",
+  "candidate_tree": "414509ef0a5f6db3cceab5e6b720fbcbcb3cb4ad",
+  "manifest_sha256": "762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f",
+  "source_after_equal": true,
+  "complete_private_guards_equal": true,
+  "source_count": 80,
+  "dependency_count": 1914,
+  "selected_children": 6,
+  "cases": [
+    {
+      "case": 1,
+      "native_exit": 0,
+      "seconds": 17.844001915999797,
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "arguments": [
+        "-InputRevision",
+        "3fe4eebd5882cd6290335fb2cb5ea7d72c5f819d",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "stdout_sha256": "9c94e2dcb6779646b727c1e3d8720f712ebc309703aa2d5dd0619eb2828bf395",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": 2,
+      "native_exit": 1,
+      "seconds": 16.755175788000088,
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "stdout_sha256": "a89fa09d1e32a91de286c5d5bf33b0e8cfb0ec31229ba0498b117f85536f6f6d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": 3,
+      "native_exit": 0,
+      "seconds": 17.47467474699988,
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "stdout_sha256": "51e94b53a508e526e30b54998e69d385ab594141b078cff2446b020291da0a52",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": 4,
+      "native_exit": 0,
+      "seconds": 17.870148718000564,
+      "checker_sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "arguments": [
+        "-InputRevision",
+        "64d30eedcce94b5749c19af0390bdb078d62d0ef",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "stdout_sha256": "16be4a675d86dfd8f5da2042d107dbe06d77072964d7a7cc583cb63f019e061b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": 5,
+      "native_exit": 0,
+      "seconds": 15.444980072999897,
+      "checker_sha256": "c3eb786a6e8d99ae9fcc6e8f79c9a77fa03dbdccbd61bfc7eea3f4e088c1b553",
+      "arguments": [
+        "-InputRevision",
+        "0d3e6d76c2d51470571eabd1fe78c70e4cbfb4ea",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4",
+        "-FinalizeMetadataNow"
+      ],
+      "clock": "2026-10-06T10:49:35.5070406+00:00",
+      "stdout_sha256": "655edbff30fe931aeaac6a6b833aa1d4ce88d137bb0431869e72b8ab14a85443",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "case": 6,
+      "native_exit": 1,
+      "seconds": 16.499754221999865,
+      "checker_sha256": "34c062acbb7dc55d982c37a4c6b3ee178cc8a05bab3f4cabf58e53f492d41178",
+      "arguments": [
+        "-InputRevision",
+        "3fe4eebd5882cd6290335fb2cb5ea7d72c5f819d",
+        "-PublishedBaselineRevision",
+        "5997197cc1bd0adbf823a2b8305c4a3b5d5a99e4"
+      ],
+      "clock": "2026-10-07T10:49:35.5070406+00:00",
+      "stdout_sha256": "7ae6a18427f25794c34aa510ba97024db53b226f7b2214106003b2d019a31a2b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "same_fault_pair_argv_cwd_clock": true,
+  "source_selftest_sha256": "1fe8a9b289505421cf207be24a880b0b1dfa8edf97405219babb7a3a20d4c3b9",
+  "result_sha256": "944c706f31596bfb1d0e9c5f6b985152faafbc67170b459eff4e5c1b0fd07f4a",
+  "status_sha256": "50253035e1ba9382eb4673700bb246064dceaefa93f447ac8741ad1c23d2c139",
+  "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one",
+  "limits": [
+    "Focused cases only; full aggregate remains mandatory.",
+    "Freshly reconstructed fixture B/H, not historical object replay.",
+    "One observed timing per child is not a speedup benchmark.",
+    "No commit, hosted or peer acceptance."
+  ]
+}

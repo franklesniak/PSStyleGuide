@@ -1,0 +1,191 @@
+{
+  "summary": {
+    "state": "failed_final_candidate_validation_no_retry",
+    "session_id": 15212,
+    "host_exit": 1,
+    "host_finished_at": "2026-10-06T10:17:14.915367+00:00",
+    "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+    "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "source_count": 80,
+    "dependency_count": 1914,
+    "host_private_guards_equal": true,
+    "preflight_exit": 0,
+    "classifier": {
+      "tests": 13,
+      "pass": 13,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "aggregate_native_exit": 1,
+    "aggregate_seconds": 684.233365,
+    "passed_hooks": 10,
+    "failed_hook": "agent-instruction-contract",
+    "exact_failure": "Author finalization caller failed (Now=True Later=False Accept=True exit=1): Agent-instruction contract failed: - STYLE_GUIDE.md Last Updated must be 2026-10-06 after a rendered-content change.",
+    "location": "Test-AgentInstructions.SelfTest.ps1:1646",
+    "aggregate_log_sha256": "eeefa5e5919d8f31a60d3ac9e94930b22bed582a53d75f5ebe89d2f182e5dd5e",
+    "note": "The inner command row retains state=running because its post-exit assertion threw before the success state update; native exit1, finished_at, outer failed state and completed guards are authoritative.",
+    "root_cause": "Not yet established. No product edit, retry, counter or native operation performed."
+  },
+  "commands": [
+    {
+      "name": "staged-preflight",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-06T10:05:00.743013+00:00",
+      "timeout_seconds": 300,
+      "state": "passed",
+      "pid": 85,
+      "exit": 0,
+      "finished_at": "2026-10-06T10:05:11.893231+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "name": "affected-node",
+      "command": [
+        "node",
+        "--test",
+        "--test-reporter=tap",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+      ],
+      "started_at": "2026-10-06T10:05:12.150171+00:00",
+      "timeout_seconds": 300,
+      "state": "passed",
+      "pid": 691,
+      "exit": 0,
+      "finished_at": "2026-10-06T10:05:32.409024+00:00",
+      "log_sha256": "2cd4bbedf57772eacc33fc58de7c3d014a11a7f666b636803bfdb84186fbca1d",
+      "node_summary": {
+        "tests": 13,
+        "pass": 13,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      }
+    },
+    {
+      "name": "aggregate",
+      "command": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-06T10:05:32.747153+00:00",
+      "timeout_seconds": 3000,
+      "state": "running",
+      "pid": 2362,
+      "exit": 1,
+      "finished_at": "2026-10-06T10:16:56.980518+00:00",
+      "log_sha256": "eeefa5e5919d8f31a60d3ac9e94930b22bed582a53d75f5ebe89d2f182e5dd5e"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/affected-node-after.json",
+      "sha256": "262990f40a8ac3bd73f4c036ed54f0277f20b2c0769bddea6f72af64e82c085b",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/affected-node.log",
+      "sha256": "2cd4bbedf57772eacc33fc58de7c3d014a11a7f666b636803bfdb84186fbca1d",
+      "bytes": 2894
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/aggregate-after.json",
+      "sha256": "262990f40a8ac3bd73f4c036ed54f0277f20b2c0769bddea6f72af64e82c085b",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/aggregate.log",
+      "sha256": "eeefa5e5919d8f31a60d3ac9e94930b22bed582a53d75f5ebe89d2f182e5dd5e",
+      "bytes": 2075
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/before.json",
+      "sha256": "262990f40a8ac3bd73f4c036ed54f0277f20b2c0769bddea6f72af64e82c085b",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/fixture-adaptation.json",
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "bytes": 328
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/host-source-after.json",
+      "sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "bytes": 402147
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/result.json",
+      "sha256": "879445ac94cf030b731cc42b473aba03eb39aef9bd8694a4b14e7aae22b12215",
+      "bytes": 2178
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/runtime.json",
+      "sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+      "bytes": 465
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/staged-preflight-after.json",
+      "sha256": "262990f40a8ac3bd73f4c036ed54f0277f20b2c0769bddea6f72af64e82c085b",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "bytes": 194
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/output/terminal-after.json",
+      "sha256": "262990f40a8ac3bd73f4c036ed54f0277f20b2c0769bddea6f72af64e82c085b",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/status.json",
+      "sha256": "b55c535717980409a69c2936734b35f7dcffa396bf03cae57eb5ea8411a2f104",
+      "bytes": 3242
+    },
+    {
+      "path": "runs/tf68-20261006-runtime-final-validation/container.log",
+      "sha256": "f40944cfe6c000cb6e841b632f3de4df6e1d318ab3246ba680b0ed11b4c64b75",
+      "bytes": 385
+    },
+    {
+      "path": "ROOT-RELEASE.json",
+      "sha256": "fd9a9e38ff9698c4fb697a2bc63422744f9c5678ac4ee5bbf34ce0b6d7a53288",
+      "bytes": 1074
+    },
+    {
+      "path": "ROOT-READINESS.json",
+      "sha256": "ef53ed2cf2a29627c7387521c1e132b4e51398a079046118fe83b4530178fe46",
+      "bytes": 23061
+    },
+    {
+      "path": "manifest.authorized.json",
+      "sha256": "04ff83f0c3b7b81a065c44b94be0d21d9d51457971568c038f1e9d83d26b4ab3",
+      "bytes": 2465
+    },
+    {
+      "path": "run-session.json",
+      "sha256": "87859dbb7ca5d48debc8701c002c8369f3ab98062fedaebd96005ce8970013d8",
+      "bytes": 972
+    },
+    {
+      "path": "bind-failure.py",
+      "sha256": "d8d0b23326763a544f3715f3190e52333bcc954bb2ab0b07b0fa10f36ec4ca3d",
+      "bytes": 2922
+    }
+  ]
+}

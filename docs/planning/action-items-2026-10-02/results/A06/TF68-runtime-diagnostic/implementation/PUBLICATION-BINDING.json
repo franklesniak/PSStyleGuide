@@ -1,0 +1,231 @@
+{
+  "commit": "2ec19ba49292a350ebf2e7577a52a66b7deddf74",
+  "captured_at": "2026-10-06T10:10:38.236235+00:00",
+  "purpose": "Bind repository raw evidence bytes separately from immutable original source hashes; Git normalizes eight copied JSON files on add. Original scratch artifacts are retained and source envelopes continue to name those roots.",
+  "artifacts": [
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/source-evidence.json",
+      "source_sha256": "fbb094dd028ac808287ceeec24a59a71655bdc07c85d799d68af437e343742fc",
+      "published_raw_sha256": "fbb094dd028ac808287ceeec24a59a71655bdc07c85d799d68af437e343742fc",
+      "publication_transform": "none",
+      "published_bytes": 16227
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/frozen-source-guard.json",
+      "source_sha256": "c7664f8a37f724135b682ebcc1c39c05d771fce1fb369f13f948179606687cf1",
+      "published_raw_sha256": "c7664f8a37f724135b682ebcc1c39c05d771fce1fb369f13f948179606687cf1",
+      "publication_transform": "none",
+      "published_bytes": 6534
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/source-catalog.json",
+      "source_sha256": "172ee124b1aa652009ccf3f9764b5696d9030b4ff7c1aee08dd04349922b3d98",
+      "published_raw_sha256": "172ee124b1aa652009ccf3f9764b5696d9030b4ff7c1aee08dd04349922b3d98",
+      "publication_transform": "none",
+      "published_bytes": 19093
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/windows-final.json",
+      "source_sha256": "d01a771a794f9f1cbac2f782f42d53466ecb052129be3cf5d11196a773517cbb",
+      "published_raw_sha256": "f464a7e602270e2ddb48f0ad93787aa5300b549ccd9ee58f1805348afff24999",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 521
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/windows-final-native.json",
+      "source_sha256": "f40e03bee535f1017fa912fd20f1ea9e05a4ecfec796cc25e3549e098715eef4",
+      "published_raw_sha256": "ff32eb34122645b47bae74f12462df53fb18620434a5fc744d5d132191631da4",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 825
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/quality-final.json",
+      "source_sha256": "c0637a437a2e197b902f972a1961f716087c32678865816eec12925f7160b37c",
+      "published_raw_sha256": "b2c7264f1c988cb3e3e8c2517efbcd745384c2b56dae6a128432003746c8175a",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 669
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutants.json",
+      "source_sha256": "f6c9cd62e5a0637dabffe98c0141435559fba2c8200d9eb7dc79ae3688729647",
+      "published_raw_sha256": "b6329320069b39707ec84514e16b159797d88e9598990716c5068df46a9a4190",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 1197
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/mutants-native.json",
+      "source_sha256": "0ca3e28e150584568cab78a04e7e210b08524b7a4468c944221169de1443eed5",
+      "published_raw_sha256": "0177da52f4d13b3dd8c1d4949a4dd99546882c4fa2f0ab5229edcb55459e8a00",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 827
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/independent-source-review.json",
+      "source_sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+      "published_raw_sha256": "da2d707f0512b6949eca965272fbd13891e078538030953528f1592424128457",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 4776
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-evidence.json",
+      "source_sha256": "3fab7a88d729a05634573092aedfeb8ddd74163a6480caf35a408aa05e4de247",
+      "published_raw_sha256": "6560ff06e1ee5e5b6e598145577f93855d3e4f477eed331d125fe2a9583bbbe6",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 10704
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-timing.json",
+      "source_sha256": "f1aa6f50852f4cae6b6182c5229f938441f70e00af3458baeaaa98a16e27c5d0",
+      "published_raw_sha256": "3dad0b4fd2fbbee6d6891aa9eac62aa21170195f0f4f94ac2e12db619ae2b760",
+      "publication_transform": "CRLF to LF by repository attributes",
+      "published_bytes": 67915
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-manifest.json",
+      "source_sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+      "published_raw_sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+      "publication_transform": "none",
+      "published_bytes": 3114
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-release.json",
+      "source_sha256": "3e12411468a05b6312e6a2c1286e6e2d078767e1710e7be8af11042e0503d658",
+      "published_raw_sha256": "3e12411468a05b6312e6a2c1286e6e2d078767e1710e7be8af11042e0503d658",
+      "publication_transform": "none",
+      "published_bytes": 3261
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-preparation-verification.json",
+      "source_sha256": "026bb0364fddcdc837627b2be20854eac028406d1c9e943330dd8743f149e1c5",
+      "published_raw_sha256": "026bb0364fddcdc837627b2be20854eac028406d1c9e943330dd8743f149e1c5",
+      "publication_transform": "none",
+      "published_bytes": 706
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison-root-verification.json",
+      "source_sha256": "3c9c623bc212538ffdfb39507ac5584b7c844f8cc96b92d3a58d20b7959f44d7",
+      "published_raw_sha256": "3c9c623bc212538ffdfb39507ac5584b7c844f8cc96b92d3a58d20b7959f44d7",
+      "publication_transform": "none",
+      "published_bytes": 2968
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/result.json",
+      "source_sha256": "54d08d92c86bb5ac6d986a1b830421c629fca3fc1f8e0cfe4882ca91eb326ba3",
+      "published_raw_sha256": "54d08d92c86bb5ac6d986a1b830421c629fca3fc1f8e0cfe4882ca91eb326ba3",
+      "publication_transform": "none",
+      "published_bytes": 2295
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/focused-result.json",
+      "source_sha256": "5407ef3d1564e282d67c694bd9efa2dbd01446bfa90573b2bc3bc6d9e20b87a6",
+      "published_raw_sha256": "5407ef3d1564e282d67c694bd9efa2dbd01446bfa90573b2bc3bc6d9e20b87a6",
+      "publication_transform": "none",
+      "published_bytes": 521
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/pair-result.json",
+      "source_sha256": "4dc9795dbf2bf17e4e1d545e569db586a42e19021d577d5e44361ef89e317f6e",
+      "published_raw_sha256": "4dc9795dbf2bf17e4e1d545e569db586a42e19021d577d5e44361ef89e317f6e",
+      "publication_transform": "none",
+      "published_bytes": 407
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/comparison-counts.json",
+      "source_sha256": "a69ce3d05d846afc443e2b395856c45b8bd10f2e44b36b109cfe6555602da4cf",
+      "published_raw_sha256": "a69ce3d05d846afc443e2b395856c45b8bd10f2e44b36b109cfe6555602da4cf",
+      "publication_transform": "none",
+      "published_bytes": 286
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/case.json",
+      "source_sha256": "8277afe947ccf7c669e73f7092b026e8d714a3e0f16a80ffa2186cbbe0f74329",
+      "published_raw_sha256": "8277afe947ccf7c669e73f7092b026e8d714a3e0f16a80ffa2186cbbe0f74329",
+      "publication_transform": "none",
+      "published_bytes": 490
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/control-child.json",
+      "source_sha256": "60a7382f99e591ae42b69c7cc279f1c77bd2ff4c5f3af4f5ce758d395777b33e",
+      "published_raw_sha256": "60a7382f99e591ae42b69c7cc279f1c77bd2ff4c5f3af4f5ce758d395777b33e",
+      "publication_transform": "none",
+      "published_bytes": 26725
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/profile-child.json",
+      "source_sha256": "e679c5558d6b85320d4d7943a47e83b83394cc879d89f4c5dee5631ce9dc4aad",
+      "published_raw_sha256": "e679c5558d6b85320d4d7943a47e83b83394cc879d89f4c5dee5631ce9dc4aad",
+      "publication_transform": "none",
+      "published_bytes": 30740
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/control-stdout.txt",
+      "source_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "published_raw_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "publication_transform": "none",
+      "published_bytes": 225
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/control-stderr.txt",
+      "source_sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+      "published_raw_sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+      "publication_transform": "none",
+      "published_bytes": 18290
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/profile-stdout.txt",
+      "source_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "published_raw_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "publication_transform": "none",
+      "published_bytes": 225
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/profile-stderr.txt",
+      "source_sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+      "published_raw_sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+      "publication_transform": "none",
+      "published_bytes": 22256
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/before.json",
+      "source_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "published_raw_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "publication_transform": "none",
+      "published_bytes": 414074
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/host-source-after.json",
+      "source_sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "published_raw_sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "publication_transform": "none",
+      "published_bytes": 402147
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/focused-reuse-after.json",
+      "source_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "published_raw_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "publication_transform": "none",
+      "published_bytes": 414074
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/attribution-pair-after.json",
+      "source_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "published_raw_sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "publication_transform": "none",
+      "published_bytes": 414074
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/status.json",
+      "source_sha256": "4bff3dfce4efa224c5bbdd929f0045c56f9568ea19ae135c48c10d1ec7995b4d",
+      "published_raw_sha256": "4bff3dfce4efa224c5bbdd929f0045c56f9568ea19ae135c48c10d1ec7995b4d",
+      "publication_transform": "none",
+      "published_bytes": 1399
+    },
+    {
+      "path": "docs/planning/action-items-2026-10-02/results/A06/TF68-runtime-diagnostic/implementation/comparison/host-source-before.json",
+      "source_sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "published_raw_sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "publication_transform": "none",
+      "published_bytes": 402147
+    }
+  ]
+}

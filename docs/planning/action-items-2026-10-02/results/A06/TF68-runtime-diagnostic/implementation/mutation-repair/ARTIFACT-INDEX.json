@@ -1,0 +1,110 @@
+{
+  "source_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair",
+  "files": [
+    {
+      "path": "IMPLEMENTATION.md",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\IMPLEMENTATION.md",
+      "sha256": "d5f98ca13ffb2ebdafd60a2dc5f39b284e783cfeea5b9657c0b78a1597f3bdeb"
+    },
+    {
+      "path": "evidence.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\evidence.json",
+      "sha256": "f87671b008063da4cb548444c16ababb7c8d04449faa1bd2ecee37e006e6736a"
+    },
+    {
+      "path": "constructor-result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\constructor-result.json",
+      "sha256": "423df2caa92d13bf8f5b4861d4d9d3749372a24546c030c1792d7f74c25b9b54"
+    },
+    {
+      "path": "constructor.ps1",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\constructor.ps1",
+      "sha256": "e994a9a92419f440cc3230140e53de7ad11780ee4a7400b784859a82cce64a56"
+    },
+    {
+      "path": "quality-final.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\quality-final.json",
+      "sha256": "db73f1729fc734485dc93a390d00dd6aa7eb3556b695701d8ed64614b0fc9541"
+    },
+    {
+      "path": "metadata-disposition.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\metadata-disposition.json",
+      "sha256": "f5d32148da23308158fdb403b197a9aad8c9f7694bce090756d8db42e31135dd"
+    },
+    {
+      "path": "ROOT-READINESS.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\ROOT-READINESS.json",
+      "sha256": "1b9d45d4683bc659b9c9277844c2b4626e354c7c06c6012d386788cc1ac29552"
+    },
+    {
+      "path": "ROOT-RESULT-VERIFICATION.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "a46fd209fbb40d10a9a0fe82d73fb0046de6a1579d15480fc3ecb482cd4781b7"
+    },
+    {
+      "path": "manifest.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\manifest.authorized.json",
+      "sha256": "762414d0ea909ea6e741f853e7fec5a8268ba5cba97a1a8def46ec8e920d2b4f"
+    },
+    {
+      "path": "status.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\status.json",
+      "sha256": "50253035e1ba9382eb4673700bb246064dceaefa93f447ac8741ad1c23d2c139"
+    },
+    {
+      "path": "result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\result.json",
+      "sha256": "944c706f31596bfb1d0e9c5f6b985152faafbc67170b459eff4e5c1b0fd07f4a"
+    },
+    {
+      "path": "six-result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\six-result.json",
+      "sha256": "0c6e6b607773907af617bce1de797715e049f8a5f7f0d15ae5ba9b3552118329"
+    },
+    {
+      "path": "six-actual-cases.log",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\six-actual-cases.log",
+      "sha256": "69551396d5e13eb6861086b77aec4166e1af7e5c34f52c5f9f4f1071a262b9e3"
+    },
+    {
+      "path": "case-1-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-1-stdout.txt",
+      "sha256": "9c94e2dcb6779646b727c1e3d8720f712ebc309703aa2d5dd0619eb2828bf395"
+    },
+    {
+      "path": "case-2-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-2-stdout.txt",
+      "sha256": "a89fa09d1e32a91de286c5d5bf33b0e8cfb0ec31229ba0498b117f85536f6f6d"
+    },
+    {
+      "path": "case-3-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-3-stdout.txt",
+      "sha256": "51e94b53a508e526e30b54998e69d385ab594141b078cff2446b020291da0a52"
+    },
+    {
+      "path": "case-4-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-4-stdout.txt",
+      "sha256": "16be4a675d86dfd8f5da2042d107dbe06d77072964d7a7cc583cb63f019e061b"
+    },
+    {
+      "path": "case-5-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-5-stdout.txt",
+      "sha256": "655edbff30fe931aeaac6a6b833aa1d4ce88d137bb0431869e72b8ab14a85443"
+    },
+    {
+      "path": "case-6-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutation-repair\\runs\\tf68-20261006-mutation-six-one\\output\\case-6-stdout.txt",
+      "sha256": "7ae6a18427f25794c34aa510ba97024db53b226f7b2214106003b2d019a31a2b"
+    },
+    {
+      "path": "independent-source-review.md",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-mutation-final-source-review.md",
+      "sha256": "ae5b8eeec14892982e891dca91d401ff02bb24282d810f345328b36ed673026f"
+    },
+    {
+      "path": "independent-source-review.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-mutation-final-source-review.json",
+      "sha256": "b844e0627b0300dd0fccfb051c8ba9bf0f2ac815c80e357646450e472bf6e293"
+    }
+  ]
+}

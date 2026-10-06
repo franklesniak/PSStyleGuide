@@ -1,0 +1,2 @@
+[codex/a06-generator-convergence ed9eea2] Reuse bounded Markdown structure while keeping parser checks fresh
+ 2 files changed, 1581 insertions(+), 713 deletions(-)
