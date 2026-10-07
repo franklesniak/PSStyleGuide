@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.20.20261006.0
+# Version: 1.21.20261007.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -3547,7 +3547,7 @@ function Get-MarkdownParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.2.20261006.0
+    # Version: 1.3.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3829,9 +3829,11 @@ function Get-MarkdownParseContext {
                 $objRawProseBlock.range.Count -ne 2 -or
                 $null -eq $objRawProseBlock.text -or
                 $objRawProseBlock.code -isnot [array] -or
-                @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                ($objRawProseBlock.code.Count -ne 0 -and
+                    @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or
                 $objRawProseBlock.links -isnot [array] -or
-                @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                ($objRawProseBlock.links.Count -ne 0 -and
+                    @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {
                 throw 'The locked Markdown parser returned a malformed prose block.'
             }
 
@@ -3883,9 +3885,11 @@ function Get-MarkdownParseContext {
                     @('th', 'td') -cnotcontains $objRawCell.tag -or
                     $objRawCell.text -isnot [string] -or
                     $objRawCell.code -isnot [array] -or
-                    @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                    ($objRawCell.code.Count -ne 0 -and
+                        @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or
                     $objRawCell.links -isnot [array] -or
-                    @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                    ($objRawCell.links.Count -ne 0 -and
+                        @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {
                     throw 'The locked Markdown parser returned a malformed table cell.'
                 }
                 $listCells.Add([pscustomobject]@{
@@ -3951,9 +3955,11 @@ function Get-MarkdownParseContext {
                 $objRawListItem.range.Count -ne 2 -or
                 ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or
                 $objRawListItem.code -isnot [array] -or
-                @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or
+                ($objRawListItem.code.Count -ne 0 -and
+                    @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or
                 $objRawListItem.links -isnot [array] -or
-                @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {
+                ($objRawListItem.links.Count -ne 0 -and
+                    @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {
                 throw 'The locked Markdown parser returned a malformed top-level list item.'
             }
 

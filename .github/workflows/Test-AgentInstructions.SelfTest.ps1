@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.11.20261006.0
+# Version: 1.12.20261007.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -200,6 +200,254 @@ function Assert-ParserJsonConversionSelfTest {
                 throw 'JSON conversion changed a strict decoder failure.'
             }
         }
+    }
+}
+
+
+function Assert-MarkdownStringArrayContextSelfTest {
+    # .SYNOPSIS
+    # Checks admission and typed output for all six Markdown string arrays.
+    #
+    # .DESCRIPTION
+    # Delegates to the real parser before changing one raw field per case.
+    # Requires explicit valid and invalid outcomes, no partial output on refusal,
+    # and exact string-array types and values. Nonstring elements, including
+    # null, are refused in prose blocks, table cells and top-level list items.
+    #
+    # .EXAMPLE
+    # Assert-MarkdownStringArrayContextSelfTest
+    #
+    # # Throws if a string-array shortcut changes context admission or output.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. A changed result or an unexpected parser fixture throws.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261007.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $scriptBlockActualParser = ${function:Invoke-MarkdownParserProcess}
+    $hashtableFixture = @{ Family = ''; Field = ''; Json = ''; Remove = $false; Mutate = $false; Processes = 0 }
+    function Invoke-MarkdownParserProcess {
+        # .SYNOPSIS
+        # Changes one string-array field after a fresh real parser call.
+        #
+        # .DESCRIPTION
+        # Preserves the process result and native exit handling while replacing
+        # only the selected field in fresh JSON. This wrapper is function-local.
+        #
+        # .PARAMETER StartInfo
+        # The validated process start information passed to the real parser.
+        #
+        # .PARAMETER Content
+        # The original Markdown fixture passed unchanged to the real parser.
+        #
+        # .EXAMPLE
+        # Invoke-MarkdownParserProcess -StartInfo $objStartInfo -Content $strMarkdown
+        #
+        # # Returns the fresh process result with one declared field mutation.
+        #
+        # .INPUTS
+        # None. No pipeline input.
+        #
+        # .OUTPUTS
+        # [pscustomobject] The actual process result with mutated JSON output.
+        #
+        # .NOTES
+        # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+        # Parameters, return shape, and positional contract can change without notice.
+        # Positional parameters are disabled; internal callers use named arguments.
+        # Version: 1.0.20261007.0
+        [CmdletBinding(PositionalBinding = $false)]
+        [OutputType([pscustomobject])]
+        param(
+            [Parameter(Mandatory)][Diagnostics.ProcessStartInfo] $StartInfo,
+            [Parameter(Mandatory)][AllowEmptyString()][string] $Content
+        )
+
+        $objProcessResult = & $scriptBlockActualParser -StartInfo $StartInfo -Content $Content
+        $hashtableFixture.Processes++
+        if (-not $hashtableFixture.Mutate) { return $objProcessResult }
+        $hashtableRawContext = $objProcessResult.Output | ConvertFrom-Json -AsHashtable
+        if ($hashtableRawContext[$hashtableFixture.Family] -isnot [array] -or
+            $hashtableRawContext[$hashtableFixture.Family].Count -eq 0) {
+            throw 'The real parser fixture lacks the selected record family.'
+        }
+        if ($hashtableFixture.Family -ceq 'tableRows') {
+            if ($hashtableRawContext.tableRows[0].cells -isnot [array] -or
+                $hashtableRawContext.tableRows[0].cells.Count -eq 0) {
+                throw 'The real parser fixture lacks a table cell.'
+            }
+            $hashtableRecord = $hashtableRawContext.tableRows[0].cells[0]
+        } else {
+            $hashtableRecord = $hashtableRawContext[$hashtableFixture.Family][0]
+        }
+        if (-not $hashtableRecord.Contains($hashtableFixture.Field)) {
+            throw 'The real parser fixture lacks the selected string-array field.'
+        }
+        if ($hashtableFixture.Remove) {
+            [void]($hashtableRecord.Remove($hashtableFixture.Field))
+        } else {
+            $objFixtureValue = ConvertFrom-ParserJsonContext `
+                -Content ('{"value":' + $hashtableFixture.Json + '}') -MaximumBytes 4096
+            $hashtableRecord[$hashtableFixture.Field] = $objFixtureValue.value
+        }
+        $objProcessResult.Output = $hashtableRawContext | ConvertTo-Json -Depth 20 -Compress
+        return $objProcessResult
+    }
+    $strMarkdown = @(
+        '# Title', '', 'Text `code` [link](https://example.invalid).', '',
+        '- Item `code` [link](https://example.invalid)', '',
+        '| Field | Value |', '| --- | --- |', '| Cell | `code` [link](https://example.invalid) |'
+    ) -join "`n"
+    $intLineCount = @([regex]::Split($strMarkdown, '\r\n|\r|\n')).Count
+    $arrCases = @(
+        @{ Name = 'empty'; Json = '[]'; Outcome = 'accept' },
+        @{ Name = 'singleton'; Json = '["one"]'; Outcome = 'accept' },
+        @{ Name = 'many strings'; Json = '["","one","\u00e9\ud83d\ude03","2026-10-06T23:00:00Z"]'; Outcome = 'accept' },
+        @{ Name = 'missing'; Json = ''; Outcome = 'reject' },
+        @{ Name = 'null field'; Json = 'null'; Outcome = 'reject' },
+        @{ Name = 'scalar string'; Json = '"text"'; Outcome = 'reject' },
+        @{ Name = 'scalar number'; Json = '1'; Outcome = 'reject' },
+        @{ Name = 'scalar Boolean'; Json = 'true'; Outcome = 'reject' },
+        @{ Name = 'object field'; Json = '{}'; Outcome = 'reject' },
+        @{ Name = 'nested array'; Json = '[["text"]]'; Outcome = 'reject' },
+        @{ Name = 'object element'; Json = '[{}]'; Outcome = 'reject' },
+        @{ Name = 'bad first'; Json = '[1,"text"]'; Outcome = 'reject' },
+        @{ Name = 'bad last'; Json = '["text",false]'; Outcome = 'reject' },
+        @{ Name = 'null element'; Json = '[null]'; Outcome = 'reject' },
+        @{ Name = 'null first string'; Json = '[null,"text"]'; Outcome = 'reject' },
+        @{ Name = 'null last string'; Json = '["text",null]'; Outcome = 'reject' },
+        @{ Name = 'null first number'; Json = '[null,1]'; Outcome = 'reject' },
+        @{ Name = 'null last number'; Json = '[1,null]'; Outcome = 'reject' }
+    )
+    try {
+        $strPlainMarkdown = $strMarkdown.Replace('`code`', 'code').Replace(
+            '[link](https://example.invalid)', 'link')
+        $objPlainContext = Get-MarkdownParseContext -Content $strPlainMarkdown -LineCount $intLineCount
+        if ($null -eq $objPlainContext -or $hashtableFixture.Processes -ne 1 -or
+            $objPlainContext.ProseBlocks -isnot [pscustomobject[]] -or $objPlainContext.ProseBlocks.Count -eq 0 -or
+            $objPlainContext.TopLevelListItems -isnot [pscustomobject[]] -or $objPlainContext.TopLevelListItems.Count -eq 0 -or
+            $objPlainContext.TableRows -isnot [pscustomobject[]] -or $objPlainContext.TableRows.Count -eq 0) {
+            throw 'The plain Markdown fixture lost its fresh parser call or record families.'
+        }
+        foreach ($objRow in $objPlainContext.TableRows) {
+            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {
+                throw 'The plain Markdown fixture lost its typed table cells.'
+            }
+        }
+        $arrPlainRecords = @($objPlainContext.ProseBlocks) + @($objPlainContext.TopLevelListItems) +
+            @($objPlainContext.TableRows | ForEach-Object { $_.Cells })
+        foreach ($objRecord in $arrPlainRecords) {
+            if ($objRecord.Code -isnot [string[]] -or $objRecord.Code.Count -ne 0 -or
+                $objRecord.Links -isnot [string[]] -or $objRecord.Links.Count -ne 0) {
+                throw 'Plain prose, table or list Markdown lost a naturally empty string array.'
+            }
+        }
+        $hashtableFixture.Mutate = $true
+        foreach ($strFamily in @('proseBlocks', 'tableRows', 'topLevelListItems')) {
+            $hashtableFixture.Family = $strFamily
+            foreach ($strField in @('code', 'links')) {
+                $hashtableFixture.Field = $strField
+                foreach ($hashtableCase in $arrCases) {
+                    $hashtableFixture.Json = $hashtableCase.Json
+                    $hashtableFixture.Remove = $hashtableCase.Name -ceq 'missing'
+                    $intPreviousProcesses = $hashtableFixture.Processes
+                    $listOutput = [Collections.Generic.List[pscustomobject]]::new()
+                    $objFailure = $null
+                    try {
+                        Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount |
+                            ForEach-Object { $listOutput.Add($_) }
+                    } catch {
+                        # Expected refusals are compared below; unrelated failures cannot pass.
+                        $objFailure = $_
+                    }
+                    if (($null -ne $objFailure -and $listOutput.Count -ne 0) -or
+                        ($hashtableCase.Outcome -ceq 'accept' -and $null -ne $objFailure) -or
+                        ($hashtableCase.Outcome -ceq 'reject' -and $null -eq $objFailure)) {
+                        throw ('String-array outcome changed: {0}/{1}/{2}.' -f
+                            $strFamily, $strField, $hashtableCase.Name)
+                    }
+                    if ($null -eq $objFailure) {
+                        if ($listOutput.Count -ne 1) { throw 'String-array context lost its single output.' }
+                        $objContext = $listOutput[0]
+                        foreach ($strArrayName in @('CodeBlockRanges', 'ProseBlocks', 'TableRows',
+                                'TopLevelBlocks', 'TopLevelListItems', 'Headings', 'LevelTwoHeadings')) {
+                            if ($objContext.$strArrayName -isnot [pscustomobject[]]) {
+                                throw 'String-array context changed an exact record-array type.'
+                            }
+                        }
+                        if ($objContext.ProseBlocks.Count -eq 0 -or $objContext.TopLevelListItems.Count -eq 0 -or
+                            $objContext.TableRows.Count -eq 0) {
+                            throw 'String-array context lost the fixture record families.'
+                        }
+                        foreach ($objRecord in @($objContext.ProseBlocks) + @($objContext.TopLevelListItems)) {
+                            if ($objRecord.Code -isnot [string[]] -or $objRecord.Links -isnot [string[]]) {
+                                throw 'String-array context changed a prose or list string-array type.'
+                            }
+                        }
+                        foreach ($objRow in $objContext.TableRows) {
+                            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {
+                                throw 'String-array context changed cell-array type or lost cells.'
+                            }
+                            foreach ($objCell in $objRow.Cells) {
+                                if ($objCell.Code -isnot [string[]] -or $objCell.Links -isnot [string[]]) {
+                                    throw 'String-array context changed a cell string-array type.'
+                                }
+                            }
+                        }
+                    }
+                    if ($null -ne $objFailure) {
+                        $strExpectedFailure = if ($hashtableFixture.Remove) {
+                            "The property '${strField}' cannot be found on this object. Verify that the property exists."
+                        } else {
+                            switch ($strFamily) {
+                                'proseBlocks' { 'The locked Markdown parser returned a malformed prose block.' }
+                                'tableRows' { 'The locked Markdown parser returned a malformed table cell.' }
+                                'topLevelListItems' { 'The locked Markdown parser returned a malformed top-level list item.' }
+                            }
+                        }
+                        if ($objFailure.Exception.Message -cne $strExpectedFailure) {
+                            throw ('String-array refusal changed: {0}/{1}/{2}.' -f
+                                $strFamily, $strField, $hashtableCase.Name)
+                        }
+                    } else {
+                        $objTarget = switch ($strFamily) {
+                            'proseBlocks' { $objContext.ProseBlocks[0] }
+                            'tableRows' { $objContext.TableRows[0].Cells[0] }
+                            'topLevelListItems' { $objContext.TopLevelListItems[0] }
+                        }
+                        $strOutputField = if ($strField -ceq 'code') { 'Code' } else { 'Links' }
+                        $objExpectedValue = ConvertFrom-ParserJsonContext `
+                            -Content ('{"value":' + $hashtableCase.Json + '}') -MaximumBytes 4096
+                        $arrExpectedStrings = $objExpectedValue.value
+                        $arrActualStrings = $objTarget.$strOutputField
+                        if ($arrActualStrings -isnot [string[]] -or
+                            $arrActualStrings.Count -ne $arrExpectedStrings.Count) {
+                            throw 'String-array context changed target type or cardinality.'
+                        }
+                        for ($intIndex = 0; $intIndex -lt $arrExpectedStrings.Count; $intIndex++) {
+                            if ($arrActualStrings[$intIndex] -cne $arrExpectedStrings[$intIndex]) {
+                                throw 'String-array context changed an exact target value.'
+                            }
+                        }
+                    }
+                    if ($hashtableFixture.Processes -ne $intPreviousProcesses + 1) {
+                        throw 'String-array context skipped its fresh parser call.'
+                    }
+                }
+            }
+        }
+    } finally {
+        Set-Item -LiteralPath Function:Invoke-MarkdownParserProcess -Value $scriptBlockActualParser
     }
 }
 
@@ -3979,6 +4227,7 @@ if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont
 
 
 Assert-ParserJsonConversionSelfTest
+Assert-MarkdownStringArrayContextSelfTest
 Assert-MarkdownParseReuseSelfTest
 Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
 
