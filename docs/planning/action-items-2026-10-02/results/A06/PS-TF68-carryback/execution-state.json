@@ -366,7 +366,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "6d6231260e6226d8a5b53685759d3ecfb7bc8d70",
+  "planning_checkpoint": "80816b49f9935498f728a523cbef5b2cb8a0f36a",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -391,7 +391,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-07T03:13:37.960078+00:00",
+  "updated_at": "2026-10-07T03:23:16.269606+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -1852,7 +1852,15 @@
     "status": "terminal_failure_one_of_three_used_wait_hourly_interval",
     "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
     "next_request_kind": "Supported Balanced UI service recovery; no duplicate pending request and no request solely to replace Lite",
-    "retry_released_now": false
+    "retry_released_now": false,
+    "support_inquiry_current": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-support\\UNSENT-PROVIDER-INQUIRY.md",
+      "sha256": "02e23abe5ff23e818e58a22088da423f3346b04b743d5087ddd936f9b9bcc048",
+      "status": "prepared_unsent",
+      "selection": "Existing P95.0 inquiry preparation; current factual update only",
+      "sending_authority": "Not granted; no inquiry sent",
+      "draft_bound_to_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+    }
   },
   "current_input_CI": {
     "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",

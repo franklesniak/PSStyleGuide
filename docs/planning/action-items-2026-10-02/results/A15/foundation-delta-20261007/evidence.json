@@ -1,0 +1,3371 @@
+{
+  "createdUtc": "2026-10-07T03:16:49.092425+00:00",
+  "routing": {
+    "requested": "gpt-6-astra/high",
+    "effectiveMetadata": "unknown; recorded centrally"
+  },
+  "authority": "Parent-supplied accepted native main identities; no new native main fetch. Proposed PS235 is unaccepted.",
+  "before": {
+    "PS": {
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "headTree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "status": "",
+      "refs": "refs/heads/agent/copilot-review-legacy-toolchain 63c4bf258344fd2f885330fdabe6b5c4023c9ade\nrefs/heads/agent/fix-pr-target-validation-scope fde79c937616b939e9463121b3cbeedf55a93547\nrefs/heads/agent/issue-145-deterministic-artifacts f62896d02f580bf497def69cac46b475318611bd\nrefs/heads/agent/issue-146-candidate-validator 8444730a8ad560b33700877a3d447ad632134e0d\nrefs/heads/agent/issue-162-isolation-maintenance-v1 3b1fe524f729b253049c396c7cf59ff67ae9ddac\nrefs/heads/agent/issue-162-workflow-isolation-policy 2fa3e16695baad74e94135a8abceeb26533ede75\nrefs/heads/agent/issue-169-bootstrap-publication 071a4eaf80145db8afbab13755dfa3ffcd9f4cd6\nrefs/heads/agent/issue-169-final-v2-draft f0e57574d1bffeb7c5f70329b4a6a0b47d075ed3\nrefs/heads/agent/issue-169-generator-identity ff80127c0022066fd5e57f70746fbcf4c9cdd02e\nrefs/heads/agent/issue-169-generator-identity-v1 825877ba4a8301d83e65342eb449b116c2733550\nrefs/heads/agent/issue-169-identity-acquisition-bootstrap 81deb2b02a01ec24d66ee45d83706416bff28fb6\nrefs/heads/agent/issue-170-admission-bootstrap-v1 bffcb18576ee34501f50f602d07d610eab6baaa8\nrefs/heads/agent/issue-170-invariant-rationale-anchors-v1 a4d046bc1ea4023175444e2d6f8996307319a1b8\nrefs/heads/agent/issue-171-bounded-generator-diagnostics-v1 0bf1d3779700aa68012161824c891d47e7d6bea2\nrefs/heads/agent/issue-171-bounded-generator-diagnostics-v2 64fd5ef13b65275a56450ccfb7c78c9a1716f260\nrefs/heads/agent/issue-171-reusable-maintenance-v1 e7d44e60c0c3c6f0ec3ff9a502782a17217f8f5f\nrefs/heads/agent/issue-176-metadata-policy-final-ms-repair eca453edf39c9b3e9c705ae68929c9fff214503c\nrefs/heads/agent/issue-176-metadata-policy-replacement-f1 0cbae339b386cd0a8833ed5a83b71a3f38f479ae\nrefs/heads/agent/issue-176-metadata-policy-stacked 65b856a2d99ebfa5f4c4969bcaf663911fc5b00e\nrefs/heads/agent/issue-176-metadata-policy-superseding-f11-f12 5ede0ceb0a2dd317380602be5d468f1b58ee8b7b\nrefs/heads/agent/issue-176-metadata-policy-superseding-f13 fb1341dd7ce12ad382937678c7647bdea038a535\nrefs/heads/agent/issue-176-metadata-policy-superseding-f14 622e9e9d291967089085b85f26999f02eab3fdcc\nrefs/heads/agent/issue-176-metadata-policy-superseding-f15 f7a921495b9473c66e09934f82342850344fb83a\nrefs/heads/agent/issue-176-metadata-policy-superseding-f15-v2 c5b7b4ab1a6c187a00bb0269caaaf82e945d0a2d\nrefs/heads/agent/issue-176-metadata-policy-superseding-f8 8f5f95b3ba7b9dc0ef2bd8ce42b80aa42d84f2a7\nrefs/heads/agent/issue-176-metadata-policy-superseding-f9-f10 04eae6655f2d1a251be75d7c33a2bb791e4fd813\nrefs/heads/agent/issue-176-metadata-policy-superseding-f9-f10-v2 d6936cb99606df5de701579672d4b91da606e283\nrefs/heads/agent/issue-176-trusted-bootstrap bff557a013e958cfaf1e408a721db8659ea514ea\nrefs/heads/agent/issue-176-trusted-bootstrap-atomic b8d7ef12757f54e29357736894b99389fd86f616\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable 07a4aedbea64faa9c2330d50ef763b9bf98bbd14\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f11-f12 951a0e187452321eda723815489caf740b17bfdd\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f12-f13 e241e768ecfdb732c5fc7ac69ae9755ee212c788\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f14 b4181dbc73960ea95e1a5580f68bc8b41f895c4e\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f15 a3dc8d0c8306621d77f704e5e9d04898bcaaae3a\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f15-v2 1ae3fa695c4965a25aa50439cb0b3050f81048dd\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f5 eb6b9b9dc98198994893292b89c511ba6b36402b\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f6 f865ebc26d2967d268746d7c1838cee0ad3f2989\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f8 02f286dc18310f63da6981814fa473c434c55018\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f9-f10 1178be6cd9f185ad3bb9647c54529b0f62f0a799\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f9-f10-v2 3e17eb388e18d0ef6293c15a50bfd113f3e07fe9\nrefs/heads/agent/issue-177-advisory-extension-60-days 57bf92d27b46c96f1056c8773b96f78ddf457d26\nrefs/heads/agent/issue-181-postmerge-handoff 3bd3e8d0f09e31784ee6110316dd3cd4d99a509a\nrefs/heads/agent/issue-181-review-loop-correction 4ed199979ae49a1ef0b3f86dcbebb8fae814e75f\nrefs/heads/agent/issue-187-bounded-self-test-r4-v1 7c58bfed4190148713a264b296f74cef42fce2d3\nrefs/heads/agent/issue-187-consumer-v126-authorization-v1 4c754b417af96968a197df191a142d12d77c6553\nrefs/heads/agent/issue-187-final-offline-workflow-auth-f64-v1 77cc06295734b420061f0b664255f16367273179\nrefs/heads/agent/issue-187-helper-presentation-domain-r3-v1 c4bdb5e5db90b5b8d5a6b68c5fa2719e7945a929\nrefs/heads/agent/issue-187-permanent-trust-root-updates-r2-v1 4e92e37ae60363426c222f411fcd944a5fe83a1d\nrefs/heads/agent/issue-187-pr-body-identity-bootstrap-v2 549251f9c69891b682d3063cf8a3b9b174a5a8e0\nrefs/heads/agent/issue-187-pr-body-identity-bootstrap-v3 df2995d4ee8eb50751a8119ae257f51473afa8a7\nrefs/heads/agent/issue-187-pr-body-identity-fetch-bounds-f63 1adfca37a5811b7b98b8ba163d8e55c4eb8e156b\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v1 b5ddb733d0b3b2b6c84746569078bab170c4c9a3\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v2 8ecc0ffa8e4ebe01b0353476a5d2c8b91a43b7ab\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v2-dev a7506e702a33aca283da9534acdaf2adec5548b8\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v3 1ccbd49d22e3f96a53d12bc3119e9382f55ddb6c\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v3-dev ef1f567c006b99c8a257752af155b2db1ec59499\nrefs/heads/agent/issue-187-pr188-final-authorization-v1 3210705b08fcd2968176eba24fdca7e1571c1e8e\nrefs/heads/agent/issue-187-pr188-final-authorization-v2 bd9f4bc1781cf3e0cecaa26479ef6ad6fd7ef66c\nrefs/heads/agent/issue-187-trust-root-bridge-bootstrap-v1 e38355eba7b8d870b35645b6fe87052ed7896705\nrefs/heads/agent/issue-187-trust-root-bridge-bootstrap-v2 cfe0a38ee12dd9e794141f5a937c73dd7d6a69bb\nrefs/heads/agent/issue-187-trust-root-bridge-v1 d6c395f89bfc1b75954883a5c02287875f45f928\nrefs/heads/agent/issue-187-trust-root-bridge-v1-dev 38a412fa98b0ea21d34b62fe910e8f50591ff240\nrefs/heads/agent/issue-187-trust-root-bridge-v2 28d7812b320011a02fc91c5798a0b043dcc3d1b3\nrefs/heads/agent/issue-187-trusted-consumer-bridge-f63-v1 c048508565127a6d4b5a1a7da3eef3694e533506\nrefs/heads/agent/issue-187-trusted-consumer-v126-f63-v1 7c031b37b3eb46364e9cf1f6ac20fb0d5ad5bcce\nrefs/heads/agent/issue-187-trusted-consumer-v127-auth-f63-v1 c52c9777841292579ceb1e6e8221c6a4f2c26358\nrefs/heads/agent/issue-187-trusted-consumer-v127-f63-v1 c97e6e1ee082766d35e35fa005b411a378d97658\nrefs/heads/agent/issue-187-trusted-consumer-v128-f64-v1 d8769910e3bc6df2aa367dbd548f1511bb83bc9f\nrefs/heads/agent/issue-187-workflow-policy-final-authorization-f63-v1 dbcc559ace41270ebc939ce4b5990849b77f0399\nrefs/heads/agent/port-pr182-to-main 541ca4e6f534b59d48f459f58dd7eaa968f35c22\nrefs/heads/agent/port-research-misc-pr-78-to-psstyleguide eaf81552ba69c2f610b4963a55320114a306c7a6\nrefs/heads/agent/pr183-clean-final 73dd348f63e88db77b78000cfb8c94774094e3d5\nrefs/heads/agent/pr183-trust-bootstrap 6152e68ba3aec386051801d7f2c1aebbc17708bd\nrefs/heads/agent/ps-metadata-policy-final-state-validation 34fb7eb492c46cdf9949a52c357a5dd04f873dab\nrefs/heads/agent/sync-main-agent-instructions-to-planning 3bd3e8d0f09e31784ee6110316dd3cd4d99a509a\nrefs/heads/backup/pr-165-pre-rebase-7db9a29 7db9a29d5ed598e06565b53791f35c4a0d299b3c\nrefs/heads/claude/psstyleguide-claude-md-codex-review 81926eff7a0692574bbd97c571ce910385344eb0\nrefs/heads/claude/psstyleguide-infra-style-conformance 3c204a5bc45542d2ecc38b30caff80ec3b3e6d7f\nrefs/heads/codex/a06-generator-convergence dec18a6303bd6ad5fe9a43b383a62daa70527aca\nrefs/heads/codex/a07-braces-remediation 0abe8bdd6d1c0359544171edbfe2305baea9b48e\nrefs/heads/codex/a07-tooling 48f4d8a36c8faceee12afac78aaecea0d176125d\nrefs/heads/codex/a07-tooling-followup c9e0b24cd3b4ea8aef87a954f5f67e7b6ce0a6f8\nrefs/heads/codex/bounded-node-preflight-20261001 f7fada8404bf2035053dee8cb6aa6d8cc26011ac\nrefs/heads/codex/coherent-foundation-reverse 86f35f47cfc744780c4c419912fcdae06fdd6f83\nrefs/heads/codex/contributor-artifact-cleanup-20261001 0a4b83fb72d9bbea16f194840dd1bc341bf1182d\nrefs/heads/codex/copilot-audit-mode-20261001 f7e68996a43cf535441243896220af0f1c26d7ca\nrefs/heads/codex/current-dependency-risk-20261001 5b32fde68e076cd384a81eb82e9774591e8daea5\nrefs/heads/codex/governance-push-exit a7b57b58d291068ed12575f66224e0e0a2f5f1af\nrefs/heads/codex/instruction-validator-convergence 2273a238f85c1b5b1adb4e38143b9eaa1db9cf81\nrefs/heads/codex/issue-141-style-guide-clarifications 6314e346d81d3597bc592948251b1210b7b3a3b8\nrefs/heads/codex/issue-158-supply-freeze-recorder 237ed71c347cb465122acc746d719bdfaa611e5c\nrefs/heads/codex/issue-160-rebase 1e35e9b50045cca8946c97070109e3c9fc38c804\nrefs/heads/codex/issue-161-generator-exact-path-convergence 769d505d46cc984416c3976ad43f1f800803fa81\nrefs/heads/codex/issue-163-review-loop-command 80c61b57fe4c578f76f106f979f4dcb422727bd3\nrefs/heads/codex/issue-201-common-contract-prerequisite 482290df95a77f35d1554e88ca75a045c8b64676\nrefs/heads/codex/issue-201-cycle3-common-contracts 857513bd34e4f87c9c3e3919dc434f7624fd72a4\nrefs/heads/codex/issue-204-supply-freeze-sync-back 5f4bd1de2db17139e0240b0b6decdcb8fe2ba462\nrefs/heads/codex/issue-207-candidate-syncback fa00dae88da046f346ef9f6eda07c8f5c1923a76\nrefs/heads/codex/issue-209-agent-workflow-isolation bfe8a863a290bcd42bee506f93e9b7c944e36b12\nrefs/heads/codex/issue-209-agent-workflow-isolation-final 9d20962d5cf956306a2d43392b31ff5f48d4b31f\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite 2e049d51b98d8ffe362171db8acd271f62811d9f\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite-final d4fe3cc1a3b7ba1856baa057a2b7db26841b5f5a\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite-round3 9213b6611b794c1bb9a943839912bd435d394dd0\nrefs/heads/codex/issue-209-agent-workflow-isolation-review-round3 4fbd20af8c5931755ba0f80895ae2c9ecaf6e540\nrefs/heads/codex/issue-209-agent-workflow-isolation-reviewed-fix 9cfd77dc42911b131deead095881dc7d51528bd6\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-corrected-draft 8a6f6b6c1777c4fda1013364d44c704ab98080f6\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-draft 361979eeff221e1c1be41f3c37181ba5e4bce18e\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-final 17296965e0a61b44a73e2426fac05cc8f1b5404a\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-k-failed-draft cf0a963a1fbf1a5d1470219e247f7555edd12c7c\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-k-validated-draft 9dde52d1b57c5c4ef22fe8d527ccbc777f4cca5d\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-r-failed-draft d9ab099d207fabd8b19e746393126fefd8810692\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-r-validated-draft a6e92644b9ffa20821ca536b68aa81e83ad1bcc4\nrefs/heads/codex/issue-211-u1-syncback 711fa181d17d30e501d75a541020d11b95368d9e\nrefs/heads/codex/issue-211-validator-compatibility 677df8f15e904714c37b237f32bfe0976026910d\nrefs/heads/codex/no-tracked-compiled-python 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/heads/codex/paperwork-cleanup 29e9ee6c146c1fce19185fc1a379b49c020052ae\nrefs/heads/codex/pr-165-reconciled-candidate d85cc242fc12ca8b37f05f7705d6922d6f3a7294\nrefs/heads/codex/protected-instruction-integration 84fb436cffe621f10a10486d588225337af97ef0\nrefs/heads/codex/shared-governance 4b69e39d2fdcbe6990ed483a712c5be4ae7874f2\nrefs/heads/codex/tf67-compareback 4783da302e26515d770bad716f02297fe3b08a8d\nrefs/heads/codex/tf68-compareback 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nrefs/heads/codex/visible-blank-line-example-20261001 5f6c847c398187433ac859a24a2bfb7bee9a43c7\nrefs/heads/codex/workflow-convergence bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9\nrefs/heads/codex/workflow-setup-convergence f2c7f738265df29c123f7d627394c6bba1a5c7d0\nrefs/heads/main 74488bd1b23dcc845449bf0be328202947c3102f\nrefs/heads/planning-CRT-PR-852 80816b49f9935498f728a523cbef5b2cb8a0f36a\nrefs/remotes/origin/HEAD 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/remotes/origin/agent/copilot-review-legacy-toolchain 63c4bf258344fd2f885330fdabe6b5c4023c9ade\nrefs/remotes/origin/agent/fix-pr-target-validation-scope 73dd348f63e88db77b78000cfb8c94774094e3d5\nrefs/remotes/origin/agent/issue-162-workflow-isolation-policy 2fa3e16695baad74e94135a8abceeb26533ede75\nrefs/remotes/origin/agent/issue-168-pr-body-identity-sync 22954b3b628856ba50ec8385c0ed9a1ac99c5738\nrefs/remotes/origin/agent/issue-169-generator-identity-v1 825877ba4a8301d83e65342eb449b116c2733550\nrefs/remotes/origin/agent/issue-170-invariant-rationale-anchors-v1 a4d046bc1ea4023175444e2d6f8996307319a1b8\nrefs/remotes/origin/agent/issue-171-bounded-generator-diagnostics-v2 64fd5ef13b65275a56450ccfb7c78c9a1716f260\nrefs/remotes/origin/agent/issue-176-metadata-policy-replacement-f1 0cbae339b386cd0a8833ed5a83b71a3f38f479ae\nrefs/remotes/origin/agent/issue-176-metadata-policy-stacked eca453edf39c9b3e9c705ae68929c9fff214503c\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f15-v2 5b3fd9869a8855edd5150f18c0f0d6b5163810bf\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f24-v1 12fe80851c5c3f9144611d79aa13dc1bfdc3666f\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f26-v1 998c568e1ab3db42c56c5b21f60355eb76705737\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f28-v1 adbcaf3274cf4ec148207b1d3aeb7ee0dbc7750d\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f30-v1 eaf07c778d186593ecee44e8cd29f4f84e6d7921\nrefs/remotes/origin/agent/issue-177-advisory-extension-60-days 70bf7522233a6c8558809a2c2fc22be83a23a7b9\nrefs/remotes/origin/agent/issue-181-review-loop-correction 4ed199979ae49a1ef0b3f86dcbebb8fae814e75f\nrefs/remotes/origin/agent/issue-187-bounded-self-test-r4-v1 7c58bfed4190148713a264b296f74cef42fce2d3\nrefs/remotes/origin/agent/issue-187-helper-presentation-domain-r3-v1 c4bdb5e5db90b5b8d5a6b68c5fa2719e7945a929\nrefs/remotes/origin/agent/issue-187-permanent-trust-root-updates-r2-v1 4e92e37ae60363426c222f411fcd944a5fe83a1d\nrefs/remotes/origin/agent/issue-187-pr-body-identity-syncback-v1 1adfca37a5811b7b98b8ba163d8e55c4eb8e156b\nrefs/remotes/origin/agent/issue-187-trust-root-bridge-v1 d6c395f89bfc1b75954883a5c02287875f45f928\nrefs/remotes/origin/agent/issue-187-trust-root-bridge-v2 28d7812b320011a02fc91c5798a0b043dcc3d1b3\nrefs/remotes/origin/agent/issue-187-trusted-consumer-bridge-f63-v1 c048508565127a6d4b5a1a7da3eef3694e533506\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v126-f63-v1 7c031b37b3eb46364e9cf1f6ac20fb0d5ad5bcce\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v127-f63-v1 c97e6e1ee082766d35e35fa005b411a378d97658\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v128-f64-v1 d8769910e3bc6df2aa367dbd548f1511bb83bc9f\nrefs/remotes/origin/agent/port-pr182-to-main 541ca4e6f534b59d48f459f58dd7eaa968f35c22\nrefs/remotes/origin/agent/port-research-misc-pr-78-to-psstyleguide eaf81552ba69c2f610b4963a55320114a306c7a6\nrefs/remotes/origin/claude/codex-review-loop-wxk5ur 7567eb32cf757354d9abb03416cdcbbe568c1c8d\nrefs/remotes/origin/claude/psstyleguide-pr-153-review-4yb30c 8444730a8ad560b33700877a3d447ad632134e0d\nrefs/remotes/origin/claude/psstyleguide-pr-164-review-s7gpiz 3ecb3c4f71e9ad144a41086d454ad70ef17bb89b\nrefs/remotes/origin/claude/psstyleguide-pr-165-review-wqfy3q 81926eff7a0692574bbd97c571ce910385344eb0\nrefs/remotes/origin/codex/a06-generator-convergence dec18a6303bd6ad5fe9a43b383a62daa70527aca\nrefs/remotes/origin/codex/a07-braces-remediation 0abe8bdd6d1c0359544171edbfe2305baea9b48e\nrefs/remotes/origin/codex/a07-tooling-followup c9e0b24cd3b4ea8aef87a954f5f67e7b6ce0a6f8\nrefs/remotes/origin/codex/bounded-node-preflight-20261001 f7fada8404bf2035053dee8cb6aa6d8cc26011ac\nrefs/remotes/origin/codex/coherent-foundation-reverse 86f35f47cfc744780c4c419912fcdae06fdd6f83\nrefs/remotes/origin/codex/contributor-artifact-cleanup-20261001 0a4b83fb72d9bbea16f194840dd1bc341bf1182d\nrefs/remotes/origin/codex/copilot-audit-mode-20261001 f7e68996a43cf535441243896220af0f1c26d7ca\nrefs/remotes/origin/codex/current-dependency-risk-20261001 5b32fde68e076cd384a81eb82e9774591e8daea5\nrefs/remotes/origin/codex/governance-push-exit a7b57b58d291068ed12575f66224e0e0a2f5f1af\nrefs/remotes/origin/codex/instruction-validator-convergence 2273a238f85c1b5b1adb4e38143b9eaa1db9cf81\nrefs/remotes/origin/codex/issue-158-supply-freeze-recorder 237ed71c347cb465122acc746d719bdfaa611e5c\nrefs/remotes/origin/codex/issue-161-generator-exact-path-convergence 769d505d46cc984416c3976ad43f1f800803fa81\nrefs/remotes/origin/codex/issue-163-review-loop-command 80c61b57fe4c578f76f106f979f4dcb422727bd3\nrefs/remotes/origin/codex/issue-201-cycle3-common-contracts 857513bd34e4f87c9c3e3919dc434f7624fd72a4\nrefs/remotes/origin/codex/issue-204-supply-freeze-sync-back 5f4bd1de2db17139e0240b0b6decdcb8fe2ba462\nrefs/remotes/origin/codex/issue-207-candidate-syncback fa00dae88da046f346ef9f6eda07c8f5c1923a76\nrefs/remotes/origin/codex/issue-209-agent-workflow-isolation 4fbd20af8c5931755ba0f80895ae2c9ecaf6e540\nrefs/remotes/origin/codex/issue-211-u1-syncback 711fa181d17d30e501d75a541020d11b95368d9e\nrefs/remotes/origin/codex/issue-211-validator-compatibility 677df8f15e904714c37b237f32bfe0976026910d\nrefs/remotes/origin/codex/paperwork-cleanup 29e9ee6c146c1fce19185fc1a379b49c020052ae\nrefs/remotes/origin/codex/protected-instruction-integration 84fb436cffe621f10a10486d588225337af97ef0\nrefs/remotes/origin/codex/shared-governance 4b69e39d2fdcbe6990ed483a712c5be4ae7874f2\nrefs/remotes/origin/codex/tf67-compareback 4783da302e26515d770bad716f02297fe3b08a8d\nrefs/remotes/origin/codex/tf68-compareback 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nrefs/remotes/origin/codex/visible-blank-line-example-20261001 5f6c847c398187433ac859a24a2bfb7bee9a43c7\nrefs/remotes/origin/codex/workflow-convergence bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9\nrefs/remotes/origin/codex/workflow-setup-convergence f2c7f738265df29c123f7d627394c6bba1a5c7d0\nrefs/remotes/origin/copilot/acceptance-check-psstyleguide 4c2eee95119531d2faa0683d689c3057911a8ee1\nrefs/remotes/origin/copilot/environment-verification-read-only b8ba47a23c0cdbd57b80fecccfacce7b6cffd5c1\nrefs/remotes/origin/copilot/run-acceptance-check-after-pr-219 44eb21d9957cdb905fc0db599b1fb77e16fa583f\nrefs/remotes/origin/copilot/run-read-only-acceptance-check 57e95805871d9d3d15b2611f9fec7a58051bb51c\nrefs/remotes/origin/main 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/remotes/origin/planning-CRT-PR-852 80816b49f9935498f728a523cbef5b2cb8a0f36a\nrefs/stash 271baf7712d108a42f9b36f3f02f1952c021a813\n",
+      "indexSha256": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+      "trackedFileHashes": {
+        ".claude/commands/review-loop.md": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+        ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+        ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+        ".github/copilot-instructions.md": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+        ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+        ".github/document-metadata-classification.json": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        ".github/instructions/docs.instructions.md": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+        ".github/instructions/yaml.instructions.md": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+        ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+        ".github/workflows/Check-NpmAudit.mjs": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+        ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+        ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+        ".github/workflows/Get-SupplyFreezeDigest.mjs": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+        ".github/workflows/Initialize-CiToolchain.ps1": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+        ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+        ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+        ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+        ".github/workflows/Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+        ".github/workflows/Test-BlankLineExamples.ps1": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+        ".github/workflows/Test-CheckoutCredentials.ps1": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+        ".github/workflows/Test-CiHelpers.test.mjs": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+        ".github/workflows/agent-instructions.yml": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        ".github/workflows/build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+        ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        ".github/workflows/copilot-code-review.yml": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        ".github/workflows/copilot-setup-steps.yml": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        ".github/workflows/historical-supply-profile.json": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+        ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+        ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+        ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+        ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+        ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+        ".github/workflows/markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+        ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+        ".github/workflows/package-lock.json": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        ".github/workflows/package.json": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        ".github/workflows/scripts-README.md": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        ".github/workflows/workflow-policy-contract.json": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        ".gitignore": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        ".vscode/settings.json": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+        "ACKNOWLEDGMENTS.md": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+        "AGENTS.md": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+        "CLAUDE.md": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+        "CONTRIBUTING.md": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+        "LICENSE": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+        "README.md": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+        "STYLE_GUIDE.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "STYLE_GUIDE_CHAT.md": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+        "STYLE_GUIDE_FULL.md": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+        "STYLE_GUIDE_RATIONALE.md": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+        "copilot-instructions.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+        "docs/P1-SUPPLY-FREEZE-v1.md": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+        "docs/decisions/0001-accept-in-repository-trust-root.md": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+        "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+        "docs/dependency-maintenance.md": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+        "package-lock.json": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+        "package.json": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+        "powershell.instructions.md": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+        "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+        "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+        "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+      }
+    },
+    "TF": {
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "headTree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "status": "",
+      "refs": "refs/heads/agent/deterministic-artifact-generation 2cb4d5d6e7ca816beb04faa0c9c4b9b98b8bc342\nrefs/heads/agent/issue-28-ruleset-decision 26fa2af548e9cc6818d113083ade9dfb6607cb1c\nrefs/heads/agent/issue-36-pr78-agent-governance ade06989c66d671765e25e3a2ba666ab65f62159\nrefs/heads/agent/issue-40-bounded-identity-acquisition-r2-v1 62c5baa60d3478f235a0ec9492209739b61ae8de\nrefs/heads/agent/issue-42-json-self-test-r3-v1 1b851d58efbed4afdec337b566e316d1120254a9\nrefs/heads/agent/issue-44-source-mutation-footprints 93e74c21275d7bdca694d3ace4ef1e57e838f18a\nrefs/heads/agent/issue-46-scalar-result-contract 5b476619305573fba81fcf4a9343c71630b12ce5\nrefs/heads/agent/issue-48-cycle3-workflow-policy-convergence 863a7d99b8157a08adec5bb91f4609e199cec891\nrefs/heads/codex/a02-peer-docs 17caede017a8054bed529517ce473ef75682b5bf\nrefs/heads/codex/a06-generator-convergence 89bf3920fb8008752c7f179e7c69c4c2979750d8\nrefs/heads/codex/bounded-node-preflight-20261001 c6691c9af77ca316fda582fa81280f31d40d1bde\nrefs/heads/codex/coherent-tooling-carryback 443b2fe3cbeda18402f0432e5c95379d09096d6a\nrefs/heads/codex/contributor-artifact-cleanup-20261001 3939dae3fd8c21a0eea539112efd42c318455217\nrefs/heads/codex/current-dependency-risk-20261001 e042caa92783bcceac4afa744908fbc552b6e2c0\nrefs/heads/codex/issue-21-candidate-validator 3e2ef2b3f5509e8e1f7b5c762844715c71437429\nrefs/heads/codex/issue-32-powershell-authoring-repair 8c9eaac4689222eb7b433fce6c3901a58868b5d7\nrefs/heads/codex/issue-34-transactional-generator-publication 1fd03050ca8855438f589b855a360e70105ec632\nrefs/heads/codex/issue-52-supply-freeze-convergence 0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2\nrefs/heads/codex/issue-54-supply-freeze-counterpart b1f3601211f3d29137e3d51a71513f1499265e5c\nrefs/heads/codex/issue-56-review-loop-command 500b9ba82920cc4cb2aa0d7e78cb18298a16707b\nrefs/heads/codex/issue-59-agent-workflow-isolation 353208347980218214e25b5096e9bc3899d1a6f6\nrefs/heads/codex/issue-59-agent-workflow-isolation-source f9f4c035321f78a628b0b20665e0705cab1a04b7\nrefs/heads/codex/issue-59-local-installation-proposal 9973a129313cbddab8fea5cde833d457b51ad67f\nrefs/heads/codex/paperwork-cleanup 26c72f10c0f28ac869cb8314e9edbeff6cc3abc3\nrefs/heads/codex/safe-state-recovery-examples-20261001 975012ed84374aa2fe9f80bb489c69bc8b9bca63\nrefs/heads/codex/task216-tf60-review-repairs 43ad50be3fad4b2e65f0e89cc5c6cabb7722696a\nrefs/heads/main fbfc3aca874e235cace92f506377f5c9e0704160\nrefs/heads/planning-CRT-PR-852 8e852a9f4fd382a122f32c1ce7461796f8762f8e\nrefs/remotes/origin/HEAD a840f21b03f0dcac0815e2f7f044928667402b42\nrefs/remotes/origin/agent/issue-36-pr78-agent-governance ade06989c66d671765e25e3a2ba666ab65f62159\nrefs/remotes/origin/agent/issue-38-pr-body-identity-sync 05a678f76181107266a41d70093fd0805d1c5fb8\nrefs/remotes/origin/agent/issue-40-bounded-identity-acquisition-r2-v1 62c5baa60d3478f235a0ec9492209739b61ae8de\nrefs/remotes/origin/agent/issue-42-json-self-test-r3-v1 1b851d58efbed4afdec337b566e316d1120254a9\nrefs/remotes/origin/agent/issue-44-source-mutation-footprints 93e74c21275d7bdca694d3ace4ef1e57e838f18a\nrefs/remotes/origin/agent/issue-46-scalar-result-contract 5b476619305573fba81fcf4a9343c71630b12ce5\nrefs/remotes/origin/agent/issue-48-cycle3-workflow-policy-convergence 863a7d99b8157a08adec5bb91f4609e199cec891\nrefs/remotes/origin/claude/codex-review-loop-32x4d5 a308c860e078b661de0dd663be35f018fc60fdcc\nrefs/remotes/origin/claude/powershell-style-guide-docs-ig3qzr 1783c8a6ecb113226dab567a7da194c5fc057a7b\nrefs/remotes/origin/codex/a02-peer-docs 17caede017a8054bed529517ce473ef75682b5bf\nrefs/remotes/origin/codex/a06-generator-convergence 89bf3920fb8008752c7f179e7c69c4c2979750d8\nrefs/remotes/origin/codex/bounded-node-preflight-20261001 c6691c9af77ca316fda582fa81280f31d40d1bde\nrefs/remotes/origin/codex/coherent-tooling-carryback 443b2fe3cbeda18402f0432e5c95379d09096d6a\nrefs/remotes/origin/codex/contributor-artifact-cleanup-20261001 3939dae3fd8c21a0eea539112efd42c318455217\nrefs/remotes/origin/codex/cross-platform-terraform-precommit 6972cfa9d4a008aa0d585e3bec0e03f76d1ea93e\nrefs/remotes/origin/codex/current-dependency-risk-20261001 e042caa92783bcceac4afa744908fbc552b6e2c0\nrefs/remotes/origin/codex/issue-21-candidate-validator 3e2ef2b3f5509e8e1f7b5c762844715c71437429\nrefs/remotes/origin/codex/issue-32-powershell-authoring-repair 8c9eaac4689222eb7b433fce6c3901a58868b5d7\nrefs/remotes/origin/codex/issue-34-transactional-generator-publication 1fd03050ca8855438f589b855a360e70105ec632\nrefs/remotes/origin/codex/issue-52-supply-freeze-convergence 0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2\nrefs/remotes/origin/codex/issue-54-supply-freeze-counterpart b1f3601211f3d29137e3d51a71513f1499265e5c\nrefs/remotes/origin/codex/issue-56-review-loop-command 500b9ba82920cc4cb2aa0d7e78cb18298a16707b\nrefs/remotes/origin/codex/issue-59-agent-workflow-isolation 43ad50be3fad4b2e65f0e89cc5c6cabb7722696a\nrefs/remotes/origin/codex/paperwork-cleanup 26c72f10c0f28ac869cb8314e9edbeff6cc3abc3\nrefs/remotes/origin/codex/safe-state-recovery-examples-20261001 975012ed84374aa2fe9f80bb489c69bc8b9bca63\nrefs/remotes/origin/copilot/add-style-guide-rule-for-terraform-urls 1fe181164f4686124f6e99d532be35db3871ca34\nrefs/remotes/origin/main a840f21b03f0dcac0815e2f7f044928667402b42\nrefs/remotes/origin/planning-CRT-PR-852 8e852a9f4fd382a122f32c1ce7461796f8762f8e\nrefs/remotes/origin/pr-37-head 2e650721a4ec5ca33501612d029ab27acfcff08e\n",
+      "indexSha256": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+      "trackedFileHashes": {
+        ".claude/commands/review-loop.md": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437",
+        ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+        ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+        ".github/copilot-instructions.md": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+        ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+        ".github/document-metadata-classification.json": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        ".github/instructions/docs.instructions.md": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+        ".github/instructions/yaml.instructions.md": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+        ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+        ".github/workflows/Check-NpmAudit.mjs": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322",
+        ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+        ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+        ".github/workflows/Get-SupplyFreezeDigest.mjs": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+        ".github/workflows/Initialize-CiToolchain.ps1": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+        ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+        ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+        ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        ".github/workflows/Test-CheckoutCredentials.ps1": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+        ".github/workflows/Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+        ".github/workflows/Test-StateRecoveryExamples.mjs": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+        ".github/workflows/agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        ".github/workflows/build.yml": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+        ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        ".github/workflows/copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        ".github/workflows/copilot-setup-steps.yml": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+        ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        ".github/workflows/historical-supply-profile.json": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+        ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+        ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+        ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+        ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+        ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+        ".github/workflows/markdownlint.yml": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+        ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+        ".github/workflows/package-lock.json": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        ".github/workflows/package.json": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        ".github/workflows/scripts-README.md": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        ".github/workflows/workflow-policy-contract.json": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        ".gitignore": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        ".pre-commit-config.yaml": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        ".vscode/settings.json": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da",
+        "ACKNOWLEDGMENTS.md": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42",
+        "AGENTS.md": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f",
+        "CLAUDE.md": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1",
+        "CONTRIBUTING.md": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d",
+        "LICENSE": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb",
+        "README.md": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3",
+        "STYLE_GUIDE.md": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "STYLE_GUIDE_CHAT.md": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+        "STYLE_GUIDE_FULL.md": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+        "STYLE_GUIDE_RATIONALE.md": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+        "copilot-instructions.md": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+        "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+        "docs/T1-SUPPLY-FREEZE-v1.md": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+        "docs/decisions/0001-accept-generated-artifact-lint-lag.md": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94",
+        "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16",
+        "docs/decisions/0003-accept-required-check-workflow-edit-residual.md": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec",
+        "docs/dependency-maintenance.md": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "package-lock.json": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+        "package.json": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+        "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+        "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+        "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+        "terraform.instructions.md": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      }
+    }
+  },
+  "sources": {
+    "PS_old": {
+      "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "tree": "ed7ad456a7147152d2c289908066195689127e85",
+      "paths": {
+        ".github/document-metadata-classification.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+          "bytes": 388,
+          "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+          "bytes": 5786,
+          "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+          "bytes": 25554,
+          "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+        },
+        ".github/workflows/Confirm-StateMutation.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+          "bytes": 86655,
+          "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+        },
+        ".github/workflows/Inspect-TerraformState.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Invoke-MarkdownLint.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "bytes": 1510,
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Review-TerraformStateDifference.mjs": {
+          "exists": false
+        },
+        ".github/workflows/StateRecoveryCaseCatalog.json": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+        },
+        ".github/workflows/Test-CheckoutCredentials.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+          "bytes": 3081,
+          "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "72b634c0664b410bca45d6331718501ff8a476f1",
+          "bytes": 43570,
+          "sha256": "a25b8fe08ef317e4d8bd50886e5bbec265d59d287d6115e549855fc2f8085cf1"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+          "bytes": 253910,
+          "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "bytes": 32648,
+          "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+          "bytes": 25947,
+          "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+          "bytes": 17320,
+          "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+        },
+        ".github/workflows/build.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+          "bytes": 4375,
+          "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/copilot-code-review.yml": {
+          "exists": false
+        },
+        ".github/workflows/copilot-setup-steps.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+          "bytes": 26612,
+          "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+        },
+        ".github/workflows/markdownlint.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+        },
+        ".github/workflows/package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+        },
+        ".github/workflows/workflow-policy-cases.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+          "bytes": 17621,
+          "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+        },
+        ".pre-commit-config.yaml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "bytes": 5398,
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+        },
+        "package-lock.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+        },
+        "package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+        },
+        ".github/workflows/Test-StyleGuideGenerator.ps1": {
+          "exists": false
+        },
+        "docs/dependency-maintenance.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+          "bytes": 9672,
+          "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+        },
+        ".github/workflows/scripts-README.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+        }
+      }
+    },
+    "PS_accepted": {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+      "paths": {
+        ".github/document-metadata-classification.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+          "bytes": 388,
+          "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+          "bytes": 6095,
+          "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "166d137206aff8f503911be9a569efbd204e023b",
+          "bytes": 26191,
+          "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+        },
+        ".github/workflows/Confirm-StateMutation.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+          "bytes": 90995,
+          "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+        },
+        ".github/workflows/Inspect-TerraformState.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Invoke-MarkdownLint.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "bytes": 1510,
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Review-TerraformStateDifference.mjs": {
+          "exists": false
+        },
+        ".github/workflows/StateRecoveryCaseCatalog.json": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+          "bytes": 229936,
+          "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+          "bytes": 482175,
+          "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+        },
+        ".github/workflows/Test-CheckoutCredentials.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+          "bytes": 3081,
+          "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+          "bytes": 123582,
+          "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+          "bytes": 253908,
+          "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+          "bytes": 36090,
+          "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+          "bytes": 31176,
+          "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+          "bytes": 17625,
+          "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+          "bytes": 12837,
+          "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+        },
+        ".github/workflows/build.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+          "bytes": 25715,
+          "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/copilot-code-review.yml": {
+          "exists": false
+        },
+        ".github/workflows/copilot-setup-steps.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+          "bytes": 51809,
+          "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+        },
+        ".github/workflows/markdownlint.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+        },
+        ".github/workflows/package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+        },
+        ".github/workflows/workflow-policy-cases.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+          "bytes": 26216,
+          "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+        },
+        ".pre-commit-config.yaml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "bytes": 5398,
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+        },
+        "package-lock.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+        },
+        "package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+        },
+        ".github/workflows/Test-StyleGuideGenerator.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+          "bytes": 27656,
+          "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+        },
+        "docs/dependency-maintenance.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+          "bytes": 9867,
+          "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d"
+        },
+        ".github/workflows/scripts-README.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+          "bytes": 13541,
+          "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+        }
+      }
+    },
+    "PS_proposed": {
+      "commit": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "paths": {
+        ".github/document-metadata-classification.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+          "bytes": 388,
+          "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+          "bytes": 6095,
+          "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "166d137206aff8f503911be9a569efbd204e023b",
+          "bytes": 26191,
+          "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+        },
+        ".github/workflows/Confirm-StateMutation.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+          "bytes": 90995,
+          "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+        },
+        ".github/workflows/Inspect-TerraformState.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Invoke-MarkdownLint.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "bytes": 1510,
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Review-TerraformStateDifference.mjs": {
+          "exists": false
+        },
+        ".github/workflows/StateRecoveryCaseCatalog.json": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+          "bytes": 299398,
+          "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8"
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+          "bytes": 510837,
+          "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+        },
+        ".github/workflows/Test-CheckoutCredentials.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+          "bytes": 3081,
+          "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+          "bytes": 130003,
+          "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+          "bytes": 253908,
+          "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+          "bytes": 36084,
+          "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+          "bytes": 31176,
+          "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+          "bytes": 17625,
+          "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+          "bytes": 12865,
+          "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3"
+        },
+        ".github/workflows/build.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+          "bytes": 25715,
+          "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/copilot-code-review.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+          "bytes": 44995,
+          "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6"
+        },
+        ".github/workflows/copilot-setup-steps.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+          "bytes": 51809,
+          "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+        },
+        ".github/workflows/markdownlint.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+        },
+        ".github/workflows/package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+          "bytes": 936,
+          "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9"
+        },
+        ".github/workflows/workflow-policy-cases.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+          "bytes": 26216,
+          "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+        },
+        ".pre-commit-config.yaml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "bytes": 5398,
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+        },
+        "package-lock.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+        },
+        "package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+        },
+        ".github/workflows/Test-StyleGuideGenerator.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+          "bytes": 27656,
+          "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+        },
+        "docs/dependency-maintenance.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+          "bytes": 10446,
+          "sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd"
+        },
+        ".github/workflows/scripts-README.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+          "bytes": 13541,
+          "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511"
+        }
+      }
+    },
+    "TF_old": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "paths": {
+        ".github/document-metadata-classification.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "bytes": 387,
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "bytes": 5632,
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "bytes": 6799,
+          "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+        },
+        ".github/workflows/Confirm-StateMutation.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "bytes": 95329,
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "bytes": 5706,
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        ".github/workflows/Inspect-TerraformState.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Invoke-MarkdownLint.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "bytes": 1510,
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Review-TerraformStateDifference.mjs": {
+          "exists": false
+        },
+        ".github/workflows/StateRecoveryCaseCatalog.json": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "bytes": 460163,
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        ".github/workflows/Test-CheckoutCredentials.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "bytes": 3088,
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "bytes": 33662,
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "bytes": 253918,
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "bytes": 22102,
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "bytes": 31949,
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "bytes": 25568,
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "bytes": 14948,
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "bytes": 9558,
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        ".github/workflows/build.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "bytes": 4222,
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/copilot-code-review.yml": {
+          "exists": false
+        },
+        ".github/workflows/copilot-setup-steps.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "bytes": 33862,
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        },
+        ".github/workflows/markdownlint.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "bytes": 6632,
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        },
+        ".github/workflows/package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "bytes": 1105,
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        ".github/workflows/workflow-policy-cases.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "bytes": 13047,
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "bytes": 1407,
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        ".pre-commit-config.yaml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "bytes": 5405,
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        "package-lock.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "bytes": 3566,
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        },
+        "package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "bytes": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        ".github/workflows/Test-StyleGuideGenerator.ps1": {
+          "exists": false
+        },
+        "docs/dependency-maintenance.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "bytes": 6448,
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+        },
+        ".github/workflows/scripts-README.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "bytes": 5421,
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        }
+      }
+    },
+    "TF_accepted": {
+      "commit": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "paths": {
+        ".github/document-metadata-classification.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "bytes": 387,
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+          "bytes": 6095,
+          "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "166d137206aff8f503911be9a569efbd204e023b",
+          "bytes": 26191,
+          "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+        },
+        ".github/workflows/Confirm-StateMutation.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+          "bytes": 91158,
+          "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "bytes": 5706,
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        ".github/workflows/Inspect-TerraformState.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Invoke-MarkdownLint.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "bytes": 1510,
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Review-TerraformStateDifference.mjs": {
+          "exists": false
+        },
+        ".github/workflows/StateRecoveryCaseCatalog.json": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+          "bytes": 285263,
+          "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+          "bytes": 510470,
+          "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+        },
+        ".github/workflows/Test-CheckoutCredentials.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "bytes": 3088,
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+          "bytes": 130059,
+          "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+          "bytes": 253908,
+          "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "bytes": 22102,
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+          "bytes": 36081,
+          "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+          "bytes": 31176,
+          "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+          "bytes": 17625,
+          "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+          "bytes": 12893,
+          "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+        },
+        ".github/workflows/build.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+          "bytes": 25744,
+          "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/copilot-code-review.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+          "bytes": 45016,
+          "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+        },
+        ".github/workflows/copilot-setup-steps.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+          "bytes": 51830,
+          "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+        },
+        ".github/workflows/markdownlint.yml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+          "bytes": 6714,
+          "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+        },
+        ".github/workflows/package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "670083e767627cfed90a61f788021dba88de1091",
+          "bytes": 994,
+          "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649"
+        },
+        ".github/workflows/workflow-policy-cases.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+          "bytes": 26216,
+          "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+          "bytes": 1496,
+          "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+        },
+        ".pre-commit-config.yaml": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "bytes": 5405,
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        "package-lock.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+          "bytes": 3566,
+          "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77"
+        },
+        "package.json": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "bytes": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        ".github/workflows/Test-StyleGuideGenerator.ps1": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+          "bytes": 27656,
+          "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+        },
+        "docs/dependency-maintenance.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+          "bytes": 10453,
+          "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c"
+        },
+        ".github/workflows/scripts-README.md": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+          "bytes": 13470,
+          "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467"
+        }
+      }
+    }
+  },
+  "deltas": {
+    "PS_accepted_delta": {
+      ".github/workflows/Classify-InstructionMaintenance.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+          "bytes": 5786,
+          "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+          "bytes": 6095,
+          "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+        }
+      },
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+          "bytes": 25554,
+          "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "166d137206aff8f503911be9a569efbd204e023b",
+          "bytes": 26191,
+          "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+        }
+      },
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+          "bytes": 86655,
+          "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+          "bytes": 90995,
+          "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+        }
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+          "bytes": 229936,
+          "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+        }
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+          "bytes": 482175,
+          "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+        }
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "72b634c0664b410bca45d6331718501ff8a476f1",
+          "bytes": 43570,
+          "sha256": "a25b8fe08ef317e4d8bd50886e5bbec265d59d287d6115e549855fc2f8085cf1"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+          "bytes": 123582,
+          "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+        }
+      },
+      ".github/workflows/Test-ExactGitPathSet.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+          "bytes": 253910,
+          "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+          "bytes": 253908,
+          "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+        }
+      },
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "bytes": 32648,
+          "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+          "bytes": 36090,
+          "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+        }
+      },
+      ".github/workflows/Test-StyleGuideGenerator.ps1": {
+        "before": {
+          "exists": false
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+          "bytes": 27656,
+          "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+        }
+      },
+      ".github/workflows/Validate-WorkflowPolicy.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+          "bytes": 25947,
+          "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+          "bytes": 31176,
+          "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+        }
+      },
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+          "bytes": 17320,
+          "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+          "bytes": 17625,
+          "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+        }
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+          "bytes": 12837,
+          "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+        }
+      },
+      ".github/workflows/build.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+          "bytes": 4375,
+          "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+          "bytes": 25715,
+          "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+        }
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+          "bytes": 26612,
+          "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+          "bytes": 51809,
+          "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+        }
+      },
+      ".github/workflows/scripts-README.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+          "bytes": 13541,
+          "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+        }
+      },
+      ".github/workflows/workflow-policy-cases.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+          "bytes": 17621,
+          "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+          "bytes": 26216,
+          "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+        }
+      },
+      "docs/dependency-maintenance.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+          "bytes": 9672,
+          "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+          "bytes": 9867,
+          "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d"
+        }
+      }
+    },
+    "TF_accepted_delta": {
+      ".github/workflows/Classify-InstructionMaintenance.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "bytes": 5632,
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+          "bytes": 6095,
+          "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+        }
+      },
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "bytes": 6799,
+          "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "166d137206aff8f503911be9a569efbd204e023b",
+          "bytes": 26191,
+          "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+        }
+      },
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "bytes": 95329,
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+          "bytes": 91158,
+          "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba"
+        }
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "before": {
+          "exists": false
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+          "bytes": 285263,
+          "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e"
+        }
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "bytes": 460163,
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+          "bytes": 510470,
+          "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+        }
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "bytes": 33662,
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+          "bytes": 130059,
+          "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        }
+      },
+      ".github/workflows/Test-ExactGitPathSet.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "bytes": 253918,
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+          "bytes": 253908,
+          "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+        }
+      },
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "bytes": 31949,
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+          "bytes": 36081,
+          "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+        }
+      },
+      ".github/workflows/Test-StyleGuideGenerator.ps1": {
+        "before": {
+          "exists": false
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+          "bytes": 27656,
+          "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+        }
+      },
+      ".github/workflows/Validate-WorkflowPolicy.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "bytes": 25568,
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+          "bytes": 31176,
+          "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+        }
+      },
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "bytes": 14948,
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+          "bytes": 17625,
+          "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+        }
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "bytes": 9558,
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+          "bytes": 12893,
+          "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8"
+        }
+      },
+      ".github/workflows/build.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "bytes": 4222,
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+          "bytes": 25744,
+          "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+        }
+      },
+      ".github/workflows/copilot-code-review.yml": {
+        "before": {
+          "exists": false
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+          "bytes": 45016,
+          "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a"
+        }
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "bytes": 33862,
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+          "bytes": 51830,
+          "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+        }
+      },
+      ".github/workflows/markdownlint.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "bytes": 6632,
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+          "bytes": 6714,
+          "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+        }
+      },
+      ".github/workflows/package.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "bytes": 1105,
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "670083e767627cfed90a61f788021dba88de1091",
+          "bytes": 994,
+          "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649"
+        }
+      },
+      ".github/workflows/scripts-README.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "bytes": 5421,
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+          "bytes": 13470,
+          "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467"
+        }
+      },
+      ".github/workflows/workflow-policy-cases.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "bytes": 13047,
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+          "bytes": 26216,
+          "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+        }
+      },
+      ".github/workflows/workflow-policy-contract.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "bytes": 1407,
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+          "bytes": 1496,
+          "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+        }
+      },
+      "docs/dependency-maintenance.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "bytes": 6448,
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+          "bytes": 10453,
+          "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c"
+        }
+      },
+      "package-lock.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "bytes": 3566,
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+          "bytes": 3566,
+          "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77"
+        }
+      }
+    },
+    "PS_prospective_delta": {
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+          "bytes": 229936,
+          "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+          "bytes": 299398,
+          "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8"
+        }
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+          "bytes": 482175,
+          "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+          "bytes": 510837,
+          "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+        }
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+          "bytes": 123582,
+          "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+          "bytes": 130003,
+          "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780"
+        }
+      },
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+          "bytes": 36090,
+          "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+          "bytes": 36084,
+          "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390"
+        }
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+          "bytes": 12837,
+          "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+          "bytes": 12865,
+          "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3"
+        }
+      },
+      ".github/workflows/copilot-code-review.yml": {
+        "before": {
+          "exists": false
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+          "bytes": 44995,
+          "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6"
+        }
+      },
+      ".github/workflows/package.json": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+          "bytes": 936,
+          "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9"
+        }
+      },
+      ".github/workflows/scripts-README.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+          "bytes": 13541,
+          "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+          "bytes": 13541,
+          "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511"
+        }
+      },
+      "docs/dependency-maintenance.md": {
+        "before": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+          "bytes": 9867,
+          "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d"
+        },
+        "after": {
+          "exists": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+          "bytes": 10446,
+          "sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd"
+        }
+      }
+    }
+  },
+  "staticExcerpts": {
+    "PS_accepted": {
+      ".github/workflows/Validate-WorkflowPolicy.mjs": [
+        {
+          "line": 456,
+          "text": "const generatorPlatforms = [\"generator_windows_51\", \"generator_windows_7\", \"generator_linux_7\"];"
+        },
+        {
+          "line": 506,
+          "text": "  const codeJobs = build ? [contract.roles.artifactVerifier, ...generatorPlatforms] : ['policy', 'markdownlint'];"
+        },
+        {
+          "line": 507,
+          "text": "  expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');"
+        },
+        {
+          "line": 519,
+          "text": "    const runner = platform === 0 || platform === 1 ? 'windows-2025' : 'ubuntu-24.04';"
+        },
+        {
+          "line": 521,
+          "text": "    if (aggregate) expectDeepEqual(job.needs, generatorPlatforms, 'generator-dependencies');"
+        },
+        {
+          "line": 590,
+          "text": "  if (publisher.needs !== contract.roles.artifactVerifier || publisher['runs-on'] !== 'ubuntu-24.04' || publisher['timeout-minutes'] !== 10) fail('publisher-execution');"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.0"
+        },
+        {
+          "line": 19,
+          "text": "param()"
+        },
+        {
+          "line": 39,
+          "text": "    SemanticRole = 'PowerShellExamples'"
+        },
+        {
+          "line": 529,
+          "text": "function Assert-ChildIntegrity {"
+        },
+        {
+          "line": 541,
+          "text": "    # Assert-ChildIntegrity"
+        },
+        {
+          "line": 592,
+          "text": "    $objNodeCommand = Get-Command -Name 'node' -CommandType Application -All -TotalCount 1 -ErrorAction Stop"
+        },
+        {
+          "line": 632,
+          "text": "        if (-not $objRecoveryProcess.WaitForExit(300000)) {"
+        },
+        {
+          "line": 648,
+          "text": "Assert-ChildIntegrity"
+        },
+        {
+          "line": 656,
+          "text": "Assert-ChildIntegrity -AllowArtifactChanges"
+        },
+        {
+          "line": 674,
+          "text": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'StyleGuide.GeneratorResult.v2') {"
+        },
+        {
+          "line": 777,
+          "text": "    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'StyleGuide.ExactGitPathSetResult.v2' -or"
+        }
+      ],
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 20,
+          "text": "$script:strGeneratorResultSchema = 'StyleGuide.GeneratorResult.v2'"
+        },
+        {
+          "line": 24,
+          "text": "    ScopedPath = 'powershell.instructions.md'"
+        },
+        {
+          "line": 29,
+          "text": "    SummaryHeading = 'Executive Summary: Author Profile'"
+        },
+        {
+          "line": 30,
+          "text": "    SummaryAnchor = 'executive-summary-author-profile'"
+        },
+        {
+          "line": 33,
+          "text": "    AppendStandalone = $false"
+        },
+        {
+          "line": 1352,
+          "text": "            $strSummaryHeading = $script:hashtableLanguage.SummaryHeading"
+        },
+        {
+          "line": 1353,
+          "text": "            $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideGenerator.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 11,
+          "text": "# Optional hosted-cell identity. LinuxPowerShell7 also requires native ext4."
+        },
+        {
+          "line": 29,
+          "text": "    [ValidateSet('Current', 'WindowsPowerShell51', 'WindowsPowerShell7', 'LinuxPowerShell7')]"
+        },
+        {
+          "line": 30,
+          "text": "    [string]$ExpectedHost = 'Current'"
+        },
+        {
+          "line": 58,
+          "text": "        $arrStorage = @(& /usr/bin/findmnt --noheadings --output FSTYPE --target $strStoragePath)"
+        },
+        {
+          "line": 60,
+          "text": "            throw 'generator-test: native ext4 is required for source and fixture storage'"
+        }
+      ],
+      ".github/workflows/Test-AgentInstructions.ps1": [
+        {
+          "line": 31,
+          "text": "    [Parameter()][switch] $SelfTest,"
+        },
+        {
+          "line": 32,
+          "text": "    [Parameter()][switch] $RequireStagedInputMatch,"
+        },
+        {
+          "line": 33,
+          "text": "    [Parameter()][switch] $MetadataClassificationOnly,"
+        },
+        {
+          "line": 34,
+          "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+        },
+        {
+          "line": 35,
+          "text": "    [Parameter()][switch] $ProposedPolicy,"
+        },
+        {
+          "line": 36,
+          "text": "    [Parameter()][AllowEmptyString()][string] $InputRevision = '',"
+        },
+        {
+          "line": 37,
+          "text": "    [Parameter()][AllowEmptyString()][string] $PublishedBaselineRevision = ''"
+        },
+        {
+          "line": 9154,
+          "text": "        -RuntimeContext $hashtableRuntimeContext `"
+        }
+      ],
+      ".github/workflows/Classify-InstructionMaintenance.mjs": [
+        {
+          "line": 22,
+          "text": "    'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1', 'Test-StyleGuideGenerator.ps1',"
+        },
+        {
+          "line": 23,
+          "text": "    'Test-BlankLineExamples.ps1', 'Test-StateRecoveryExamples.mjs', 'Test-StyleGuideArtifacts.ps1',"
+        },
+        {
+          "line": 63,
+          "text": "    const workflowEntry = /^\\.github\\/workflows\\/[^/]+\\.ya?ml$/u.test(name);"
+        },
+        {
+          "line": 107,
+          "text": "const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {"
+        }
+      ],
+      ".github/workflows/Initialize-CiToolchain.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.3"
+        },
+        {
+          "line": 3,
+          "text": "# Installs the reviewed Linux runtime and the requested locked dependency trees."
+        },
+        {
+          "line": 10,
+          "text": "    [Parameter()][switch] $WorkflowDependencies,"
+        },
+        {
+          "line": 11,
+          "text": "    [Parameter()][switch] $InstructionDependencies"
+        },
+        {
+          "line": 16,
+          "text": "if (-not $IsLinux) { throw 'The CI runtime installer requires Linux.' }"
+        },
+        {
+          "line": 81,
+          "text": "if ($InstructionDependencies) { $arrInstallRoots += $strRepositoryRoot }"
+        },
+        {
+          "line": 82,
+          "text": "if ($WorkflowDependencies) { $arrInstallRoots += $PSScriptRoot }"
+        }
+      ]
+    },
+    "TF_accepted": {
+      ".github/workflows/Validate-WorkflowPolicy.mjs": [
+        {
+          "line": 456,
+          "text": "const generatorPlatforms = [\"generator_windows_51\", \"generator_windows_7\", \"generator_linux_7\"];"
+        },
+        {
+          "line": 506,
+          "text": "  const codeJobs = build ? [contract.roles.artifactVerifier, ...generatorPlatforms] : ['policy', 'markdownlint'];"
+        },
+        {
+          "line": 507,
+          "text": "  expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');"
+        },
+        {
+          "line": 519,
+          "text": "    const runner = platform === 0 || platform === 1 ? 'windows-2025' : 'ubuntu-24.04';"
+        },
+        {
+          "line": 521,
+          "text": "    if (aggregate) expectDeepEqual(job.needs, generatorPlatforms, 'generator-dependencies');"
+        },
+        {
+          "line": 590,
+          "text": "  if (publisher.needs !== contract.roles.artifactVerifier || publisher['runs-on'] !== 'ubuntu-24.04' || publisher['timeout-minutes'] !== 10) fail('publisher-execution');"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.0"
+        },
+        {
+          "line": 19,
+          "text": "param()"
+        },
+        {
+          "line": 39,
+          "text": "    SemanticRole = 'TerraformRecovery'"
+        },
+        {
+          "line": 529,
+          "text": "function Assert-ChildIntegrity {"
+        },
+        {
+          "line": 541,
+          "text": "    # Assert-ChildIntegrity"
+        },
+        {
+          "line": 592,
+          "text": "    $objNodeCommand = Get-Command -Name 'node' -CommandType Application -All -TotalCount 1 -ErrorAction Stop"
+        },
+        {
+          "line": 632,
+          "text": "        if (-not $objRecoveryProcess.WaitForExit(300000)) {"
+        },
+        {
+          "line": 648,
+          "text": "Assert-ChildIntegrity"
+        },
+        {
+          "line": 656,
+          "text": "Assert-ChildIntegrity -AllowArtifactChanges"
+        },
+        {
+          "line": 674,
+          "text": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'StyleGuide.GeneratorResult.v2') {"
+        },
+        {
+          "line": 777,
+          "text": "    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'StyleGuide.ExactGitPathSetResult.v2' -or"
+        }
+      ],
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 20,
+          "text": "$script:strGeneratorResultSchema = 'StyleGuide.GeneratorResult.v2'"
+        },
+        {
+          "line": 24,
+          "text": "    ScopedPath = 'terraform.instructions.md'"
+        },
+        {
+          "line": 29,
+          "text": "    SummaryHeading = 'Executive Summary: Terraform Philosophy'"
+        },
+        {
+          "line": 30,
+          "text": "    SummaryAnchor = 'executive-summary-terraform-philosophy'"
+        },
+        {
+          "line": 33,
+          "text": "    AppendStandalone = $true"
+        },
+        {
+          "line": 1352,
+          "text": "            $strSummaryHeading = $script:hashtableLanguage.SummaryHeading"
+        },
+        {
+          "line": 1353,
+          "text": "            $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideGenerator.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 11,
+          "text": "# Optional hosted-cell identity. LinuxPowerShell7 also requires native ext4."
+        },
+        {
+          "line": 29,
+          "text": "    [ValidateSet('Current', 'WindowsPowerShell51', 'WindowsPowerShell7', 'LinuxPowerShell7')]"
+        },
+        {
+          "line": 30,
+          "text": "    [string]$ExpectedHost = 'Current'"
+        },
+        {
+          "line": 58,
+          "text": "        $arrStorage = @(& /usr/bin/findmnt --noheadings --output FSTYPE --target $strStoragePath)"
+        },
+        {
+          "line": 60,
+          "text": "            throw 'generator-test: native ext4 is required for source and fixture storage'"
+        }
+      ],
+      ".github/workflows/Test-AgentInstructions.ps1": [
+        {
+          "line": 31,
+          "text": "    [Parameter()][switch] $SelfTest,"
+        },
+        {
+          "line": 32,
+          "text": "    [Parameter()][switch] $RequireStagedInputMatch,"
+        },
+        {
+          "line": 33,
+          "text": "    [Parameter()][switch] $MetadataClassificationOnly,"
+        },
+        {
+          "line": 34,
+          "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+        },
+        {
+          "line": 35,
+          "text": "    [Parameter()][switch] $ProposedPolicy,"
+        },
+        {
+          "line": 36,
+          "text": "    [Parameter()][AllowEmptyString()][string] $InputRevision = '',"
+        },
+        {
+          "line": 37,
+          "text": "    [Parameter()][AllowEmptyString()][string] $PublishedBaselineRevision = ''"
+        },
+        {
+          "line": 95,
+          "text": "    '.github/workflows/copilot-code-review.yml',"
+        },
+        {
+          "line": 246,
+          "text": "    # .PARAMETER UseNativeStructuralConversion"
+        },
+        {
+          "line": 271,
+          "text": "        [Parameter()][switch] $UseNativeStructuralConversion"
+        },
+        {
+          "line": 327,
+          "text": "        if ($UseNativeStructuralConversion) {"
+        },
+        {
+          "line": 496,
+          "text": "            ,@('.github/workflows/copilot-code-review.yml', 65536, $true)"
+        },
+        {
+          "line": 845,
+          "text": "            '.github/workflows/copilot-code-review.yml')) {"
+        },
+        {
+          "line": 3782,
+          "text": "                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion"
+        },
+        {
+          "line": 9684,
+          "text": "        -RuntimeContext $hashtableRuntimeContext `"
+        }
+      ],
+      ".github/workflows/Classify-InstructionMaintenance.mjs": [
+        {
+          "line": 22,
+          "text": "    'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1', 'Test-StyleGuideGenerator.ps1',"
+        },
+        {
+          "line": 23,
+          "text": "    'Test-BlankLineExamples.ps1', 'Test-StateRecoveryExamples.mjs', 'Test-StyleGuideArtifacts.ps1',"
+        },
+        {
+          "line": 63,
+          "text": "    const workflowEntry = /^\\.github\\/workflows\\/[^/]+\\.ya?ml$/u.test(name);"
+        },
+        {
+          "line": 107,
+          "text": "const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {"
+        }
+      ],
+      ".github/workflows/Initialize-CiToolchain.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.3"
+        },
+        {
+          "line": 3,
+          "text": "# Installs the reviewed Linux runtime and the requested locked dependency trees."
+        },
+        {
+          "line": 10,
+          "text": "    [Parameter()][switch] $WorkflowDependencies,"
+        },
+        {
+          "line": 11,
+          "text": "    [Parameter()][switch] $InstructionDependencies"
+        },
+        {
+          "line": 16,
+          "text": "if (-not $IsLinux) { throw 'The CI runtime installer requires Linux.' }"
+        },
+        {
+          "line": 80,
+          "text": "if ($InstructionDependencies) { $arrInstallRoots += $strRepositoryRoot }"
+        },
+        {
+          "line": 81,
+          "text": "if ($WorkflowDependencies) { $arrInstallRoots += $PSScriptRoot }"
+        }
+      ],
+      ".github/workflows/Test-StateRecoveryExamples.mjs": [
+        {
+          "line": 112,
+          "text": "  assert.equal(process.platform, 'linux', 'Recovery examples require Linux; a skip is not a passing result.');"
+        },
+        {
+          "line": 113,
+          "text": "  assert.ok(Number(process.versions.node.split('.')[0]) >= 22, 'Node 22 or newer is required.');"
+        },
+        {
+          "line": 133,
+          "text": "  assert.ok(path.isAbsolute(jq) && fs.existsSync(jq), 'jq is required; missing jq cannot skip the tests.');"
+        }
+      ]
+    },
+    "PS_proposed": {
+      ".github/workflows/Validate-WorkflowPolicy.mjs": [
+        {
+          "line": 456,
+          "text": "const generatorPlatforms = [\"generator_windows_51\", \"generator_windows_7\", \"generator_linux_7\"];"
+        },
+        {
+          "line": 506,
+          "text": "  const codeJobs = build ? [contract.roles.artifactVerifier, ...generatorPlatforms] : ['policy', 'markdownlint'];"
+        },
+        {
+          "line": 507,
+          "text": "  expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');"
+        },
+        {
+          "line": 519,
+          "text": "    const runner = platform === 0 || platform === 1 ? 'windows-2025' : 'ubuntu-24.04';"
+        },
+        {
+          "line": 521,
+          "text": "    if (aggregate) expectDeepEqual(job.needs, generatorPlatforms, 'generator-dependencies');"
+        },
+        {
+          "line": 590,
+          "text": "  if (publisher.needs !== contract.roles.artifactVerifier || publisher['runs-on'] !== 'ubuntu-24.04' || publisher['timeout-minutes'] !== 10) fail('publisher-execution');"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.0"
+        },
+        {
+          "line": 19,
+          "text": "param()"
+        },
+        {
+          "line": 39,
+          "text": "    SemanticRole = 'PowerShellExamples'"
+        },
+        {
+          "line": 529,
+          "text": "function Assert-ChildIntegrity {"
+        },
+        {
+          "line": 541,
+          "text": "    # Assert-ChildIntegrity"
+        },
+        {
+          "line": 592,
+          "text": "    $objNodeCommand = Get-Command -Name 'node' -CommandType Application -All -TotalCount 1 -ErrorAction Stop"
+        },
+        {
+          "line": 632,
+          "text": "        if (-not $objRecoveryProcess.WaitForExit(300000)) {"
+        },
+        {
+          "line": 648,
+          "text": "Assert-ChildIntegrity"
+        },
+        {
+          "line": 656,
+          "text": "Assert-ChildIntegrity -AllowArtifactChanges"
+        },
+        {
+          "line": 674,
+          "text": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'StyleGuide.GeneratorResult.v2') {"
+        },
+        {
+          "line": 777,
+          "text": "    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'StyleGuide.ExactGitPathSetResult.v2' -or"
+        }
+      ],
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 20,
+          "text": "$script:strGeneratorResultSchema = 'StyleGuide.GeneratorResult.v2'"
+        },
+        {
+          "line": 24,
+          "text": "    ScopedPath = 'powershell.instructions.md'"
+        },
+        {
+          "line": 29,
+          "text": "    SummaryHeading = 'Executive Summary: Author Profile'"
+        },
+        {
+          "line": 30,
+          "text": "    SummaryAnchor = 'executive-summary-author-profile'"
+        },
+        {
+          "line": 33,
+          "text": "    AppendStandalone = $false"
+        },
+        {
+          "line": 1352,
+          "text": "            $strSummaryHeading = $script:hashtableLanguage.SummaryHeading"
+        },
+        {
+          "line": 1353,
+          "text": "            $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor"
+        }
+      ],
+      ".github/workflows/Test-StyleGuideGenerator.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 5.1"
+        },
+        {
+          "line": 11,
+          "text": "# Optional hosted-cell identity. LinuxPowerShell7 also requires native ext4."
+        },
+        {
+          "line": 29,
+          "text": "    [ValidateSet('Current', 'WindowsPowerShell51', 'WindowsPowerShell7', 'LinuxPowerShell7')]"
+        },
+        {
+          "line": 30,
+          "text": "    [string]$ExpectedHost = 'Current'"
+        },
+        {
+          "line": 58,
+          "text": "        $arrStorage = @(& /usr/bin/findmnt --noheadings --output FSTYPE --target $strStoragePath)"
+        },
+        {
+          "line": 60,
+          "text": "            throw 'generator-test: native ext4 is required for source and fixture storage'"
+        }
+      ],
+      ".github/workflows/Test-AgentInstructions.ps1": [
+        {
+          "line": 31,
+          "text": "    [Parameter()][switch] $SelfTest,"
+        },
+        {
+          "line": 32,
+          "text": "    [Parameter()][switch] $RequireStagedInputMatch,"
+        },
+        {
+          "line": 33,
+          "text": "    [Parameter()][switch] $MetadataClassificationOnly,"
+        },
+        {
+          "line": 34,
+          "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+        },
+        {
+          "line": 35,
+          "text": "    [Parameter()][switch] $ProposedPolicy,"
+        },
+        {
+          "line": 36,
+          "text": "    [Parameter()][AllowEmptyString()][string] $InputRevision = '',"
+        },
+        {
+          "line": 37,
+          "text": "    [Parameter()][AllowEmptyString()][string] $PublishedBaselineRevision = ''"
+        },
+        {
+          "line": 95,
+          "text": "    '.github/workflows/copilot-code-review.yml',"
+        },
+        {
+          "line": 246,
+          "text": "    # .PARAMETER UseNativeStructuralConversion"
+        },
+        {
+          "line": 271,
+          "text": "        [Parameter()][switch] $UseNativeStructuralConversion"
+        },
+        {
+          "line": 327,
+          "text": "        if ($UseNativeStructuralConversion) {"
+        },
+        {
+          "line": 496,
+          "text": "            ,@('.github/workflows/copilot-code-review.yml', 65536, $true)"
+        },
+        {
+          "line": 845,
+          "text": "            '.github/workflows/copilot-code-review.yml')) {"
+        },
+        {
+          "line": 3782,
+          "text": "                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion"
+        },
+        {
+          "line": 9690,
+          "text": "        -RuntimeContext $hashtableRuntimeContext `"
+        }
+      ],
+      ".github/workflows/Classify-InstructionMaintenance.mjs": [
+        {
+          "line": 22,
+          "text": "    'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1', 'Test-StyleGuideGenerator.ps1',"
+        },
+        {
+          "line": 23,
+          "text": "    'Test-BlankLineExamples.ps1', 'Test-StateRecoveryExamples.mjs', 'Test-StyleGuideArtifacts.ps1',"
+        },
+        {
+          "line": 63,
+          "text": "    const workflowEntry = /^\\.github\\/workflows\\/[^/]+\\.ya?ml$/u.test(name);"
+        },
+        {
+          "line": 107,
+          "text": "const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {"
+        }
+      ],
+      ".github/workflows/Initialize-CiToolchain.ps1": [
+        {
+          "line": 1,
+          "text": "#Requires -Version 7.3"
+        },
+        {
+          "line": 3,
+          "text": "# Installs the reviewed Linux runtime and the requested locked dependency trees."
+        },
+        {
+          "line": 10,
+          "text": "    [Parameter()][switch] $WorkflowDependencies,"
+        },
+        {
+          "line": 11,
+          "text": "    [Parameter()][switch] $InstructionDependencies"
+        },
+        {
+          "line": 16,
+          "text": "if (-not $IsLinux) { throw 'The CI runtime installer requires Linux.' }"
+        },
+        {
+          "line": 81,
+          "text": "if ($InstructionDependencies) { $arrInstallRoots += $strRepositoryRoot }"
+        },
+        {
+          "line": 82,
+          "text": "if ($WorkflowDependencies) { $arrInstallRoots += $PSScriptRoot }"
+        }
+      ]
+    }
+  },
+  "r5PriorToProposedDiff": ":100644 100644 6d53053 ef0c89a M\tdocs/dependency-maintenance.md\n",
+  "sevenLoaderAbsences": {
+    "PS_old": [
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ],
+    "PS_accepted": [
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ],
+    "PS_proposed": [
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ],
+    "TF_old": [
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ],
+    "TF_accepted": [
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ]
+  },
+  "scopedPairDifferences": [
+    ".github/document-metadata-classification.json",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Initialize-CiToolchain.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CheckoutCredentials.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-StateRecoveryExamples.mjs",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/markdownlint.yml",
+    ".github/workflows/package.json",
+    ".github/workflows/workflow-policy-contract.json",
+    ".pre-commit-config.yaml",
+    "package-lock.json",
+    "package.json"
+  ],
+  "r5DocumentationOnlyDiff": "diff --git a/docs/dependency-maintenance.md b/docs/dependency-maintenance.md\nindex 6d53053..ef0c89a 100644\n--- a/docs/dependency-maintenance.md\n+++ b/docs/dependency-maintenance.md\n@@ -5,5 +5,5 @@\n - **Status:** Active\n - **Owner:** Repository maintainer (@franklesniak)\n-- **Last Updated:** 2026-10-06\n+- **Last Updated:** 2026-10-07\n - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.\n \n",
+  "referenceIdentities": {
+    "STATUS.md": {
+      "sha256": "569c4c6e3ecf0d0119db5b3503bda71d4af19fed3241ce948e3d64cefafc70b0",
+      "bytes": 11004
+    },
+    "README.md": {
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4",
+      "bytes": 10209
+    },
+    "LOOP-POLICY.md": {
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    "tasks/A15.md": {
+      "sha256": "5aad23b76457b58c02a48e86540f25a4497e8c9b1ea0db2f20f7aaf52d2449c6",
+      "bytes": 3662
+    },
+    "tasks/A16.md": {
+      "sha256": "84815cac37e574f27ca52d829d04b1cc8041ad4d3b24d270fa682de11bf4ccc6",
+      "bytes": 4285
+    },
+    "results/A15/RESULT.md": {
+      "sha256": "e306de286310260fdd43489ef38318fdcb8d9fe5d9d0b2f786d56ca942f4ac3c",
+      "bytes": 11742
+    },
+    "results/A15/foundation-refresh/REPORT.md": {
+      "sha256": "f504b47be06d612ae90a94b147617c2459900fe4fb4e5c07e6bb91bacee4f1f6",
+      "bytes": 16807
+    },
+    "results/A15/foundation-refresh/identities.json": {
+      "sha256": "52a3ddffff168ec413137d9b0f8375d0d238874459ee7b4ce14ebff565aeb499",
+      "bytes": 11084
+    },
+    "results/A15/scope-manifest.json": {
+      "sha256": "d89e7165c559bc1cd0ed0770969c4141f2c63b5e012ab318de05fa217205705f",
+      "bytes": 18438
+    },
+    "results/A03/foundation-dependency-decision.md": {
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4",
+      "bytes": 10441
+    },
+    "results/A07/recovery-runtime/current-consumers-20261006/REPORT.md": {
+      "sha256": "0d7608ace59c78d46ccb38c577bc48ab345a2ad6ee557049e58f8db2f4ce7d9d",
+      "bytes": 8805
+    },
+    "results/A07/recovery-runtime/SELECTION.md": {
+      "sha256": "7f04a1bc3870271145cc9e346871a0fdbd086796341ba39656a8ea9bd9bbfba5",
+      "bytes": 3736
+    },
+    "results/A07/recovery-runtime/PROPOSAL.md": {
+      "sha256": "476df9bf1dcf546f082f60a29f8f597993dbd8e53784da74b2a0e920714ee133",
+      "bytes": 34591
+    },
+    "results/A21/core-loader-decision.md": {
+      "sha256": "03016f19797dd051e8ebb56fadb206fea252be58e71354ff4d89a0d4a1888908",
+      "bytes": 13140
+    }
+  },
+  "after": {
+    "PS": {
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "headTree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "status": "",
+      "refs": "refs/heads/agent/copilot-review-legacy-toolchain 63c4bf258344fd2f885330fdabe6b5c4023c9ade\nrefs/heads/agent/fix-pr-target-validation-scope fde79c937616b939e9463121b3cbeedf55a93547\nrefs/heads/agent/issue-145-deterministic-artifacts f62896d02f580bf497def69cac46b475318611bd\nrefs/heads/agent/issue-146-candidate-validator 8444730a8ad560b33700877a3d447ad632134e0d\nrefs/heads/agent/issue-162-isolation-maintenance-v1 3b1fe524f729b253049c396c7cf59ff67ae9ddac\nrefs/heads/agent/issue-162-workflow-isolation-policy 2fa3e16695baad74e94135a8abceeb26533ede75\nrefs/heads/agent/issue-169-bootstrap-publication 071a4eaf80145db8afbab13755dfa3ffcd9f4cd6\nrefs/heads/agent/issue-169-final-v2-draft f0e57574d1bffeb7c5f70329b4a6a0b47d075ed3\nrefs/heads/agent/issue-169-generator-identity ff80127c0022066fd5e57f70746fbcf4c9cdd02e\nrefs/heads/agent/issue-169-generator-identity-v1 825877ba4a8301d83e65342eb449b116c2733550\nrefs/heads/agent/issue-169-identity-acquisition-bootstrap 81deb2b02a01ec24d66ee45d83706416bff28fb6\nrefs/heads/agent/issue-170-admission-bootstrap-v1 bffcb18576ee34501f50f602d07d610eab6baaa8\nrefs/heads/agent/issue-170-invariant-rationale-anchors-v1 a4d046bc1ea4023175444e2d6f8996307319a1b8\nrefs/heads/agent/issue-171-bounded-generator-diagnostics-v1 0bf1d3779700aa68012161824c891d47e7d6bea2\nrefs/heads/agent/issue-171-bounded-generator-diagnostics-v2 64fd5ef13b65275a56450ccfb7c78c9a1716f260\nrefs/heads/agent/issue-171-reusable-maintenance-v1 e7d44e60c0c3c6f0ec3ff9a502782a17217f8f5f\nrefs/heads/agent/issue-176-metadata-policy-final-ms-repair eca453edf39c9b3e9c705ae68929c9fff214503c\nrefs/heads/agent/issue-176-metadata-policy-replacement-f1 0cbae339b386cd0a8833ed5a83b71a3f38f479ae\nrefs/heads/agent/issue-176-metadata-policy-stacked 65b856a2d99ebfa5f4c4969bcaf663911fc5b00e\nrefs/heads/agent/issue-176-metadata-policy-superseding-f11-f12 5ede0ceb0a2dd317380602be5d468f1b58ee8b7b\nrefs/heads/agent/issue-176-metadata-policy-superseding-f13 fb1341dd7ce12ad382937678c7647bdea038a535\nrefs/heads/agent/issue-176-metadata-policy-superseding-f14 622e9e9d291967089085b85f26999f02eab3fdcc\nrefs/heads/agent/issue-176-metadata-policy-superseding-f15 f7a921495b9473c66e09934f82342850344fb83a\nrefs/heads/agent/issue-176-metadata-policy-superseding-f15-v2 c5b7b4ab1a6c187a00bb0269caaaf82e945d0a2d\nrefs/heads/agent/issue-176-metadata-policy-superseding-f8 8f5f95b3ba7b9dc0ef2bd8ce42b80aa42d84f2a7\nrefs/heads/agent/issue-176-metadata-policy-superseding-f9-f10 04eae6655f2d1a251be75d7c33a2bb791e4fd813\nrefs/heads/agent/issue-176-metadata-policy-superseding-f9-f10-v2 d6936cb99606df5de701579672d4b91da606e283\nrefs/heads/agent/issue-176-trusted-bootstrap bff557a013e958cfaf1e408a721db8659ea514ea\nrefs/heads/agent/issue-176-trusted-bootstrap-atomic b8d7ef12757f54e29357736894b99389fd86f616\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable 07a4aedbea64faa9c2330d50ef763b9bf98bbd14\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f11-f12 951a0e187452321eda723815489caf740b17bfdd\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f12-f13 e241e768ecfdb732c5fc7ac69ae9755ee212c788\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f14 b4181dbc73960ea95e1a5580f68bc8b41f895c4e\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f15 a3dc8d0c8306621d77f704e5e9d04898bcaaae3a\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f15-v2 1ae3fa695c4965a25aa50439cb0b3050f81048dd\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f5 eb6b9b9dc98198994893292b89c511ba6b36402b\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f6 f865ebc26d2967d268746d7c1838cee0ad3f2989\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f8 02f286dc18310f63da6981814fa473c434c55018\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f9-f10 1178be6cd9f185ad3bb9647c54529b0f62f0a799\nrefs/heads/agent/issue-176-trusted-bootstrap-mergeable-f9-f10-v2 3e17eb388e18d0ef6293c15a50bfd113f3e07fe9\nrefs/heads/agent/issue-177-advisory-extension-60-days 57bf92d27b46c96f1056c8773b96f78ddf457d26\nrefs/heads/agent/issue-181-postmerge-handoff 3bd3e8d0f09e31784ee6110316dd3cd4d99a509a\nrefs/heads/agent/issue-181-review-loop-correction 4ed199979ae49a1ef0b3f86dcbebb8fae814e75f\nrefs/heads/agent/issue-187-bounded-self-test-r4-v1 7c58bfed4190148713a264b296f74cef42fce2d3\nrefs/heads/agent/issue-187-consumer-v126-authorization-v1 4c754b417af96968a197df191a142d12d77c6553\nrefs/heads/agent/issue-187-final-offline-workflow-auth-f64-v1 77cc06295734b420061f0b664255f16367273179\nrefs/heads/agent/issue-187-helper-presentation-domain-r3-v1 c4bdb5e5db90b5b8d5a6b68c5fa2719e7945a929\nrefs/heads/agent/issue-187-permanent-trust-root-updates-r2-v1 4e92e37ae60363426c222f411fcd944a5fe83a1d\nrefs/heads/agent/issue-187-pr-body-identity-bootstrap-v2 549251f9c69891b682d3063cf8a3b9b174a5a8e0\nrefs/heads/agent/issue-187-pr-body-identity-bootstrap-v3 df2995d4ee8eb50751a8119ae257f51473afa8a7\nrefs/heads/agent/issue-187-pr-body-identity-fetch-bounds-f63 1adfca37a5811b7b98b8ba163d8e55c4eb8e156b\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v1 b5ddb733d0b3b2b6c84746569078bab170c4c9a3\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v2 8ecc0ffa8e4ebe01b0353476a5d2c8b91a43b7ab\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v2-dev a7506e702a33aca283da9534acdaf2adec5548b8\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v3 1ccbd49d22e3f96a53d12bc3119e9382f55ddb6c\nrefs/heads/agent/issue-187-pr-body-identity-syncback-v3-dev ef1f567c006b99c8a257752af155b2db1ec59499\nrefs/heads/agent/issue-187-pr188-final-authorization-v1 3210705b08fcd2968176eba24fdca7e1571c1e8e\nrefs/heads/agent/issue-187-pr188-final-authorization-v2 bd9f4bc1781cf3e0cecaa26479ef6ad6fd7ef66c\nrefs/heads/agent/issue-187-trust-root-bridge-bootstrap-v1 e38355eba7b8d870b35645b6fe87052ed7896705\nrefs/heads/agent/issue-187-trust-root-bridge-bootstrap-v2 cfe0a38ee12dd9e794141f5a937c73dd7d6a69bb\nrefs/heads/agent/issue-187-trust-root-bridge-v1 d6c395f89bfc1b75954883a5c02287875f45f928\nrefs/heads/agent/issue-187-trust-root-bridge-v1-dev 38a412fa98b0ea21d34b62fe910e8f50591ff240\nrefs/heads/agent/issue-187-trust-root-bridge-v2 28d7812b320011a02fc91c5798a0b043dcc3d1b3\nrefs/heads/agent/issue-187-trusted-consumer-bridge-f63-v1 c048508565127a6d4b5a1a7da3eef3694e533506\nrefs/heads/agent/issue-187-trusted-consumer-v126-f63-v1 7c031b37b3eb46364e9cf1f6ac20fb0d5ad5bcce\nrefs/heads/agent/issue-187-trusted-consumer-v127-auth-f63-v1 c52c9777841292579ceb1e6e8221c6a4f2c26358\nrefs/heads/agent/issue-187-trusted-consumer-v127-f63-v1 c97e6e1ee082766d35e35fa005b411a378d97658\nrefs/heads/agent/issue-187-trusted-consumer-v128-f64-v1 d8769910e3bc6df2aa367dbd548f1511bb83bc9f\nrefs/heads/agent/issue-187-workflow-policy-final-authorization-f63-v1 dbcc559ace41270ebc939ce4b5990849b77f0399\nrefs/heads/agent/port-pr182-to-main 541ca4e6f534b59d48f459f58dd7eaa968f35c22\nrefs/heads/agent/port-research-misc-pr-78-to-psstyleguide eaf81552ba69c2f610b4963a55320114a306c7a6\nrefs/heads/agent/pr183-clean-final 73dd348f63e88db77b78000cfb8c94774094e3d5\nrefs/heads/agent/pr183-trust-bootstrap 6152e68ba3aec386051801d7f2c1aebbc17708bd\nrefs/heads/agent/ps-metadata-policy-final-state-validation 34fb7eb492c46cdf9949a52c357a5dd04f873dab\nrefs/heads/agent/sync-main-agent-instructions-to-planning 3bd3e8d0f09e31784ee6110316dd3cd4d99a509a\nrefs/heads/backup/pr-165-pre-rebase-7db9a29 7db9a29d5ed598e06565b53791f35c4a0d299b3c\nrefs/heads/claude/psstyleguide-claude-md-codex-review 81926eff7a0692574bbd97c571ce910385344eb0\nrefs/heads/claude/psstyleguide-infra-style-conformance 3c204a5bc45542d2ecc38b30caff80ec3b3e6d7f\nrefs/heads/codex/a06-generator-convergence dec18a6303bd6ad5fe9a43b383a62daa70527aca\nrefs/heads/codex/a07-braces-remediation 0abe8bdd6d1c0359544171edbfe2305baea9b48e\nrefs/heads/codex/a07-tooling 48f4d8a36c8faceee12afac78aaecea0d176125d\nrefs/heads/codex/a07-tooling-followup c9e0b24cd3b4ea8aef87a954f5f67e7b6ce0a6f8\nrefs/heads/codex/bounded-node-preflight-20261001 f7fada8404bf2035053dee8cb6aa6d8cc26011ac\nrefs/heads/codex/coherent-foundation-reverse 86f35f47cfc744780c4c419912fcdae06fdd6f83\nrefs/heads/codex/contributor-artifact-cleanup-20261001 0a4b83fb72d9bbea16f194840dd1bc341bf1182d\nrefs/heads/codex/copilot-audit-mode-20261001 f7e68996a43cf535441243896220af0f1c26d7ca\nrefs/heads/codex/current-dependency-risk-20261001 5b32fde68e076cd384a81eb82e9774591e8daea5\nrefs/heads/codex/governance-push-exit a7b57b58d291068ed12575f66224e0e0a2f5f1af\nrefs/heads/codex/instruction-validator-convergence 2273a238f85c1b5b1adb4e38143b9eaa1db9cf81\nrefs/heads/codex/issue-141-style-guide-clarifications 6314e346d81d3597bc592948251b1210b7b3a3b8\nrefs/heads/codex/issue-158-supply-freeze-recorder 237ed71c347cb465122acc746d719bdfaa611e5c\nrefs/heads/codex/issue-160-rebase 1e35e9b50045cca8946c97070109e3c9fc38c804\nrefs/heads/codex/issue-161-generator-exact-path-convergence 769d505d46cc984416c3976ad43f1f800803fa81\nrefs/heads/codex/issue-163-review-loop-command 80c61b57fe4c578f76f106f979f4dcb422727bd3\nrefs/heads/codex/issue-201-common-contract-prerequisite 482290df95a77f35d1554e88ca75a045c8b64676\nrefs/heads/codex/issue-201-cycle3-common-contracts 857513bd34e4f87c9c3e3919dc434f7624fd72a4\nrefs/heads/codex/issue-204-supply-freeze-sync-back 5f4bd1de2db17139e0240b0b6decdcb8fe2ba462\nrefs/heads/codex/issue-207-candidate-syncback fa00dae88da046f346ef9f6eda07c8f5c1923a76\nrefs/heads/codex/issue-209-agent-workflow-isolation bfe8a863a290bcd42bee506f93e9b7c944e36b12\nrefs/heads/codex/issue-209-agent-workflow-isolation-final 9d20962d5cf956306a2d43392b31ff5f48d4b31f\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite 2e049d51b98d8ffe362171db8acd271f62811d9f\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite-final d4fe3cc1a3b7ba1856baa057a2b7db26841b5f5a\nrefs/heads/codex/issue-209-agent-workflow-isolation-prerequisite-round3 9213b6611b794c1bb9a943839912bd435d394dd0\nrefs/heads/codex/issue-209-agent-workflow-isolation-review-round3 4fbd20af8c5931755ba0f80895ae2c9ecaf6e540\nrefs/heads/codex/issue-209-agent-workflow-isolation-reviewed-fix 9cfd77dc42911b131deead095881dc7d51528bd6\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-corrected-draft 8a6f6b6c1777c4fda1013364d44c704ab98080f6\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-draft 361979eeff221e1c1be41f3c37181ba5e4bce18e\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-f-final 17296965e0a61b44a73e2426fac05cc8f1b5404a\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-k-failed-draft cf0a963a1fbf1a5d1470219e247f7555edd12c7c\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-k-validated-draft 9dde52d1b57c5c4ef22fe8d527ccbc777f4cca5d\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-r-failed-draft d9ab099d207fabd8b19e746393126fefd8810692\nrefs/heads/codex/issue-209-agent-workflow-isolation-round3-r-validated-draft a6e92644b9ffa20821ca536b68aa81e83ad1bcc4\nrefs/heads/codex/issue-211-u1-syncback 711fa181d17d30e501d75a541020d11b95368d9e\nrefs/heads/codex/issue-211-validator-compatibility 677df8f15e904714c37b237f32bfe0976026910d\nrefs/heads/codex/no-tracked-compiled-python 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/heads/codex/paperwork-cleanup 29e9ee6c146c1fce19185fc1a379b49c020052ae\nrefs/heads/codex/pr-165-reconciled-candidate d85cc242fc12ca8b37f05f7705d6922d6f3a7294\nrefs/heads/codex/protected-instruction-integration 84fb436cffe621f10a10486d588225337af97ef0\nrefs/heads/codex/shared-governance 4b69e39d2fdcbe6990ed483a712c5be4ae7874f2\nrefs/heads/codex/tf67-compareback 4783da302e26515d770bad716f02297fe3b08a8d\nrefs/heads/codex/tf68-compareback 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nrefs/heads/codex/visible-blank-line-example-20261001 5f6c847c398187433ac859a24a2bfb7bee9a43c7\nrefs/heads/codex/workflow-convergence bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9\nrefs/heads/codex/workflow-setup-convergence f2c7f738265df29c123f7d627394c6bba1a5c7d0\nrefs/heads/main 74488bd1b23dcc845449bf0be328202947c3102f\nrefs/heads/planning-CRT-PR-852 80816b49f9935498f728a523cbef5b2cb8a0f36a\nrefs/remotes/origin/HEAD 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/remotes/origin/agent/copilot-review-legacy-toolchain 63c4bf258344fd2f885330fdabe6b5c4023c9ade\nrefs/remotes/origin/agent/fix-pr-target-validation-scope 73dd348f63e88db77b78000cfb8c94774094e3d5\nrefs/remotes/origin/agent/issue-162-workflow-isolation-policy 2fa3e16695baad74e94135a8abceeb26533ede75\nrefs/remotes/origin/agent/issue-168-pr-body-identity-sync 22954b3b628856ba50ec8385c0ed9a1ac99c5738\nrefs/remotes/origin/agent/issue-169-generator-identity-v1 825877ba4a8301d83e65342eb449b116c2733550\nrefs/remotes/origin/agent/issue-170-invariant-rationale-anchors-v1 a4d046bc1ea4023175444e2d6f8996307319a1b8\nrefs/remotes/origin/agent/issue-171-bounded-generator-diagnostics-v2 64fd5ef13b65275a56450ccfb7c78c9a1716f260\nrefs/remotes/origin/agent/issue-176-metadata-policy-replacement-f1 0cbae339b386cd0a8833ed5a83b71a3f38f479ae\nrefs/remotes/origin/agent/issue-176-metadata-policy-stacked eca453edf39c9b3e9c705ae68929c9fff214503c\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f15-v2 5b3fd9869a8855edd5150f18c0f0d6b5163810bf\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f24-v1 12fe80851c5c3f9144611d79aa13dc1bfdc3666f\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f26-v1 998c568e1ab3db42c56c5b21f60355eb76705737\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f28-v1 adbcaf3274cf4ec148207b1d3aeb7ee0dbc7750d\nrefs/remotes/origin/agent/issue-176-metadata-policy-superseding-f30-v1 eaf07c778d186593ecee44e8cd29f4f84e6d7921\nrefs/remotes/origin/agent/issue-177-advisory-extension-60-days 70bf7522233a6c8558809a2c2fc22be83a23a7b9\nrefs/remotes/origin/agent/issue-181-review-loop-correction 4ed199979ae49a1ef0b3f86dcbebb8fae814e75f\nrefs/remotes/origin/agent/issue-187-bounded-self-test-r4-v1 7c58bfed4190148713a264b296f74cef42fce2d3\nrefs/remotes/origin/agent/issue-187-helper-presentation-domain-r3-v1 c4bdb5e5db90b5b8d5a6b68c5fa2719e7945a929\nrefs/remotes/origin/agent/issue-187-permanent-trust-root-updates-r2-v1 4e92e37ae60363426c222f411fcd944a5fe83a1d\nrefs/remotes/origin/agent/issue-187-pr-body-identity-syncback-v1 1adfca37a5811b7b98b8ba163d8e55c4eb8e156b\nrefs/remotes/origin/agent/issue-187-trust-root-bridge-v1 d6c395f89bfc1b75954883a5c02287875f45f928\nrefs/remotes/origin/agent/issue-187-trust-root-bridge-v2 28d7812b320011a02fc91c5798a0b043dcc3d1b3\nrefs/remotes/origin/agent/issue-187-trusted-consumer-bridge-f63-v1 c048508565127a6d4b5a1a7da3eef3694e533506\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v126-f63-v1 7c031b37b3eb46364e9cf1f6ac20fb0d5ad5bcce\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v127-f63-v1 c97e6e1ee082766d35e35fa005b411a378d97658\nrefs/remotes/origin/agent/issue-187-trusted-consumer-v128-f64-v1 d8769910e3bc6df2aa367dbd548f1511bb83bc9f\nrefs/remotes/origin/agent/port-pr182-to-main 541ca4e6f534b59d48f459f58dd7eaa968f35c22\nrefs/remotes/origin/agent/port-research-misc-pr-78-to-psstyleguide eaf81552ba69c2f610b4963a55320114a306c7a6\nrefs/remotes/origin/claude/codex-review-loop-wxk5ur 7567eb32cf757354d9abb03416cdcbbe568c1c8d\nrefs/remotes/origin/claude/psstyleguide-pr-153-review-4yb30c 8444730a8ad560b33700877a3d447ad632134e0d\nrefs/remotes/origin/claude/psstyleguide-pr-164-review-s7gpiz 3ecb3c4f71e9ad144a41086d454ad70ef17bb89b\nrefs/remotes/origin/claude/psstyleguide-pr-165-review-wqfy3q 81926eff7a0692574bbd97c571ce910385344eb0\nrefs/remotes/origin/codex/a06-generator-convergence dec18a6303bd6ad5fe9a43b383a62daa70527aca\nrefs/remotes/origin/codex/a07-braces-remediation 0abe8bdd6d1c0359544171edbfe2305baea9b48e\nrefs/remotes/origin/codex/a07-tooling-followup c9e0b24cd3b4ea8aef87a954f5f67e7b6ce0a6f8\nrefs/remotes/origin/codex/bounded-node-preflight-20261001 f7fada8404bf2035053dee8cb6aa6d8cc26011ac\nrefs/remotes/origin/codex/coherent-foundation-reverse 86f35f47cfc744780c4c419912fcdae06fdd6f83\nrefs/remotes/origin/codex/contributor-artifact-cleanup-20261001 0a4b83fb72d9bbea16f194840dd1bc341bf1182d\nrefs/remotes/origin/codex/copilot-audit-mode-20261001 f7e68996a43cf535441243896220af0f1c26d7ca\nrefs/remotes/origin/codex/current-dependency-risk-20261001 5b32fde68e076cd384a81eb82e9774591e8daea5\nrefs/remotes/origin/codex/governance-push-exit a7b57b58d291068ed12575f66224e0e0a2f5f1af\nrefs/remotes/origin/codex/instruction-validator-convergence 2273a238f85c1b5b1adb4e38143b9eaa1db9cf81\nrefs/remotes/origin/codex/issue-158-supply-freeze-recorder 237ed71c347cb465122acc746d719bdfaa611e5c\nrefs/remotes/origin/codex/issue-161-generator-exact-path-convergence 769d505d46cc984416c3976ad43f1f800803fa81\nrefs/remotes/origin/codex/issue-163-review-loop-command 80c61b57fe4c578f76f106f979f4dcb422727bd3\nrefs/remotes/origin/codex/issue-201-cycle3-common-contracts 857513bd34e4f87c9c3e3919dc434f7624fd72a4\nrefs/remotes/origin/codex/issue-204-supply-freeze-sync-back 5f4bd1de2db17139e0240b0b6decdcb8fe2ba462\nrefs/remotes/origin/codex/issue-207-candidate-syncback fa00dae88da046f346ef9f6eda07c8f5c1923a76\nrefs/remotes/origin/codex/issue-209-agent-workflow-isolation 4fbd20af8c5931755ba0f80895ae2c9ecaf6e540\nrefs/remotes/origin/codex/issue-211-u1-syncback 711fa181d17d30e501d75a541020d11b95368d9e\nrefs/remotes/origin/codex/issue-211-validator-compatibility 677df8f15e904714c37b237f32bfe0976026910d\nrefs/remotes/origin/codex/paperwork-cleanup 29e9ee6c146c1fce19185fc1a379b49c020052ae\nrefs/remotes/origin/codex/protected-instruction-integration 84fb436cffe621f10a10486d588225337af97ef0\nrefs/remotes/origin/codex/shared-governance 4b69e39d2fdcbe6990ed483a712c5be4ae7874f2\nrefs/remotes/origin/codex/tf67-compareback 4783da302e26515d770bad716f02297fe3b08a8d\nrefs/remotes/origin/codex/tf68-compareback 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nrefs/remotes/origin/codex/visible-blank-line-example-20261001 5f6c847c398187433ac859a24a2bfb7bee9a43c7\nrefs/remotes/origin/codex/workflow-convergence bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9\nrefs/remotes/origin/codex/workflow-setup-convergence f2c7f738265df29c123f7d627394c6bba1a5c7d0\nrefs/remotes/origin/copilot/acceptance-check-psstyleguide 4c2eee95119531d2faa0683d689c3057911a8ee1\nrefs/remotes/origin/copilot/environment-verification-read-only b8ba47a23c0cdbd57b80fecccfacce7b6cffd5c1\nrefs/remotes/origin/copilot/run-acceptance-check-after-pr-219 44eb21d9957cdb905fc0db599b1fb77e16fa583f\nrefs/remotes/origin/copilot/run-read-only-acceptance-check 57e95805871d9d3d15b2611f9fec7a58051bb51c\nrefs/remotes/origin/main 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nrefs/remotes/origin/planning-CRT-PR-852 80816b49f9935498f728a523cbef5b2cb8a0f36a\nrefs/stash 271baf7712d108a42f9b36f3f02f1952c021a813\n",
+      "indexSha256": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+      "trackedFileHashes": {
+        ".claude/commands/review-loop.md": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+        ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+        ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+        ".github/copilot-instructions.md": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+        ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+        ".github/document-metadata-classification.json": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        ".github/instructions/docs.instructions.md": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+        ".github/instructions/yaml.instructions.md": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+        ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+        ".github/workflows/Check-NpmAudit.mjs": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+        ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+        ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+        ".github/workflows/Get-SupplyFreezeDigest.mjs": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+        ".github/workflows/Initialize-CiToolchain.ps1": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+        ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+        ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+        ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+        ".github/workflows/Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+        ".github/workflows/Test-BlankLineExamples.ps1": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+        ".github/workflows/Test-CheckoutCredentials.ps1": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+        ".github/workflows/Test-CiHelpers.test.mjs": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+        ".github/workflows/agent-instructions.yml": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        ".github/workflows/build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+        ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        ".github/workflows/copilot-code-review.yml": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        ".github/workflows/copilot-setup-steps.yml": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        ".github/workflows/historical-supply-profile.json": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+        ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+        ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+        ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+        ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+        ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+        ".github/workflows/markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+        ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+        ".github/workflows/package-lock.json": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        ".github/workflows/package.json": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        ".github/workflows/scripts-README.md": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        ".github/workflows/workflow-policy-contract.json": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        ".gitignore": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        ".vscode/settings.json": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+        "ACKNOWLEDGMENTS.md": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+        "AGENTS.md": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+        "CLAUDE.md": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+        "CONTRIBUTING.md": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+        "LICENSE": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+        "README.md": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+        "STYLE_GUIDE.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "STYLE_GUIDE_CHAT.md": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+        "STYLE_GUIDE_FULL.md": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+        "STYLE_GUIDE_RATIONALE.md": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+        "copilot-instructions.md": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+        "docs/P1-SUPPLY-FREEZE-v1.md": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+        "docs/decisions/0001-accept-in-repository-trust-root.md": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+        "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+        "docs/dependency-maintenance.md": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+        "package-lock.json": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+        "package.json": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+        "powershell.instructions.md": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+        "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+        "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+        "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+      }
+    },
+    "TF": {
+      "head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "headTree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "status": "",
+      "refs": "refs/heads/agent/deterministic-artifact-generation 2cb4d5d6e7ca816beb04faa0c9c4b9b98b8bc342\nrefs/heads/agent/issue-28-ruleset-decision 26fa2af548e9cc6818d113083ade9dfb6607cb1c\nrefs/heads/agent/issue-36-pr78-agent-governance ade06989c66d671765e25e3a2ba666ab65f62159\nrefs/heads/agent/issue-40-bounded-identity-acquisition-r2-v1 62c5baa60d3478f235a0ec9492209739b61ae8de\nrefs/heads/agent/issue-42-json-self-test-r3-v1 1b851d58efbed4afdec337b566e316d1120254a9\nrefs/heads/agent/issue-44-source-mutation-footprints 93e74c21275d7bdca694d3ace4ef1e57e838f18a\nrefs/heads/agent/issue-46-scalar-result-contract 5b476619305573fba81fcf4a9343c71630b12ce5\nrefs/heads/agent/issue-48-cycle3-workflow-policy-convergence 863a7d99b8157a08adec5bb91f4609e199cec891\nrefs/heads/codex/a02-peer-docs 17caede017a8054bed529517ce473ef75682b5bf\nrefs/heads/codex/a06-generator-convergence 89bf3920fb8008752c7f179e7c69c4c2979750d8\nrefs/heads/codex/bounded-node-preflight-20261001 c6691c9af77ca316fda582fa81280f31d40d1bde\nrefs/heads/codex/coherent-tooling-carryback 443b2fe3cbeda18402f0432e5c95379d09096d6a\nrefs/heads/codex/contributor-artifact-cleanup-20261001 3939dae3fd8c21a0eea539112efd42c318455217\nrefs/heads/codex/current-dependency-risk-20261001 e042caa92783bcceac4afa744908fbc552b6e2c0\nrefs/heads/codex/issue-21-candidate-validator 3e2ef2b3f5509e8e1f7b5c762844715c71437429\nrefs/heads/codex/issue-32-powershell-authoring-repair 8c9eaac4689222eb7b433fce6c3901a58868b5d7\nrefs/heads/codex/issue-34-transactional-generator-publication 1fd03050ca8855438f589b855a360e70105ec632\nrefs/heads/codex/issue-52-supply-freeze-convergence 0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2\nrefs/heads/codex/issue-54-supply-freeze-counterpart b1f3601211f3d29137e3d51a71513f1499265e5c\nrefs/heads/codex/issue-56-review-loop-command 500b9ba82920cc4cb2aa0d7e78cb18298a16707b\nrefs/heads/codex/issue-59-agent-workflow-isolation 353208347980218214e25b5096e9bc3899d1a6f6\nrefs/heads/codex/issue-59-agent-workflow-isolation-source f9f4c035321f78a628b0b20665e0705cab1a04b7\nrefs/heads/codex/issue-59-local-installation-proposal 9973a129313cbddab8fea5cde833d457b51ad67f\nrefs/heads/codex/paperwork-cleanup 26c72f10c0f28ac869cb8314e9edbeff6cc3abc3\nrefs/heads/codex/safe-state-recovery-examples-20261001 975012ed84374aa2fe9f80bb489c69bc8b9bca63\nrefs/heads/codex/task216-tf60-review-repairs 43ad50be3fad4b2e65f0e89cc5c6cabb7722696a\nrefs/heads/main fbfc3aca874e235cace92f506377f5c9e0704160\nrefs/heads/planning-CRT-PR-852 8e852a9f4fd382a122f32c1ce7461796f8762f8e\nrefs/remotes/origin/HEAD a840f21b03f0dcac0815e2f7f044928667402b42\nrefs/remotes/origin/agent/issue-36-pr78-agent-governance ade06989c66d671765e25e3a2ba666ab65f62159\nrefs/remotes/origin/agent/issue-38-pr-body-identity-sync 05a678f76181107266a41d70093fd0805d1c5fb8\nrefs/remotes/origin/agent/issue-40-bounded-identity-acquisition-r2-v1 62c5baa60d3478f235a0ec9492209739b61ae8de\nrefs/remotes/origin/agent/issue-42-json-self-test-r3-v1 1b851d58efbed4afdec337b566e316d1120254a9\nrefs/remotes/origin/agent/issue-44-source-mutation-footprints 93e74c21275d7bdca694d3ace4ef1e57e838f18a\nrefs/remotes/origin/agent/issue-46-scalar-result-contract 5b476619305573fba81fcf4a9343c71630b12ce5\nrefs/remotes/origin/agent/issue-48-cycle3-workflow-policy-convergence 863a7d99b8157a08adec5bb91f4609e199cec891\nrefs/remotes/origin/claude/codex-review-loop-32x4d5 a308c860e078b661de0dd663be35f018fc60fdcc\nrefs/remotes/origin/claude/powershell-style-guide-docs-ig3qzr 1783c8a6ecb113226dab567a7da194c5fc057a7b\nrefs/remotes/origin/codex/a02-peer-docs 17caede017a8054bed529517ce473ef75682b5bf\nrefs/remotes/origin/codex/a06-generator-convergence 89bf3920fb8008752c7f179e7c69c4c2979750d8\nrefs/remotes/origin/codex/bounded-node-preflight-20261001 c6691c9af77ca316fda582fa81280f31d40d1bde\nrefs/remotes/origin/codex/coherent-tooling-carryback 443b2fe3cbeda18402f0432e5c95379d09096d6a\nrefs/remotes/origin/codex/contributor-artifact-cleanup-20261001 3939dae3fd8c21a0eea539112efd42c318455217\nrefs/remotes/origin/codex/cross-platform-terraform-precommit 6972cfa9d4a008aa0d585e3bec0e03f76d1ea93e\nrefs/remotes/origin/codex/current-dependency-risk-20261001 e042caa92783bcceac4afa744908fbc552b6e2c0\nrefs/remotes/origin/codex/issue-21-candidate-validator 3e2ef2b3f5509e8e1f7b5c762844715c71437429\nrefs/remotes/origin/codex/issue-32-powershell-authoring-repair 8c9eaac4689222eb7b433fce6c3901a58868b5d7\nrefs/remotes/origin/codex/issue-34-transactional-generator-publication 1fd03050ca8855438f589b855a360e70105ec632\nrefs/remotes/origin/codex/issue-52-supply-freeze-convergence 0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2\nrefs/remotes/origin/codex/issue-54-supply-freeze-counterpart b1f3601211f3d29137e3d51a71513f1499265e5c\nrefs/remotes/origin/codex/issue-56-review-loop-command 500b9ba82920cc4cb2aa0d7e78cb18298a16707b\nrefs/remotes/origin/codex/issue-59-agent-workflow-isolation 43ad50be3fad4b2e65f0e89cc5c6cabb7722696a\nrefs/remotes/origin/codex/paperwork-cleanup 26c72f10c0f28ac869cb8314e9edbeff6cc3abc3\nrefs/remotes/origin/codex/safe-state-recovery-examples-20261001 975012ed84374aa2fe9f80bb489c69bc8b9bca63\nrefs/remotes/origin/copilot/add-style-guide-rule-for-terraform-urls 1fe181164f4686124f6e99d532be35db3871ca34\nrefs/remotes/origin/main a840f21b03f0dcac0815e2f7f044928667402b42\nrefs/remotes/origin/planning-CRT-PR-852 8e852a9f4fd382a122f32c1ce7461796f8762f8e\nrefs/remotes/origin/pr-37-head 2e650721a4ec5ca33501612d029ab27acfcff08e\n",
+      "indexSha256": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+      "trackedFileHashes": {
+        ".claude/commands/review-loop.md": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437",
+        ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+        ".gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+        ".github/copilot-instructions.md": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+        ".github/dependabot.yml": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+        ".github/document-metadata-classification.json": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        ".github/instructions/docs.instructions.md": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+        ".github/instructions/yaml.instructions.md": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+        ".github/workflows/.markdownlint.jsonc": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+        ".github/workflows/Check-NpmAudit.mjs": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322",
+        ".github/workflows/Check-NpmAudit.test.mjs": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+        ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+        ".github/workflows/Get-SupplyFreezeDigest.mjs": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+        ".github/workflows/Initialize-CiToolchain.ps1": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+        ".github/workflows/Invoke-LockedPythonHook.ps1": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+        ".github/workflows/Invoke-MarkdownLint.ps1": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+        ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        ".github/workflows/Test-AgentInstructions.ps1": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        ".github/workflows/Test-CheckoutCredentials.ps1": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+        ".github/workflows/Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+        ".github/workflows/Test-StateRecoveryExamples.mjs": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+        ".github/workflows/agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        ".github/workflows/build.yml": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+        ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        ".github/workflows/copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        ".github/workflows/copilot-setup-steps.yml": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+        ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        ".github/workflows/historical-supply-profile.json": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+        ".github/workflows/install-husky.mjs": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+        ".github/workflows/lint-markdown.mjs": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+        ".github/workflows/lint-markdown.test.mjs": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+        ".github/workflows/lint-nested-markdown.js": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+        ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+        ".github/workflows/markdownlint.yml": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+        ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+        ".github/workflows/package-lock.json": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        ".github/workflows/package.json": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        ".github/workflows/scripts-README.md": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        ".github/workflows/workflow-policy-contract.json": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        ".gitignore": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        ".husky/pre-commit": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        ".pre-commit-config.yaml": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        ".vscode/settings.json": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da",
+        "ACKNOWLEDGMENTS.md": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42",
+        "AGENTS.md": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f",
+        "CLAUDE.md": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1",
+        "CONTRIBUTING.md": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d",
+        "LICENSE": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb",
+        "README.md": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3",
+        "STYLE_GUIDE.md": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "STYLE_GUIDE_CHAT.md": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+        "STYLE_GUIDE_FULL.md": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+        "STYLE_GUIDE_RATIONALE.md": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+        "copilot-instructions.md": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "docs/ISSUE_EVALUATION_PROMPT.md": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+        "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+        "docs/T1-SUPPLY-FREEZE-v1.md": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+        "docs/decisions/0001-accept-generated-artifact-lint-lag.md": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94",
+        "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16",
+        "docs/decisions/0003-accept-required-check-workflow-edit-residual.md": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec",
+        "docs/dependency-maintenance.md": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "package-lock.json": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+        "package.json": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+        "requirements-dev.txt": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+        "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+        "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+        "terraform.instructions.md": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      }
+    }
+  },
+  "nonmutation": {
+    "PS": {
+      "equal": true,
+      "changedFields": []
+    },
+    "TF": {
+      "equal": true,
+      "changedFields": []
+    }
+  },
+  "completedUtc": "2026-10-07T03:20:47.900134+00:00",
+  "report": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A15-foundation-delta-20261007\\REPORT.md",
+    "sha256": "fdaeb6b513fd4d72a1ba3f36682beb8824b26a96288c4e884320c1baefe02347"
+  },
+  "limitations": [
+    "No candidate execution or imports; all product evidence is static.",
+    "No native network read; accepted mains supplied by root.",
+    "No acceptance or new design scope granted."
+  ]
+}
