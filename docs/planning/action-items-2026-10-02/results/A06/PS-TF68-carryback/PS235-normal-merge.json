@@ -1,0 +1,92 @@
+{
+  "status": "normal_merge_confirmed_landed_CI_pending",
+  "intent_at": "2026-10-07T04:09:43.231283+00:00",
+  "repository": "franklesniak/PSStyleGuide",
+  "pr": 235,
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "body_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+  "method": "merge",
+  "transport": "GitHub normal merge REST API via gh; expected head SHA; no override/force/admin/branch deletion",
+  "independent_quality": {
+    "status": "PASS_CURRENT_INPUT_RECOVERY_AND_FINAL_QUALITY_SUPPLEMENT",
+    "worker": "ps235_recovery2_acceptance",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2",
+    "scope": "New terminal service/review/native evidence and overview duplicate assessment; unchanged source quality reused.",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2\\REPORT.md",
+    "report_sha256": "339d58aa639966c76457e32c9d2328f0880386514f66334d80db7a49a77fe9c8",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2\\evidence.json",
+    "evidence_sha256": "668f8b948ee6574cdf73e91fbd83ca5c2aa0c92b68a173199778d48cb2d44c11",
+    "root_read_complete": true,
+    "root_consequential_reference_samples": 5,
+    "body_proposal_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+    "new_material_findings": 0,
+    "acceptance_released": false,
+    "remaining": "Immediate native premerge check and normal source merge; later landed/dedicated/paired gates remain."
+  },
+  "premerge_evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-premerge-native.json": "630a9701cbc9fb81f3d64af701e7e5344730f1751e18293737dba63f0966cc03",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-premerge-gates.json": "4296cf2e1f5329d092fe9ce9df00b73c965a42f5d2faa479b4e1f3e2db7f2ff5",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-success.json": "bab5f103d4ee546347359e39cc2d7467bd3ab788f123522acd7d1cc909c28d8f",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-body-validation.json": "e00241812fb3f040f3f84df40f5232b0683ac52ee544d879e20945470cbc3996"
+  },
+  "historical_cancelled_run_retained": 37562640212,
+  "current_successful_recovery": 37567459621,
+  "postlanding_requirements": "All landed CI, actual peer comparison and genuine dedicated-service selection/guard/success remain. No paired completion.",
+  "transport_exit": 0,
+  "merged_at": "2026-10-07T04:09:44Z",
+  "merge_commit": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "merged_by": "franklesniak",
+  "main": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+    "object": {
+      "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "type": "commit",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+    }
+  },
+  "commit": {
+    "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "node_id": "C_kwDOQkjdhNoAKDU4YTEzNDU4OTZkYTFhMWU4Nzk0MDc4ZTU4OGU4OGU1OGE3OGUyZWI",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-07T04:09:44Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-07T04:09:44Z"
+    },
+    "tree": {
+      "sha": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/821a952c9d4be1395cab3b2af8da7a679987e4a6"
+    },
+    "message": "Merge pull request #235 from franklesniak/codex/tf68-compareback\n\nCarry shared validation and review setup fixes back to PowerShell",
+    "parents": [
+      {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      },
+      {
+        "sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxcYICRC1aQ7uu5UhlAAAJhgQAA0VdQXraNCu7ZZWjBWBYapP\ntEg54veEPakzcptUpMlX1qXLQnaoQG3Yh1iqa02bAYo87bjVaaXzgL1FBS6QjNf5\nT7zAIQ3Pg0jICyhzH54pkbvIA6Z9JtakIsWdXdY+GHlxjXfkQqnPKZWwUhDngH9f\n6Ym8drL6YcAz2CeTzlYppEtBOu+6sCYIYqqAEwCg8lMXZuXbeSHK+nPhWGFkxvDC\n9DjWgApnpOdcWnQqI/nYPL/Bsnc3My/hAk0rX/68YJLL+2me7KM/BXoBFsypNAkB\nv4v3kcXoaslCfP26HTidrnJUGJ498J6PiDW6DW3d5iwhoGTlKDWBXFpRLZxAl9KR\nJOQa28iJ2bSretAw/6okhyzVZ8kvl3p//oVECEIzF+CYAY6ekE6fH7gbFX6I8As1\nU1lPGGgX6/NEdJQgH0rK9f9FDjgdyLqKvMqEcybS7dbj706K4lb63t1Pi6NaAYsg\n2N8O8rXT7U1aameMEAo/HVLxv9u1EUvx2QwUpkfhNnxGOUfomzi4l3WQWAWLcj43\nLmtfmFSW1HLYL+OsnPpGOgwNRPB/QgrZFjXSwAHUsIjnhcoOScvpC6MFfAbwU1Cn\n4Cg84JVDZTrpEXjgFYSY/hLOXr5PGUn3Eq8lmXteILg6wDnNTBdlXfl69zCqwbUg\nmKY5lZgnyjpWlHSfYvWj\n=2fAh\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 821a952c9d4be1395cab3b2af8da7a679987e4a6\nparent 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nparent 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791346184 -0500\ncommitter GitHub <noreply@github.com> 1791346184 -0500\n\nMerge pull request #235 from franklesniak/codex/tf68-compareback\n\nCarry shared validation and review setup fixes back to PowerShell",
+      "verified_at": "2026-10-07T04:09:44Z"
+    }
+  },
+  "confirmed_at": "2026-10-07T04:09:47.786483+00:00"
+}

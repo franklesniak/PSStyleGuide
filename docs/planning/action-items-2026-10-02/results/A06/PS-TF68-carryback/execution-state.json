@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round2_reviews_quality_CI_pass_ready_for_immediate_native_check",
+  "status": "PS235_merged_landed_CI_pending",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,7 +89,29 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [],
+  "pending_native_operations": [
+    {
+      "kind": "Landed push CI",
+      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "run_id": 37570120509,
+      "name": "Agent instruction validation",
+      "status": "in_progress"
+    },
+    {
+      "kind": "Landed push CI",
+      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "run_id": 37570120503,
+      "name": "Build Style Guide Artifacts",
+      "status": "in_progress"
+    },
+    {
+      "kind": "Landed push CI",
+      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "run_id": 37570118386,
+      "name": "Copilot setup steps",
+      "status": "in_progress"
+    }
+  ],
   "local_operation": {
     "kind": "non_force_topic_publication_and_PR_body",
     "status": "completed",
@@ -97,7 +119,7 @@
     "reconciled_at": "2026-10-07T02:32:20.614Z"
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Immediately recheck exact native H/B/tree/body, all reviews/current CI/scope/rules, then perform one normal source merge if unchanged. Verify actual landed identities and all resulting CI before downstream implementation; dedicated service and paired comparison remain due.",
+  "next_action": "Collect and verify all actual landed push CI, bind native merge/main/tree, then rebind existing peer delta on accepted refs. S1 dedicated-service proof remains required; no fabricated service input or closed-PR review.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -366,7 +388,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "eaaec67d6f110fc14fb9a8c94d1748d1d6bb7d64",
+  "planning_checkpoint": "c5f73069d46e9c40bd6b7efdd717bc76f875a589",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -391,7 +413,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-07T04:07:17.054168+00:00",
+  "updated_at": "2026-10-07T04:10:55.998423+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -2124,5 +2146,59 @@
     "new_material_findings": 0,
     "acceptance_released": false,
     "remaining": "Immediate native premerge check and normal source merge; later landed/dedicated/paired gates remain."
+  },
+  "merge": {
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-normal-merge.json",
+    "sha256": "732ba8b400cebd615a0a3cc88e8008129e6b1dde98497bd635e704a0bdf9b1d4",
+    "commit": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "merged_at": "2026-10-07T04:09:44Z",
+    "normal_method": "merge",
+    "source_acceptance": "Landed CI pending; not yet accepted paired foundation."
+  },
+  "landed_CI": {
+    "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-observation-one.json",
+    "sha256": "64a0d5b4644c841ba65775d5a3117ac5d828f51cb41a249302b2ee8ec45a4990",
+    "captured_at": "2026-10-07T04:10:55.998423+00:00",
+    "runs": [
+      {
+        "id": 37570120509,
+        "name": "Agent instruction validation",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37570120503,
+        "name": "Build Style Guide Artifacts",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37570120599,
+        "name": "Copilot code review preparation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37570120429,
+        "name": "Dev container boundary",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37570118386,
+        "name": "Copilot setup steps",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37570118398,
+        "name": "Markdown Lint",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "acceptance": false
   }
 }
