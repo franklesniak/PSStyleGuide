@@ -1,0 +1,887 @@
+name: Copilot code review preparation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+    paths:
+      - .github/workflows/**
+      - .husky/**
+      - requirements-dev.txt
+      - "**/*.yml"
+      - "**/*.yaml"
+      - .npmrc
+      - npm-shrinkwrap.json
+      - package.json
+      - package-lock.json
+  pull_request:
+    paths:
+      - .github/workflows/**
+      - .husky/**
+      - requirements-dev.txt
+      - "**/*.yml"
+      - "**/*.yaml"
+      - .npmrc
+      - npm-shrinkwrap.json
+      - package.json
+      - package-lock.json
+
+# Review setup prepares tools and hooks. Complete validation remains in
+# ordinary CI and the coding-agent setup; readiness is not acceptance.
+permissions: {}
+
+jobs:
+  copilot-setup-steps:
+    name: Prepare locked code review tools and hooks
+    runs-on: ubuntu-24.04
+    timeout-minutes: 59
+    permissions: {}
+    steps:
+      - name: Acquire triggering revision without an action
+        timeout-minutes: 5
+        id: acquire
+        shell: pwsh
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: external Git command configuration is not allowed'
+          }
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          # git reports absent state with a non-zero status in places this step
+          # accepts, so native-command error mapping is disabled the same way
+          # the other governed steps disable it and each status is classified
+          # explicitly instead.
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          # Every value below is set by the runner before any repository code
+          # executes, and is read from the environment rather than expanded as
+          # a workflow expression, because no governed script step in this
+          # repository contains an expression at all.
+          $strServerUrl = $env:GITHUB_SERVER_URL
+          $strRepository = $env:GITHUB_REPOSITORY
+          $strSha = $env:GITHUB_SHA
+          if ($strServerUrl -cne 'https://github.com') {
+              throw 'acquire: the runner named an unexpected server'
+          }
+          if ($strRepository -cne 'franklesniak/TerraformStyleGuide') {
+              throw 'acquire: the triggering repository is not the expected repository'
+          }
+          # A full 40-hex commit is required rather than a ref. A ref would let
+          # the fetch resolve to whatever the ref points at when the fetch runs,
+          # which for a push to a busy branch is not necessarily the revision
+          # that triggered this run.
+          if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'acquire: the triggering revision is not a full commit hash'
+          }
+
+          # The workspace is proven empty rather than cleaned. Cleaning would
+          # decide what to delete from state that is already present, while an
+          # emptiness assertion has no such input.
+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'acquire: the workspace is not empty'
+          }
+
+          # Resolved from a fixed candidate list rather than by name. Nothing has
+          # executed in this step yet, so name resolution is not attacker-
+          # influenced here -- but PowerShell aliases curl and wget to
+          # Invoke-WebRequest on the Desktop edition, this repository already
+          # pins the Git executable this way in the verify step, and relying on
+          # an alias being absent is a property of the host rather than
+          # something this file asserts. Constant, so nothing later can rebind
+          # it.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'acquire: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+
+          & $strGitPath -c core.hooksPath=/dev/null init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
+          & $strGitPath remote add origin "$strServerUrl/$strRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }
+          # Fetching the commit itself, not a ref that names it. No credential
+          # is supplied and none is configured, so nothing is persisted for the
+          # next step to have to clean up.
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin $strSha
+              $intFetchExitCode = $LASTEXITCODE
+              if ($intFetchExitCode -eq 0) { break }
+              if ($intAttempt -lt 3) { Start-Sleep -Seconds 2 }
+          }
+          if ($intFetchExitCode -ne 0) { throw "acquire: git fetch exited $intFetchExitCode after three attempts" }
+          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
+          $arrHeadOutput = @(& $strGitPath rev-parse HEAD)
+          $intHeadExitCode = $LASTEXITCODE
+          if ($intHeadExitCode -ne 0) {
+              throw "acquire: git rev-parse exited $intHeadExitCode"
+          }
+          if ($arrHeadOutput.Count -ne 1) {
+              throw 'acquire: git rev-parse must return exactly one line'
+          }
+          $strHead = $arrHeadOutput[0].Trim()
+          if ($strHead -cne $strSha) {
+              throw 'acquire: the checked out revision is not the triggering revision'
+          }
+          Write-Information "acquire: anonymous exact checkout of $strSha" -InformationAction Continue
+      - name: Verify checkout credential cleanup
+        timeout-minutes: 2
+        id: verify-checkout-credentials
+        shell: pwsh
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: external Git command configuration is not allowed'
+          }
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          # git config exits 1 when a queried key is absent, which is the secure
+          # expected state this step asserts. If the runner enables native-command
+          # error mapping, that accepted status would terminate the step before the
+          # explicit capture below runs, so it is disabled the same way
+          # markdownlint.yml disables it.
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+          # Resolved here too. Constants do not cross step boundaries, and this
+          # step asserts a credential property, so the executable it asks must
+          # not be chosen by name resolution either.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'credential-policy: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          $arrRemoteUrls = @(& $strGitPath remote get-url --all origin)
+          if ($LASTEXITCODE -ne 0 -or $arrRemoteUrls.Count -ne 1) {
+              throw 'credential-policy: unable to resolve exactly one origin URL'
+          }
+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {
+              throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'
+          }
+          $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)
+          $intHelperExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {
+              throw 'credential-policy: a local credential helper is configured'
+          }
+          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\..*\.extraheader$')
+          $intAuthorizationExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {
+              throw 'credential-policy: persisted HTTP authorization is configured'
+          }
+
+          $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)
+          $intEffectiveConfigExit = $LASTEXITCODE
+          if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object { $_ -cmatch '^(system|global)\s' }).Count -ne 0) {
+              throw 'credential-policy: external Git configuration was not excluded'
+          }
+
+      - name: Acquire published main reference
+        timeout-minutes: 5
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: external Git command configuration is not allowed'
+          }
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          # git reports absent state with a non-zero status in places this step
+          # accepts, so native-command error mapping is disabled the same way
+          # the other governed steps disable it and each status is classified
+          # explicitly instead.
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          $strGitPath = @('/usr/bin/git', '/bin/git') | Where-Object {
+              [IO.File]::Exists($_)
+          } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strGitPath)) {
+              throw 'main: fixed Git is unavailable'
+          }
+          $arrUrls = @(& $strGitPath remote get-url --all origin)
+          if ($LASTEXITCODE -ne 0 -or $arrUrls.Count -ne 1 -or
+              $arrUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {
+              throw 'main: origin identity is invalid'
+          }
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin refs/heads/main:refs/remotes/origin/main
+              $intFetchExitCode = $LASTEXITCODE
+              if ($intFetchExitCode -eq 0) {
+                  break
+              }
+              if ($intAttempt -lt 3) {
+                  Start-Sleep -Seconds 2
+              }
+          }
+          if ($intFetchExitCode -ne 0) {
+              throw "main: git fetch exited $intFetchExitCode after three attempts"
+          }
+          $arrMain = @(& $strGitPath rev-parse --verify refs/remotes/origin/main)
+          if ($LASTEXITCODE -ne 0 -or $arrMain.Count -ne 1 -or
+              $arrMain[0] -cnotmatch '^[0-9a-f]{40}$' -or $arrMain[0] -ceq ('0' * 40)) {
+              throw 'main: expected one nonzero commit identity'
+          }
+          $strMain = $arrMain[0]
+          $arrType = @(& $strGitPath cat-file -t $strMain)
+          if ($LASTEXITCODE -ne 0 -or $arrType.Count -ne 1 -or $arrType[0] -cne 'commit') {
+              throw 'main: fetched authority is not a commit'
+          }
+          $arrHead = @(& $strGitPath rev-parse HEAD)
+          if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {
+              throw 'main: event checkout changed during authority acquisition'
+          }
+          Write-Information "main: setup-time authority $strMain; event checkout $env:GITHUB_SHA" -InformationAction Continue
+
+      - name: Reject alternate npm install inputs
+        timeout-minutes: 2
+        shell: bash
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          declare -ar alternate_inputs=(
+            .npmrc
+            npm-shrinkwrap.json
+            .github/workflows/.npmrc
+            .github/workflows/npm-shrinkwrap.json
+          )
+          for alternate_input in "${alternate_inputs[@]}"; do
+            if [[ -e "${alternate_input}" || -L "${alternate_input}" ]]; then
+              echo "::error file=${alternate_input}::Unsupported npm" \
+                'install input.'
+              exit 1
+            fi
+          done
+
+      - name: Detect locked validation-tool layout
+        timeout-minutes: 2
+        id: toolchain
+        shell: bash
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          workflow_manifest='.github/workflows/package.json'
+          workflow_lock='.github/workflows/package-lock.json'
+
+          for required_file in "${workflow_manifest}" "${workflow_lock}"; do
+            if [[ ! -f "${required_file}" || -L "${required_file}" ]]; then
+              echo "::error file=${required_file}::Required locked npm input" \
+                'is missing or is not a regular file.'
+              exit 1
+            fi
+          done
+
+          classify_npm_input() {
+            if [[ -L "$1" ]]; then
+              printf 'symlink'
+            elif [[ -f "$1" ]]; then
+              printf 'regular-file'
+            elif [[ -e "$1" ]]; then
+              printf 'non-regular'
+            else
+              printf 'absent'
+            fi
+          }
+
+          root_manifest_state="$(classify_npm_input package.json)"
+          root_lock_state="$(classify_npm_input package-lock.json)"
+
+          if [[ "${root_manifest_state}" == regular-file && \
+            "${root_lock_state}" == regular-file ]]; then
+            echo 'layout=modern' >> "${GITHUB_OUTPUT}"
+          elif [[ "${root_manifest_state}" == absent && \
+            "${root_lock_state}" == absent ]]; then
+            echo 'layout=legacy' >> "${GITHUB_OUTPUT}"
+          else
+            echo '::error::The root npm validation tuple requires both inputs as' \
+              'regular files or both inputs absent;' \
+              "package.json=${root_manifest_state};" \
+              "package-lock.json=${root_lock_state}."
+            exit 1
+          fi
+
+
+          declaration='.github/workflows/ci-toolchain.json'
+          declaration_state="$(classify_npm_input "${declaration}")"
+          python_lock_state="$(classify_npm_input requirements-dev.txt)"
+          launcher_state="$(classify_npm_input .github/workflows/Invoke-LockedPythonHook.ps1)"
+          capability='full'
+          version=''
+          if [[ "${root_manifest_state}" == absent ]]; then
+            if [[ "${declaration_state}" != absent || "${python_lock_state}" != absent || "${launcher_state}" != absent ]]; then
+              echo '::error::Legacy npm layout has partial current validation inputs.'
+              exit 1
+            fi
+            capability='node-only'
+          elif [[ "${declaration_state}" == absent ]]; then
+            # PowerShell variables are intentionally literal to Bash.
+            # shellcheck disable=SC2016
+            version="$(pwsh -NoLogo -NoProfile -NonInteractive -Command '
+              $ErrorActionPreference = "Stop"
+              $obj = Get-Content -Raw -LiteralPath package.json | ConvertFrom-Json -ErrorAction Stop
+              if ($obj.engines.npm -cne "11.16.0" -or $obj.engines.node -cnotin @("24.18.0", "24.18.1")) {
+                  throw "Unsupported pre-declaration runtime tuple"
+              }
+              Write-Output $obj.engines.node')"
+            if [[ "${version}" == 24.18.0 && "${python_lock_state}" == absent && "${launcher_state}" == absent ]]; then
+              capability='node-only'
+            fi
+          elif [[ "${declaration_state}" != regular-file ]]; then
+            echo '::error::Runtime declaration is not a regular file.'
+            exit 1
+          else
+            # shellcheck disable=SC2016
+            pwsh -NoLogo -NoProfile -NonInteractive -Command '
+              $ErrorActionPreference = "Stop"
+              $null = Get-Content -Raw -LiteralPath .github/workflows/ci-toolchain.json | ConvertFrom-Json -ErrorAction Stop'
+          fi
+          if [[ "${capability}" == full ]]; then
+            installer_state="$(classify_npm_input .github/workflows/install-husky.mjs)"
+            if [[ "${declaration_state}" == absent && "${version}" == 24.18.1 && "${installer_state}" == absent ]]; then
+              # Retain the evidenced historical command, not an arbitrary missing-input fallback.
+              # shellcheck disable=SC2016
+              pwsh -NoLogo -NoProfile -NonInteractive -Command '
+                $ErrorActionPreference = "Stop"
+                $obj = Get-Content -Raw -LiteralPath .github/workflows/package.json | ConvertFrom-Json -ErrorAction Stop
+                if ($obj.scripts.prepare -isnot [string] -or $obj.scripts.prepare -cne "cd ../.. && husky") {
+                    throw "Historical full setup requires the exact retained prepare command"
+                }'
+              echo 'Retained historical Husky prepare command selected.'
+            elif [[ "${installer_state}" != regular-file ]]; then
+              echo '::error::Full validation requires a regular current Husky installer.'
+              exit 1
+            fi
+            for required_file in requirements-dev.txt .github/workflows/Invoke-LockedPythonHook.ps1 \
+              .pre-commit-config.yaml .husky/pre-commit \
+              .github/workflows/lint-staged-markdown.mjs; do
+              if [[ "$(classify_npm_input "${required_file}")" != regular-file ]]; then
+                echo "::error file=${required_file}::Full validation requires a regular input."
+                exit 1
+              fi
+            done
+            echo 'Full Node/Python/hook preparation selected.'
+          else
+            echo 'Historical Node-only preparation selected; Python and full validation are unavailable for this tree.'
+          fi
+          printf 'validation=%s\n' "${capability}" >> "${GITHUB_OUTPUT}"
+
+
+      - name: Verify acquired immutable setup inputs
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          declare -ar setup_inputs=(
+            package.json package-lock.json .github/workflows/package.json .github/workflows/package-lock.json
+            .github/workflows/ci-toolchain.json requirements-dev.txt .github/workflows/Invoke-LockedPythonHook.ps1
+            .pre-commit-config.yaml .github/workflows/install-husky.mjs .husky/pre-commit
+            .github/workflows/lint-staged-markdown.mjs
+          )
+          git diff --cached --exit-code HEAD -- "${setup_inputs[@]}"
+          git diff --exit-code HEAD -- "${setup_inputs[@]}"
+          untracked_inputs="$(git ls-files --others -- "${setup_inputs[@]}")"
+          if [[ -n "${untracked_inputs}" ]]; then
+            printf '::error::Untracked setup inputs changed: %s\n' "${untracked_inputs}"
+            exit 1
+          fi
+
+      - name: Set up verified official Node.js runtime
+        timeout-minutes: 8
+        shell: pwsh
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: external Git command configuration is not allowed'
+          }
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          $strDigestSource = 'copilot-setup-steps.yml retained runtime digest'
+          if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
+              $strVersion = '20.20.2'
+              $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
+          } elseif ($env:TOOLCHAIN_LAYOUT -ceq 'modern') {
+              if (Test-Path -LiteralPath '.github/workflows/ci-toolchain.json') {
+                  $objRuntimePin = Get-Content -Raw -LiteralPath '.github/workflows/ci-toolchain.json' | ConvertFrom-Json -ErrorAction Stop
+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
+                  $strVersion = $objPackage.engines.node
+                  $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()
+                  $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'
+              } else {
+                  # Preserve service setup for published branches from before the shared declaration.
+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
+                  $strVersion = $objPackage.engines.node
+                  if ($objPackage.engines.npm -cne '11.16.0') {
+                      throw 'toolchain: unsupported pre-declaration npm version'
+                  }
+                  switch -CaseSensitive ($strVersion) {
+                      '24.18.0' {
+                          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
+                      }
+                      '24.18.1' {
+                          $strReviewedSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+                      }
+                      default {
+                          throw 'toolchain: a current runtime declaration is required'
+                      }
+                  }
+              }
+              if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
+                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+                  throw 'toolchain: the reviewed runtime declaration is invalid'
+              }
+          } else {
+              throw 'toolchain: unsupported validation-tool layout'
+          }
+          $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')
+          $strArchive = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node.tar.xz')
+          if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {
+              throw 'toolchain: runtime staging destination already exists'
+          }
+          $strCurlPath = @('/usr/bin/curl', '/bin/curl') |
+              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1
+          $strTarPath = @('/usr/bin/tar', '/bin/tar') |
+              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strCurlPath) -or [string]::IsNullOrEmpty($strTarPath)) {
+              throw 'toolchain: fixed download/extraction tools are unavailable'
+          }
+          $strUrl = "https://nodejs.org/dist/v$strVersion/node-v$strVersion-linux-x64.tar.xz"
+          & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl
+          if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
+          if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
+              throw "toolchain: official Node archive does not match the reviewed digest for $strUrl. Check $strDigestSource. Verify the official release checksum before changing the declaration."
+          }
+          [void][IO.Directory]::CreateDirectory($strNodeRoot)
+          & $strTarPath -xJf $strArchive -C $strNodeRoot --strip-components=1
+          if ($LASTEXITCODE -ne 0) { throw "toolchain: extraction exited $LASTEXITCODE" }
+          $strNodePath = [IO.Path]::Combine($strNodeRoot, 'bin', 'node')
+          $strNpmPath = [IO.Path]::Combine($strNodeRoot, 'bin', 'npm')
+          if (-not [IO.File]::Exists($strNodePath) -or -not [IO.File]::Exists($strNpmPath)) {
+              throw 'toolchain: verified runtime executables are missing'
+          }
+          $arrVersionOutput = @(& $strNodePath --version)
+          $intVersionExitCode = $LASTEXITCODE
+          if ($intVersionExitCode -ne 0) {
+              throw "toolchain: runtime version command exited $intVersionExitCode"
+          }
+          if ($arrVersionOutput.Count -ne 1) {
+              throw 'toolchain: runtime version command must return exactly one line'
+          }
+          $strObservedVersion = $arrVersionOutput[0].Trim()
+          if ($strObservedVersion -cne "v$strVersion") {
+              throw 'toolchain: verified runtime executable identity is wrong'
+          }
+          [IO.File]::AppendAllText($env:GITHUB_PATH,
+              [IO.Path]::Combine($strNodeRoot, 'bin') + "`n", [Text.UTF8Encoding]::new($false))
+
+      - name: Verify selected Node.js runtime
+        timeout-minutes: 2
+        shell: bash
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          printf '%s\n' 'npm_config_userconfig=/dev/null' \
+            'npm_config_globalconfig=/etc/npmrc-absent-by-policy' >> "${GITHUB_ENV}"
+          if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
+            expected_node="$(node -p 'require("./package.json").engines.node')"
+            expected_npm="$(node -p 'require("./package.json").engines.npm')"
+            test "$(node --version)" = "v${expected_node}"
+            test "$("${npm_environment[@]}" npm --version)" = "${expected_npm}"
+          elif [[ "${TOOLCHAIN_LAYOUT}" == legacy ]]; then
+            test "$(node -p 'process.versions.node.split(".")[0]')" = '20'
+          else
+            echo '::error::The validation-tool layout is unsupported.'
+            exit 1
+          fi
+
+      - name: Install locked Node.js validation tools
+        timeout-minutes: 10
+        shell: bash
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          if [[ -f .github/workflows/ci-toolchain.json ]]; then
+            node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
+          fi
+          if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
+            "${npm_environment[@]}" npm ci --ignore-scripts --no-audit --fund=false --include=dev
+          elif [[ "${TOOLCHAIN_LAYOUT}" != legacy ]]; then
+            echo '::error::The validation-tool layout is unsupported.'
+            exit 1
+          fi
+          "${npm_environment[@]}" npm ci --ignore-scripts --no-audit --fund=false --include=dev \
+            --prefix .github/workflows
+
+      - name: Verify locked dependency trees and immutable manifests
+        timeout-minutes: 2
+        shell: bash
+        env:
+          GIT_CONFIG_NOSYSTEM: "1"
+          GIT_CONFIG_GLOBAL: /dev/null
+          GIT_TERMINAL_PROMPT: "0"
+          TOOLCHAIN_LAYOUT: ${{ steps.toolchain.outputs.layout }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
+            "${npm_environment[@]}" npm ls --all
+            immutable_inputs=(
+              package.json
+              package-lock.json
+              .github/workflows/package.json
+              .github/workflows/package-lock.json
+            )
+          elif [[ "${TOOLCHAIN_LAYOUT}" == legacy ]]; then
+            immutable_inputs=(
+              .github/workflows/package.json
+              .github/workflows/package-lock.json
+            )
+          else
+            echo '::error::The validation-tool layout is unsupported.'
+            exit 1
+          fi
+          "${npm_environment[@]}" npm --prefix .github/workflows ls --all
+          git diff --exit-code -- "${immutable_inputs[@]}"
+
+      - name: Set up isolated Python 3.12
+        if: steps.toolchain.outputs.validation == 'full'
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # Preserve setup-python's installed 3.12/x64 selection and exports.
+          # Missing hosted cache fails closed; no runtime download or system fallback.
+          cache_root='/opt/hostedtoolcache/Python'
+          test -d "${cache_root}"
+          test ! -L "${cache_root}"
+          resolved_cache="$(realpath -e -- "${cache_root}")"
+          test "${resolved_cache}" = "${cache_root}"
+          selected_python=''
+          versions="$(find "${cache_root}" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -Vr)"
+          while IFS= read -r version; do
+            [[ "${version}" =~ ^3\.12\.[0-9]+$ ]] || continue
+            candidate="${cache_root}/${version}/x64"
+            if [[ -d "${candidate}" && ! -L "${candidate}" &&
+              -f "${candidate}.complete" && ! -L "${candidate}.complete" ]]; then
+              resolved_candidate="$(realpath -e -- "${candidate}")"
+              test "${resolved_candidate}" = "${candidate}"
+              selected_python="${candidate}"
+              break
+            fi
+          done <<< "${versions}"
+          test -n "${selected_python}"
+          for required_directory in bin lib; do
+            test -d "${selected_python}/${required_directory}"
+            test ! -L "${selected_python}/${required_directory}"
+          done
+          executable="$(realpath -e -- "${selected_python}/bin/python")"
+          case "${executable}" in
+            "${selected_python}/bin/"*) ;;
+            *) exit 1 ;;
+          esac
+          test -f "${executable}"
+          test -x "${executable}"
+          library_path="${LD_LIBRARY_PATH:-}"
+          case "${library_path}" in
+            *$'\r'*|*$'\n'*)
+              echo '::error::Python library path contains a line break.'
+              exit 1
+              ;;
+          esac
+          case ":${library_path}:" in
+            *":${selected_python}/lib:"*) ;;
+            *) library_path="${selected_python}/lib${library_path:+:${library_path}}" ;;
+          esac
+          export LD_LIBRARY_PATH="${library_path}"
+          observed_python="$("${executable}" -I -S -c \
+            'import sys; print((sys.implementation.name, sys.version_info[:3], sys.maxsize > 2**32))')"
+          test "${observed_python}" = "('cpython', (3, 12, ${version##*.}), True)"
+          # Keep repository installs out of the hosted interpreter and tracked worktree.
+          case "${RUNNER_TEMP}" in *$'\r'*|*$'\n'*) echo '::error::Invalid runner temporary path.'; exit 1 ;; esac
+          venv="${RUNNER_TEMP}/agent-validation-python"
+          if [[ -e "${venv}" || -L "${venv}" ]]; then
+            echo '::error::Python venv staging destination already exists.'
+            exit 1
+          fi
+          "${executable}" -E -P -m venv "${venv}"
+          test -x "${venv}/bin/python3.12"
+          observed_venv="$("${venv}/bin/python3.12" -I -S -c \
+            'import sys; print((sys.implementation.name, sys.version_info[:3], sys.maxsize > 2**32))')"
+          test "${observed_venv}" = "${observed_python}"
+          "${venv}/bin/python3.12" -I -c \
+            'import os, sys; assert os.path.samefile(sys._base_executable, sys.argv[1]); assert sys.prefix == sys.argv[2]' \
+            "${executable}" "${venv}"
+          printf '%s\n' "${venv}/bin" >> "${GITHUB_PATH}"
+          {
+            printf 'VALIDATION_PYTHON=%s/bin/python3.12\n' "${venv}"
+            printf 'LD_LIBRARY_PATH=%s\n' "${LD_LIBRARY_PATH}"
+          } >> "${GITHUB_ENV}"
+
+      - name: Install locked Python validation tools
+        if: steps.toolchain.outputs.validation == 'full'
+        timeout-minutes: 10
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          test -x "${VALIDATION_PYTHON}"
+          observed_minor="$("${VALIDATION_PYTHON}" -E -P -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+          test "${observed_minor}" = '3.12'
+          "${VALIDATION_PYTHON}" -E -P -m pip --isolated install --require-hashes --only-binary=:all: \
+            --index-url https://pypi.org/simple -r requirements-dev.txt
+          observed_pre_commit="$("${VALIDATION_PYTHON}" -E -P -m pre_commit --version)"
+          expected_pre_commit="$(sed -n 's/^pre-commit==\([^ ]*\) .*/\1/p' requirements-dev.txt)"
+          test -n "${expected_pre_commit}"
+          test "${observed_pre_commit}" = "pre-commit ${expected_pre_commit}"
+          "${VALIDATION_PYTHON}" -E -P -m pip --isolated check
+
+      - name: Activate repository hooks
+        if: steps.toolchain.outputs.validation == 'full'
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          "${npm_environment[@]}" npm --prefix .github/workflows run prepare
+          test "$(git config --get core.hooksPath)" = '.husky/_'
+          test -f .husky/_/pre-commit && test -x .husky/_/pre-commit
+
+      - name: Verify final immutable setup inputs
+        if: always() && steps.toolchain.outcome == 'success'
+        timeout-minutes: 2
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          declare -ar setup_inputs=(
+            package.json package-lock.json .github/workflows/package.json .github/workflows/package-lock.json
+            .github/workflows/ci-toolchain.json requirements-dev.txt .github/workflows/Invoke-LockedPythonHook.ps1
+            .pre-commit-config.yaml .github/workflows/install-husky.mjs .husky/pre-commit
+            .github/workflows/lint-staged-markdown.mjs
+          )
+          git diff --cached --exit-code HEAD -- "${setup_inputs[@]}"
+          git diff --exit-code HEAD -- "${setup_inputs[@]}"
+          untracked_inputs="$(git ls-files --others -- "${setup_inputs[@]}")"
+          if [[ -n "${untracked_inputs}" ]]; then
+            printf '::error::Untracked setup inputs changed: %s\n' "${untracked_inputs}"
+            exit 1
+          fi

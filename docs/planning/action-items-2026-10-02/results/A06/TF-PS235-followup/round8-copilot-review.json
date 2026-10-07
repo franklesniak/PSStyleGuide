@@ -1,0 +1,40 @@
+{
+  "id": 5438134380,
+  "node_id": "PRR_kwDOSAZRhc8AAAABRCNYbA",
+  "user": {
+    "login": "copilot-pull-request-reviewer[bot]",
+    "id": 175728472,
+    "node_id": "BOT_kgDOCnlnWA",
+    "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D",
+    "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+    "followers_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/followers",
+    "following_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/following{/other_user}",
+    "gists_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/subscriptions",
+    "organizations_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/orgs",
+    "repos_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/repos",
+    "events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/received_events",
+    "type": "Bot",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### 🔵 Needs a closer look\n\nThe change edits the automated-merge governance validator with ~248 lines of dense self-test logic that cannot be fully executed here, so despite no defects found it warrants human review of the governance-critical surface.\n\n**Review effort:** Balanced  \n**Findings:** None\n\n<details>\n<summary><strong>What changed in this PR</strong></summary>\n\nThis PR ports an optimization accepted upstream in PSStyleGuide #235 into TerraformStyleGuide's agent-instruction Markdown validator (`Get-MarkdownParseContext`). It short-circuits the per-element \"all strings\" scan for `code`/`links` arrays when those arrays are empty, while preserving the existing array-type and malformed-element checks. The change is behavior-preserving: for an empty array the original `@(... | Where-Object { $_ -isnot [string] }).Count -ne 0` already evaluated to `$false`, so the new `.Count -ne 0 -and (...)` guard simply skips an unnecessary pipeline scan. The `-isnot [array]` test still precedes the new `.Count` access, so `.Count` is only evaluated on a confirmed array.\n\nThe change is applied consistently to all three affected validation sites (prose blocks, table cells, top-level list items); a search confirmed these are the only occurrences of the pattern. A new permanent self-test (`Assert-MarkdownStringArrayContextSelfTest`) adds 109 cases (19 accepts, 90 refusals) that drive the real parser via a function-local mutation wrapper and assert exact admission, typed output, failure messages, and no partial output on refusal. Its expected \"property cannot be found\" messages are valid because the script runs under `Set-StrictMode -Version Latest`.\n\n**Changes:**\n- Skip the non-string element scan for empty `code`/`links` arrays in prose, table-cell, and list-item validation (behavior-preserving).\n- Add `Assert-MarkdownStringArrayContextSelfTest` with 109 cases plus its registration in the self-test run order.\n- Bump `Version`/`Last Updated` metadata on the two scripts and `docs/dependency-maintenance.md`.\n\n| File | Description |\r\n| ---- | ----------- |\r\n| `.github/​workflows/​Test-AgentInstructions.ps1` | Adds empty-array skip to the three string-array validation branches; version comments bumped. |\r\n| `.github/​workflows/​Test-AgentInstructions.SelfTest.ps1` | New `Assert-MarkdownStringArrayContextSelfTest` covering empty/populated/invalid arrays across prose, table-cell, and list-item contexts; registered in run order. |\r\n| `docs/​dependency-maintenance.md` | `Last Updated` date bumped to 2026-10-07 (metadata-only). |\n</details>\n\n---\n\n💡 <a href=\"/franklesniak/TerraformStyleGuide/new/main?filename=.github/skills/code-review/SKILL.md\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Add a `code-review` agent skill</a> or configure MCP servers for context-aware, tailored reviews. <a href=\"https://docs.github.com/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui#mcp-servers-and-agent-skills\" class=\"Link--inTextBlock\" target=\"_blank\" rel=\"noopener noreferrer\">Learn more in the docs.</a>",
+  "state": "COMMENTED",
+  "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/69#pullrequestreview-5438134380",
+  "pull_request_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69",
+  "author_association": "NONE",
+  "_links": {
+    "html": {
+      "href": "https://github.com/franklesniak/TerraformStyleGuide/pull/69#pullrequestreview-5438134380"
+    },
+    "pull_request": {
+      "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69"
+    }
+  },
+  "submitted_at": "2026-10-07T05:44:14Z",
+  "commit_id": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe"
+}

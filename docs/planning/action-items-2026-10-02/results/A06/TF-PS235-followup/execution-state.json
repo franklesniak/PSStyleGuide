@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "ROUND8_COPILOT_AND_CI_PENDING",
+  "status": "TF69_MERGED_LANDED_CI_PENDING",
   "released_at": "2026-10-07T04:34:47.428231+00:00",
   "objective": "Carry accepted D94.1 validator/109-case repair and touched guide metadata into TF; preserve finite exceptions and prove paired convergence.",
   "repository": "franklesniak/TerraformStyleGuide",
@@ -192,31 +192,64 @@
         "basis": "Authenticated completed exact-head PR-open summary, authenticated app thumbs-up, and complete empty review/comment/thread surfaces on unchanged head/base/body. No manual duplicate trigger."
       },
       "copilot": {
-        "status": "requested",
+        "status": "clean",
         "transport": "GitHub Reviewers UI",
         "selected_effort": "Balanced",
-        "observed_completed_effort": null,
+        "observed_completed_effort": "Balanced",
         "requested_at": "2026-10-07T05:36:54.410759+00:00",
         "event_id": 32661944598,
         "accepted_at": "2026-10-07T05:37:00Z",
         "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\round8-request-readback.json",
         "observed_timeline": "requested a balanced review; Reviewing at balanced effort",
-        "effort_observation_status": "request timeline observed; completed overview pending"
+        "effort_observation_status": "completed Copilot review overview explicitly states Balanced",
+        "workflow_run_id": 37577209812,
+        "job_id": 112648669716,
+        "last_observed_at": "2026-10-07T05:39:47.750843+00:00",
+        "setup_observation": "Actual dynamic service selected and passed the dedicated setup; exact source/run body comparison and native successful guard steps verified.",
+        "review_id": 5438134380,
+        "submitted_at": "2026-10-07T05:44:14Z",
+        "review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\round8-copilot-review.json",
+        "review_body_sha256": "c71e200a6a06e0a719c9ca51962fb9aef67413fe4e5c13de5815c97a776d78ef",
+        "service_conclusion": "success",
+        "service_completed_observed_at": "2026-10-07T05:46:21.032432+00:00",
+        "body_advisory": "No concrete defect or missing case. Independent source review, actual Windows/Linux focused checks and local/hosted full SelfTests address the stated execution limitation. No human approval is claimed.",
+        "advisory_disposition_report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\REPORT.md"
       }
     }
   ],
   "pr": 69,
   "clock_basis": "TF69 continues unresolved paired TF outcome: seven prior rounds retained, round8 starts with authenticated automatic Codex PR-open review. Original first request/deadline unchanged.",
-  "pending_native_operations": [],
+  "pending_native_operations": [
+    {
+      "kind": "Landed push CI",
+      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+      "run_id": 37579626338,
+      "name": "Copilot setup steps",
+      "status": "in_progress"
+    },
+    {
+      "kind": "Landed push CI",
+      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+      "run_id": 37579626311,
+      "name": "Agent instruction validation",
+      "status": "in_progress"
+    },
+    {
+      "kind": "Landed push CI",
+      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+      "run_id": 37579626389,
+      "name": "Build Style Guide Artifacts",
+      "status": "in_progress"
+    }
+  ],
   "local_operation": {
-    "kind": "Corrected private maintenance-subset expectation; full actual-H endpoint/audit run",
+    "kind": "planning checkpoint publication",
     "status": "passed",
-    "session_id": 88405,
-    "observed_at": "2026-10-07T05:19:57.984645+00:00",
-    "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run",
-    "recovery": "Completed with exit0; reuse results. Do not poll or replay this finished validation.",
+    "session_id": 65479,
     "exit": 0,
-    "finished_at": "2026-10-07T05:24:23.967379+00:00"
+    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-local-pass-review-start-planning-publication.json",
+    "commit": "6f098cb6179ed5ddd02217c1cc3e5d1d9ceaafb7",
+    "recovery": "Published and native branch readback matched; do not repeat."
   },
   "product_edit_authorized": false,
   "validation_execution_authorized": "One actual committed-H endpoint/audit run in the released packet; no repeat.",
@@ -228,9 +261,9 @@
     "No new framework, benchmark, broad unchanged suite, protected-file edit or bypass.",
     "Retain original rounds/deadlines, all failed history, hourly CI rule and pending-operation suppression."
   ],
-  "next_action": "Collect accepted Copilot request32661944598 and all exact-head CI; inspect genuine review setup selection/guard/success, then final native quality and normal merge gates. Do not duplicate accepted requests.",
+  "next_action": "Verify landed CI and native tree, then compare actual accepted source/peer bytes and finite exceptions. Preserve all counters and remaining broad outcomes.",
   "branch_created_at": "2026-10-07T04:34:47.952447+00:00",
-  "planning_checkpoint": "76d2b977a323221ff8fd06f3f1f3bb5facbf1464",
+  "planning_checkpoint": "6f098cb6179ed5ddd02217c1cc3e5d1d9ceaafb7",
   "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
   "staged_at": "2026-10-07T04:40:36.596743+00:00",
   "source_catalog": {
@@ -242,7 +275,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\QUALIFICATION-RELEASE.json",
     "sha256": "6244e4eca25c7e0cc005d51ca64757a0a0099fe196b5653cd8bfd55c8fd5496b"
   },
-  "updated_at": "2026-10-07T05:38:50.556295+00:00",
+  "updated_at": "2026-10-07T06:06:06.953661+00:00",
   "focused_validation": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\FOCUSED-VALIDATION.json",
     "sha256": "97ee39d786c57b9227c85ea97f638cfe22ac0b4dae4063fea2904a73a3bb58f8"
@@ -507,5 +540,110 @@
     "verified_at": "2026-10-07T05:35:38.722251+00:00"
   },
   "pr_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/69",
-  "body_sha256": "c02fecbcd1e8c7f85a99764410c66d5bc6ac3b78a18a575df8cf9ae6e1e2fda0"
+  "body_sha256": "c02fecbcd1e8c7f85a99764410c66d5bc6ac3b78a18a575df8cf9ae6e1e2fda0",
+  "final_native_quality": {
+    "status": "passed",
+    "worker": "tf_ps235_candidate_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final",
+    "scope": "Exact published candidate, complete remote reviews and 14 successful workflows; root read report, verified referenced evidence and sampled raw final test logs. Agent review is not human approval.",
+    "root_verified": true,
+    "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\REPORT.md",
+    "report_sha256": "b610f9dd3b08faf50182811afa3779811b52e20b41ffa851f21a19fe88c784fd",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\evidence.json",
+    "evidence_sha256": "dddc167380c61f669776d8fda2773819dfc9dae070e4603ce9316de7fd6fcf08",
+    "root_verified_at": "2026-10-07T06:04:59.922888+00:00",
+    "immutable_references_verified": 73,
+    "material_findings": []
+  },
+  "latest_native_observation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\evidence.json",
+    "sha256": "dddc167380c61f669776d8fda2773819dfc9dae070e4603ce9316de7fd6fcf08",
+    "captured_at": "2026-10-07T05:58:22.090191+00:00",
+    "live_run_ids": [],
+    "successful_run_ids": [
+      37577209812,
+      37577050009,
+      37577050023,
+      37577049937,
+      37577050029,
+      37577049984,
+      37577049952,
+      37577049970,
+      37577019787,
+      37577019827,
+      37577019854,
+      37577019850,
+      37577019758,
+      37577019730
+    ],
+    "current_failed_or_cancelled": []
+  },
+  "dedicated_service": {
+    "status": "verified_success",
+    "repository": "franklesniak/TerraformStyleGuide",
+    "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "run_id": 37577209812,
+    "job_id": 112648669716,
+    "source": ".github/workflows/copilot-code-review.yml",
+    "source_sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+    "source_copy": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-source.yml",
+    "body_comparison": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-selection-body-comparison.json",
+    "body_comparison_sha256": "300d035f9cd8ed4134a67bb07fcdd4e71afe3fed0fb6fd66aba150e9617ce36c",
+    "raw_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577209812.zip",
+    "raw_archive_sha256": "c8f4b614586ca1ef10706237cc79b45ecc1bbc1cadd0c0c31c438574b659c153",
+    "scope_limit": "Genuine Terraform service proof only. PowerShell service selection remains a later natural PR observation; no synthetic review request."
+  },
+  "merge": {
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-normal-merge.json",
+    "sha256": "0decb09856baa278420999a6ebca2f8d5d3a3f18b53e9ca5be59edb33730ae1d",
+    "commit": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+    "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+    "merged_at": "2026-10-07T06:05:19Z",
+    "normal_method": "merge",
+    "source_acceptance": "Landed CI and paired comparison pending."
+  },
+  "landed_CI": {
+    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-landed-observation-one.json",
+    "sha256": "5fd22ec8dce24ced20f70a99412d3ada87d1764ac18251d86be28e35372f2167",
+    "captured_at": "2026-10-07T06:06:06.953661+00:00",
+    "runs": [
+      {
+        "id": 37579626338,
+        "name": "Copilot setup steps",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37579626311,
+        "name": "Agent instruction validation",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37579626389,
+        "name": "Build Style Guide Artifacts",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37579626316,
+        "name": "Dev container boundary",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37579626331,
+        "name": "Markdown Lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37579626328,
+        "name": "Copilot code review preparation",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  }
 }

@@ -1,0 +1,495 @@
+{
+  "captured_at": "2026-10-07T05:58:22.090191+00:00",
+  "status": "EXACT_PUBLISHED_CANDIDATE_NATIVE_QUALITY_PASS",
+  "material_findings": [],
+  "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "workflow_runs": [
+    {
+      "id": 37577209812,
+      "event": "dynamic",
+      "name": "Running Copilot Code Review",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577050009,
+      "event": "pull_request",
+      "name": "Markdown Lint",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577050023,
+      "event": "pull_request_target",
+      "name": "Agent instruction validation",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577049937,
+      "event": "pull_request",
+      "name": "Dev container boundary",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577050029,
+      "event": "pull_request",
+      "name": "Copilot code review preparation",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577049984,
+      "event": "pull_request",
+      "name": "Build Style Guide Artifacts",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577049952,
+      "event": "pull_request",
+      "name": "Copilot setup steps",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577049970,
+      "event": "pull_request",
+      "name": "Agent instruction validation",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019787,
+      "event": "push",
+      "name": "Copilot code review preparation",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019827,
+      "event": "push",
+      "name": "Markdown Lint",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019854,
+      "event": "push",
+      "name": "Dev container boundary",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019850,
+      "event": "push",
+      "name": "Build Style Guide Artifacts",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019758,
+      "event": "push",
+      "name": "Copilot setup steps",
+      "attempt": 1,
+      "conclusion": "success"
+    },
+    {
+      "id": 37577019730,
+      "event": "push",
+      "name": "Agent instruction validation",
+      "attempt": 1,
+      "conclusion": "success"
+    }
+  ],
+  "checks": {
+    "total": 27,
+    "success": 24,
+    "event_inapplicable_skipped": 3
+  },
+  "physical_source_entries_verified": 80,
+  "reviewers": {
+    "codex_summary": 6031693724,
+    "codex_issue_reaction": 550293798,
+    "copilot_review": 5438134380,
+    "copilot_effort": "Balanced",
+    "complete_thread_count": 0,
+    "inline_comment_count": 0,
+    "copilot_limitation_disposition": "No specific defect or uncovered case. Existing independently reviewed focused and full local/native results address service execution limitation; agent review is not human approval."
+  },
+  "remaining_root_gates": [
+    "fresh merge identity/authority/revocation checks",
+    "normal merge and landed-source acceptance",
+    "reverse comparison and paired convergence"
+  ],
+  "refs": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\checks-final.json",
+      "sha256": "4d7e327509fd4d5cc11f4858cf576e06cd1204e70540246b01c928a0c1029bd7",
+      "bytes": 98643
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\checks-initial.json",
+      "sha256": "f4f21535869eb5facecc3f117f38026c77895f4a721c6112790993c3eb087934",
+      "bytes": 98538
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\comments-final.json",
+      "sha256": "8ae15c221a71eb00d2b2b41ce1613a5919dfb3e3861831463722cac02a2b805e",
+      "bytes": 4541
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\comments-initial.json",
+      "sha256": "8ae15c221a71eb00d2b2b41ce1613a5919dfb3e3861831463722cac02a2b805e",
+      "bytes": 4541
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\completed-jobs-first.json",
+      "sha256": "827784ce7e3d6b725829a7998903ce1e51715652ec08d4bee27de97ae535d0ee",
+      "bytes": 100330
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\completed-log-excerpts-first.json",
+      "sha256": "3caa8a3a86377b40e36ae5a8ac1f00c2035737b40280cc132149e2668e2f3895",
+      "bytes": 9913
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-selection-body-comparison.json",
+      "sha256": "300d035f9cd8ed4134a67bb07fcdd4e71afe3fed0fb6fd66aba150e9617ce36c",
+      "bytes": 2701
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-source.yml",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dynamic-jobs-second.json",
+      "sha256": "96d1a7473de5cc9004321ee3b5b39bff823544087774c6afed96f3584d1e5505",
+      "bytes": 17601
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\events-initial.json",
+      "sha256": "e1193a7d7f935c1ee363e0bbaf0dcb0622ae0ba9469d7e9e8567acf61e52bd5a",
+      "bytes": 8432
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\files-final.json",
+      "sha256": "ee5820ba2e44743f8f7c3f0b0c4d62bb3ef40a49a09c5c06057e51c72b860dae",
+      "bytes": 21695
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\files-initial.json",
+      "sha256": "ee5820ba2e44743f8f7c3f0b0c4d62bb3ef40a49a09c5c06057e51c72b860dae",
+      "bytes": 21695
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\final-physical-source-verification.json",
+      "sha256": "4ae6798c5cd849203b69bedb6095a6469db3dea1bb62d34df93aad6b2f64b421",
+      "bytes": 14090
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\issue-reactions-final.json",
+      "sha256": "934ab2ccc51d4163c635969072794ce5b3d17a8c6e90d1bd50d8152fdac2af47",
+      "bytes": 1336
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\issue-reactions.json",
+      "sha256": "934ab2ccc51d4163c635969072794ce5b3d17a8c6e90d1bd50d8152fdac2af47",
+      "bytes": 1336
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\jobs-37577019730.json",
+      "sha256": "9b48d0191b1314042e2231e994b1f28d017f37623e36aafb5ecbb53c2ef008c5",
+      "bytes": 3060
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\jobs-37577049952.json",
+      "sha256": "4671005bdc64e17cc9153a69dff93562645f4d5c7471b7fa474a47f744ce8a50",
+      "bytes": 4002
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\jobs-37577049970-progress.json",
+      "sha256": "59dc1c1a037be0b461da33212a3cc23fa8a0c5d9f0f67722d10e261df3a7a941",
+      "bytes": 3060
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\main-protection-read.json",
+      "sha256": "00e1ac730fcd365c85b2153e7d59a225816048cade39b1f660649e69eeaadf2b",
+      "bytes": 249
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\main-rules-read.json",
+      "sha256": "e5e1589264796c710acb0cbd2bccc91e203b680fbc8475469c444677ccc736df",
+      "bytes": 1287
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\master-final.json",
+      "sha256": "eaf339cc160ee08b6ff455f71a9e0c85478fd8ea7fbde197fdd34083384a14b9",
+      "bytes": 30292
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\master-initial.json",
+      "sha256": "e3d688064dcc6419161df9ca7866e598006ba923664b241528c8f553398b7961",
+      "bytes": 28882
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\native-commit.json",
+      "sha256": "cef62dac5765ed8fd400cacf0d1e7f7e1981e91c734608d96ca5e83f286ccd77",
+      "bytes": 1230
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\native-commits-list.json",
+      "sha256": "117a829f04787f647c20b427efeb257cb588d1de0c78369bf52e999faa4ef83d",
+      "bytes": 3498
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\native-pr-merge-commit.json",
+      "sha256": "4a42999ae7fc9c47e24627502e011de5202fcb0c735c5e8a101d8adbec104f4d",
+      "bytes": 2721
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\pr-final.json",
+      "sha256": "5b1be8e59a6500688de30c1d4fea0c34891a5bd0c7b29e822d10f0f17ec77206",
+      "bytes": 19450
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\pr-initial.json",
+      "sha256": "b2e16670a29e7e265519f4636020702ad5dd769e1cb3f90dd3869e3c52d44310",
+      "bytes": 19453
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\PROGRESS.json",
+      "sha256": "310842f01f25f1cc0de4808dc96e79848f4ecd7545fa94ffbe4a9b51b84f2bf7",
+      "bytes": 13375
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\reactions-initial.json",
+      "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "bytes": 4
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\REPORT.md",
+      "sha256": "b610f9dd3b08faf50182811afa3779811b52e20b41ffa851f21a19fe88c784fd",
+      "bytes": 4740
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\requested-reviewers-final.json",
+      "sha256": "eaefa0ce35d5eda044fdba0b5651a324901e31109516423950fb15424bb50dc7",
+      "bytes": 25
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\requested_reviewers-initial.json",
+      "sha256": "eaefa0ce35d5eda044fdba0b5651a324901e31109516423950fb15424bb50dc7",
+      "bytes": 25
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\review-comments-final.json",
+      "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "bytes": 4
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\review_comments-initial.json",
+      "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "bytes": 4
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\reviews-final.json",
+      "sha256": "3e38828975889d52c731c62bc895c84e626a3eb35856db7ebb75ba58ebff0c6f",
+      "bytes": 5109
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\reviews-initial.json",
+      "sha256": "cf1cbb66a638b4860a516671fb74850e6ccf787fe6c4c8d29e9c04efe880bd05",
+      "bytes": 4
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\reviews-third.json",
+      "sha256": "3e38828975889d52c731c62bc895c84e626a3eb35856db7ebb75ba58ebff0c6f",
+      "bytes": 5109
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019730-progress-two.json",
+      "sha256": "c86199191b462761e052cc46192483269a31309ebb6e0f721cf7e82a2b07277b",
+      "bytes": 14163
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019730-progress.json",
+      "sha256": "2e84cb952ab4ea1e16b7ead3e72b04b7f943d1df352da42529f1bf0587691db3",
+      "bytes": 14160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019730.zip",
+      "sha256": "6fd6e0df4cfe1264151e8558a3fdb390eddd657b65916434197a5cf8aff256ed",
+      "bytes": 39964
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019758.zip",
+      "sha256": "23a40dd700e795ffe9df1400e289e11ca0af183f4ae97553dcc00a337c98bea9",
+      "bytes": 55022
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019787.zip",
+      "sha256": "87fb6a1a36508fcff5c08003221071e8b0918d87c5d0a712630f7d36265de90c",
+      "bytes": 48944
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019827.zip",
+      "sha256": "3fdc1c5623030ed48c8dd70db7bd35c7dd83906a5872fc36a3625be35ae6a41c",
+      "bytes": 16938
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019850.zip",
+      "sha256": "472aa6a18977e312bcf542f23b3a42f0e6ea4ab7450fbbad0e7e24622c997b13",
+      "bytes": 45337
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577019854.zip",
+      "sha256": "a06e573c3ac87b6e858105377b6f0bfaa14b7a1d1fd9d3d7e5c33b1aaca7ea56",
+      "bytes": 8583
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049937.zip",
+      "sha256": "a2b0d47a52049c456c9c2407691340c1fd1d1838349a5e2832f6c9d97ee32cac",
+      "bytes": 8594
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049952-progress-two.json",
+      "sha256": "ba02ae4f6510566cead7cfe30ca8cabfaaf8b44dced3c1be2545e0d450a2f156",
+      "bytes": 14156
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049952-progress.json",
+      "sha256": "969a013a6b2252a1a459432ccf441d4bf11a6c3da738314a2e721a49de75d9f9",
+      "bytes": 14153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049952.zip",
+      "sha256": "3dc87621107e12c5394540757caff4752ce19d463b303aed96bbaeab9e749e01",
+      "bytes": 55326
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049970-progress-three.json",
+      "sha256": "676f7d37d1a54b21a3fa4237c8ed5ea0fd33d2674568f71890650ef964ed3410",
+      "bytes": 14161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049970-progress-two.json",
+      "sha256": "676f7d37d1a54b21a3fa4237c8ed5ea0fd33d2674568f71890650ef964ed3410",
+      "bytes": 14161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049970-progress.json",
+      "sha256": "676f7d37d1a54b21a3fa4237c8ed5ea0fd33d2674568f71890650ef964ed3410",
+      "bytes": 14161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049970.zip",
+      "sha256": "1ac03eb5e07c27721c47aa96b29791bfe04cc73ab4a873a81d328ad962d819ee",
+      "bytes": 40224
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577049984.zip",
+      "sha256": "2f413eb63d19efafb107f6ef2560608f2d1757b07b536bdbe417c8f03c2edc88",
+      "bytes": 45173
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577050009.zip",
+      "sha256": "c65187165f274c2533abcfe73307e16b38ee25bd1a1001867d44e8212fbc23e7",
+      "bytes": 17028
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577050023.zip",
+      "sha256": "5b8bb24155a3d695c990ad9eda0ee4b5d7c27194c611a929bfc114ea4b718bb2",
+      "bytes": 10050
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577050029.zip",
+      "sha256": "1f8d792b4c1c9136dab78859d5c14b6337af6838999ef0e3f186ca04a980d62a",
+      "bytes": 48967
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577209812.zip",
+      "sha256": "c8f4b614586ca1ef10706237cc79b45ecc1bbc1cadd0c0c31c438574b659c153",
+      "bytes": 141698
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\runs-final.json",
+      "sha256": "ac00d766e3ad428ea8ad28632d16e4e61a3c7cfd4436f5c9c8656dfe814d509a",
+      "bytes": 198138
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\runs-fourth.json",
+      "sha256": "bd1ad5e44bc1ce108c34e2add2b90f680fe68e8ad8a4f91ae4c131535ee7aba1",
+      "bytes": 198129
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\runs-second.json",
+      "sha256": "49fec35240e4ab8ef733861c2e3f2de66483362df0c5fa443751899dd8bdc73f",
+      "bytes": 198123
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\runs-third.json",
+      "sha256": "42239e4f294cafc00489525248f0896f4b9eaf53efb86fae6704332dead39102",
+      "bytes": 198126
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\STATUS-final.md",
+      "sha256": "23d71b30f0bd4dbce33acf64c128d8ff96fad0cf18410b2a2f1973a0f30fef8b",
+      "bytes": 11021
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\STATUS-initial.md",
+      "sha256": "6cd3db17ce7ea678ae10f0be174b49be86799ac693f3c6f3464d3661ec2d297f",
+      "bytes": 10908
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\terminal-log-excerpts.json",
+      "sha256": "210ce3df9d08479a55410938c9c3ec6b8c628d743dd79051a087f583a1206c95",
+      "bytes": 16436
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\threads-final.json",
+      "sha256": "dcdbcd0ef41c89f116a9e1794d8bce36af34b88cb38580e084f1bed87dbc13f9",
+      "bytes": 281
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\threads-initial.json",
+      "sha256": "35c6b0317891e6b52623d4403a4ee26d769fa47c503adc7f31828f65008f6f9c",
+      "bytes": 232
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\worktree-final.json",
+      "sha256": "ce167b40d6daafde25eda52fb622b812f108c25c8b2adfc37911f2bbc082ccb4",
+      "bytes": 767
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\INITIAL-REPORT.md",
+      "sha256": "c236a83162ef2009c44470b06b482d0e4f064f1cb57cfd24e74ca86963d04e0c",
+      "bytes": 6859
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\evidence.json",
+      "sha256": "22fbf7d1cc0610a46b373eeac70e12af5da2c1d4cdc5b3afbb37b7ea1acc3117",
+      "bytes": 22344
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\final-local\\REPORT.md",
+      "sha256": "aa0f2933870b2e11ce97d07a59d268e06edf58d07256b114c313cfde76a44c60",
+      "bytes": 7003
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\final-local\\evidence.json",
+      "sha256": "d461b8fe1fbc78337e8f84c65e34ef9a308428866ef334d53b06ab5c5d6b766a",
+      "bytes": 34699
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\candidate-source-catalog.json",
+      "sha256": "063ac7eea0f977eb68d1699484f940aa3089fb763d141867baa1182ee937782f",
+      "bytes": 19093
+    }
+  ]
+}

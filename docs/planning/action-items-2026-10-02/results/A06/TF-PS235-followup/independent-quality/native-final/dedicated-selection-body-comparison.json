@@ -1,0 +1,72 @@
+[
+  {
+    "step": "Acquire triggering revision without an action",
+    "member": "copilot-pull-request-reviewer/12_Acquire triggering revision without an action.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Verify checkout credential cleanup",
+    "member": "copilot-pull-request-reviewer/17_Verify checkout credential cleanup.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Acquire published main reference",
+    "member": "copilot-pull-request-reviewer/22_Acquire published main reference.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Reject alternate npm install inputs",
+    "member": "copilot-pull-request-reviewer/27_Reject alternate npm install inputs.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Detect locked validation-tool layout",
+    "member": "copilot-pull-request-reviewer/32_Detect locked validation-tool layout.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Verify acquired immutable setup inputs",
+    "member": "copilot-pull-request-reviewer/37_Verify acquired immutable setup inputs.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Set up verified official Node.js runtime",
+    "member": "copilot-pull-request-reviewer/42_Set up verified official Node.js runtime.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Verify selected Node.js runtime",
+    "member": "copilot-pull-request-reviewer/47_Verify selected Node.js runtime.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Install locked Node.js validation tools",
+    "member": "copilot-pull-request-reviewer/52_Install locked Node.js validation tools.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Verify locked dependency trees and immutable manifests",
+    "member": "copilot-pull-request-reviewer/57_Verify locked dependency trees and immutable manifests.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Set up isolated Python 3.12",
+    "member": "copilot-pull-request-reviewer/62_Set up isolated Python 3.12.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Install locked Python validation tools",
+    "member": "copilot-pull-request-reviewer/67_Install locked Python validation tools.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Activate repository hooks",
+    "member": "copilot-pull-request-reviewer/72_Activate repository hooks.txt",
+    "exact_run_body_present": true
+  },
+  {
+    "step": "Verify final immutable setup inputs",
+    "member": "copilot-pull-request-reviewer/77_Verify final immutable setup inputs.txt",
+    "exact_run_body_present": true
+  }
+]

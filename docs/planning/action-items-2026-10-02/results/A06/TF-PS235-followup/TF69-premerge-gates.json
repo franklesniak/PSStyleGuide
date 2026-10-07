@@ -1,0 +1,979 @@
+{
+  "status": "ALL_CURRENT_NATIVE_GATES_PASSED",
+  "captured_at": "2026-10-07T06:05:09.511056+00:00",
+  "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "body_sha256": "c02fecbcd1e8c7f85a99764410c66d5bc6ac3b78a18a575df8cf9ae6e1e2fda0",
+  "native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-premerge-native.json",
+  "native_snapshot_sha256": "32f41fc83b1a8a4515f4dda852ef13b34328880f41140469b6408ea1efa0b873",
+  "pr": {
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69",
+    "id": 4768425520,
+    "node_id": "PR_kwDOSAZRhc8AAAABHDhmMA",
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/69",
+    "diff_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/69.diff",
+    "patch_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/69.patch",
+    "issue_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/69",
+    "number": 69,
+    "state": "open",
+    "locked": false,
+    "title": "Skip empty Markdown array scans and add context coverage",
+    "user": {
+      "login": "franklesniak",
+      "id": 11204406,
+      "node_id": "MDQ6VXNlcjExMjA0NDA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/franklesniak",
+      "html_url": "https://github.com/franklesniak",
+      "followers_url": "https://api.github.com/users/franklesniak/followers",
+      "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+      "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+      "repos_url": "https://api.github.com/users/franklesniak/repos",
+      "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "Skip element scans for empty code and link arrays in Markdown parse contexts while preserving the existing array-type and malformed-element checks. Apply the change accepted in [PSStyleGuide #235](https://github.com/franklesniak/PSStyleGuide/pull/235) to TerraformStyleGuide's prose, table-cell and list-item validation.\n\nThe permanent SelfTest adds 109 cases that call the real parser and structural decoder. They cover valid empty and populated arrays, missing/null fields, wrong types and malformed elements. Rejected inputs must produce no partial context, and the test restores its temporary parser wrapper. Within these three files, the only repository-specific differences remain the existing T1 provenance fixture and dependency-guide scope sentence; touched metadata is current.\n\nValidation of the candidate bytes, unchanged by the normal commit:\n\n- Windows PowerShell 7.6.5 and Linux PowerShell 7.6.3: 109 cases each, with 19 accepts and 90 refusals; fresh parser/decoder calls and restoration verified.\n- Both changed PowerShell files: zero parser errors and zero PSScriptAnalyzer 1.24.0 warnings/errors on both platforms.\n- Staged preflight, ordinary Markdown checks, all eleven pre-commit checks including the full mutation SelfTest, and normal commit hooks passed.\n- Independent review of the exact source and focused results found no material issue.\n- All five committed-input checks passed: accepted maintenance classification, accepted content, current-date finalization, metadata classification and proposed-policy diagnostics.\n- The ordinary dependency audit was CLEAN for both installed roots, with no findings or exception grants. Separate native-main reads confirmed the accepted authority before and after the audit; its offline result does not itself discover external revocations or later ref changes.\n\nNative reviews, CI and paired acceptance remain separate gates. This change makes no performance claim and does not change generator output, dependencies, workflow permissions or review setup.\n",
+    "created_at": "2026-10-07T05:35:14Z",
+    "updated_at": "2026-10-07T05:44:14Z",
+    "closed_at": null,
+    "merged_at": null,
+    "merge_commit_sha": "c6c2a62d34fdca6c453cc90a53bd99862f49f6ce",
+    "assignees": [],
+    "requested_reviewers": [],
+    "requested_teams": [],
+    "labels": [],
+    "milestone": null,
+    "draft": false,
+    "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69/commits",
+    "review_comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69/comments",
+    "review_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments{/number}",
+    "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/69/comments",
+    "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "head": {
+      "label": "franklesniak:codex/ps235-validator-followup",
+      "ref": "codex/ps235-validator-followup",
+      "sha": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+      "user": {
+        "login": "franklesniak",
+        "id": 11204406,
+        "node_id": "MDQ6VXNlcjExMjA0NDA2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/franklesniak",
+        "html_url": "https://github.com/franklesniak",
+        "followers_url": "https://api.github.com/users/franklesniak/followers",
+        "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+        "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+        "repos_url": "https://api.github.com/users/franklesniak/repos",
+        "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": {
+        "id": 1208373637,
+        "node_id": "R_kgDOSAZRhQ",
+        "name": "TerraformStyleGuide",
+        "full_name": "franklesniak/TerraformStyleGuide",
+        "private": false,
+        "owner": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+        "fork": false,
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+        "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+        "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+        "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+        "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+        "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+        "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+        "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+        "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+        "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+        "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+        "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+        "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+        "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+        "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments",
+        "created_at": "2026-04-12T07:25:06Z",
+        "updated_at": "2026-10-06T18:21:27Z",
+        "pushed_at": "2026-10-07T05:34:54Z",
+        "git_url": "git://github.com/franklesniak/TerraformStyleGuide.git",
+        "ssh_url": "git@github.com:franklesniak/TerraformStyleGuide.git",
+        "clone_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+        "svn_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "homepage": null,
+        "size": 5241,
+        "stargazers_count": 2,
+        "watchers_count": 2,
+        "language": "Shell",
+        "has_issues": true,
+        "has_projects": true,
+        "has_downloads": false,
+        "has_wiki": true,
+        "has_pages": false,
+        "has_discussions": false,
+        "forks_count": 0,
+        "mirror_url": null,
+        "archived": false,
+        "disabled": false,
+        "open_issues_count": 2,
+        "license": {
+          "key": "mit",
+          "name": "MIT License",
+          "spdx_id": "MIT",
+          "url": "https://api.github.com/licenses/mit",
+          "node_id": "MDc6TGljZW5zZTEz"
+        },
+        "allow_forking": true,
+        "is_template": false,
+        "web_commit_signoff_required": false,
+        "has_pull_requests": true,
+        "pull_request_creation_policy": "all",
+        "topics": [],
+        "visibility": "public",
+        "forks": 0,
+        "open_issues": 2,
+        "watchers": 2,
+        "default_branch": "main"
+      }
+    },
+    "base": {
+      "label": "franklesniak:main",
+      "ref": "main",
+      "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "user": {
+        "login": "franklesniak",
+        "id": 11204406,
+        "node_id": "MDQ6VXNlcjExMjA0NDA2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/franklesniak",
+        "html_url": "https://github.com/franklesniak",
+        "followers_url": "https://api.github.com/users/franklesniak/followers",
+        "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+        "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+        "repos_url": "https://api.github.com/users/franklesniak/repos",
+        "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "repo": {
+        "id": 1208373637,
+        "node_id": "R_kgDOSAZRhQ",
+        "name": "TerraformStyleGuide",
+        "full_name": "franklesniak/TerraformStyleGuide",
+        "private": false,
+        "owner": {
+          "login": "franklesniak",
+          "id": 11204406,
+          "node_id": "MDQ6VXNlcjExMjA0NDA2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/franklesniak",
+          "html_url": "https://github.com/franklesniak",
+          "followers_url": "https://api.github.com/users/franklesniak/followers",
+          "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+          "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+          "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+          "repos_url": "https://api.github.com/users/franklesniak/repos",
+          "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+        "fork": false,
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+        "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+        "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+        "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+        "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+        "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+        "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+        "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+        "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+        "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+        "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+        "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+        "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+        "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+        "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments",
+        "created_at": "2026-04-12T07:25:06Z",
+        "updated_at": "2026-10-06T18:21:27Z",
+        "pushed_at": "2026-10-07T05:34:54Z",
+        "git_url": "git://github.com/franklesniak/TerraformStyleGuide.git",
+        "ssh_url": "git@github.com:franklesniak/TerraformStyleGuide.git",
+        "clone_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+        "svn_url": "https://github.com/franklesniak/TerraformStyleGuide",
+        "homepage": null,
+        "size": 5241,
+        "stargazers_count": 2,
+        "watchers_count": 2,
+        "language": "Shell",
+        "has_issues": true,
+        "has_projects": true,
+        "has_downloads": false,
+        "has_wiki": true,
+        "has_pages": false,
+        "has_discussions": false,
+        "forks_count": 0,
+        "mirror_url": null,
+        "archived": false,
+        "disabled": false,
+        "open_issues_count": 2,
+        "license": {
+          "key": "mit",
+          "name": "MIT License",
+          "spdx_id": "MIT",
+          "url": "https://api.github.com/licenses/mit",
+          "node_id": "MDc6TGljZW5zZTEz"
+        },
+        "allow_forking": true,
+        "is_template": false,
+        "web_commit_signoff_required": false,
+        "has_pull_requests": true,
+        "pull_request_creation_policy": "all",
+        "topics": [],
+        "visibility": "public",
+        "forks": 0,
+        "open_issues": 2,
+        "watchers": 2,
+        "default_branch": "main"
+      }
+    },
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69"
+      },
+      "html": {
+        "href": "https://github.com/franklesniak/TerraformStyleGuide/pull/69"
+      },
+      "issue": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/69"
+      },
+      "comments": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/69/comments"
+      },
+      "review_comments": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69/comments"
+      },
+      "review_comment": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/comments{/number}"
+      },
+      "commits": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls/69/commits"
+      },
+      "statuses": {
+        "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/5e2424768c5d7d78a7f8ea852d4239e62069d0fe"
+      }
+    },
+    "author_association": "OWNER",
+    "auto_merge": null,
+    "assignee": null,
+    "active_lock_reason": null,
+    "merged": false,
+    "mergeable": true,
+    "rebaseable": true,
+    "mergeable_state": "clean",
+    "merged_by": null,
+    "comments": 1,
+    "review_comments": 0,
+    "maintainer_can_modify": false,
+    "commits": 1,
+    "additions": 265,
+    "deletions": 10,
+    "changed_files": 3
+  },
+  "main": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+    "object": {
+      "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "type": "commit",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+    }
+  },
+  "source_main": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+    "object": {
+      "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "type": "commit",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+    }
+  },
+  "files": [
+    [
+      {
+        "sha": "6f06546f3fe151ed6654d4f1e28b696b77a4cd75",
+        "filename": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "status": "modified",
+        "additions": 250,
+        "deletions": 1,
+        "changes": 251,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -33,7 +33,7 @@\n # None. The script throws when a self-test fails.\n #\n # .NOTES\n-# Version: 1.11.20261006.0\n+# Version: 1.12.20261007.0\n \n [CmdletBinding(PositionalBinding = $false)]\n [OutputType([void])]\n@@ -204,6 +204,254 @@ function Assert-ParserJsonConversionSelfTest {\n }\n \n \n+function Assert-MarkdownStringArrayContextSelfTest {\n+    # .SYNOPSIS\n+    # Checks admission and typed output for all six Markdown string arrays.\n+    #\n+    # .DESCRIPTION\n+    # Delegates to the real parser before changing one raw field per case.\n+    # Requires explicit valid and invalid outcomes, no partial output on refusal,\n+    # and exact string-array types and values. Nonstring elements, including\n+    # null, are refused in prose blocks, table cells and top-level list items.\n+    #\n+    # .EXAMPLE\n+    # Assert-MarkdownStringArrayContextSelfTest\n+    #\n+    # # Throws if a string-array shortcut changes context admission or output.\n+    #\n+    # .INPUTS\n+    # None. No pipeline input.\n+    #\n+    # .OUTPUTS\n+    # None. A changed result or an unexpected parser fixture throws.\n+    #\n+    # .NOTES\n+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n+    # Parameters, return shape, and positional contract can change without notice.\n+    # Positional parameters are disabled; internal callers use named arguments.\n+    # Version: 1.0.20261007.0\n+    [CmdletBinding(PositionalBinding = $false)]\n+    [OutputType([void])]\n+    param()\n+\n+    $scriptBlockActualParser = ${function:Invoke-MarkdownParserProcess}\n+    $hashtableFixture = @{ Family = ''; Field = ''; Json = ''; Remove = $false; Mutate = $false; Processes = 0 }\n+    function Invoke-MarkdownParserProcess {\n+        # .SYNOPSIS\n+        # Changes one string-array field after a fresh real parser call.\n+        #\n+        # .DESCRIPTION\n+        # Preserves the process result and native exit handling while replacing\n+        # only the selected field in fresh JSON. This wrapper is function-local.\n+        #\n+        # .PARAMETER StartInfo\n+        # The validated process start information passed to the real parser.\n+        #\n+        # .PARAMETER Content\n+        # The original Markdown fixture passed unchanged to the real parser.\n+        #\n+        # .EXAMPLE\n+        # Invoke-MarkdownParserProcess -StartInfo $objStartInfo -Content $strMarkdown\n+        #\n+        # # Returns the fresh process result with one declared field mutation.\n+        #\n+        # .INPUTS\n+        # None. No pipeline input.\n+        #\n+        # .OUTPUTS\n+        # [pscustomobject] The actual process result with mutated JSON output.\n+        #\n+        # .NOTES\n+        # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n+        # Parameters, return shape, and positional contract can change without notice.\n+        # Positional parameters are disabled; internal callers use named arguments.\n+        # Version: 1.0.20261007.0\n+        [CmdletBinding(PositionalBinding = $false)]\n+        [OutputType([pscustomobject])]\n+        param(\n+            [Parameter(Mandatory)][Diagnostics.ProcessStartInfo] $StartInfo,\n+            [Parameter(Mandatory)][AllowEmptyString()][string] $Content\n+        )\n+\n+        $objProcessResult = & $scriptBlockActualParser -StartInfo $StartInfo -Content $Content\n+        $hashtableFixture.Processes++\n+        if (-not $hashtableFixture.Mutate) { return $objProcessResult }\n+        $hashtableRawContext = $objProcessResult.Output | ConvertFrom-Json -AsHashtable\n+        if ($hashtableRawContext[$hashtableFixture.Family] -isnot [array] -or\n+            $hashtableRawContext[$hashtableFixture.Family].Count -eq 0) {\n+            throw 'The real parser fixture lacks the selected record family.'\n+        }\n+        if ($hashtableFixture.Family -ceq 'tableRows') {\n+            if ($hashtableRawContext.tableRows[0].cells -isnot [array] -or\n+                $hashtableRawContext.tableRows[0].cells.Count -eq 0) {\n+                throw 'The real parser fixture lacks a table cell.'\n+            }\n+            $hashtableRecord = $hashtableRawContext.tableRows[0].cells[0]\n+        } else {\n+            $hashtableRecord = $hashtableRawContext[$hashtableFixture.Family][0]\n+        }\n+        if (-not $hashtableRecord.Contains($hashtableFixture.Field)) {\n+            throw 'The real parser fixture lacks the selected string-array field.'\n+        }\n+        if ($hashtableFixture.Remove) {\n+            [void]($hashtableRecord.Remove($hashtableFixture.Field))\n+        } else {\n+            $objFixtureValue = ConvertFrom-ParserJsonContext `\n+                -Content ('{\"value\":' + $hashtableFixture.Json + '}') -MaximumBytes 4096\n+            $hashtableRecord[$hashtableFixture.Field] = $objFixtureValue.value\n+        }\n+        $objProcessResult.Output = $hashtableRawContext | ConvertTo-Json -Depth 20 -Compress\n+        return $objProcessResult\n+    }\n+    $strMarkdown = @(\n+        '# Title', '', 'Text `code` [link](https://example.invalid).', '',\n+        '- Item `code` [link](https://example.invalid)', '',\n+        '| Field | Value |', '| --- | --- |', '| Cell | `code` [link](https://example.invalid) |'\n+    ) -join \"`n\"\n+    $intLineCount = @([regex]::Split($strMarkdown, '\\r\\n|\\r|\\n')).Count\n+    $arrCases = @(\n+        @{ Name = 'empty'; Json = '[]'; Outcome = 'accept' },\n+        @{ Name = 'singleton'; Json = '[\"one\"]'; Outcome = 'accept' },\n+        @{ Name = 'many strings'; Json = '[\"\",\"one\",\"\\u00e9\\ud83d\\ude03\",\"2026-10-06T23:00:00Z\"]'; Outcome = 'accept' },\n+        @{ Name = 'missing'; Json = ''; Outcome = 'reject' },\n+        @{ Name = 'null field'; Json = 'null'; Outcome = 'reject' },\n+        @{ Name = 'scalar string'; Json = '\"text\"'; Outcome = 'reject' },\n+        @{ Name = 'scalar number'; Json = '1'; Outcome = 'reject' },\n+        @{ Name = 'scalar Boolean'; Json = 'true'; Outcome = 'reject' },\n+        @{ Name = 'object field'; Json = '{}'; Outcome = 'reject' },\n+        @{ Name = 'nested array'; Json = '[[\"text\"]]'; Outcome = 'reject' },\n+        @{ Name = 'object element'; Json = '[{}]'; Outcome = 'reject' },\n+        @{ Name = 'bad first'; Json = '[1,\"text\"]'; Outcome = 'reject' },\n+        @{ Name = 'bad last'; Json = '[\"text\",false]'; Outcome = 'reject' },\n+        @{ Name = 'null element'; Json = '[null]'; Outcome = 'reject' },\n+        @{ Name = 'null first string'; Json = '[null,\"text\"]'; Outcome = 'reject' },\n+        @{ Name = 'null last string'; Json = '[\"text\",null]'; Outcome = 'reject' },\n+        @{ Name = 'null first number'; Json = '[null,1]'; Outcome = 'reject' },\n+        @{ Name = 'null last number'; Json = '[1,null]'; Outcome = 'reject' }\n+    )\n+    try {\n+        $strPlainMarkdown = $strMarkdown.Replace('`code`', 'code').Replace(\n+            '[link](https://example.invalid)', 'link')\n+        $objPlainContext = Get-MarkdownParseContext -Content $strPlainMarkdown -LineCount $intLineCount\n+        if ($null -eq $objPlainContext -or $hashtableFixture.Processes -ne 1 -or\n+            $objPlainContext.ProseBlocks -isnot [pscustomobject[]] -or $objPlainContext.ProseBlocks.Count -eq 0 -or\n+            $objPlainContext.TopLevelListItems -isnot [pscustomobject[]] -or $objPlainContext.TopLevelListItems.Count -eq 0 -or\n+            $objPlainContext.TableRows -isnot [pscustomobject[]] -or $objPlainContext.TableRows.Count -eq 0) {\n+            throw 'The plain Markdown fixture lost its fresh parser call or record families.'\n+        }\n+        foreach ($objRow in $objPlainContext.TableRows) {\n+            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {\n+                throw 'The plain Markdown fixture lost its typed table cells.'\n+            }\n+        }\n+        $arrPlainRecords = @($objPlainContext.ProseBlocks) + @($objPlainContext.TopLevelListItems) +\n+            @($objPlainContext.TableRows | ForEach-Object { $_.Cells })\n+        foreach ($objRecord in $arrPlainRecords) {\n+            if ($objRecord.Code -isnot [string[]] -or $objRecord.Code.Count -ne 0 -or\n+                $objRecord.Links -isnot [string[]] -or $objRecord.Links.Count -ne 0) {\n+                throw 'Plain prose, table or list Markdown lost a naturally empty string array.'\n+            }\n+        }\n+        $hashtableFixture.Mutate = $true\n+        foreach ($strFamily in @('proseBlocks', 'tableRows', 'topLevelListItems')) {\n+            $hashtableFixture.Family = $strFamily\n+            foreach ($strField in @('code', 'links')) {\n+                $hashtableFixture.Field = $strField\n+                foreach ($hashtableCase in $arrCases) {\n+                    $hashtableFixture.Json = $hashtableCase.Json\n+                    $hashtableFixture.Remove = $hashtableCase.Name -ceq 'missing'\n+                    $intPreviousProcesses = $hashtableFixture.Processes\n+                    $listOutput = [Collections.Generic.List[pscustomobject]]::new()\n+                    $objFailure = $null\n+                    try {\n+                        Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount |\n+                            ForEach-Object { $listOutput.Add($_) }\n+                    } catch {\n+                        # Expected refusals are compared below; unrelated failures cannot pass.\n+                        $objFailure = $_\n+                    }\n+                    if (($null -ne $objFailure -and $listOutput.Count -ne 0) -or\n+                        ($hashtableCase.Outcome -ceq 'accept' -and $null -ne $objFailure) -or\n+                        ($hashtableCase.Outcome -ceq 'reject' -and $null -eq $objFailure)) {\n+                        throw ('String-array outcome changed: {0}/{1}/{2}.' -f\n+                            $strFamily, $strField, $hashtableCase.Name)\n+                    }\n+                    if ($null -eq $objFailure) {\n+                        if ($listOutput.Count -ne 1) { throw 'String-array context lost its single output.' }\n+                        $objContext = $listOutput[0]\n+                        foreach ($strArrayName in @('CodeBlockRanges', 'ProseBlocks', 'TableRows',\n+                                'TopLevelBlocks', 'TopLevelListItems', 'Headings', 'LevelTwoHeadings')) {\n+                            if ($objContext.$strArrayName -isnot [pscustomobject[]]) {\n+                                throw 'String-array context changed an exact record-array type.'\n+                            }\n+                        }\n+                        if ($objContext.ProseBlocks.Count -eq 0 -or $objContext.TopLevelListItems.Count -eq 0 -or\n+                            $objContext.TableRows.Count -eq 0) {\n+                            throw 'String-array context lost the fixture record families.'\n+                        }\n+                        foreach ($objRecord in @($objContext.ProseBlocks) + @($objContext.TopLevelListItems)) {\n+                            if ($objRecord.Code -isnot [string[]] -or $objRecord.Links -isnot [string[]]) {\n+                                throw 'String-array context changed a prose or list string-array type.'\n+                            }\n+                        }\n+                        foreach ($objRow in $objContext.TableRows) {\n+                            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {\n+                                throw 'String-array context changed cell-array type or lost cells.'\n+                            }\n+                            foreach ($objCell in $objRow.Cells) {\n+                                if ($objCell.Code -isnot [string[]] -or $objCell.Links -isnot [string[]]) {\n+                                    throw 'String-array context changed a cell string-array type.'\n+                                }\n+                            }\n+                        }\n+                    }\n+                    if ($null -ne $objFailure) {\n+                        $strExpectedFailure = if ($hashtableFixture.Remove) {\n+                            \"The property '${strField}' cannot be found on this object. Verify that the property exists.\"\n+                        } else {\n+                            switch ($strFamily) {\n+                                'proseBlocks' { 'The locked Markdown parser returned a malformed prose block.' }\n+                                'tableRows' { 'The locked Markdown parser returned a malformed table cell.' }\n+                                'topLevelListItems' { 'The locked Markdown parser returned a malformed top-level list item.' }\n+                            }\n+                        }\n+                        if ($objFailure.Exception.Message -cne $strExpectedFailure) {\n+                            throw ('String-array refusal changed: {0}/{1}/{2}.' -f\n+                                $strFamily, $strField, $hashtableCase.Name)\n+                        }\n+                    } else {\n+                        $objTarget = switch ($strFamily) {\n+                            'proseBlocks' { $objContext.ProseBlocks[0] }\n+                            'tableRows' { $objContext.TableRows[0].Cells[0] }\n+                            'topLevelListItems' { $objContext.TopLevelListItems[0] }\n+                        }\n+                        $strOutputField = if ($strField -ceq 'code') { 'Code' } else { 'Links' }\n+                        $objExpectedValue = ConvertFrom-ParserJsonContext `\n+                            -Content ('{\"value\":' + $hashtableCase.Json + '}') -MaximumBytes 4096\n+                        $arrExpectedStrings = $objExpectedValue.value\n+                        $arrActualStrings = $objTarget.$strOutputField\n+                        if ($arrActualStrings -isnot [string[]] -or\n+                            $arrActualStrings.Count -ne $arrExpectedStrings.Count) {\n+                            throw 'String-array context changed target type or cardinality.'\n+                        }\n+                        for ($intIndex = 0; $intIndex -lt $arrExpectedStrings.Count; $intIndex++) {\n+                            if ($arrActualStrings[$intIndex] -cne $arrExpectedStrings[$intIndex]) {\n+                                throw 'String-array context changed an exact target value.'\n+                            }\n+                        }\n+                    }\n+                    if ($hashtableFixture.Processes -ne $intPreviousProcesses + 1) {\n+                        throw 'String-array context skipped its fresh parser call.'\n+                    }\n+                }\n+            }\n+        }\n+    } finally {\n+        Set-Item -LiteralPath Function:Invoke-MarkdownParserProcess -Value $scriptBlockActualParser\n+    }\n+}\n+\n+\n function Assert-MarkdownParseReuseSelfTest {\n     # .SYNOPSIS\n     # Tests isolated structural reuse without skipping the real parser.\n@@ -3979,6 +4227,7 @@ if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont\n \n \n Assert-ParserJsonConversionSelfTest\n+Assert-MarkdownStringArrayContextSelfTest\n Assert-MarkdownParseReuseSelfTest\n Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath\n "
+      },
+      {
+        "sha": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+        "filename": ".github/workflows/Test-AgentInstructions.ps1",
+        "status": "modified",
+        "additions": 14,
+        "deletions": 8,
+        "changes": 22,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.ps1",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.ps1",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/.github%2Fworkflows%2FTest-AgentInstructions.ps1?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -23,7 +23,7 @@\n #\n # .NOTES\n # Positional parameters are not supported.\n-# Version: 1.20.20261006.0\n+# Version: 1.21.20261007.0\n \n [CmdletBinding(PositionalBinding = $false)]\n [OutputType([string])]\n@@ -3547,7 +3547,7 @@ function Get-MarkdownParseContext {\n     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.2.20261006.0\n+    # Version: 1.3.20261007.0\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([pscustomobject])]\n     param(\n@@ -3829,9 +3829,11 @@ function Get-MarkdownParseContext {\n                 $objRawProseBlock.range.Count -ne 2 -or\n                 $null -eq $objRawProseBlock.text -or\n                 $objRawProseBlock.code -isnot [array] -or\n-                @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawProseBlock.code.Count -ne 0 -and\n+                    @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawProseBlock.links -isnot [array] -or\n-                @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawProseBlock.links.Count -ne 0 -and\n+                    @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed prose block.'\n             }\n \n@@ -3883,9 +3885,11 @@ function Get-MarkdownParseContext {\n                     @('th', 'td') -cnotcontains $objRawCell.tag -or\n                     $objRawCell.text -isnot [string] -or\n                     $objRawCell.code -isnot [array] -or\n-                    @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                    ($objRawCell.code.Count -ne 0 -and\n+                        @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                     $objRawCell.links -isnot [array] -or\n-                    @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                    ($objRawCell.links.Count -ne 0 -and\n+                        @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                     throw 'The locked Markdown parser returned a malformed table cell.'\n                 }\n                 $listCells.Add([pscustomobject]@{\n@@ -3951,9 +3955,11 @@ function Get-MarkdownParseContext {\n                 $objRawListItem.range.Count -ne 2 -or\n                 ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or\n                 $objRawListItem.code -isnot [array] -or\n-                @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawListItem.code.Count -ne 0 -and\n+                    @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawListItem.links -isnot [array] -or\n-                @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawListItem.links.Count -ne 0 -and\n+                    @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed top-level list item.'\n             }\n "
+      },
+      {
+        "sha": "b97de56a0bed982beb793c6aca6ffe2490718d81",
+        "filename": "docs/dependency-maintenance.md",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1,
+        "changes": 2,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/docs%2Fdependency-maintenance.md",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/docs%2Fdependency-maintenance.md",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/docs%2Fdependency-maintenance.md?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -4,7 +4,7 @@\n \n - **Status:** Active\n - **Owner:** Repository maintainer (@franklesniak)\n-- **Last Updated:** 2026-10-06\n+- **Last Updated:** 2026-10-07\n - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in TerraformStyleGuide.\n \n Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux CI bootstrap verifies its Node archive with `linuxX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:"
+      }
+    ]
+  ],
+  "rules": [
+    [
+      {
+        "type": "deletion",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "franklesniak/TerraformStyleGuide",
+        "ruleset_id": 20623677
+      },
+      {
+        "type": "non_fast_forward",
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "franklesniak/TerraformStyleGuide",
+        "ruleset_id": 20623677
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": false,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge",
+            "squash",
+            "rebase"
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "franklesniak/TerraformStyleGuide",
+        "ruleset_id": 20623677
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "markdownlint",
+              "integration_id": 15368
+            },
+            {
+              "context": "policy",
+              "integration_id": 15368
+            },
+            {
+              "context": "verify",
+              "integration_id": 15368
+            }
+          ]
+        },
+        "ruleset_source_type": "Repository",
+        "ruleset_source": "franklesniak/TerraformStyleGuide",
+        "ruleset_id": 20623677
+      }
+    ]
+  ],
+  "rulesets": {
+    "20623677": {
+      "id": 20623677,
+      "name": "terraform-style-guide-main-protection",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "franklesniak/TerraformStyleGuide",
+      "enforcement": "active",
+      "conditions": {
+        "ref_name": {
+          "exclude": [],
+          "include": [
+            "~DEFAULT_BRANCH"
+          ]
+        }
+      },
+      "rules": [
+        {
+          "type": "deletion"
+        },
+        {
+          "type": "non_fast_forward"
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": false,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge",
+              "squash",
+              "rebase"
+            ]
+          }
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "markdownlint",
+                "integration_id": 15368
+              },
+              {
+                "context": "policy",
+                "integration_id": 15368
+              },
+              {
+                "context": "verify",
+                "integration_id": 15368
+              }
+            ]
+          }
+        }
+      ],
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5IBlGFzgE6sT0",
+      "created_at": "2026-08-10T00:29:23.780-05:00",
+      "updated_at": "2026-08-10T00:29:23.880-05:00",
+      "bypass_actors": [],
+      "current_user_can_bypass": "never",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/rulesets/20623677"
+        },
+        "html": {
+          "href": "https://github.com/franklesniak/TerraformStyleGuide/rules/20623677"
+        }
+      }
+    }
+  },
+  "repository": {
+    "id": 1208373637,
+    "node_id": "R_kgDOSAZRhQ",
+    "name": "TerraformStyleGuide",
+    "full_name": "franklesniak/TerraformStyleGuide",
+    "private": false,
+    "owner": {
+      "login": "franklesniak",
+      "id": 11204406,
+      "node_id": "MDQ6VXNlcjExMjA0NDA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/franklesniak",
+      "html_url": "https://github.com/franklesniak",
+      "followers_url": "https://api.github.com/users/franklesniak/followers",
+      "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+      "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+      "repos_url": "https://api.github.com/users/franklesniak/repos",
+      "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+    "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+    "fork": false,
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+    "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+    "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+    "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+    "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+    "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+    "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+    "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+    "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+    "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+    "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+    "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+    "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+    "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+    "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+    "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+    "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+    "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+    "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+    "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+    "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+    "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+    "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+    "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+    "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+    "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+    "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+    "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+    "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+    "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+    "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+    "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+    "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+    "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+    "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+    "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+    "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments",
+    "created_at": "2026-04-12T07:25:06Z",
+    "updated_at": "2026-10-06T18:21:27Z",
+    "pushed_at": "2026-10-07T05:34:54Z",
+    "git_url": "git://github.com/franklesniak/TerraformStyleGuide.git",
+    "ssh_url": "git@github.com:franklesniak/TerraformStyleGuide.git",
+    "clone_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+    "svn_url": "https://github.com/franklesniak/TerraformStyleGuide",
+    "homepage": null,
+    "size": 5241,
+    "stargazers_count": 2,
+    "watchers_count": 2,
+    "language": "Shell",
+    "has_issues": true,
+    "has_projects": true,
+    "has_downloads": false,
+    "has_wiki": true,
+    "has_pages": false,
+    "has_discussions": false,
+    "forks_count": 0,
+    "mirror_url": null,
+    "archived": false,
+    "disabled": false,
+    "open_issues_count": 2,
+    "license": {
+      "key": "mit",
+      "name": "MIT License",
+      "spdx_id": "MIT",
+      "url": "https://api.github.com/licenses/mit",
+      "node_id": "MDc6TGljZW5zZTEz"
+    },
+    "allow_forking": true,
+    "is_template": false,
+    "web_commit_signoff_required": false,
+    "has_pull_requests": true,
+    "pull_request_creation_policy": "all",
+    "topics": [],
+    "visibility": "public",
+    "forks": 0,
+    "open_issues": 2,
+    "watchers": 2,
+    "default_branch": "main",
+    "permissions": {
+      "admin": true,
+      "maintain": true,
+      "push": true,
+      "triage": true,
+      "pull": true
+    },
+    "temp_clone_token": "",
+    "allow_squash_merge": true,
+    "allow_merge_commit": true,
+    "allow_rebase_merge": true,
+    "allow_auto_merge": false,
+    "delete_branch_on_merge": false,
+    "allow_update_branch": false,
+    "use_squash_pr_title_as_default": false,
+    "squash_merge_commit_message": "COMMIT_MESSAGES",
+    "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
+    "merge_commit_message": "PR_TITLE",
+    "merge_commit_title": "MERGE_MESSAGE",
+    "security_and_analysis": {
+      "secret_scanning": {
+        "status": "enabled"
+      },
+      "secret_scanning_push_protection": {
+        "status": "enabled"
+      },
+      "dependabot_security_updates": {
+        "status": "disabled"
+      },
+      "secret_scanning_non_provider_patterns": {
+        "status": "disabled"
+      },
+      "secret_scanning_validity_checks": {
+        "status": "disabled"
+      }
+    },
+    "network_count": 0,
+    "subscribers_count": 0
+  },
+  "statuses": {
+    "state": "pending",
+    "statuses": [],
+    "sha": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "total_count": 0,
+    "repository": {
+      "id": 1208373637,
+      "node_id": "R_kgDOSAZRhQ",
+      "name": "TerraformStyleGuide",
+      "full_name": "franklesniak/TerraformStyleGuide",
+      "private": false,
+      "owner": {
+        "login": "franklesniak",
+        "id": 11204406,
+        "node_id": "MDQ6VXNlcjExMjA0NDA2",
+        "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/franklesniak",
+        "html_url": "https://github.com/franklesniak",
+        "followers_url": "https://api.github.com/users/franklesniak/followers",
+        "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+        "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+        "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+        "repos_url": "https://api.github.com/users/franklesniak/repos",
+        "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+        "type": "User",
+        "user_view_type": "public",
+        "site_admin": false
+      },
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide",
+      "description": "A style guide that describes how I want my Terraform/HCL written. For use by both humans and LLMs/agents.",
+      "fork": false,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide",
+      "forks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/forks",
+      "keys_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/keys{/key_id}",
+      "collaborators_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/collaborators{/collaborator}",
+      "teams_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/teams",
+      "hooks_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/hooks",
+      "issue_events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/events{/number}",
+      "events_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/events",
+      "assignees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/assignees{/user}",
+      "branches_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/branches{/branch}",
+      "tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/tags",
+      "blobs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs{/sha}",
+      "git_tags_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/tags{/sha}",
+      "git_refs_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs{/sha}",
+      "trees_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees{/sha}",
+      "statuses_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/statuses/{sha}",
+      "languages_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/languages",
+      "stargazers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/stargazers",
+      "contributors_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contributors",
+      "subscribers_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscribers",
+      "subscription_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/subscription",
+      "commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits{/sha}",
+      "git_commits_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits{/sha}",
+      "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/comments{/number}",
+      "issue_comment_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments{/number}",
+      "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/{+path}",
+      "compare_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/compare/{base}...{head}",
+      "merges_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/merges",
+      "archive_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/{archive_format}{/ref}",
+      "downloads_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/downloads",
+      "issues_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues{/number}",
+      "pulls_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/pulls{/number}",
+      "milestones_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/milestones{/number}",
+      "notifications_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/notifications{?since,all,participating}",
+      "labels_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/labels{/name}",
+      "releases_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/releases{/id}",
+      "deployments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/deployments"
+    },
+    "commit_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits/5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/status"
+  },
+  "reactions": [
+    [
+      {
+        "id": 550293798,
+        "node_id": "REA_lAHOSAZRhc8AAAABViDQ7M4gzNEm",
+        "user": {
+          "login": "chatgpt-codex-connector[bot]",
+          "id": 199175422,
+          "node_id": "BOT_kgDOC98s_g",
+          "avatar_url": "https://avatars.githubusercontent.com/in/1144995?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D",
+          "html_url": "https://github.com/chatgpt-codex-connector%5Bbot%5D",
+          "followers_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/followers",
+          "following_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/following{/other_user}",
+          "gists_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/subscriptions",
+          "organizations_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/orgs",
+          "repos_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/repos",
+          "events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/chatgpt-codex-connector%5Bbot%5D/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "content": "+1",
+        "created_at": "2026-10-07T05:37:06Z"
+      }
+    ]
+  ],
+  "commit": {
+    "sha": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "node_id": "C_kwDOSAZRhdoAKDVlMjQyNDc2OGM1ZDdkNzhhN2Y4ZWE4NTJkNDIzOWU2MjA2OWQwZmU",
+    "commit": {
+      "author": {
+        "name": "Frank Lesniak",
+        "email": "franklesniak@hotmail.com",
+        "date": "2026-10-07T05:04:16Z"
+      },
+      "committer": {
+        "name": "Frank Lesniak",
+        "email": "franklesniak@hotmail.com",
+        "date": "2026-10-07T05:04:16Z"
+      },
+      "message": "Accept empty Markdown context arrays and test malformed entries",
+      "tree": {
+        "sha": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/c19b92d54746aa4cdea4b6eee055b07de724b31a"
+      },
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits/5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "comments_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/comments",
+    "author": {
+      "login": "franklesniak",
+      "id": 11204406,
+      "node_id": "MDQ6VXNlcjExMjA0NDA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/franklesniak",
+      "html_url": "https://github.com/franklesniak",
+      "followers_url": "https://api.github.com/users/franklesniak/followers",
+      "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+      "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+      "repos_url": "https://api.github.com/users/franklesniak/repos",
+      "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "franklesniak",
+      "id": 11204406,
+      "node_id": "MDQ6VXNlcjExMjA0NDA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/franklesniak",
+      "html_url": "https://github.com/franklesniak",
+      "followers_url": "https://api.github.com/users/franklesniak/followers",
+      "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+      "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+      "repos_url": "https://api.github.com/users/franklesniak/repos",
+      "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/commits/a840f21b03f0dcac0815e2f7f044928667402b42",
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    ],
+    "stats": {
+      "total": 275,
+      "additions": 265,
+      "deletions": 10
+    },
+    "files": [
+      {
+        "sha": "6f06546f3fe151ed6654d4f1e28b696b77a4cd75",
+        "filename": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "status": "modified",
+        "additions": 250,
+        "deletions": 1,
+        "changes": 251,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/.github%2Fworkflows%2FTest-AgentInstructions.SelfTest.ps1?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -33,7 +33,7 @@\n # None. The script throws when a self-test fails.\n #\n # .NOTES\n-# Version: 1.11.20261006.0\n+# Version: 1.12.20261007.0\n \n [CmdletBinding(PositionalBinding = $false)]\n [OutputType([void])]\n@@ -204,6 +204,254 @@ function Assert-ParserJsonConversionSelfTest {\n }\n \n \n+function Assert-MarkdownStringArrayContextSelfTest {\n+    # .SYNOPSIS\n+    # Checks admission and typed output for all six Markdown string arrays.\n+    #\n+    # .DESCRIPTION\n+    # Delegates to the real parser before changing one raw field per case.\n+    # Requires explicit valid and invalid outcomes, no partial output on refusal,\n+    # and exact string-array types and values. Nonstring elements, including\n+    # null, are refused in prose blocks, table cells and top-level list items.\n+    #\n+    # .EXAMPLE\n+    # Assert-MarkdownStringArrayContextSelfTest\n+    #\n+    # # Throws if a string-array shortcut changes context admission or output.\n+    #\n+    # .INPUTS\n+    # None. No pipeline input.\n+    #\n+    # .OUTPUTS\n+    # None. A changed result or an unexpected parser fixture throws.\n+    #\n+    # .NOTES\n+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n+    # Parameters, return shape, and positional contract can change without notice.\n+    # Positional parameters are disabled; internal callers use named arguments.\n+    # Version: 1.0.20261007.0\n+    [CmdletBinding(PositionalBinding = $false)]\n+    [OutputType([void])]\n+    param()\n+\n+    $scriptBlockActualParser = ${function:Invoke-MarkdownParserProcess}\n+    $hashtableFixture = @{ Family = ''; Field = ''; Json = ''; Remove = $false; Mutate = $false; Processes = 0 }\n+    function Invoke-MarkdownParserProcess {\n+        # .SYNOPSIS\n+        # Changes one string-array field after a fresh real parser call.\n+        #\n+        # .DESCRIPTION\n+        # Preserves the process result and native exit handling while replacing\n+        # only the selected field in fresh JSON. This wrapper is function-local.\n+        #\n+        # .PARAMETER StartInfo\n+        # The validated process start information passed to the real parser.\n+        #\n+        # .PARAMETER Content\n+        # The original Markdown fixture passed unchanged to the real parser.\n+        #\n+        # .EXAMPLE\n+        # Invoke-MarkdownParserProcess -StartInfo $objStartInfo -Content $strMarkdown\n+        #\n+        # # Returns the fresh process result with one declared field mutation.\n+        #\n+        # .INPUTS\n+        # None. No pipeline input.\n+        #\n+        # .OUTPUTS\n+        # [pscustomobject] The actual process result with mutated JSON output.\n+        #\n+        # .NOTES\n+        # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n+        # Parameters, return shape, and positional contract can change without notice.\n+        # Positional parameters are disabled; internal callers use named arguments.\n+        # Version: 1.0.20261007.0\n+        [CmdletBinding(PositionalBinding = $false)]\n+        [OutputType([pscustomobject])]\n+        param(\n+            [Parameter(Mandatory)][Diagnostics.ProcessStartInfo] $StartInfo,\n+            [Parameter(Mandatory)][AllowEmptyString()][string] $Content\n+        )\n+\n+        $objProcessResult = & $scriptBlockActualParser -StartInfo $StartInfo -Content $Content\n+        $hashtableFixture.Processes++\n+        if (-not $hashtableFixture.Mutate) { return $objProcessResult }\n+        $hashtableRawContext = $objProcessResult.Output | ConvertFrom-Json -AsHashtable\n+        if ($hashtableRawContext[$hashtableFixture.Family] -isnot [array] -or\n+            $hashtableRawContext[$hashtableFixture.Family].Count -eq 0) {\n+            throw 'The real parser fixture lacks the selected record family.'\n+        }\n+        if ($hashtableFixture.Family -ceq 'tableRows') {\n+            if ($hashtableRawContext.tableRows[0].cells -isnot [array] -or\n+                $hashtableRawContext.tableRows[0].cells.Count -eq 0) {\n+                throw 'The real parser fixture lacks a table cell.'\n+            }\n+            $hashtableRecord = $hashtableRawContext.tableRows[0].cells[0]\n+        } else {\n+            $hashtableRecord = $hashtableRawContext[$hashtableFixture.Family][0]\n+        }\n+        if (-not $hashtableRecord.Contains($hashtableFixture.Field)) {\n+            throw 'The real parser fixture lacks the selected string-array field.'\n+        }\n+        if ($hashtableFixture.Remove) {\n+            [void]($hashtableRecord.Remove($hashtableFixture.Field))\n+        } else {\n+            $objFixtureValue = ConvertFrom-ParserJsonContext `\n+                -Content ('{\"value\":' + $hashtableFixture.Json + '}') -MaximumBytes 4096\n+            $hashtableRecord[$hashtableFixture.Field] = $objFixtureValue.value\n+        }\n+        $objProcessResult.Output = $hashtableRawContext | ConvertTo-Json -Depth 20 -Compress\n+        return $objProcessResult\n+    }\n+    $strMarkdown = @(\n+        '# Title', '', 'Text `code` [link](https://example.invalid).', '',\n+        '- Item `code` [link](https://example.invalid)', '',\n+        '| Field | Value |', '| --- | --- |', '| Cell | `code` [link](https://example.invalid) |'\n+    ) -join \"`n\"\n+    $intLineCount = @([regex]::Split($strMarkdown, '\\r\\n|\\r|\\n')).Count\n+    $arrCases = @(\n+        @{ Name = 'empty'; Json = '[]'; Outcome = 'accept' },\n+        @{ Name = 'singleton'; Json = '[\"one\"]'; Outcome = 'accept' },\n+        @{ Name = 'many strings'; Json = '[\"\",\"one\",\"\\u00e9\\ud83d\\ude03\",\"2026-10-06T23:00:00Z\"]'; Outcome = 'accept' },\n+        @{ Name = 'missing'; Json = ''; Outcome = 'reject' },\n+        @{ Name = 'null field'; Json = 'null'; Outcome = 'reject' },\n+        @{ Name = 'scalar string'; Json = '\"text\"'; Outcome = 'reject' },\n+        @{ Name = 'scalar number'; Json = '1'; Outcome = 'reject' },\n+        @{ Name = 'scalar Boolean'; Json = 'true'; Outcome = 'reject' },\n+        @{ Name = 'object field'; Json = '{}'; Outcome = 'reject' },\n+        @{ Name = 'nested array'; Json = '[[\"text\"]]'; Outcome = 'reject' },\n+        @{ Name = 'object element'; Json = '[{}]'; Outcome = 'reject' },\n+        @{ Name = 'bad first'; Json = '[1,\"text\"]'; Outcome = 'reject' },\n+        @{ Name = 'bad last'; Json = '[\"text\",false]'; Outcome = 'reject' },\n+        @{ Name = 'null element'; Json = '[null]'; Outcome = 'reject' },\n+        @{ Name = 'null first string'; Json = '[null,\"text\"]'; Outcome = 'reject' },\n+        @{ Name = 'null last string'; Json = '[\"text\",null]'; Outcome = 'reject' },\n+        @{ Name = 'null first number'; Json = '[null,1]'; Outcome = 'reject' },\n+        @{ Name = 'null last number'; Json = '[1,null]'; Outcome = 'reject' }\n+    )\n+    try {\n+        $strPlainMarkdown = $strMarkdown.Replace('`code`', 'code').Replace(\n+            '[link](https://example.invalid)', 'link')\n+        $objPlainContext = Get-MarkdownParseContext -Content $strPlainMarkdown -LineCount $intLineCount\n+        if ($null -eq $objPlainContext -or $hashtableFixture.Processes -ne 1 -or\n+            $objPlainContext.ProseBlocks -isnot [pscustomobject[]] -or $objPlainContext.ProseBlocks.Count -eq 0 -or\n+            $objPlainContext.TopLevelListItems -isnot [pscustomobject[]] -or $objPlainContext.TopLevelListItems.Count -eq 0 -or\n+            $objPlainContext.TableRows -isnot [pscustomobject[]] -or $objPlainContext.TableRows.Count -eq 0) {\n+            throw 'The plain Markdown fixture lost its fresh parser call or record families.'\n+        }\n+        foreach ($objRow in $objPlainContext.TableRows) {\n+            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {\n+                throw 'The plain Markdown fixture lost its typed table cells.'\n+            }\n+        }\n+        $arrPlainRecords = @($objPlainContext.ProseBlocks) + @($objPlainContext.TopLevelListItems) +\n+            @($objPlainContext.TableRows | ForEach-Object { $_.Cells })\n+        foreach ($objRecord in $arrPlainRecords) {\n+            if ($objRecord.Code -isnot [string[]] -or $objRecord.Code.Count -ne 0 -or\n+                $objRecord.Links -isnot [string[]] -or $objRecord.Links.Count -ne 0) {\n+                throw 'Plain prose, table or list Markdown lost a naturally empty string array.'\n+            }\n+        }\n+        $hashtableFixture.Mutate = $true\n+        foreach ($strFamily in @('proseBlocks', 'tableRows', 'topLevelListItems')) {\n+            $hashtableFixture.Family = $strFamily\n+            foreach ($strField in @('code', 'links')) {\n+                $hashtableFixture.Field = $strField\n+                foreach ($hashtableCase in $arrCases) {\n+                    $hashtableFixture.Json = $hashtableCase.Json\n+                    $hashtableFixture.Remove = $hashtableCase.Name -ceq 'missing'\n+                    $intPreviousProcesses = $hashtableFixture.Processes\n+                    $listOutput = [Collections.Generic.List[pscustomobject]]::new()\n+                    $objFailure = $null\n+                    try {\n+                        Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount |\n+                            ForEach-Object { $listOutput.Add($_) }\n+                    } catch {\n+                        # Expected refusals are compared below; unrelated failures cannot pass.\n+                        $objFailure = $_\n+                    }\n+                    if (($null -ne $objFailure -and $listOutput.Count -ne 0) -or\n+                        ($hashtableCase.Outcome -ceq 'accept' -and $null -ne $objFailure) -or\n+                        ($hashtableCase.Outcome -ceq 'reject' -and $null -eq $objFailure)) {\n+                        throw ('String-array outcome changed: {0}/{1}/{2}.' -f\n+                            $strFamily, $strField, $hashtableCase.Name)\n+                    }\n+                    if ($null -eq $objFailure) {\n+                        if ($listOutput.Count -ne 1) { throw 'String-array context lost its single output.' }\n+                        $objContext = $listOutput[0]\n+                        foreach ($strArrayName in @('CodeBlockRanges', 'ProseBlocks', 'TableRows',\n+                                'TopLevelBlocks', 'TopLevelListItems', 'Headings', 'LevelTwoHeadings')) {\n+                            if ($objContext.$strArrayName -isnot [pscustomobject[]]) {\n+                                throw 'String-array context changed an exact record-array type.'\n+                            }\n+                        }\n+                        if ($objContext.ProseBlocks.Count -eq 0 -or $objContext.TopLevelListItems.Count -eq 0 -or\n+                            $objContext.TableRows.Count -eq 0) {\n+                            throw 'String-array context lost the fixture record families.'\n+                        }\n+                        foreach ($objRecord in @($objContext.ProseBlocks) + @($objContext.TopLevelListItems)) {\n+                            if ($objRecord.Code -isnot [string[]] -or $objRecord.Links -isnot [string[]]) {\n+                                throw 'String-array context changed a prose or list string-array type.'\n+                            }\n+                        }\n+                        foreach ($objRow in $objContext.TableRows) {\n+                            if ($objRow.Cells -isnot [pscustomobject[]] -or $objRow.Cells.Count -eq 0) {\n+                                throw 'String-array context changed cell-array type or lost cells.'\n+                            }\n+                            foreach ($objCell in $objRow.Cells) {\n+                                if ($objCell.Code -isnot [string[]] -or $objCell.Links -isnot [string[]]) {\n+                                    throw 'String-array context changed a cell string-array type.'\n+                                }\n+                            }\n+                        }\n+                    }\n+                    if ($null -ne $objFailure) {\n+                        $strExpectedFailure = if ($hashtableFixture.Remove) {\n+                            \"The property '${strField}' cannot be found on this object. Verify that the property exists.\"\n+                        } else {\n+                            switch ($strFamily) {\n+                                'proseBlocks' { 'The locked Markdown parser returned a malformed prose block.' }\n+                                'tableRows' { 'The locked Markdown parser returned a malformed table cell.' }\n+                                'topLevelListItems' { 'The locked Markdown parser returned a malformed top-level list item.' }\n+                            }\n+                        }\n+                        if ($objFailure.Exception.Message -cne $strExpectedFailure) {\n+                            throw ('String-array refusal changed: {0}/{1}/{2}.' -f\n+                                $strFamily, $strField, $hashtableCase.Name)\n+                        }\n+                    } else {\n+                        $objTarget = switch ($strFamily) {\n+                            'proseBlocks' { $objContext.ProseBlocks[0] }\n+                            'tableRows' { $objContext.TableRows[0].Cells[0] }\n+                            'topLevelListItems' { $objContext.TopLevelListItems[0] }\n+                        }\n+                        $strOutputField = if ($strField -ceq 'code') { 'Code' } else { 'Links' }\n+                        $objExpectedValue = ConvertFrom-ParserJsonContext `\n+                            -Content ('{\"value\":' + $hashtableCase.Json + '}') -MaximumBytes 4096\n+                        $arrExpectedStrings = $objExpectedValue.value\n+                        $arrActualStrings = $objTarget.$strOutputField\n+                        if ($arrActualStrings -isnot [string[]] -or\n+                            $arrActualStrings.Count -ne $arrExpectedStrings.Count) {\n+                            throw 'String-array context changed target type or cardinality.'\n+                        }\n+                        for ($intIndex = 0; $intIndex -lt $arrExpectedStrings.Count; $intIndex++) {\n+                            if ($arrActualStrings[$intIndex] -cne $arrExpectedStrings[$intIndex]) {\n+                                throw 'String-array context changed an exact target value.'\n+                            }\n+                        }\n+                    }\n+                    if ($hashtableFixture.Processes -ne $intPreviousProcesses + 1) {\n+                        throw 'String-array context skipped its fresh parser call.'\n+                    }\n+                }\n+            }\n+        }\n+    } finally {\n+        Set-Item -LiteralPath Function:Invoke-MarkdownParserProcess -Value $scriptBlockActualParser\n+    }\n+}\n+\n+\n function Assert-MarkdownParseReuseSelfTest {\n     # .SYNOPSIS\n     # Tests isolated structural reuse without skipping the real parser.\n@@ -3979,6 +4227,7 @@ if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandCont\n \n \n Assert-ParserJsonConversionSelfTest\n+Assert-MarkdownStringArrayContextSelfTest\n Assert-MarkdownParseReuseSelfTest\n Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath\n "
+      },
+      {
+        "sha": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+        "filename": ".github/workflows/Test-AgentInstructions.ps1",
+        "status": "modified",
+        "additions": 14,
+        "deletions": 8,
+        "changes": 22,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.ps1",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/.github%2Fworkflows%2FTest-AgentInstructions.ps1",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/.github%2Fworkflows%2FTest-AgentInstructions.ps1?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -23,7 +23,7 @@\n #\n # .NOTES\n # Positional parameters are not supported.\n-# Version: 1.20.20261006.0\n+# Version: 1.21.20261007.0\n \n [CmdletBinding(PositionalBinding = $false)]\n [OutputType([string])]\n@@ -3547,7 +3547,7 @@ function Get-MarkdownParseContext {\n     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.2.20261006.0\n+    # Version: 1.3.20261007.0\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([pscustomobject])]\n     param(\n@@ -3829,9 +3829,11 @@ function Get-MarkdownParseContext {\n                 $objRawProseBlock.range.Count -ne 2 -or\n                 $null -eq $objRawProseBlock.text -or\n                 $objRawProseBlock.code -isnot [array] -or\n-                @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawProseBlock.code.Count -ne 0 -and\n+                    @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawProseBlock.links -isnot [array] -or\n-                @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawProseBlock.links.Count -ne 0 -and\n+                    @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed prose block.'\n             }\n \n@@ -3883,9 +3885,11 @@ function Get-MarkdownParseContext {\n                     @('th', 'td') -cnotcontains $objRawCell.tag -or\n                     $objRawCell.text -isnot [string] -or\n                     $objRawCell.code -isnot [array] -or\n-                    @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                    ($objRawCell.code.Count -ne 0 -and\n+                        @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                     $objRawCell.links -isnot [array] -or\n-                    @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                    ($objRawCell.links.Count -ne 0 -and\n+                        @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                     throw 'The locked Markdown parser returned a malformed table cell.'\n                 }\n                 $listCells.Add([pscustomobject]@{\n@@ -3951,9 +3955,11 @@ function Get-MarkdownParseContext {\n                 $objRawListItem.range.Count -ne 2 -or\n                 ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or\n                 $objRawListItem.code -isnot [array] -or\n-                @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawListItem.code.Count -ne 0 -and\n+                    @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawListItem.links -isnot [array] -or\n-                @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawListItem.links.Count -ne 0 -and\n+                    @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed top-level list item.'\n             }\n "
+      },
+      {
+        "sha": "b97de56a0bed982beb793c6aca6ffe2490718d81",
+        "filename": "docs/dependency-maintenance.md",
+        "status": "modified",
+        "additions": 1,
+        "deletions": 1,
+        "changes": 2,
+        "blob_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/docs%2Fdependency-maintenance.md",
+        "raw_url": "https://github.com/franklesniak/TerraformStyleGuide/raw/5e2424768c5d7d78a7f8ea852d4239e62069d0fe/docs%2Fdependency-maintenance.md",
+        "contents_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/contents/docs%2Fdependency-maintenance.md?ref=5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "patch": "@@ -4,7 +4,7 @@\n \n - **Status:** Active\n - **Owner:** Repository maintainer (@franklesniak)\n-- **Last Updated:** 2026-10-06\n+- **Last Updated:** 2026-10-07\n - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in TerraformStyleGuide.\n \n Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux CI bootstrap verifies its Node archive with `linuxX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:"
+      }
+    ]
+  },
+  "independent_quality": {
+    "status": "passed",
+    "worker": "tf_ps235_candidate_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final",
+    "scope": "Exact published candidate, complete remote reviews and 14 successful workflows; root read report, verified referenced evidence and sampled raw final test logs. Agent review is not human approval.",
+    "root_verified": true,
+    "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\REPORT.md",
+    "report_sha256": "b610f9dd3b08faf50182811afa3779811b52e20b41ffa851f21a19fe88c784fd",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\evidence.json",
+    "evidence_sha256": "dddc167380c61f669776d8fda2773819dfc9dae070e4603ce9316de7fd6fcf08",
+    "root_verified_at": "2026-10-07T06:04:59.922888+00:00",
+    "immutable_references_verified": 73,
+    "material_findings": []
+  },
+  "dedicated_service": {
+    "status": "verified_success",
+    "repository": "franklesniak/TerraformStyleGuide",
+    "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+    "run_id": 37577209812,
+    "job_id": 112648669716,
+    "source": ".github/workflows/copilot-code-review.yml",
+    "source_sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+    "source_copy": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-source.yml",
+    "body_comparison": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\dedicated-selection-body-comparison.json",
+    "body_comparison_sha256": "300d035f9cd8ed4134a67bb07fcdd4e71afe3fed0fb6fd66aba150e9617ce36c",
+    "raw_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\independent-quality\\native-final\\run-37577209812.zip",
+    "raw_archive_sha256": "c8f4b614586ca1ef10706237cc79b45ecc1bbc1cadd0c0c31c438574b659c153",
+    "scope_limit": "Genuine Terraform service proof only. PowerShell service selection remains a later natural PR observation; no synthetic review request."
+  }
+}
