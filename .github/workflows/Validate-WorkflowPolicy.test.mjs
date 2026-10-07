@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import test from 'node:test';
 import {
@@ -295,4 +295,78 @@ test('candidate revision cannot replace accepted contract or execute candidate v
 });
 test('obsolete catalog execution mode is rejected instead of silently claiming coverage', async () => {
   await assert.rejects(main(['--ordinary-case-catalog-data']), error => error.category === 'arguments');
+});
+
+test('immutable event acquisition survives a moved ref and refuses an unavailable object', t => {
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-event-acquisition-'));
+  t.after(() => {
+    assert.equal(path.dirname(path.resolve(temporary)), path.resolve(os.tmpdir()));
+    assert.ok(path.basename(temporary).startsWith('styleguide-event-acquisition-'));
+    fs.rmSync(temporary, { recursive: true, force: true });
+  });
+  const git = (cwd, parameters, expectedStatus = 0) => {
+    const result = spawnSync('git', [
+      // Exercise the complete fixture without permitting implicit bare discovery.
+      '-c', 'safe.bareRepository=explicit',
+      '-c', `core.hooksPath=${path.join(temporary, 'no-hooks')}`,
+      '-c', 'commit.gpgsign=false', '-c', 'core.autocrlf=false',
+      '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+      ...parameters,
+    ], { cwd, encoding: 'utf8', timeout: 15000, maxBuffer: 1024 * 1024, windowsHide: true });
+    assert.equal(result.error, undefined, `Git process failed: ${parameters.join(' ')}`);
+    assert.equal(result.signal, null);
+    assert.equal(result.status, expectedStatus, `${parameters.join(' ')}\n${result.stderr}`);
+    return result.stdout;
+  };
+  const origin = path.join(temporary, 'bare origin');
+  const writer = path.join(temporary, 'event writer');
+  git(temporary, ['init', '--bare', '--object-format=sha1', '--initial-branch=event', origin]);
+  git(temporary, ['init', '--object-format=sha1', '--initial-branch=event', writer]);
+  // A file URL uses upload-pack and honors depth on both Windows and Linux.
+  const originUrl = pathToFileURL(origin).href;
+  git(writer, ['remote', 'add', 'origin', originUrl]);
+  fs.writeFileSync(path.join(writer, 'event.txt'), 'event A\n');
+  git(writer, ['add', 'event.txt']);
+  git(writer, ['commit', '-m', 'Event A']);
+  const expectedRevision = git(writer, ['rev-parse', '--verify', 'HEAD^{commit}']).trim();
+  assert.match(expectedRevision, /^[0-9a-f]{40}$/);
+  git(writer, ['push', 'origin', 'HEAD:refs/heads/event']);
+  assert.equal(git(temporary, [`--git-dir=${origin}`, 'rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), expectedRevision);
+
+  fs.writeFileSync(path.join(writer, 'event.txt'), 'event B\n');
+  git(writer, ['add', 'event.txt']);
+  git(writer, ['commit', '-m', 'Event B']);
+  const movedRevision = git(writer, ['rev-parse', '--verify', 'HEAD^{commit}']).trim();
+  assert.notEqual(movedRevision, expectedRevision);
+  git(writer, ['push', 'origin', 'HEAD:refs/heads/event']);
+  assert.equal(git(temporary, [`--git-dir=${origin}`, 'rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), movedRevision);
+
+  const target = 'refs/remotes/event/target';
+  const freshDestination = name => {
+    const destination = path.join(temporary, name);
+    git(temporary, ['init', '--object-format=sha1', destination]);
+    git(destination, ['remote', 'add', 'origin', originUrl]);
+    assert.equal(git(destination, ['for-each-ref', '--format=%(refname)']), '');
+    return destination;
+  };
+  const fetchOptions = ['fetch', '--no-tags', '--no-recurse-submodules', '--depth=1', '--refmap=', 'origin'];
+  const immutable = freshDestination('immutable destination');
+  git(immutable, [...fetchOptions, `${expectedRevision}:${target}`]);
+  const immutableRevision = git(immutable, ['rev-parse', '--verify', `${target}^{commit}`]).trim();
+  assert.equal(immutableRevision, expectedRevision);
+  assert.equal(git(immutable, ['show', `${target}:event.txt`]), 'event A\n');
+  assert.equal(git(immutable, ['rev-list', '--count', target]).trim(), '1');
+
+  const mutable = freshDestination('mutable destination');
+  git(mutable, [...fetchOptions, `refs/heads/event:${target}`]);
+  const mutableRevision = git(mutable, ['rev-parse', '--verify', `${target}^{commit}`]).trim();
+  assert.equal(mutableRevision, movedRevision);
+  assert.throws(() => assert.equal(mutableRevision, expectedRevision), { code: 'ERR_ASSERTION' });
+  assert.equal(git(mutable, ['show', `${target}:event.txt`]), 'event B\n');
+  assert.equal(git(mutable, ['rev-list', '--count', target]).trim(), '1');
+
+  const missing = freshDestination('missing object destination');
+  git(missing, [...fetchOptions, `${'0'.repeat(40)}:${target}`], 128);
+  git(missing, ['show-ref', '--verify', '--quiet', target], 1);
+  assert.equal(git(missing, ['for-each-ref', '--format=%(refname)']), '');
 });
