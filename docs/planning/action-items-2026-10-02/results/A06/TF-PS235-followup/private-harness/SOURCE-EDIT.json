@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "status": "EXACT_THREE_POSTIMAGES_APPLIED_TESTS_NOT_RUN",
+  "applied_at": "2026-10-07T04:39:29.807367+00:00",
+  "source": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "source_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "base_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "branch": "codex/ps235-validator-followup",
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "state_sha256": "7219b5b85e8965ec69ecbeb04262c171d1345312e745622b3a261745991f5a67",
+  "rebind_sha256": "1c7a2120d241c6721244e4f5aca3260ff4081f20e185d4e7e6692da9aba21124",
+  "files": [
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "before_sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+      "after_sha256": "6cdf45bf178fe4e27e3ff063ec93e7e1277a604cef8f83ac7e68f7f361e88787",
+      "bytes": 10453,
+      "source_blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+      "substitutions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "before_sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+      "after_sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+      "bytes": 299417,
+      "source_blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "substitutions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository.",
+          "TF_regions": [
+            {
+              "start_line": 2729,
+              "end_line": 2729
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2977,
+              "end_line": 2977
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "before_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "after_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837,
+      "source_blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "substitutions": []
+    }
+  ],
+  "diff_sha256": "d66d1c580c8847ac12406efdf7b80b59260a69d72e99de91f940791506a65243",
+  "diff_numstat": "250\t1\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\n14\t8\t.github/workflows/Test-AgentInstructions.ps1\n1\t1\tdocs/dependency-maintenance.md",
+  "git_metadata_before": {
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\config.worktree": null,
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\HEAD": "3a6f35aabd853cbb6e930aadbc5be04be0e1995df805afb3b2c0f80e0586383a",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\packed-refs": "1cc6282d35f2c6f2008ec09b35c22fe440866e8a4833e2db79619f9efba1f3ec",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\a02-peer-docs": "f13a57bc8b5fc3a6b87e7080f689c7e0049818d8bf161576ce94822d399350e8",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\a06-generator-convergence": "ce88a9f65c72860897e53c67ce17c47b823063cc0c4ff699ec74d80b3d03b61b",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\bounded-node-preflight-20261001": "b3e6c78b7d5646432be480b7ff694e5a386e41e2a8bd0050da32769428fc36eb",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\coherent-tooling-carryback": "e8a38226bcdb1e96dac15c53780965018f8cc60d7c657c8ca8b7f656f59c9876",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\ps235-validator-followup": "7950964180449aad28da594ec1f52446ce4ddf7ebce0bbb553533fd3fdb416c4",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\heads\\codex\\safe-state-recovery-examples-20261001": "b11d29c21d1f6348d2daa485d1a3ad562b29485aac01ddbf8ae8cbd2dcdb1fa8",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\codex\\a02-peer-docs": "f13a57bc8b5fc3a6b87e7080f689c7e0049818d8bf161576ce94822d399350e8",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\codex\\a06-generator-convergence": "ce88a9f65c72860897e53c67ce17c47b823063cc0c4ff699ec74d80b3d03b61b",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\codex\\bounded-node-preflight-20261001": "b3e6c78b7d5646432be480b7ff694e5a386e41e2a8bd0050da32769428fc36eb",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\codex\\coherent-tooling-carryback": "e8a38226bcdb1e96dac15c53780965018f8cc60d7c657c8ca8b7f656f59c9876",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\codex\\safe-state-recovery-examples-20261001": "b11d29c21d1f6348d2daa485d1a3ad562b29485aac01ddbf8ae8cbd2dcdb1fa8",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\HEAD": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\refs\\remotes\\origin\\main": "7950964180449aad28da594ec1f52446ce4ddf7ebce0bbb553533fd3fdb416c4",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\worktrees\\TerraformStyleGuide-A02-peer-docs-20261003\\config": null,
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\worktrees\\TerraformStyleGuide-A02-peer-docs-20261003\\config.worktree": null,
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\worktrees\\TerraformStyleGuide-A02-peer-docs-20261003\\HEAD": "124b6ef81bb631302a248a57de69d04240acd810275b2687a8de3b78d0227598",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\worktrees\\TerraformStyleGuide-A02-peer-docs-20261003\\index": "807c4bd5b7951e016f57b2e4ee8f312a59cf4b67c87ba45242cd42baa3a0e200",
+    "C:\\Users\\flesniak\\GitHub\\TerraformStyleGuide\\.git\\worktrees\\TerraformStyleGuide-A02-peer-docs-20261003\\packed-refs": null
+  },
+  "git_metadata_unchanged": true,
+  "index_unchanged": true,
+  "tests_run": 0,
+  "validation_execution_authorized": false,
+  "native_requests": 0,
+  "commits": 0,
+  "refs_mutated": 0,
+  "instructions_read_in_full": [
+    "TF AGENTS.md",
+    "TF .github/copilot-instructions.md",
+    "TF .github/instructions/docs.instructions.md",
+    "PS STYLE_GUIDE.md (2820 lines)"
+  ],
+  "preserved_prior_rounds": 7,
+  "preserved_deadline": "2026-10-13T23:47:31+00:00"
+}

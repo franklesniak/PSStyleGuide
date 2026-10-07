@@ -1,0 +1,542 @@
+{
+  "schema": 1,
+  "status": "INITIAL_EXACT_STAGED_SOURCE_AND_FOCUSED_RESULTS_PASS",
+  "written_at": "2026-10-07T04:58:06.450762+00:00",
+  "material_findings": [],
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "branch": "codex/ps235-validator-followup",
+  "head_base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "base_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "accepted_source": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "accepted_source_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "postimages": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "6f06546f3fe151ed6654d4f1e28b696b77a4cd75",
+      "bytes": 299417,
+      "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "bytes": 510837,
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "b97de56a0bed982beb793c6aca6ffe2490718d81",
+      "bytes": 10453,
+      "sha256": "6cdf45bf178fe4e27e3ff063ec93e7e1277a604cef8f83ac7e68f7f361e88787"
+    }
+  ],
+  "independent_identity_checks": {
+    "candidate_index_physical_entries": 80,
+    "accepted_source_peer_raw_entries": 48,
+    "qualification_archive_entries": 80,
+    "dependency_entries": 1914,
+    "mismatches": [],
+    "accepted_source_equality": "exact validator; one literal per SelfTest and guide as recorded in source edit",
+    "candidate_test_entire_selftest_identical": true
+  },
+  "cells": [
+    {
+      "platform": "windows",
+      "mode": "focus",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one",
+      "recorded_receipt_hashes_match": true,
+      "actual_guard_identity_equal": true,
+      "guard_equal_receipt": true,
+      "result_state": "passed",
+      "primary_failure": null,
+      "native_and_wrapper_exits": [
+        {
+          "native": 0,
+          "wrapper": 0,
+          "before": {
+            "total": 224,
+            "active": 0,
+            "terminated": 0
+          },
+          "after": {
+            "total": 224,
+            "active": 0,
+            "terminated": 0
+          },
+          "cleanup": []
+        }
+      ],
+      "cleanup_failures": [],
+      "pwsh": "7.6.5",
+      "parser_calls": 109,
+      "decoder_calls": 109,
+      "terminal_definitions_restored": true,
+      "restoration_failures": [],
+      "observation_failures": [],
+      "events": 109,
+      "accepted": 19,
+      "rejected": 90,
+      "refusals_all_emit_zero": true,
+      "fresh_each_case": true,
+      "all_collected_blob_hashes_match": true,
+      "helper_receipts": [
+        {
+          "check": "Assert-MarkdownStringArrayContextSelfTest",
+          "helpers": [
+            "ConvertFrom-ParserJsonContext",
+            "Clear-MarkdownParseReuseSlot",
+            "Copy-MarkdownParseReuseContext",
+            "Get-MarkdownParseReuseSlot",
+            "Get-NodeApplicationContext",
+            "Invoke-MarkdownParserProcess",
+            "Get-MarkdownParseContext"
+          ],
+          "before": true,
+          "after": true
+        }
+      ],
+      "keyed_prior_complete_data_comparison": "109 cases, zero mismatches independently checked; case keys, not sequence, align retained expectations"
+    },
+    {
+      "platform": "linux",
+      "mode": "focus",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one",
+      "recorded_receipt_hashes_match": true,
+      "actual_guard_identity_equal": true,
+      "guard_equal_receipt": true,
+      "result_state": "passed",
+      "primary_failure": null,
+      "container_exit": 0,
+      "container_absent": true,
+      "host_cleanup_failures": [],
+      "command_exits": [
+        0
+      ],
+      "strict_cleanup": [
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        }
+      ],
+      "pwsh": "7.6.3",
+      "parser_calls": 109,
+      "decoder_calls": 109,
+      "terminal_definitions_restored": true,
+      "restoration_failures": [],
+      "observation_failures": [],
+      "events": 109,
+      "accepted": 19,
+      "rejected": 90,
+      "refusals_all_emit_zero": true,
+      "fresh_each_case": true,
+      "all_collected_blob_hashes_match": true,
+      "helper_receipts": [
+        {
+          "after": true,
+          "helpers": [
+            "Clear-MarkdownParseReuseSlot",
+            "ConvertFrom-ParserJsonContext",
+            "Get-MarkdownParseReuseSlot",
+            "Get-MarkdownParseContext",
+            "Invoke-MarkdownParserProcess",
+            "Get-NodeApplicationContext",
+            "Copy-MarkdownParseReuseContext"
+          ],
+          "before": true,
+          "check": "Assert-MarkdownStringArrayContextSelfTest"
+        }
+      ],
+      "keyed_prior_complete_data_comparison": "109 cases, zero mismatches independently checked; case keys, not sequence, align retained expectations"
+    },
+    {
+      "platform": "windows",
+      "mode": "quality",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one",
+      "recorded_receipt_hashes_match": true,
+      "actual_guard_identity_equal": true,
+      "guard_equal_receipt": true,
+      "result_state": "passed",
+      "primary_failure": null,
+      "native_and_wrapper_exits": [
+        {
+          "native": 0,
+          "wrapper": 0,
+          "before": {
+            "total": 4,
+            "active": 0,
+            "terminated": 0
+          },
+          "after": {
+            "total": 4,
+            "active": 0,
+            "terminated": 0
+          },
+          "cleanup": []
+        }
+      ],
+      "cleanup_failures": [],
+      "quality": {
+        "pwsh": "7.6.5",
+        "rows": [
+          {
+            "parser_errors": [],
+            "diagnostics": [],
+            "parser_basis": "exact final bytes / current ParseFile on this platform",
+            "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+            "name": "Test-AgentInstructions.ps1"
+          },
+          {
+            "parser_errors": [],
+            "diagnostics": [],
+            "parser_basis": "exact final bytes / current ParseFile on this platform",
+            "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+            "name": "Test-AgentInstructions.SelfTest.ps1"
+          }
+        ],
+        "analyzer": "1.24.0",
+        "analyzer_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1"
+      }
+    },
+    {
+      "platform": "linux",
+      "mode": "quality",
+      "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one",
+      "recorded_receipt_hashes_match": true,
+      "actual_guard_identity_equal": true,
+      "guard_equal_receipt": true,
+      "result_state": "passed",
+      "primary_failure": null,
+      "container_exit": 0,
+      "container_absent": true,
+      "host_cleanup_failures": [],
+      "command_exits": [
+        0
+      ],
+      "strict_cleanup": [
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        },
+        {
+          "members_before": [],
+          "members_after": [],
+          "strict_nonempty_before_failed": false,
+          "waits": [],
+          "signals": [],
+          "empty_after": true,
+          "failure": null,
+          "owner_pid": 1
+        }
+      ],
+      "quality": {
+        "analyzer": "1.24.0",
+        "pwsh": "7.6.3",
+        "analyzer_path": "/work/empty-array-v5pymx_4/analyzer/PSScriptAnalyzer.psd1",
+        "rows": [
+          {
+            "parser_errors": [],
+            "diagnostics": [],
+            "parser_basis": "exact final bytes / current ParseFile on this platform",
+            "name": "Test-AgentInstructions.ps1",
+            "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+          },
+          {
+            "parser_errors": [],
+            "diagnostics": [],
+            "parser_basis": "exact final bytes / current ParseFile on this platform",
+            "name": "Test-AgentInstructions.SelfTest.ps1",
+            "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f"
+          }
+        ]
+      }
+    }
+  ],
+  "source_and_evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\execution-state.json",
+      "sha256": "770b26c7907703ca49abc7a9955049b6bfdcabc39885111bec9f2bc78c41baf5",
+      "bytes": 12112
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ACTUAL-ACCEPTED-PEER-REBIND.json",
+      "sha256": "1c7a2120d241c6721244e4f5aca3260ff4081f20e185d4e7e6692da9aba21124",
+      "bytes": 23839
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\candidate-source-catalog.json",
+      "sha256": "063ac7eea0f977eb68d1699484f940aa3089fb763d141867baa1182ee937782f",
+      "bytes": 19093
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\FOCUSED-VALIDATION.json",
+      "sha256": "97ee39d786c57b9227c85ea97f638cfe22ac0b4dae4063fea2904a73a3bb58f8",
+      "bytes": 8323
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\PREPARATION.md",
+      "sha256": "8308bc8d0479d674c2a0f53a00a100fe810f3dca28f1ff956f377d700d0fdb26",
+      "bytes": 14571
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\validation-plan.json",
+      "sha256": "85be3b39cf48ed4c78c773225641c3f2b557d27f4db8380073f4e54993f6672e",
+      "bytes": 19428
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ROOT-PRIVATE-PREPARATION-VERIFICATION.json",
+      "sha256": "18c88375b633c8b1558b65c71f6fc846195dad29f17db8b4c91230f31545173e",
+      "bytes": 3431
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\SOURCE-EDIT.json",
+      "sha256": "7e3c95029414e6eabfcff6073cfa19ed9b605e118c593f17c8761029a5577c80",
+      "bytes": 8161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\manifest.root-authorized.json",
+      "sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+      "bytes": 463386
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\candidate-test.ps1",
+      "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+      "bytes": 299417
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\focus.ps1",
+      "sha256": "709e4a50410f873183a43f9af009b0a423399f8b2aa75335c22c4c821bb248dc",
+      "bytes": 17095
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\compare.py",
+      "sha256": "d5bbeb8d51a6802a2fe75e2135c82ec3cf147edfd769348a680016d063897daf",
+      "bytes": 8441
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\quality.ps1",
+      "sha256": "c7de2c191911d31ba191a7c4564ff8b37ff972034e831dbf19b06609ba62a444",
+      "bytes": 1761
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\proven-cases.json",
+      "sha256": "8d536b7ca9210e142f08910317a8fb95f8ef767b9de4f1e957a90c732f83cef9",
+      "bytes": 262259
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+      "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+      "bytes": 134145
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\source-before.json",
+      "sha256": "e901f5c7719f03175ebccf095d385fdfe172b035a02798504a08a96175329b87",
+      "bytes": 834
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\source-after.json",
+      "sha256": "56a857800083bd5c924e040d3b439932d96f809c0f52fd4d6400e6e3193a1117",
+      "bytes": 914
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\result.json",
+      "sha256": "03ae6ef535c1488a963fbe9ce45f1b652304df326b58bdd62e592acedc41ddff",
+      "bytes": 3280
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\differential.json",
+      "sha256": "eaa9d4dd74642af9d170914364e8be9f9c3f5678e237ee3642b6f1a6131d9a76",
+      "bytes": 483
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\candidate\\focus.json",
+      "sha256": "6f4275206b116751af371bafac0fd664ac5afd6670d6115c5c76d347619de20a",
+      "bytes": 127970
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\host-source-before.json",
+      "sha256": "e901f5c7719f03175ebccf095d385fdfe172b035a02798504a08a96175329b87",
+      "bytes": 834
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\host-source-after.json",
+      "sha256": "56a857800083bd5c924e040d3b439932d96f809c0f52fd4d6400e6e3193a1117",
+      "bytes": 914
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\result.json",
+      "sha256": "fcb3e9aceddd9c6a5c1bbf8d715b132dd46e055678141ee9f55ef2fdf9938183",
+      "bytes": 7144
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\status.json",
+      "sha256": "92d33d720955129c91d6dc1e5fc2646f449552186915a1814c91886cb5228b99",
+      "bytes": 1346
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\differential.json",
+      "sha256": "41561e786362595b36241e07e27311c4f2b6515ec2f21bda45c60b7376eaa988",
+      "bytes": 481
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\candidate\\focus.json",
+      "sha256": "b90f61888d4f45fb39fa1ab906f3d033d44354c37e1b4b06a8a324c134434686",
+      "bytes": 127970
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\source-before.json",
+      "sha256": "e901f5c7719f03175ebccf095d385fdfe172b035a02798504a08a96175329b87",
+      "bytes": 834
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\source-after.json",
+      "sha256": "56a857800083bd5c924e040d3b439932d96f809c0f52fd4d6400e6e3193a1117",
+      "bytes": 914
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\result.json",
+      "sha256": "ed77a1749136dec9e2cd1fe90c9a79e93dc51044451a7a7af1536f5475077fbc",
+      "bytes": 3558
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\quality.json",
+      "sha256": "9a9f6a00213b7bdbdf82f996ba2fa8841ed0a66d87fff097a0746dd81229b059",
+      "bytes": 805
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\host-source-before.json",
+      "sha256": "e901f5c7719f03175ebccf095d385fdfe172b035a02798504a08a96175329b87",
+      "bytes": 834
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\host-source-after.json",
+      "sha256": "56a857800083bd5c924e040d3b439932d96f809c0f52fd4d6400e6e3193a1117",
+      "bytes": 914
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\result.json",
+      "sha256": "4bb8a528b77cb1e475f8f5e2fe2e60058d66a57f55aa0a8eba374199e625679f",
+      "bytes": 6801
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\status.json",
+      "sha256": "56a9254f4cca0126af3fe3d7e4f6f123b88cde59615230bc508cc8a6e730bcce",
+      "bytes": 1354
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\quality.json",
+      "sha256": "c0bb5d2c98df0c950a4707774ba9166c499190d753fae916b5caf1567982c009",
+      "bytes": 695
+    }
+  ],
+  "final_guard": {
+    "observed_at": "2026-10-07T04:56:40.426585+00:00",
+    "head": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "index_sha256": "517606a00957e648f079314eb633a4ef3cac9e21ad1981b816d721892510d490",
+    "status": "M  .github/workflows/Test-AgentInstructions.SelfTest.ps1\nM  .github/workflows/Test-AgentInstructions.ps1\nM  docs/dependency-maintenance.md",
+    "candidate_index_diff": "",
+    "catalog_physical_mismatches": []
+  },
+  "remaining": [
+    "full aggregate terminal proof",
+    "normal commit and actual H binding",
+    "actual-H five endpoints",
+    "current ordinary audit",
+    "final current-input quality supplement",
+    "current native reviews and CI/landed checks",
+    "dedicated-service actual selection and success",
+    "accepted TF landing and fresh reverse comparison"
+  ],
+  "non_actions": {
+    "product_tests": 0,
+    "product_mutations": 0,
+    "git_config_ref_mutations": 0,
+    "native_requests": 0,
+    "descendants": 0
+  },
+  "report_sha256": "c236a83162ef2009c44470b06b482d0e4f064f1cb57cfd24e74ca86963d04e0c"
+}

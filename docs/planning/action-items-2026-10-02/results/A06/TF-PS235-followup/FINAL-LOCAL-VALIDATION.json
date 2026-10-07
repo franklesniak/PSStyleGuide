@@ -1,0 +1,236 @@
+{
+  "schema": 1,
+  "status": "ALL_LOCAL_GATES_PASSED",
+  "recorded_at": "2026-10-07T05:25:45.362312+00:00",
+  "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "scope": [
+    "docs/dependency-maintenance.md",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "focused": {
+    "platforms": [
+      "Windows PowerShell7.6.5",
+      "Linux PowerShell7.6.3"
+    ],
+    "cases_each": 109,
+    "accepts_each": 19,
+    "refusals_each": 90,
+    "parser_and_PSSA_errors_warnings": 0
+  },
+  "aggregate": {
+    "all_hooks_passed": 11,
+    "skipped": 0,
+    "ordinary_markdown_commands": 2,
+    "staged_preflight": "passed"
+  },
+  "normal_commit": "passed through normal hooks; tree unchanged",
+  "endpoints": {
+    "status": "passed",
+    "session_id": 88405,
+    "tool_exit": 0,
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\result.json",
+    "five_modes_passed": true,
+    "native_and_wrapper_exits": 0,
+    "full_guards_equal": true,
+    "owned_temp_absent": true,
+    "whole_seconds": 294.21899999998277,
+    "classification": {
+      "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+      "policy": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "classification": "maintenance_required",
+      "maintenancePaths": [
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ]
+    },
+    "audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "authoritySource": "local-origin-main",
+      "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+      "installedGraphRoots": [
+        ".",
+        ".github/workflows"
+      ],
+      "findings": []
+    }
+  },
+  "prior_failed_endpoint_run": {
+    "status": "failed_private_assertion",
+    "session_id": 98821,
+    "tool_exit": 1,
+    "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\execution-run",
+    "result_sha256": "c13cc0e97259334c6bf6c5377c011e930f3cef4602f7b1a9cb4002a20025c4ab",
+    "manifest_sha256": "546c05edd837ee3f3a0b071cf82e23cdda1640f6a98e245271949721dcc1ce3b",
+    "cause": "Private runner required the ordinary guide path in maintenancePaths; accepted classifier correctly returns only the two scripts.",
+    "product_command_exit": 0,
+    "guards_equal": true,
+    "cleanup_passed": true,
+    "remaining_modes_not_run": [
+      "AcceptedContent",
+      "FinalizeMetadataNow",
+      "MetadataClassificationOnly",
+      "ProposedPolicy",
+      "CurrentAudit"
+    ]
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\FOCUSED-VALIDATION.json",
+      "sha256": "97ee39d786c57b9227c85ea97f638cfe22ac0b4dae4063fea2904a73a3bb58f8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\LOCAL-VALIDATION.json",
+      "sha256": "92356b17bd96b8673c472b055a22375a201c9568684abc25cc3aa122988e7ac3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\normal-followup-commit.log",
+      "sha256": "a5e6f31efac0789c5053ddf6ae03bcadf44f84e4af20e5683aa3e79b279f1927"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\manifest.authorized.json",
+      "sha256": "016364d09af0cf55def7aee9c9c94a249c078df82de67fe0ae7d8bb4330e5286"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\read-results.py",
+      "sha256": "2494c62480d9300e4c363d2bd4b3d0279ca32a8a913412e03f732028a5cd6ac1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\result.json",
+      "sha256": "b62bb611953c29322bd638ff7671fee8e3e6d3d4abab047fe1c69ed7bc344c7a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\before.json",
+      "sha256": "2fc156381028d8892e849b3ddf5f9609506df81c5be226502ad4bf3c0ad4a2ff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\after.json",
+      "sha256": "2fc156381028d8892e849b3ddf5f9609506df81c5be226502ad4bf3c0ad4a2ff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\temp-root-final.json",
+      "sha256": "8bbd73b16e52db094e85f5f3a89379264e38bb983109772364eb813a268f4de7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-release-native.json",
+      "sha256": "5816da095f2300a51c8dcee5018c216935f645e566a35ed05b6f0cbc14b89407"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainInitial\\log.txt",
+      "sha256": "68f587d19440aaa759b2c611834571c4b0b6d5587d96995a7bfc5b1c9ae61690"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainInitial\\result.json",
+      "sha256": "dc4137e50dca4efd03e9957d0f39ff30986ac51aba951b20274c5bbef8ad27e6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainInitial\\native-result.json",
+      "sha256": "515b901a61d2e6e7186b6680d07e3fbce9eb2f8206d4d52f7c6e0fa49214e09b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedMaintenance\\log.txt",
+      "sha256": "ed58f7e25acd09d27c0f2273510e1a4dee010f48fe7cbe796037048889ecabf2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedMaintenance\\result.json",
+      "sha256": "49059780e68f659229aa43a4084a1563c780dd2422ca5da94ea953397a7ab4e0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedMaintenance\\native-result.json",
+      "sha256": "32a9c39d5f9f65659cc6dc8ec31ccc5822649ab74c5bd2c4cf682176c8050a08"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedContent\\log.txt",
+      "sha256": "9015b1e6931a5d2680c37e63a22a69546a9ef62169d53aa08b7f91faf6391188"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedContent\\result.json",
+      "sha256": "b1e4dce2cc032f59223de0c103aa43d2c3406dcfb22f6091f340d55fda88941f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\AcceptedContent\\native-result.json",
+      "sha256": "912def6f12b529a8d1f259ef9021b36179d6ce1f73d9ca7c164f14f4890c351e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\FinalizeMetadataNow\\log.txt",
+      "sha256": "3737ef11d48923eee62a3db7a82e919aa51356792c148865250ac2b0edfb716e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\FinalizeMetadataNow\\result.json",
+      "sha256": "39143ec492c3d62458a583c9331af5435e7ca9ca910ac9fcb003358e85fd294d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\FinalizeMetadataNow\\native-result.json",
+      "sha256": "6f173d11b17cbca329bdafea0cc0ba01769f01e776d8958258f4b0733b2d71dc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\MetadataClassificationOnly\\log.txt",
+      "sha256": "2c296a9649e0113ba21bfab2fa5e204ff0675e8ec8ca04b99f4d7c8766d9191c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\MetadataClassificationOnly\\result.json",
+      "sha256": "676b63b613df740a4e2fcc2d4dae64e715e76fb48363223e768ceae9dca88b34"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\MetadataClassificationOnly\\native-result.json",
+      "sha256": "68ab2a9c42205503bb2dac589bcb670e7e47ca3b31edd5a89a8d28688c11e01f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\ProposedPolicy\\log.txt",
+      "sha256": "279820caaf6150e1e726a52e0c36d51e8227e45a221865adc6b4ae27799bcdce"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\ProposedPolicy\\result.json",
+      "sha256": "3c5d57034bbfaee91ec1a6a3b95585bcade1c8ab188a22e75c0901ffad0af112"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\ProposedPolicy\\native-result.json",
+      "sha256": "4da29fc42523bc4769c94d6dea15997e236f9cfa5e1a0c407264d6c943055a5d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainBeforeAudit\\log.txt",
+      "sha256": "68f587d19440aaa759b2c611834571c4b0b6d5587d96995a7bfc5b1c9ae61690"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainBeforeAudit\\result.json",
+      "sha256": "d783ea0fdbc3924a8742cbedddda49b7869333c57b9d331576e25c0436542b8a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainBeforeAudit\\native-result.json",
+      "sha256": "73841a7daa3ad395efb61d1a58f6d764c505762e5a23bce07636ad10042ba39a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\CurrentAudit\\log.txt",
+      "sha256": "15c9f246fc8a9865deccc1aec6cd216be2bf4a73319a3d062c5477f6bc2886fb"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\CurrentAudit\\result.json",
+      "sha256": "043ba78fc7a83a54da4b880a1e234f9f583627f26565416c5a289d33453371b4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\CurrentAudit\\native-result.json",
+      "sha256": "50eccd24829d9739c1246d43a9548908b1a6886a4c24de54643b2324056d26c5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainAfterAudit\\log.txt",
+      "sha256": "68f587d19440aaa759b2c611834571c4b0b6d5587d96995a7bfc5b1c9ae61690"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainAfterAudit\\result.json",
+      "sha256": "a4340c458b8b71786e6df448130380c8e6d13cbf32579bbb54354a6bdcf08361"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-correction-one\\endpoints\\execution-run\\output\\NativeMainAfterAudit\\native-result.json",
+      "sha256": "16b0487cfad23ce88c6c5b1d8a25a800c95ab65d25ac81214a8f36cdce1acdd4"
+    }
+  ],
+  "limits": "Current native reviews/CI, dedicated-service proof, normal source landing and paired reverse comparison are not established by local success."
+}

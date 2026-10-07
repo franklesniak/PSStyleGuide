@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "status": "FULL_STAGED_VALIDATION_PASSED",
+  "recorded_at": "2026-10-07T05:04:14.309619+00:00",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "tool_session_exit": 0,
+  "proof": {
+    "state": "PASS_COMPLETED_RECEIPTS_ONLY",
+    "packet": "aggregate",
+    "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one",
+    "manifest_sha256": "c04d5f6f546f76b2aa03544b437d1b2e03b36a81241334c2ed8a3258f4ffafc6",
+    "proof": {
+      "passed_hooks": 11,
+      "skipped_hooks": 0,
+      "ordinary_lint_commands": 2,
+      "full_selftest": "normal bound hook",
+      "source_guard_equal": true
+    }
+  },
+  "focused_validation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\FOCUSED-VALIDATION.json",
+    "sha256": "97ee39d786c57b9227c85ea97f638cfe22ac0b4dae4063fea2904a73a3bb58f8"
+  },
+  "commands": [
+    {
+      "name": "staged-preflight",
+      "state": "passed",
+      "exit": 0,
+      "started_at": "2026-10-07T04:52:00.745429+00:00",
+      "finished_at": "2026-10-07T04:52:11.885321+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "name": "lint-md",
+      "state": "passed",
+      "exit": 0,
+      "started_at": "2026-10-07T04:52:12.140375+00:00",
+      "finished_at": "2026-10-07T04:52:13.386324+00:00",
+      "log_sha256": "2de3e6c9c28354fe7578ee32c0fd471b0a7da41417aecf7893fbd298b3fb2bfc"
+    },
+    {
+      "name": "lint-md-nested",
+      "state": "passed",
+      "exit": 0,
+      "started_at": "2026-10-07T04:52:13.594792+00:00",
+      "finished_at": "2026-10-07T04:52:14.342636+00:00",
+      "log_sha256": "6d49996587da720bc044823c0a04323343746093469a03bbf1e47810a630eb4a"
+    },
+    {
+      "name": "aggregate",
+      "state": "passed",
+      "exit": 0,
+      "started_at": "2026-10-07T04:52:14.554307+00:00",
+      "finished_at": "2026-10-07T05:02:11.557895+00:00",
+      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    }
+  ],
+  "source_guard_equal": true,
+  "container_absent": true,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\manifest.root-authorized.json",
+      "sha256": "c04d5f6f546f76b2aa03544b437d1b2e03b36a81241334c2ed8a3258f4ffafc6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\read-results.py",
+      "sha256": "818ed2374bebe73e2835328fb9df8fcca1bc1c9b6b77511814ab5513e951320e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\status.json",
+      "sha256": "6b6889a000a5a62a9a03392717ac484bbbeef39e0725922828d1bb66d0dbf0cb"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\result.json",
+      "sha256": "b9c7afcc6fddbb319507f0ce060f35b10a374cfe4340627ef276bedf10ca2fca"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\inputs\\source-before.json",
+      "sha256": "f631919d8b6890c9192ca32c1014e50ea6604cb8d41a1e06c2936ad15d471ac2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\host-source-after.json",
+      "sha256": "f631919d8b6890c9192ca32c1014e50ea6604cb8d41a1e06c2936ad15d471ac2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\lint-md.log",
+      "sha256": "2de3e6c9c28354fe7578ee32c0fd471b0a7da41417aecf7893fbd298b3fb2bfc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\lint-md-nested.log",
+      "sha256": "6d49996587da720bc044823c0a04323343746093469a03bbf1e47810a630eb4a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\aggregate\\runs\\tf-ps235-candidate-one\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    }
+  ],
+  "limits": "No new commit, endpoint, current audit, native review/CI or paired acceptance is inferred."
+}

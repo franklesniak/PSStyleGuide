@@ -1,0 +1,58 @@
+{
+  "status": "FOCUSED_QUALIFICATION_RELEASED_ONLY",
+  "released_at": "2026-10-07T04:46:08.437571+00:00",
+  "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\manifest.root-authorized.json",
+  "manifest_sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    }
+  },
+  "verified_source_archive_files": 80,
+  "verified_dependency_archive_files": 1914,
+  "runtime_hashes_verified": true,
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "reader_sha256": "818ed2374bebe73e2835328fb9df8fcca1bc1c9b6b77511814ab5513e951320e",
+  "reader_leaf_negative_cases": [
+    "wrapper_exit",
+    "exit",
+    "cleanup",
+    "state",
+    "job_before_cleanup",
+    "job_after_cleanup",
+    "native_exit",
+    "primary_failure",
+    "cleanup_failures",
+    "terminal_guard_error",
+    "container_cleanup_failure",
+    "whole_envelope_failure"
+  ],
+  "reader_limit": "Full schema and cleanup receipts are checked against each actual result; these leaf fixtures are not product validation.",
+  "allowed_runs": [
+    "windows-focus-tf-followup-one",
+    "linux-focus-tf-followup-one",
+    "windows-quality-tf-followup-one",
+    "linux-quality-tf-followup-one"
+  ],
+  "aggregate_released": false,
+  "endpoints_released": false
+}

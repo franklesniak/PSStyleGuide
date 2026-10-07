@@ -1,0 +1,151 @@
+{
+  "status": "FOCUSED_WINDOWS_LINUX_CORRECTNESS_AND_QUALITY_PASSED",
+  "verified_at": "2026-10-07T04:51:41.185392+00:00",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "cells": [
+    {
+      "platform": "windows",
+      "mode": "focus",
+      "session_id": 96018,
+      "native_session_exit": 0,
+      "reader": {
+        "state": "PASS_COMPLETED_RECEIPTS_ONLY",
+        "packet": "qualification",
+        "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one",
+        "manifest_sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+        "proof": {
+          "state": "passed_final_case_receipts",
+          "platform": "windows",
+          "variant": "candidate",
+          "exact_cases": 109,
+          "real_parser_calls": 109,
+          "structural_decoder_calls": 109,
+          "previous_case_data_compared": 109,
+          "previous_source_receipt_sha256": "dea06aa8d4d2b6799fd458402426d0fef511a83ca720d1d40d5ff8ac67c5a46d",
+          "scope": "Final permanent SelfTest integration only; no stitched old status, baseline/reuse/converter/private-null replay, runtime gain or broad acceptance."
+        }
+      },
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\result.json": "03ae6ef535c1488a963fbe9ce45f1b652304df326b58bdd62e592acedc41ddff",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-focus-tf-followup-one\\output\\differential.json": "eaa9d4dd74642af9d170914364e8be9f9c3f5678e237ee3642b6f1a6131d9a76"
+      }
+    },
+    {
+      "platform": "linux",
+      "mode": "focus",
+      "session_id": 92138,
+      "native_session_exit": 0,
+      "reader": {
+        "state": "PASS_COMPLETED_RECEIPTS_ONLY",
+        "packet": "qualification",
+        "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one",
+        "manifest_sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+        "proof": {
+          "state": "passed_final_case_receipts",
+          "platform": "linux",
+          "variant": "candidate",
+          "exact_cases": 109,
+          "real_parser_calls": 109,
+          "structural_decoder_calls": 109,
+          "previous_case_data_compared": 109,
+          "previous_source_receipt_sha256": "fdf71ddd5be3eb7c2034b862f884c41a7ba52d140a1d65409421ebadf1006006",
+          "scope": "Final permanent SelfTest integration only; no stitched old status, baseline/reuse/converter/private-null replay, runtime gain or broad acceptance."
+        }
+      },
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\result.json": "fcb3e9aceddd9c6a5c1bbf8d715b132dd46e055678141ee9f55ef2fdf9938183",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\status.json": "92d33d720955129c91d6dc1e5fc2646f449552186915a1814c91886cb5228b99",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-focus-tf-followup-one\\output\\differential.json": "41561e786362595b36241e07e27311c4f2b6515ec2f21bda45c60b7376eaa988"
+      }
+    },
+    {
+      "platform": "windows",
+      "mode": "quality",
+      "session_id": 46817,
+      "native_session_exit": 0,
+      "reader": {
+        "state": "PASS_COMPLETED_RECEIPTS_ONLY",
+        "packet": "qualification",
+        "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one",
+        "manifest_sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+        "proof": {
+          "pwsh": "7.6.5",
+          "rows": [
+            {
+              "parser_errors": [],
+              "diagnostics": [],
+              "parser_basis": "exact final bytes / current ParseFile on this platform",
+              "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+              "name": "Test-AgentInstructions.ps1"
+            },
+            {
+              "parser_errors": [],
+              "diagnostics": [],
+              "parser_basis": "exact final bytes / current ParseFile on this platform",
+              "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+              "name": "Test-AgentInstructions.SelfTest.ps1"
+            }
+          ],
+          "analyzer": "1.24.0",
+          "analyzer_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1"
+        }
+      },
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\result.json": "ed77a1749136dec9e2cd1fe90c9a79e93dc51044451a7a7af1536f5475077fbc",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\windows-quality-tf-followup-one\\output\\quality.json": "9a9f6a00213b7bdbdf82f996ba2fa8841ed0a66d87fff097a0746dd81229b059"
+      }
+    },
+    {
+      "platform": "linux",
+      "mode": "quality",
+      "session_id": 10205,
+      "native_session_exit": 0,
+      "reader": {
+        "state": "PASS_COMPLETED_RECEIPTS_ONLY",
+        "packet": "qualification",
+        "run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one",
+        "manifest_sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+        "proof": {
+          "analyzer": "1.24.0",
+          "pwsh": "7.6.3",
+          "analyzer_path": "/work/empty-array-v5pymx_4/analyzer/PSScriptAnalyzer.psd1",
+          "rows": [
+            {
+              "parser_errors": [],
+              "diagnostics": [],
+              "parser_basis": "exact final bytes / current ParseFile on this platform",
+              "name": "Test-AgentInstructions.ps1",
+              "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+            },
+            {
+              "parser_errors": [],
+              "diagnostics": [],
+              "parser_basis": "exact final bytes / current ParseFile on this platform",
+              "name": "Test-AgentInstructions.SelfTest.ps1",
+              "sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f"
+            }
+          ]
+        }
+      },
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\result.json": "4bb8a528b77cb1e475f8f5e2fe2e60058d66a57f55aa0a8eba374199e625679f",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\status.json": "56a9254f4cca0126af3fe3d7e4f6f123b88cde59615230bc508cc8a6e730bcce",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\runs\\linux-quality-tf-followup-one\\output\\quality.json": "c0bb5d2c98df0c950a4707774ba9166c499190d753fae916b5caf1567982c009"
+      }
+    }
+  ],
+  "focus_each_platform": {
+    "cases": 109,
+    "fresh_parser_calls": 109,
+    "decoder_calls": 109
+  },
+  "quality_each_platform": {
+    "files": 2,
+    "parser_errors": 0,
+    "PSSA_1_24_0_warning_errors": 0
+  },
+  "guards_equal": true,
+  "cleanup_strictly_passed": true,
+  "limits": "Actual staged candidate only. Full aggregate, normal commit/endpoints, current reviews/CI and peer/dedicated acceptance still required."
+}

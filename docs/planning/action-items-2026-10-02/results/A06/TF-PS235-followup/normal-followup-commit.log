@@ -1,0 +1,42 @@
+Running staged Markdown lint against the Git index...
+
+Total nested Markdown blocks found: 0
+
+[32m✓[0m No issues found in nested Markdown code fences
+Running markdownlint with the repository configuration...
+
+> terraformstyleguide@1.0.0 lint:md
+> node lint-markdown.mjs
+
+[1mLinting outer Markdown...[0m
+
+Found 26 Markdown file(s) to scan
+
+Running nested Markdown lint (code fences) with the repository configuration...
+
+> terraformstyleguide@1.0.0 lint:md:nested
+> node lint-nested-markdown.js
+
+[1mLinting nested Markdown in code fences...[0m
+
+Found 26 Markdown file(s) to scan
+
+[36mterraform.instructions.md[0m: Found 1 nested Markdown block(s)
+[36mSTYLE_GUIDE_RATIONALE.md[0m: Found 1 nested Markdown block(s)
+[36mSTYLE_GUIDE_FULL.md[0m: Found 2 nested Markdown block(s)
+[36mSTYLE_GUIDE_CHAT.md[0m: Found 2 nested Markdown block(s)
+[36mSTYLE_GUIDE.md[0m: Found 1 nested Markdown block(s)
+[36mcopilot-instructions.md[0m: Found 1 nested Markdown block(s)
+[36msamples\test-recursive-nested-markdown.md[0m: Found 10 nested Markdown block(s)
+[36msamples\test-nested-markdown-linting.md[0m: Found 5 nested Markdown block(s)
+[36mdocs\T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md[0m: Found 2 nested Markdown block(s)
+[36mdocs\ISSUE_EVALUATION_PROMPT.md[0m: Found 2 nested Markdown block(s)
+[36m.github\instructions\docs.instructions.md[0m: Found 5 nested Markdown block(s)
+
+Total nested Markdown blocks found: 32
+
+[32m✓[0m No issues found in nested Markdown code fences
+[32m[1m✓[0m [32mNested Markdown linting passed[0m
+
+[codex/ps235-validator-followup 5e24247] Accept empty Markdown context arrays and test malformed entries
+ 3 files changed, 265 insertions(+), 10 deletions(-)

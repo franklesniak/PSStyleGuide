@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "state": "ACTUAL_INPUTS_BOUND_EXECUTION_NOT_AUTHORIZED",
+  "bound_at": "2026-10-07T04:43:13.305900+00:00",
+  "root_state_sha256": "fd1eeb157f8b87e477e7db114503b5c1ab006fda20a0ab8947a128372e66c620",
+  "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "branch": "codex/ps235-validator-followup",
+  "source_catalog": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\candidate-source-catalog.json",
+    "sha256": "063ac7eea0f977eb68d1699484f940aa3089fb763d141867baa1182ee937782f",
+    "bytes": 19093
+  },
+  "dependency_catalog": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+    "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+    "bytes": 411879
+  },
+  "source_count": 80,
+  "dependency_count": 1914,
+  "named_runtime_count": 9,
+  "runtime_rows": 54,
+  "full_analyzer_rows": 51,
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "image_inspected_now": false,
+  "image_basis": "Previously qualified immutable content digest; launch will independently require exact local Linux amd64 image. No container or Docker operation was run during binding.",
+  "source_guard_unchanged": true,
+  "product_writes": 0,
+  "git_mutations": 0,
+  "tests_run": 0,
+  "native_requests": 0,
+  "execution_authorized": false,
+  "prepared": false,
+  "root_qualification_required": [
+    "Finite release-gate and result-reader adaptation qualification",
+    "Confirm complete bindings and finite exceptions",
+    "Aggregate current accepted base and candidate policy/dependency compatibility confirmations",
+    "Fresh root release manifests/digests; never replay old authorization"
+  ],
+  "endpoint_H_bound": false,
+  "source_acceptance_sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+  "runtime_inventory_source": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\manifest.prepared.json",
+    "sha256": "6739626eb687092f9ab452789f9b479d09d3886cae04446d47dbaa6d2c229720",
+    "bytes": 504789
+  },
+  "new_release_manifest_reused": false
+}

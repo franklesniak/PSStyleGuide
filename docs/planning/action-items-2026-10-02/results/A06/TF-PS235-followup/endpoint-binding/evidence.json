@@ -1,0 +1,550 @@
+{
+  "schema": 1,
+  "status": "BOUND_COMMITTED_ENDPOINT_DRAFT_NOT_AUTHORIZED",
+  "prepared": false,
+  "execution_authorized": false,
+  "bound_at": "2026-10-07T05:12:10.567361+00:00",
+  "master": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\execution-state.json",
+    "sha256": "5d18db726bba90b6d2343e76b18cfdbd986a46344d53079cd25d59ac56f443ab",
+    "unchanged": true
+  },
+  "manifest": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\manifest.bound-not-authorized.json",
+    "sha256": "87f52a4b7eff92c86666cca53941c45461c868c1b79b50ea4b5819bfc0765413",
+    "bytes": 25969
+  },
+  "report": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\endpoint-binding\\REPORT.md",
+    "sha256": "f513044c0e1aacc6a8b437a473b6cbee3bc8a4a895112543b9cbc25120498421",
+    "bytes": 5796
+  },
+  "copied_qualified_files": [
+    {
+      "name": "driver-body.py",
+      "sha256": "c22c2f8beaec3de44202cbd6552c212f829f9e2e884e6790e49b8994e3a779ca",
+      "bytes": 13610,
+      "byte_identical": true
+    },
+    {
+      "name": "release_gate.py",
+      "sha256": "5540330c8878f5a2f160bddf86e814b62f4f31a00142ed9ee02a55a6926cb348",
+      "bytes": 1864,
+      "byte_identical": true
+    },
+    {
+      "name": "run-stage.py",
+      "sha256": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795",
+      "bytes": 3407,
+      "byte_identical": true
+    },
+    {
+      "name": "runner.py",
+      "sha256": "2453a90ba9afce63a297545bb00becbac971d6a2e1695c829e151a4197c3b2c6",
+      "bytes": 21957,
+      "byte_identical": true
+    },
+    {
+      "name": "transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+      "bytes": 4238,
+      "byte_identical": true
+    }
+  ],
+  "inventory": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\accepted-dependency-catalog.json",
+      "sha256": "73212e27bfc0051004d8996258bda3eab7b6a58e38a91ba999b45785dd88c013",
+      "bytes": 362113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\accepted-source-catalog.json",
+      "sha256": "f179043bb30649e93b2bca26a228bccbbc6d7cfe067bf41fe6057fbaa9d43817",
+      "bytes": 19093
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\binding-differences.json",
+      "sha256": "ea6a5472a6af94e4e611da1819ddf4b1f2cfa464cd37120fa1b958379306b9cf",
+      "bytes": 28154
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\candidate-dependency-catalog.json",
+      "sha256": "73212e27bfc0051004d8996258bda3eab7b6a58e38a91ba999b45785dd88c013",
+      "bytes": 362113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\candidate-source-catalog.json",
+      "sha256": "063ac7eea0f977eb68d1699484f940aa3089fb763d141867baa1182ee937782f",
+      "bytes": 19093
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\driver-body.py",
+      "sha256": "c22c2f8beaec3de44202cbd6552c212f829f9e2e884e6790e49b8994e3a779ca",
+      "bytes": 13610
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\input-guard.json",
+      "sha256": "2fc156381028d8892e849b3ddf5f9609506df81c5be226502ad4bf3c0ad4a2ff",
+      "bytes": 1836
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\manifest.bound-not-authorized.json",
+      "sha256": "87f52a4b7eff92c86666cca53941c45461c868c1b79b50ea4b5819bfc0765413",
+      "bytes": 25969
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\prepare-binding.py",
+      "sha256": "17ba0afe60eace768936074fc30e4317b155ec5cd880a564a66aefd11bc8435b",
+      "bytes": 20623
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\release_gate.py",
+      "sha256": "5540330c8878f5a2f160bddf86e814b62f4f31a00142ed9ee02a55a6926cb348",
+      "bytes": 1864
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\run-stage.py",
+      "sha256": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795",
+      "bytes": 3407
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\runner.py",
+      "sha256": "2453a90ba9afce63a297545bb00becbac971d6a2e1695c829e151a4197c3b2c6",
+      "bytes": 21957
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+      "bytes": 4238
+    }
+  ],
+  "private_draft": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\endpoints\\manifest.draft.json",
+    "sha256": "6194cefc889887e83d4e3185c0d51f8b9e0f955ad434099e495f6130a7b864d7",
+    "bytes": 3467
+  },
+  "differences": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\binding-differences.json",
+    "sha256": "ea6a5472a6af94e4e611da1819ddf4b1f2cfa464cd37120fa1b958379306b9cf",
+    "bytes": 28154
+  },
+  "qualification_manifest": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\qualification\\manifest.root-authorized.json",
+    "sha256": "7404a9f0109b6a4d41a2da7f4329655dc6b679c930dea8e619cf025ad9379bbf",
+    "bytes": 463386
+  },
+  "root_prior_qualification": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ROOT-PRIVATE-PREPARATION-VERIFICATION.json",
+    "sha256": "18c88375b633c8b1558b65c71f6fc846195dad29f17db8b4c91230f31545173e",
+    "bytes": 3431
+  },
+  "qualification_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\QUALIFICATION-RELEASE.json",
+    "sha256": "6244e4eca25c7e0cc005d51ca64757a0a0099fe196b5653cd8bfd55c8fd5496b",
+    "bytes": 2384
+  },
+  "source_acceptance": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+    "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+    "bytes": 134145
+  },
+  "actual_peer_rebind": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ACTUAL-ACCEPTED-PEER-REBIND.json",
+    "sha256": "1c7a2120d241c6721244e4f5aca3260ff4081f20e185d4e7e6692da9aba21124",
+    "bytes": 23839
+  },
+  "finite_exception_postimages": [
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "post_sha256": "6cdf45bf178fe4e27e3ff063ec93e7e1277a604cef8f83ac7e68f7f361e88787",
+      "post_bytes": 10453,
+      "accepted_source_blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+      "exact_substitutions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "post_sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+      "post_bytes": 299417,
+      "accepted_source_blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "exact_substitutions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository.",
+          "TF_regions": [
+            {
+              "start_line": 2729,
+              "end_line": 2729
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2977,
+              "end_line": 2977
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "post_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "post_bytes": 510837,
+      "accepted_source_blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "exact_substitutions": []
+    }
+  ],
+  "full_guard_before": {
+    "accepted": {
+      "head": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "index_entries_sha256": "3054e84d1e65f1179870fbaec5ab2ee4a9773192f25588c6714c3588ed10c1d1",
+      "refs_sha256": "dc3e2fe783e01c30ae2f86c5d3638fca47b61b5150c069a05b319d3ec6093494",
+      "config_sha256": "15a225755f8ddb175cc46d39155c7ce56efc660e7de187b22ab4a3fe47d60bac",
+      "physical_metadata_sha256": {
+        "HEAD": "7950964180449aad28da594ec1f52446ce4ddf7ebce0bbb553533fd3fdb416c4",
+        "index": "d72fc59e84a189b19c5b1972aaf898fcc41b95321c503564ce66605714cb6c95",
+        "config": "7a62fae522f87889196e4115de39665a757a2c687738fc2f527992319702a899",
+        "config.worktree": null
+      },
+      "branch": "",
+      "origin_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+      "clean": true
+    },
+    "candidate": {
+      "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+      "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+      "index_entries_sha256": "dd8d4eb29decf6d967888bb815c2f0bf777a354f0172c21c58b3c2c6ebee3c4d",
+      "refs_sha256": "be895e3c1edc7bc297b87730a06656de0839c00bf0258c1f5c5d586ddeb23a5c",
+      "config_sha256": "1e4f8d763fe9194556bfdd3baad4d9e99bbfca22865a76a462db2b0a0a3e27b7",
+      "physical_metadata_sha256": {
+        "HEAD": "124b6ef81bb631302a248a57de69d04240acd810275b2687a8de3b78d0227598",
+        "index": "517606a00957e648f079314eb633a4ef3cac9e21ad1981b816d721892510d490",
+        "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+        "config.worktree": null
+      },
+      "branch": "codex/ps235-validator-followup",
+      "origin_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+      "clean": true
+    }
+  },
+  "full_guard_after": {
+    "accepted": {
+      "head": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "index_entries_sha256": "3054e84d1e65f1179870fbaec5ab2ee4a9773192f25588c6714c3588ed10c1d1",
+      "refs_sha256": "dc3e2fe783e01c30ae2f86c5d3638fca47b61b5150c069a05b319d3ec6093494",
+      "config_sha256": "15a225755f8ddb175cc46d39155c7ce56efc660e7de187b22ab4a3fe47d60bac",
+      "physical_metadata_sha256": {
+        "HEAD": "7950964180449aad28da594ec1f52446ce4ddf7ebce0bbb553533fd3fdb416c4",
+        "index": "d72fc59e84a189b19c5b1972aaf898fcc41b95321c503564ce66605714cb6c95",
+        "config": "7a62fae522f87889196e4115de39665a757a2c687738fc2f527992319702a899",
+        "config.worktree": null
+      },
+      "branch": "",
+      "origin_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+      "clean": true
+    },
+    "candidate": {
+      "head": "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+      "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+      "index_entries_sha256": "dd8d4eb29decf6d967888bb815c2f0bf777a354f0172c21c58b3c2c6ebee3c4d",
+      "refs_sha256": "be895e3c1edc7bc297b87730a06656de0839c00bf0258c1f5c5d586ddeb23a5c",
+      "config_sha256": "1e4f8d763fe9194556bfdd3baad4d9e99bbfca22865a76a462db2b0a0a3e27b7",
+      "physical_metadata_sha256": {
+        "HEAD": "124b6ef81bb631302a248a57de69d04240acd810275b2687a8de3b78d0227598",
+        "index": "517606a00957e648f079314eb633a4ef3cac9e21ad1981b816d721892510d490",
+        "config": "5a7360cc368f81fad0131a0f8d9d506116765651bd7768e393d4d00227e68d8b",
+        "config.worktree": null
+      },
+      "branch": "codex/ps235-validator-followup",
+      "origin_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "origin_url": "https://github.com/franklesniak/TerraformStyleGuide.git",
+      "clean": true
+    }
+  },
+  "guards_equal": true,
+  "current_local_refs": {
+    "accepted": [
+      "5e2424768c5d7d78a7f8ea852d4239e62069d0fe refs/heads/codex/ps235-candidate",
+      "a840f21b03f0dcac0815e2f7f044928667402b42 refs/remotes/origin/main"
+    ],
+    "candidate": [
+      "2cb4d5d6e7ca816beb04faa0c9c4b9b98b8bc342 refs/heads/agent/deterministic-artifact-generation",
+      "26fa2af548e9cc6818d113083ade9dfb6607cb1c refs/heads/agent/issue-28-ruleset-decision",
+      "ade06989c66d671765e25e3a2ba666ab65f62159 refs/heads/agent/issue-36-pr78-agent-governance",
+      "62c5baa60d3478f235a0ec9492209739b61ae8de refs/heads/agent/issue-40-bounded-identity-acquisition-r2-v1",
+      "1b851d58efbed4afdec337b566e316d1120254a9 refs/heads/agent/issue-42-json-self-test-r3-v1",
+      "93e74c21275d7bdca694d3ace4ef1e57e838f18a refs/heads/agent/issue-44-source-mutation-footprints",
+      "5b476619305573fba81fcf4a9343c71630b12ce5 refs/heads/agent/issue-46-scalar-result-contract",
+      "863a7d99b8157a08adec5bb91f4609e199cec891 refs/heads/agent/issue-48-cycle3-workflow-policy-convergence",
+      "17caede017a8054bed529517ce473ef75682b5bf refs/heads/codex/a02-peer-docs",
+      "89bf3920fb8008752c7f179e7c69c4c2979750d8 refs/heads/codex/a06-generator-convergence",
+      "c6691c9af77ca316fda582fa81280f31d40d1bde refs/heads/codex/bounded-node-preflight-20261001",
+      "443b2fe3cbeda18402f0432e5c95379d09096d6a refs/heads/codex/coherent-tooling-carryback",
+      "3939dae3fd8c21a0eea539112efd42c318455217 refs/heads/codex/contributor-artifact-cleanup-20261001",
+      "e042caa92783bcceac4afa744908fbc552b6e2c0 refs/heads/codex/current-dependency-risk-20261001",
+      "3e2ef2b3f5509e8e1f7b5c762844715c71437429 refs/heads/codex/issue-21-candidate-validator",
+      "8c9eaac4689222eb7b433fce6c3901a58868b5d7 refs/heads/codex/issue-32-powershell-authoring-repair",
+      "1fd03050ca8855438f589b855a360e70105ec632 refs/heads/codex/issue-34-transactional-generator-publication",
+      "0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2 refs/heads/codex/issue-52-supply-freeze-convergence",
+      "b1f3601211f3d29137e3d51a71513f1499265e5c refs/heads/codex/issue-54-supply-freeze-counterpart",
+      "500b9ba82920cc4cb2aa0d7e78cb18298a16707b refs/heads/codex/issue-56-review-loop-command",
+      "353208347980218214e25b5096e9bc3899d1a6f6 refs/heads/codex/issue-59-agent-workflow-isolation",
+      "f9f4c035321f78a628b0b20665e0705cab1a04b7 refs/heads/codex/issue-59-agent-workflow-isolation-source",
+      "9973a129313cbddab8fea5cde833d457b51ad67f refs/heads/codex/issue-59-local-installation-proposal",
+      "26c72f10c0f28ac869cb8314e9edbeff6cc3abc3 refs/heads/codex/paperwork-cleanup",
+      "5e2424768c5d7d78a7f8ea852d4239e62069d0fe refs/heads/codex/ps235-validator-followup",
+      "975012ed84374aa2fe9f80bb489c69bc8b9bca63 refs/heads/codex/safe-state-recovery-examples-20261001",
+      "43ad50be3fad4b2e65f0e89cc5c6cabb7722696a refs/heads/codex/task216-tf60-review-repairs",
+      "fbfc3aca874e235cace92f506377f5c9e0704160 refs/heads/main",
+      "8e852a9f4fd382a122f32c1ce7461796f8762f8e refs/heads/planning-CRT-PR-852",
+      "a840f21b03f0dcac0815e2f7f044928667402b42 refs/remotes/origin/HEAD",
+      "ade06989c66d671765e25e3a2ba666ab65f62159 refs/remotes/origin/agent/issue-36-pr78-agent-governance",
+      "05a678f76181107266a41d70093fd0805d1c5fb8 refs/remotes/origin/agent/issue-38-pr-body-identity-sync",
+      "62c5baa60d3478f235a0ec9492209739b61ae8de refs/remotes/origin/agent/issue-40-bounded-identity-acquisition-r2-v1",
+      "1b851d58efbed4afdec337b566e316d1120254a9 refs/remotes/origin/agent/issue-42-json-self-test-r3-v1",
+      "93e74c21275d7bdca694d3ace4ef1e57e838f18a refs/remotes/origin/agent/issue-44-source-mutation-footprints",
+      "5b476619305573fba81fcf4a9343c71630b12ce5 refs/remotes/origin/agent/issue-46-scalar-result-contract",
+      "863a7d99b8157a08adec5bb91f4609e199cec891 refs/remotes/origin/agent/issue-48-cycle3-workflow-policy-convergence",
+      "a308c860e078b661de0dd663be35f018fc60fdcc refs/remotes/origin/claude/codex-review-loop-32x4d5",
+      "1783c8a6ecb113226dab567a7da194c5fc057a7b refs/remotes/origin/claude/powershell-style-guide-docs-ig3qzr",
+      "17caede017a8054bed529517ce473ef75682b5bf refs/remotes/origin/codex/a02-peer-docs",
+      "89bf3920fb8008752c7f179e7c69c4c2979750d8 refs/remotes/origin/codex/a06-generator-convergence",
+      "c6691c9af77ca316fda582fa81280f31d40d1bde refs/remotes/origin/codex/bounded-node-preflight-20261001",
+      "443b2fe3cbeda18402f0432e5c95379d09096d6a refs/remotes/origin/codex/coherent-tooling-carryback",
+      "3939dae3fd8c21a0eea539112efd42c318455217 refs/remotes/origin/codex/contributor-artifact-cleanup-20261001",
+      "6972cfa9d4a008aa0d585e3bec0e03f76d1ea93e refs/remotes/origin/codex/cross-platform-terraform-precommit",
+      "e042caa92783bcceac4afa744908fbc552b6e2c0 refs/remotes/origin/codex/current-dependency-risk-20261001",
+      "3e2ef2b3f5509e8e1f7b5c762844715c71437429 refs/remotes/origin/codex/issue-21-candidate-validator",
+      "8c9eaac4689222eb7b433fce6c3901a58868b5d7 refs/remotes/origin/codex/issue-32-powershell-authoring-repair",
+      "1fd03050ca8855438f589b855a360e70105ec632 refs/remotes/origin/codex/issue-34-transactional-generator-publication",
+      "0d3264caf5f1c028e41950c9aa7bbf1c9dbf7ce2 refs/remotes/origin/codex/issue-52-supply-freeze-convergence",
+      "b1f3601211f3d29137e3d51a71513f1499265e5c refs/remotes/origin/codex/issue-54-supply-freeze-counterpart",
+      "500b9ba82920cc4cb2aa0d7e78cb18298a16707b refs/remotes/origin/codex/issue-56-review-loop-command",
+      "43ad50be3fad4b2e65f0e89cc5c6cabb7722696a refs/remotes/origin/codex/issue-59-agent-workflow-isolation",
+      "26c72f10c0f28ac869cb8314e9edbeff6cc3abc3 refs/remotes/origin/codex/paperwork-cleanup",
+      "975012ed84374aa2fe9f80bb489c69bc8b9bca63 refs/remotes/origin/codex/safe-state-recovery-examples-20261001",
+      "1fe181164f4686124f6e99d532be35db3871ca34 refs/remotes/origin/copilot/add-style-guide-rule-for-terraform-urls",
+      "a840f21b03f0dcac0815e2f7f044928667402b42 refs/remotes/origin/main",
+      "8e852a9f4fd382a122f32c1ce7461796f8762f8e refs/remotes/origin/planning-CRT-PR-852",
+      "2e650721a4ec5ca33501612d029ab27acfcff08e refs/remotes/origin/pr-37-head"
+    ]
+  },
+  "source_counts": {
+    "accepted": 80,
+    "candidate": 80
+  },
+  "dependency_counts": {
+    "accepted": 1914,
+    "candidate": 1914
+  },
+  "named_runtime_count": 9,
+  "runtime_rows": 54,
+  "native_cli": {
+    "path": "C:\\Program Files\\GitHub CLI\\gh.EXE",
+    "sha256": "54c7da7e7816f8c33dffec2023a0d23c04386ef6662cfb7640d927fbfea5c05b"
+  },
+  "native_cli_identity_basis": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\manifest.authorized.json",
+    "sha256": "a5b11e9bf5124ba01f181b59a89f67866f7da8e6430e674c54f05d8894ae5b2e",
+    "bytes": 26670
+  },
+  "static_parse_files": [
+    "driver-body.py",
+    "release_gate.py",
+    "run-stage.py",
+    "runner.py",
+    "transport-prefix.py"
+  ],
+  "driver_imported": false,
+  "driver_executed": false,
+  "raw_git_blobs_verified": 160,
+  "commands": [
+    {
+      "mode": "AcceptedMaintenance",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted",
+        "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "5e2424768c5d7d78a7f8ea852d4239e62069d0fe"
+      ]
+    },
+    {
+      "mode": "AcceptedContent",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "-PublishedBaselineRevision",
+        "a840f21b03f0dcac0815e2f7f044928667402b42"
+      ]
+    },
+    {
+      "mode": "FinalizeMetadataNow",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "-PublishedBaselineRevision",
+        "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "-FinalizeMetadataNow"
+      ]
+    },
+    {
+      "mode": "MetadataClassificationOnly",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-accepted",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "-PublishedBaselineRevision",
+        "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "-MetadataClassificationOnly"
+      ]
+    },
+    {
+      "mode": "ProposedPolicy",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e2424768c5d7d78a7f8ea852d4239e62069d0fe",
+        "-PublishedBaselineRevision",
+        "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "-ProposedPolicy"
+      ]
+    },
+    {
+      "mode": "CurrentAudit",
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ]
+    }
+  ],
+  "short_temp_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\tf-ps235-e1",
+  "short_temp_root_characters": 48,
+  "short_temp_absent": true,
+  "short_temp_created": false,
+  "root_completion_fields": {
+    "prepared": false,
+    "execution_authorized": false,
+    "root_confirmed_bindings_complete": false,
+    "root_confirmed_finite_exceptions": false,
+    "root_known_revocations_checked": false,
+    "root_known_revocations_checked_utc": null,
+    "fresh_native_refs": null
+  },
+  "transfers": {
+    "A06": {
+      "used": 3,
+      "cap": 12
+    },
+    "A03": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 7,
+      "cap": 12
+    },
+    "A07": {
+      "used": 7,
+      "cap": 12
+    }
+  },
+  "rounds_used": 7,
+  "deadline": "2026-10-13T23:47:31+00:00",
+  "product_tests_run": 0,
+  "native_requests": 0,
+  "git_mutations": 0,
+  "product_writes": 0,
+  "master_writes": 0,
+  "material_findings": []
+}
