@@ -1,0 +1,35 @@
+{
+  "status": "ACTUAL_COMMITTED_ENDPOINTS_RELEASED",
+  "at": "2026-10-07T08:30:28.180189+00:00",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\manifest.authorized.json",
+  "sha256": "0aebef5ab1db29f17259ae6235bad2472ac969587369a3f6f1c1b23f921a7a1b",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "binding_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\binding-evidence.json",
+  "binding_evidence_sha256": "91aac9793bedcd91e7cef62f08f83df029516ba3bf1ca9bc644982265ab90cf9",
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+      }
+    }
+  },
+  "known_revocations": "Current explicit owner direction remains in force; accepted receipts intact; both policy roots have zero risk exceptions. Fresh ordinary audit remains required.",
+  "auto_repeat": false
+}

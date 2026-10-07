@@ -1,6 +1,6 @@
 {
-  "status": "ACCEPTED_MAIN_DRAFT_INTEGRATED_AND_STAGED_UNTESTED",
-  "created_at": "2026-10-06T21:24:16.646475+00:00",
+  "status": "FINAL_LOCAL_QUALITY_PASSED_PUBLICATION_PENDING",
+  "created_at": "2026-10-06T16:24:16.646475-05:00",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
   "branch": "codex/b99-accepted-main",
   "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
@@ -15,8 +15,8 @@
   "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-current-readiness\\source-boundary-20261006\\ROOT-DECISION.json",
   "writer": "root integration; source author stopped",
   "local_source_released": true,
-  "tests_released": false,
-  "commit_publication_released": false,
+  "tests_released": true,
+  "commit_publication_released": "Normal commit complete; publication held for actual endpoints/audit and independent final quality.",
   "pending_native_operations": [],
   "held_A07_index": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
   "PS235_frozen_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
@@ -27,7 +27,7 @@
     "A07": 7,
     "cap": 12
   },
-  "next_action": "Review composed qualified transports, bind exact platform manifests, then execute one focus and one quality cell per platform.",
+  "next_action": "Publish owned planning evidence and exact topic, create PR once with reviewed body, then capture reviewer baselines and request Copilot Balanced plus remote Codex.",
   "branch_command_exit": 0,
   "observed_head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
   "observed_branch": "codex/b99-accepted-main",
@@ -112,7 +112,7 @@
     "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
     "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
   },
-  "updated_at": "2026-10-07T06:48:55.815004+00:00",
+  "updated_at": "2026-10-07T08:47:26.6819440Z",
   "source_writer_stopped": true,
   "candidate_sha256": {
     ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
@@ -266,7 +266,7 @@
     "report_sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835",
     "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\evidence.json",
     "evidence_sha256": "2da3b15169682a77aff71a381f6e66636a08be928506a60d8a989783a25ad813",
-    "root_verified_at": "2026-10-06T22:27:34.738268+00:00",
+    "root_verified_at": "2026-10-06T17:27:34.738268-05:00",
     "root_read_full_report": true,
     "root_reference_hashes_checked": 34,
     "root_live_candidate_hashes_checked": 4,
@@ -280,12 +280,12 @@
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation",
     "accepted_PS_main": "58a1345896da1a1e8794078e588e88e58a78e2eb",
     "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
-    "released_at": "2026-10-07T05:45:34.972038+00:00",
+    "released_at": "2026-10-07T00:45:34.972038-05:00",
     "scope": "Read-only semantic integration preparation and private draft only; no product/Git/native change, test or installation. Reuse P1/P2 decisions; preserve all PS235 accepted changes.",
     "boundary": "Root product integration and final-input qualification remain serialized after current TF69 acceptance. This preparation spends no transfer or review round.",
     "reported_conflict": "Validated source-traced index inheritance; selected C99.4 private draft restores and stages only canonical .gitignore with native exit checking. Runtime qualification remains.",
     "next_action": "Prepare final-input qualification packet; root integration after landed TF acceptance.",
-    "observed_at": "2026-10-07T05:50:46.598017+00:00",
+    "observed_at": "2026-10-07T00:50:46.598017-05:00",
     "root_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DECISION.json",
     "root_decision_sha256": "faf76fd3964aba3537888634b33710424dca3bf29c5d6a00f5f39abc60c5243c",
     "root_draft_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DRAFT-REVIEW.json",
@@ -332,7 +332,7 @@
       "v2-to-v3.patch": "3afff4c89696aeb0e08b011fe15ed33740ac331efeb5a51426e4af539ccd0f52",
       "evidence.json": "b30aa4270edab8e0cd879a175628397a71a3075b91a1a503770aaa7a045db0d0"
     },
-    "received_at": "2026-10-07T06:44:47.991925+00:00",
+    "received_at": "2026-10-07T01:44:47.991925-05:00",
     "executed": false,
     "test_authorization": false,
     "author_writes_stopped": true
@@ -341,5 +341,363 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\binding-inputs.json",
     "sha256": "5af6deda6bea75904d83b101b250102c87f9b896ceab8bcef869a0dc786f0f22",
     "status": "VERIFIED_INPUTS_NOT_AUTHORIZED"
-  }
+  },
+  "planning_checkpoint": "ddeed9b9f181669a10b43d96e99d72d3105e6120",
+  "active_preparation": {
+    "transport_author": "ps_carryback_final_quality",
+    "scope": "qualification-composition; static only",
+    "independent_reader": "tf_ps235_candidate_quality",
+    "reader_scope": "independent-quality/staged-initial; source only",
+    "tests_released": false
+  },
+  "qualification_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-release\\QUALIFICATION-RELEASE.json",
+    "sha256": "1a15f53c466bdf43bc80babc557916cb53f53f1cab873a5f95af6f19358e86fc"
+  },
+  "validation_sessions": [
+    {
+      "platform": "Windows",
+      "mode": "focus",
+      "session": 57018,
+      "state": "failed_private_fixture",
+      "root": "C:/b99-wf01",
+      "exit": 1
+    },
+    {
+      "platform": "Linux",
+      "mode": "focus",
+      "session": 67363,
+      "state": "failed_private_fixture",
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-one",
+      "exit": 1,
+      "container_absent": true
+    },
+    {
+      "platform": "Windows",
+      "mode": "quality",
+      "session": 1618,
+      "state": "passed",
+      "root": "C:/b99-wq01",
+      "exit": 0
+    },
+    {
+      "platform": "Linux",
+      "mode": "quality",
+      "session": 21230,
+      "state": "passed",
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one",
+      "exit": 0
+    },
+    {
+      "platform": "Windows",
+      "mode": "focus",
+      "session": 79776,
+      "state": "failed_private_fixture",
+      "root": "C:/b99-wf02",
+      "private_retry_reason": "single-lstat output scan correction; limits unchanged",
+      "exit": 1,
+      "owned_job_active": 0,
+      "source_guard_unchanged": true
+    },
+    {
+      "platform": "Windows",
+      "mode": "focus",
+      "session": 26521,
+      "state": "failed_private_fixture",
+      "root": "C:/b99-wf03",
+      "packet": "qualification-composition-v4",
+      "exit": 1,
+      "expected_main_checks_completed": 43,
+      "source_guard_unchanged": true
+    },
+    {
+      "platform": "Linux",
+      "mode": "focus",
+      "session": 80092,
+      "state": "failed_private_fixture",
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two",
+      "container_name": "ps-b99-focus-two",
+      "packet": "qualification-composition-v4",
+      "exit": 1,
+      "expected_main_checks_completed": 43,
+      "source_guard_unchanged": true,
+      "container_absent_after_evidence_recovery": true
+    },
+    {
+      "platform": "Windows",
+      "mode": "focus",
+      "session": 87952,
+      "state": "passed",
+      "root": "C:/b99-wf04",
+      "packet": "qualification-composition-v5",
+      "exit": 0,
+      "owned_job_active": 0,
+      "source_guard_unchanged": true
+    },
+    {
+      "platform": "Linux",
+      "mode": "focus",
+      "session": 16656,
+      "state": "failed_private_oracle_behavior_separately_accepted",
+      "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three",
+      "container_name": "ps-b99-focus-three",
+      "packet": "qualification-composition-v5",
+      "exit": 1,
+      "source_guard_unchanged": true,
+      "container_absent": true
+    }
+  ],
+  "partial_validation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-release\\PARTIAL-VALIDATION.json",
+    "sha256": "d80a90dca63a77c1deeb740db96af871a01ad1890668a95a49fc8c287ca1b53b"
+  },
+  "private_runner_correction": {
+    "status": "Sparse parent repaired; actual-scale compressed export and failure preservation qualified; v5 focus released for both platforms",
+    "finding": "output scan stat raced Git lock-file removal",
+    "scope": "Ignore vanished paths only; single lstat regular-file sizes; unchanged finite caps.",
+    "product_edit": false,
+    "quality_replay_needed": false
+  },
+  "windows_focus_second_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\windows-focus-release-two\\RELEASE.json",
+    "sha256": "62f65b159627b289d6e7105cc507a768216c8c2272b11d99a61a2c6d1d59a0e4"
+  },
+  "integrated_initial_quality": {
+    "status": "PASS_STATIC_INITIAL_FINAL_ACCEPTANCE_WITHHELD",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\staged-initial\\REPORT.md",
+    "report_sha256": "97e1dbf9b1e37f46d1d0a05857a45fa3e309ee325996a810e73ecf12ae2bc2ec",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\staged-initial\\evidence.json",
+    "evidence_sha256": "cf5b5f311b922bee56c994dd6acd04163b94dd4ce91c3c05fb8f411127723db6",
+    "root_read_full_report": true,
+    "root_sampled_references": [
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\candidate.tar",
+        "sha256": "a25786fd0ab11692297c90f57f65b74c88e95e5d04176337b070b952604d6c5e",
+        "bytes": 3809280
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\dependency-catalog.json",
+        "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+        "bytes": 400393
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DRAFT-REVIEW.json",
+        "sha256": "75fdb0c33fa7cea9fae274165588a5bf52d4d6ff8e076a0c3d4d39ea710ddb0f",
+        "bytes": 1904
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\focus.py",
+        "sha256": "e8225c5fd762fec4b1096e5e94f6967b21529bccfc37147a1c54a8fc91a5de14",
+        "bytes": 22118
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\helpers.ps1",
+        "sha256": "cda326153821c33b05b76e002f18a4b96ce69a012cfa1c2455d8237d6f75d67d",
+        "bytes": 4010
+      }
+    ],
+    "final_acceptance": false
+  },
+  "windows_focus_second_reconciliation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\windows-focus-release-two\\RECONCILIATION.json",
+    "sha256": "93ec3e1b60fd167f00654461dcff5e047696df85c8eb831979b72ee0fbfccb5e"
+  },
+  "corrected_focus_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-v5\\RELEASE.json",
+    "sha256": "1dc8ff4f3e4699e6ea98934802b5bbab8099a64d9a4b823e385cfe652326f516"
+  },
+  "focus_v4_reconciliation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-corrected\\RECONCILIATION.json",
+    "sha256": "b296c0eb01487dcdd23e196a75a6f76c4a9ada5cf5464d17bb765f05b8411f7d"
+  },
+  "focused_behavior_acceptance": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\ROOT-FOCUS-ACCEPTANCE.json",
+    "sha256": "71637e7c8c27f097127e022ae45bec9c78c819648780bddfe3a54f35c38e6af3"
+  },
+  "aggregate_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-release-v2\\RELEASE.json",
+    "sha256": "f716cc3bcb7cc0f53a814db0c2c032272050b1c936ae9ec4687d3e3ea0f7fa50"
+  },
+  "aggregate_session": {
+    "session": 48462,
+    "state": "passed",
+    "run_id": "b99-final-two",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\runs\\b99-final-two",
+    "manifest_sha256": "1c79101eefe306e572ae0ddfc9f6ab2c804d27d2536dfc0be1bbc624db33c40c",
+    "whole_timeout_seconds": 3900,
+    "expected_hooks": 11,
+    "auto_repeat": false,
+    "exit": 0,
+    "source_after_equal": true,
+    "container_absent": true
+  },
+  "aggregate_failed_setup": {
+    "status": "AGGREGATE_FAILED_PRIVATE_SETUP",
+    "at": "2026-10-07T08:10:27.7216367Z",
+    "session": 95091,
+    "exit": 1,
+    "run_id": "b99-final-one",
+    "tests_executed": 0,
+    "failure": "inside.py:181 requires byte-identical image/candidate pre-commit config; repository-name comment differs",
+    "source_after_equal": true,
+    "terminal_cleanup_empty": true,
+    "container_absent": true,
+    "original_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation\\runs\\b99-final-one",
+    "next_action": "Preserve original packet and failed run. Prepare separate minimal runtime-config comparison correction with exact raw hashes and only known repository-comment equivalence. Review before a new bound aggregate. Keep all original limits, final guards, eleven hooks and full SelfTest."
+  },
+  "aggregate_session_history": [
+    {
+      "session": 95091,
+      "state": "failed_private_setup",
+      "run_id": "b99-final-one",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation\\runs\\b99-final-one",
+      "manifest_sha256": "5722134338f268c18c022ca2eeb1cfb29ab56f6dfb5db99bbd002585155e9e7a",
+      "whole_timeout_seconds": 3900,
+      "expected_hooks": 11,
+      "auto_repeat": false,
+      "exit": 1
+    }
+  ],
+  "independent_windows_review": {
+    "status": "passed_finite_scope",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\focused-transport\\WINDOWS-ADDENDUM.md",
+    "report_sha256": "6f8e2521eb7ea8fe47b4b1c9e3d5034ed44725056e9f5fbefa1c57303a478b96",
+    "evidence_sha256": "8e5eeb064c3f6a17b177ad88baa28ffd7b05c4e0aadc88d1d55fe3d94c26ac41"
+  },
+  "endpoint_preparation_worker": {
+    "worker": "/root/ps_carryback_final_quality",
+    "state": "delivered_stopped_root_static_review_passed",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation",
+    "actual_head_not_yet_available": true,
+    "evidence_sha256": "17931150310f83fc8eeb30386ae6cb5d56298897099f1453da975158e81bb9c2"
+  },
+  "next_prepared_scripts": [
+    "reconcile-aggregate-v2.py",
+    "commit-validated-b99.py",
+    "prepare-endpoint-inputs.py",
+    "endpoint-preparation/prepare-binding.py"
+  ],
+  "local_validation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\LOCAL-VALIDATION.json",
+    "sha256": "77704f9e33465902fa6e4131524df46664873809ebd82a0899735023146433ec"
+  },
+  "normal_b99_commit": {
+    "status": "committed",
+    "at": "2026-10-07T03:27:34.746393-05:00",
+    "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+    "paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".gitignore"
+    ],
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\normal-b99-commit.log",
+    "log_sha256": "445559cf92d339e63f9fcad046e070bab1c644c1128b4ade97eaf5fcbaf105a6",
+    "observed_head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+    "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+    "finished_at": "2026-10-07T03:27:36.97764-05:00"
+  },
+  "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "endpoint_release": {
+    "status": "ACTUAL_COMMITTED_ENDPOINTS_RELEASED",
+    "at": "2026-10-07T03:30:28.180189-05:00",
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\manifest.authorized.json",
+    "sha256": "0aebef5ab1db29f17259ae6235bad2472ac969587369a3f6f1c1b23f921a7a1b",
+    "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+    "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+    "binding_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\binding-evidence.json",
+    "binding_evidence_sha256": "91aac9793bedcd91e7cef62f08f83df029516ba3bf1ca9bc644982265ab90cf9",
+    "native_refs": {
+      "PSStyleGuide": {
+        "ref": "refs/heads/main",
+        "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+        "object": {
+          "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+          "type": "commit",
+          "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+        }
+      },
+      "TerraformStyleGuide": {
+        "ref": "refs/heads/main",
+        "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+        "object": {
+          "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+          "type": "commit",
+          "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+        }
+      }
+    },
+    "known_revocations": "Current explicit owner direction remains in force; accepted receipts intact; both policy roots have zero risk exceptions. Fresh ordinary audit remains required.",
+    "auto_repeat": false
+  },
+  "endpoint_session": {
+    "session": 51289,
+    "state": "passed",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\execution-run",
+    "manifest_sha256": "0aebef5ab1db29f17259ae6235bad2472ac969587369a3f6f1c1b23f921a7a1b",
+    "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+    "auto_repeat": false,
+    "exit": 0
+  },
+  "endpoint_acceptance": {
+    "status": "ACTUAL_ENDPOINTS_AND_AUDIT_ACCEPTED",
+    "at": "2026-10-07T08:37:26.0383285Z",
+    "session": 51289,
+    "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+    "result_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\execution-run\\result.json",
+    "result_sha256": "08629662abe450071ee8178e532fb955e1614c71a4ff5a80d1e2b12e473ee950",
+    "stages": 9,
+    "five_modes_passed": true,
+    "audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "authoritySource": "local-origin-main",
+      "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+      "installedGraphRoots": [
+        ".",
+        ".github/workflows"
+      ],
+      "findings": []
+    },
+    "native_main_reads": 3,
+    "native_main_equal_base": true,
+    "guards_equal": true,
+    "owned_cleanup_empty": true,
+    "short_temp_absent": true,
+    "pr_body": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\PR-BODY.md",
+    "pr_body_sha256": "3f4bb58809c4b034cf863a435eebc827b0a71cce609119e62b000758f99762d8",
+    "remaining": "Independent final quality, publication, both native reviews, hosted CI, source landing, counterpart comparison and repair.",
+    "prior_pr_body": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\PR-BODY-before-audit-clarification.md",
+      "sha256": "ce7c714d09e65477e4993913fc3adcc5d99e2bf3f81dd9035060e7b79748df66",
+      "reason": "Independent review requested explicit audit-authority limitation."
+    }
+  },
+  "independent_local_quality": {
+    "status": "PASS_FINAL_LOCAL_QUALITY",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\committed-final\\FINAL-LOCAL-ADDENDUM.md",
+    "report_sha256": "21d21c02fad55d5f4923c60b87aef7004124f75f1ef9d3a15650377118408907",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\committed-final\\final-local-evidence.json",
+    "evidence_sha256": "43c8b9cd7fb60ad24de22bcfde0e39805b8fd22950e5bd4902ff794a1e0bddd7",
+    "body_sha256": "3f4bb58809c4b034cf863a435eebc827b0a71cce609119e62b000758f99762d8",
+    "root_verified_at": "2026-10-07T08:47:26.6754136Z"
+  },
+  "scope": [
+    ".gitignore",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "candidate_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "repository": "franklesniak/PSStyleGuide",
+  "pr": null,
+  "body_sha256": "3f4bb58809c4b034cf863a435eebc827b0a71cce609119e62b000758f99762d8"
 }

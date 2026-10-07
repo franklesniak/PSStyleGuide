@@ -1,0 +1,49 @@
+{
+  "status": "V4_FOCUS_FAILED_PRIVATE_SPARSE_SETUP_ALL_EVIDENCE_RECOVERED",
+  "at": "2026-10-07T07:41:05.710733+00:00",
+  "windows_session": 26521,
+  "linux_session": 80092,
+  "exit_codes": [
+    1,
+    1
+  ],
+  "expected_main_checks_completed_each": 43,
+  "shared_failure": "Empty Git template omits .git/info; fixture attempted sparse-checkout write before making that directory.",
+  "linux_export_failure": "Original per-file synchronous uncompressed export exceeded180seconds; exact stopped container retained until root recovery.",
+  "recovery": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two\\recovery\\result.json",
+    "sha256": "acff51cc1bae424634d4dd1f868b64afd03485b154c8db6484104a5c75f03875",
+    "combined_bytes_before_removal": 30186927,
+    "container_absent": true
+  },
+  "source_guards_unchanged": true,
+  "windows_job_empty": true,
+  "product_acceptance": false,
+  "next_action": "Review minimal v5 sparse parent creation and compressed native export; qualify export at actual file count; release fresh bounded focus runs.",
+  "evidence": [
+    {
+      "path": "C:\\b99-wf03\\output\\result.json",
+      "sha256": "4b8a2d77680ed605c642b27d588d257aadfca97bd248d0e25edf8e7f40ac943e"
+    },
+    {
+      "path": "C:\\b99-wf03\\output\\candidate\\log.txt",
+      "sha256": "c3c106641c44ec41f54f03cd4d5f2d1adc9b653bf294ab8b074c448697db9dd6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two\\output\\result.json",
+      "sha256": "c7b45f4a85878e359da2d7383a0dffcfbed8118a813e2681e38d180690b19e7f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two\\output\\host-status.json",
+      "sha256": "716c8b632ce851f677c16466fa3ba37a841d2c773c3c7d7928910968acae5712"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two\\output\\candidate\\log.txt",
+      "sha256": "e6c90057cedaa65f3ccd7c1218bac91e6a6716f8d2c4a5d3d4eb886da7ba2835"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-two\\output\\native-export.json",
+      "sha256": "5edd3f948e3c23553aa1cb495102de889b5f7aa6480181014408fd86ace13b8c"
+    }
+  ]
+}

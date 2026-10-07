@@ -1,0 +1,57 @@
+{
+  "status": "FOCUSED_AND_QUALITY_RELEASED_ONLY",
+  "at": "2026-10-07T06:57:22.019973+00:00",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-release\\manifest.root-authorized.json",
+  "manifest_sha256": "e4c632c1b826dd0b9a0eb5e10d8403a3ba2317b691ee69bf46345c2f0455399d",
+  "review": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-release\\ROOT-COMPOSITION-REVIEW.json",
+    "sha256": "3a7d4453a738394ba58a4e3e6776277c712e1f2806f11639e65ac6e7c5eed24e"
+  },
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+      }
+    }
+  },
+  "candidate_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "run_roots": {
+    "windows-focus": "C:/b99-wf01",
+    "windows-quality": "C:/b99-wq01",
+    "linux-focus": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-one",
+    "linux-quality": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one"
+  },
+  "allowed_invocations": [
+    "windows focus once",
+    "linux focus once",
+    "windows quality once",
+    "linux quality once"
+  ],
+  "changed_gate_negative_cases": [
+    "prepared",
+    "execution_authorized",
+    "task_identity",
+    "accepted_base",
+    "auto_repeat"
+  ],
+  "aggregate_released": false,
+  "endpoints_released": false,
+  "auto_retry": false,
+  "D07_note": "Stopped-container Docker cp -L misresolved a Python absolute symlink. Initial read failed and the never-started owned container was removed; v2 followed observed archive links. No product or runtime test was repeated."
+}

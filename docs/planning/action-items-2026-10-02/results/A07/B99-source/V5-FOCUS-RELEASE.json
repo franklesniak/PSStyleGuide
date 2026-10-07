@@ -1,0 +1,38 @@
+{
+  "status": "CORRECTED_FOCUS_BOTH_PLATFORMS_RELEASED",
+  "at": "2026-10-07T07:45:48.905345+00:00",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-v5\\manifest.root-authorized.json",
+  "manifest_sha256": "d496fff8793a344060e5bdb2e73ea33511b850fc4bf066b23880fce25b6da7ef",
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+      }
+    }
+  },
+  "root_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-v5\\ROOT-REVIEW.json",
+  "allowed_invocations": [
+    "Windows focus once at C:/b99-wf04",
+    "Linux focus once at linux-focus-three"
+  ],
+  "quality_replay_authorized": false,
+  "auto_retry": false,
+  "limits_unchanged": true,
+  "candidate_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "prior_failed_evidence_preserved": true
+}

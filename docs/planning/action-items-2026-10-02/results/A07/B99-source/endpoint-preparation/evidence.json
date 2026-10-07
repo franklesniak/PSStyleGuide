@@ -1,0 +1,147 @@
+{
+  "status": "PREPARED_NOT_AUTHORIZED_NO_ACTUAL_H",
+  "created_utc": "2026-10-07T08:21:42.514088+00:00",
+  "unchanged_modules": {
+    "transport-prefix.py": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+    "run-stage.py": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795"
+  },
+  "unchanged_B99_gate": "d179fb61174c3ef24d956a0101568cb18a42f07cc71531b18a90a4ecdda2cb32",
+  "unchanged_driver_functions": [
+    "persist",
+    "output_guard",
+    "finish_temp",
+    "git",
+    "value",
+    "dependency_guard",
+    "source_guard",
+    "guard"
+  ],
+  "driver_functions_identity_only_changes": [
+    "acquire_temp",
+    "native_main"
+  ],
+  "static_python_asts": [
+    "driver-body.py",
+    "prepare-binding.py",
+    "release_gate.py",
+    "run-stage.py",
+    "runner.py",
+    "transport-prefix.py"
+  ],
+  "new_diagnostic_checks": "Four PowerShell endpoint output families; exact date/B/H and authority limits. Accepted classifier two maintenance paths differs from full three-path source scope.",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\ROOT-FOCUS-ACCEPTANCE.json",
+      "sha256": "71637e7c8c27f097127e022ae45bec9c78c819648780bddfe3a54f35c38e6af3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\binding-inputs.json",
+      "sha256": "5af6deda6bea75904d83b101b250102c87f9b896ceab8bcef869a0dc786f0f22"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\accepted-preimage\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+    }
+  ],
+  "qualified_predecessors": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\run-stage.py",
+      "sha256": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\driver-body.py",
+      "sha256": "c22c2f8beaec3de44202cbd6552c212f829f9e2e884e6790e49b8994e3a779ca"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\runner.py",
+      "sha256": "2453a90ba9afce63a297545bb00becbac971d6a2e1695c829e151a4197c3b2c6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\release_gate.py",
+      "sha256": "5540330c8878f5a2f160bddf86e814b62f4f31a00142ed9ee02a55a6926cb348"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\prepare-binding.py",
+      "sha256": "17ba0afe60eace768936074fc30e4317b155ec5cd880a564a66aefd11bc8435b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\bound-inputs\\endpoints\\manifest.bound-not-authorized.json",
+      "sha256": "87f52a4b7eff92c86666cca53941c45461c868c1b79b50ea4b5819bfc0765413"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\binding-request.template.json",
+      "sha256": "1e09963981871841571b059689ada1cd1e16153109b22485487a2fa08921af6e",
+      "bytes": 620
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\D07-NOTE.md",
+      "sha256": "8a87882d84626c30047d86a7ba6f33f4941134f36bac28f9c4ccb620acf74312",
+      "bytes": 493
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\driver-body.py",
+      "sha256": "00922148b34901425c8ce3a507df437c7b69128410233f10aa3c91ed85a0df0f",
+      "bytes": 14780
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\manifest.template.json",
+      "sha256": "c8a62b1bd2a70e7bc0d4a3243dd1c1275a8046637c93f45bf4de043cd969bbc7",
+      "bytes": 21317
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\prepare-binding.py",
+      "sha256": "273fc470d3127496889dd5e54f904adaa386a8053e1b4fcd7418be5fdc609d6c",
+      "bytes": 12193
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\qualified-predecessor.patch",
+      "sha256": "ba8d548f27d4eb60af654d861c265dd60e188208557a273e472ed2ca58dfad00",
+      "bytes": 55284
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\README.md",
+      "sha256": "c585639080a272d5c1435884ea8ad8161cddf557d0e5ce45a49770d28561b28b",
+      "bytes": 5206
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\release_gate.py",
+      "sha256": "d179fb61174c3ef24d956a0101568cb18a42f07cc71531b18a90a4ecdda2cb32",
+      "bytes": 2166
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\run-stage.py",
+      "sha256": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795",
+      "bytes": 3407
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\runner.py",
+      "sha256": "27aa883d87a1adbcbdc009d2bfd23a893a356227a4a8b8da6d56c175c2446414",
+      "bytes": 23127
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+      "bytes": 4238
+    }
+  ],
+  "execution": {
+    "binder_run": false,
+    "driver_run": false,
+    "candidate_tests": 0,
+    "native_requests": 0,
+    "git_commands": 0,
+    "product_writes": 0
+  },
+  "remaining": [
+    "Root aggregate acceptance and normal commit",
+    "Actual H and accepted detached fixture; bound raw catalogs and full guards",
+    "Root authorization/current authority/date checks",
+    "Actual endpoints/current audit and final independent quality"
+  ]
+}

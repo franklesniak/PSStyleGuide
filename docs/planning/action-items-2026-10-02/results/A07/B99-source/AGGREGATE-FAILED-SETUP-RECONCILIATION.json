@@ -1,0 +1,14 @@
+{
+  "status": "AGGREGATE_FAILED_PRIVATE_SETUP",
+  "at": "2026-10-07T08:10:27.7216367Z",
+  "session": 95091,
+  "exit": 1,
+  "run_id": "b99-final-one",
+  "tests_executed": 0,
+  "failure": "inside.py:181 requires byte-identical image/candidate pre-commit config; repository-name comment differs",
+  "source_after_equal": true,
+  "terminal_cleanup_empty": true,
+  "container_absent": true,
+  "original_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation\\runs\\b99-final-one",
+  "next_action": "Preserve original packet and failed run. Prepare separate minimal runtime-config comparison correction with exact raw hashes and only known repository-comment equivalence. Review before a new bound aggregate. Keep all original limits, final guards, eleven hooks and full SelfTest."
+}

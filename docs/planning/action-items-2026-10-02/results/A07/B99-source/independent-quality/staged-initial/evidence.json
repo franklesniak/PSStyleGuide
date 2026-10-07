@@ -1,0 +1,640 @@
+{
+  "status": "PASS_STATIC_INITIAL_FINAL_ACCEPTANCE_WITHHELD",
+  "candidate_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "before": {
+    "time": "2026-10-07T06:59:19.969199+00:00",
+    "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "head_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "branch": "codex/b99-accepted-main",
+    "staged_raw": ":100644 100644 38754eff438fbad9d64f58470a575bb42c4c845a ab870af1d90d24a2f1a3d28ff664691b3e2b866c M\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\n:100644 100644 6607c5e4eecc4d9dd23a6123011176da7a4455b7 a12785d268acd7bfa0c1d934c62bed221a70ea46 M\t.github/workflows/Test-AgentInstructions.ps1\n:100644 100644 926d96e120f52d9e812ab4f07d6c835ab74941a6 1dc3daeba6e1dea524ab4e5ef27bc6b969035b3c M\t.gitignore\n",
+    "unstaged": "",
+    "untracked": "",
+    "index_sha256": "743b420dec5782d4aea24ba9efffc5ac283ea2363d86b8507f94e6040ce2a276",
+    "refs_sha256": "6111ea30474fc0bec4602ec9bab8830dc999894e90d859dbf01722e0ff50963a",
+    "checks": {
+      "candidate_rows": {
+        "count": 78,
+        "bytes": 3747753,
+        "physical_and_raw_index_match": true
+      },
+      "dependency_rows": {
+        "count": 1914,
+        "bytes": 18816883,
+        "physical_and_raw_index_match": true
+      },
+      "candidate_archive": {
+        "exact_entry_count": 78,
+        "all_entry_bytes_match": true
+      },
+      "dependency_archive": {
+        "exact_entry_count": 1914,
+        "all_entry_bytes_match": true
+      },
+      "analyzer_archive": {
+        "exact_entry_count": 51,
+        "all_entry_bytes_match": true
+      },
+      "runtime_files": {
+        "bound_rows": 54,
+        "windows_named_rows": 9,
+        "all_match": true
+      }
+    },
+    "references": [
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\candidate.tar",
+        "sha256": "a25786fd0ab11692297c90f57f65b74c88e95e5d04176337b070b952604d6c5e",
+        "bytes": 3809280
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\dependencies.tar",
+        "sha256": "c09f273178c5d18b1da93878f6c7badf2fca9f7deaca503dff395da1d1badd8b",
+        "bytes": 20316160
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\dependency-catalog.json",
+        "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+        "bytes": 400393
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\analyzer.tar",
+        "sha256": "c7a69a6f7d8eb881657822c6566b0f8eb1ab2b5d1d1e6109e5d37d6ac684e32e",
+        "bytes": 347166720
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\.signature.p7s",
+        "sha256": "3f3dc98fc5188c024c019be66cf1cca80d9763a4fb9b75a3a11777215c856c56",
+        "bytes": 12812
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\ubuntu_x64_18.04_6.2.4_x64_4.0.30319.42000_core.json",
+        "sha256": "878362300df6712cb3cbb98dd369331d54d0b5e07092dca7d14c71dd9aab4f04",
+        "bytes": 14057147
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\ubuntu_x64_18.04_7.0.0_x64_3.1.2_core.json",
+        "sha256": "cdb761d8e75be72b78157babd233487a79bf689b0b926ba6ae46f5aef3dc2a94",
+        "bytes": 14800607
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\union_19c8c86e.json",
+        "sha256": "ba52452eca30e5d2254d151f04eae9230677537cc6169d08840f761615beb03c",
+        "bytes": 47876395
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-48_x64_10.0.17763.0_5.1.17763.316_x64_4.0.30319.42000_framework.json",
+        "sha256": "9a99ccc7d25a974190e5352e0f773e24039d2fe831307d666a7502310d7c0907",
+        "bytes": 23653457
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-4_x64_10.0.18362.0_6.2.4_x64_4.0.30319.42000_core.json",
+        "sha256": "196beb5415dfb8b63e3e3678268f2990e2239401a98b86d89800749504b69b66",
+        "bytes": 17942759
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-4_x64_10.0.18362.0_7.0.0_x64_3.1.2_core.json",
+        "sha256": "66a64ccee6b4bcb3b68842843693849d2beb88cd1ddde525a1c4f0132f1609bf",
+        "bytes": 33660662
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.14393.0_5.1.14393.2791_x64_4.0.30319.42000_framework.json",
+        "sha256": "10cabb80ec1e5567a96d50f053854c833b7b9701b01ffc1e4700dc115fa2ba4a",
+        "bytes": 23727309
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.14393.0_6.2.4_x64_4.0.30319.42000_core.json",
+        "sha256": "d889900200c1bed3f098991ccef0c84d48226fdb5be722c1018102819a1a38ad",
+        "bytes": 15076121
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.14393.0_7.0.0_x64_3.1.2_core.json",
+        "sha256": "00d4fa18798da98b27a047f9cf629c71185e51e37ec627872450d4d2f7c67d87",
+        "bytes": 30796461
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.17763.0_5.1.17763.316_x64_4.0.30319.42000_framework.json",
+        "sha256": "01c0d51beb49979d55f52e0dd58cb06bafd8d0553e197b65d4b17955ce97270d",
+        "bytes": 24690250
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.17763.0_6.2.4_x64_4.0.30319.42000_core.json",
+        "sha256": "7fa1bbbc38a59984f9bb661dd653f64f6116b6661a4efcd70e9dd051c7576f84",
+        "bytes": 17196301
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_10.0.17763.0_7.0.0_x64_3.1.2_core.json",
+        "sha256": "bab82f4bc80c15bf3f2a2ef967c7244aae24acf9984b7910a3d95c0291a62b75",
+        "bytes": 32967223
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_6.2.9200.0_3.0_x64_4.0.30319.42000_framework.json",
+        "sha256": "60c3f51e87d332989cf0082dd8b785fa412f8b1cd488f7c8417560022e0bcc28",
+        "bytes": 21257822
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\compatibility_profiles\\win-8_x64_6.3.9600.0_4.0_x64_4.0.30319.42000_framework.json",
+        "sha256": "fc584750c710acf52d21eaf09b19ef52d54f87c95a67cb6c55fdd46746584153",
+        "bytes": 21716676
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\en-US\\Microsoft.Windows.PowerShell.ScriptAnalyzer.dll-Help.xml",
+        "sha256": "efb6db773eb0790ddc793e04905eddcb14ae9d070202f74d1b8fc29d3fb604d0",
+        "bytes": 109093
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\LICENSE",
+        "sha256": "646f8936b8ddcd14e13e578ff6857e368780b0d1a4f6066bee89211923a373e2",
+        "bytes": 1073
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Microsoft.PowerShell.CrossCompatibility.dll",
+        "sha256": "7a37164bb23f0ad023faaf67a88519e28811835c73be773cfbb2fbce256ef0f4",
+        "bytes": 143392
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Microsoft.Windows.PowerShell.ScriptAnalyzer.BuiltinRules.dll",
+        "sha256": "be0da121658cba0fc0b2e8856d3e5b3909f70ff7cbabb1272e5bd4f106c5ab3a",
+        "bytes": 367648
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Microsoft.Windows.PowerShell.ScriptAnalyzer.dll",
+        "sha256": "cdecdb17904a9a5643b5d69d97b9b7a57ee799b40ff351714e5b27210b9b445c",
+        "bytes": 226336
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Newtonsoft.Json.dll",
+        "sha256": "094214c4db482ea1749b05d69a517b51450ffa99919b5c28d35e156482d20d08",
+        "bytes": 722264
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSGetModuleInfo.xml",
+        "sha256": "6452486d8d6a387dd225865b8ed66d23aadb6bc940b89ffa6636767216d14172",
+        "bytes": 8141
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1",
+        "sha256": "b65f47ef115a4f68b562ca2ed749d3aab48d16a478f30e30a43df5d22ba54ac3",
+        "bytes": 17822
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psm1",
+        "sha256": "a620133324f293dfafb32483be1eac5d784990a96c7e900d6c8a9bb300eb1842",
+        "bytes": 17873
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSv7\\Microsoft.PowerShell.CrossCompatibility.dll",
+        "sha256": "ab0421653ff5702acd978c132a4e6ea13f7295c05a694cecbbb2e6e6b74e515c",
+        "bytes": 153632
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSv7\\Microsoft.Windows.PowerShell.ScriptAnalyzer.BuiltinRules.dll",
+        "sha256": "318639f220718e14c587d07da5a37ac7f23b697dc56cb29e0dd8b2ea55950432",
+        "bytes": 414240
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSv7\\Microsoft.Windows.PowerShell.ScriptAnalyzer.dll",
+        "sha256": "a816f622b3bc1b3000afd51be8c40358050a544675181c55d0e14fdfd1ce470c",
+        "bytes": 250912
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSv7\\Pluralize.NET.dll",
+        "sha256": "910a6d94740250f4ee80c2e173910857ef6933aad3c497f92c9b35fbdd634364",
+        "bytes": 30256
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\README.md",
+        "sha256": "d892f44933873d6e9355fb3805afb0743a37b30e2c8fc01235400b5614378904",
+        "bytes": 8524
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\ScriptAnalyzer.format.ps1xml",
+        "sha256": "8d2c467c371e637bf466183451e41017044f69b5a6fa5d1f343573c50a0f708a",
+        "bytes": 20877
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\ScriptAnalyzer.types.ps1xml",
+        "sha256": "6d955ad7dee3b3fe9e7c7c58bce20fd55a71d78be21204bb44b4307949fe1141",
+        "bytes": 18798
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\SECURITY.md",
+        "sha256": "abe73f3d2a40900de478d8d6a9b9c76e7e9bf602309cdd3cee4355f1fcd1b459",
+        "bytes": 2701
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\CmdletDesign.psd1",
+        "sha256": "efe85b69204e36f71393ac42d33183791e82a8182580fbb74b4956acd05c83e5",
+        "bytes": 15021
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\CodeFormatting.psd1",
+        "sha256": "fe305219c4cfaef69e6fc7cd0cded273cbe89b1c830e6f635e92ae87bdf727c8",
+        "bytes": 16330
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\CodeFormattingAllman.psd1",
+        "sha256": "0d2223f59455c830dc625e71e59ac6a7acd0108116bf02f83803c83594de9be7",
+        "bytes": 16367
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\CodeFormattingOTBS.psd1",
+        "sha256": "bedfbee2d0d1dfb545e0d41a0ce87feb95526c238016ab9230a62148e46c5b36",
+        "bytes": 16331
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\CodeFormattingStroustrup.psd1",
+        "sha256": "e0c69aea30c54d6d381714ebd096c16fdeab24c7b9d9bc2eb3ba267bbfb1374f",
+        "bytes": 16371
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\core-6.1.0-linux-arm.json",
+        "sha256": "4ac89539ca47eae3eb1d95547efc59894a8a6e062f86d52840da35edf189131b",
+        "bytes": 141310
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\core-6.1.0-linux.json",
+        "sha256": "a43e4b44e055410dd18742a281a704945aa1f39519b19c344d7cd78f4a4757b5",
+        "bytes": 141310
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\core-6.1.0-macos.json",
+        "sha256": "70703e205682f5d216320143ed50f9acc9cf4d3655240435fcd109ac504a3b05",
+        "bytes": 141310
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\core-6.1.0-windows.json",
+        "sha256": "e35c5ab33003a8a4fbbd5aff0f659a920743080f9337c90819d4001c7928720e",
+        "bytes": 184113
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\desktop-2.0-windows.json",
+        "sha256": "e0dd156000b822ff10a9347ef3ba6a17c00c2136811acea01ef47d6dd1c092a7",
+        "bytes": 287033
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\desktop-3.0-windows.json",
+        "sha256": "60aae851911741248d3414925cbaf4c59e8743efaf5a5005ed129db257dc4c4f",
+        "bytes": 1083242
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\desktop-4.0-windows.json",
+        "sha256": "d11970a52c011335e3f93dea7f3da887428caf1f12807a803ec65a8068b77ba8",
+        "bytes": 1213067
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\desktop-5.1.14393.206-windows.json",
+        "sha256": "b829ff1493cadd5284c5bc326487107a0617b0b8c3799c5b8dbfcbb78ac8f652",
+        "bytes": 1821748
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\DSC.psd1",
+        "sha256": "4f3376c6daded3a0620edac26bd239a5091cc90d3988ce75908dc4b192e21323",
+        "bytes": 14678
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\PSGallery.psd1",
+        "sha256": "a3ef224f2b7ab25f3b070f2e2fbb7373090aac278bc5167c9126bbb05bd33d68",
+        "bytes": 15679
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\ScriptFunctions.psd1",
+        "sha256": "26e170089921c4707d87ddbec220608eff0ec8598aaa31d7a6d630199c7a59ca",
+        "bytes": 15101
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\ScriptingStyle.psd1",
+        "sha256": "c4fcf19d8793107b45a96f7e2d235651328d9c70f596f4dc1474018d0c30279a",
+        "bytes": 14732
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\Settings\\ScriptSecurity.psd1",
+        "sha256": "66fb219c38b290aeab9921bff0b2dfafabd8ace07682e6e95513d5660a24a9da",
+        "bytes": 14929
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\ThirdPartyNotices.txt",
+        "sha256": "2328c49f600036e032cbcca36b850ce4f2ae5db31a67d1485f779be03facf499",
+        "bytes": 1732
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\pyvenv.cfg",
+        "sha256": "15a7793991738d9186f7ef675f42841e0d270579206c8c677e1c05d801d5781d",
+        "bytes": 376
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "sha256": "3ce7cba6f5128dd5f54c98b6a5036b0f850496878cc2e21044b675fe3c594e3e",
+        "bytes": 56
+      },
+      {
+        "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\System.Management.Automation.dll",
+        "sha256": "2d8af026e589c5603629bfc3e7c57265b4167b12eca3ae549c6a6c3ca7e4967b",
+        "bytes": 19646264
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+        "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+        "bytes": 274424
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+        "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+        "bytes": 104952
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.dll",
+        "sha256": "9a0e3435aaa680d868150f87ab3e388ad2eebc22f87e036155c7b4eda8cd2120",
+        "bytes": 6945272
+      },
+      {
+        "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+        "bytes": 301368
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582",
+        "bytes": 92540232
+      },
+      {
+        "path": "C:\\Program Files\\Git\\cmd\\git.exe",
+        "sha256": "78211c7ed73988da93a6d8a33d47ec6187f464d7ea2a9a00c182bbd7a1ecf30f",
+        "bytes": 43352
+      },
+      {
+        "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "sha256": "0010d7d71a94b0441028eea42381589483836d2c097f24940d282f5c4eba7919",
+        "bytes": 43368
+      },
+      {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "sha256": "15cd209c995b7d3009c91ca40892d5b8f1fb162f3e5f10716642ea278e8e0d7b",
+        "bytes": 339968
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\execution-state.json",
+        "sha256": "e3a9828de25d90aba540c12fe115680fefacffce5c9de0475eac9fbe6563fe2e",
+        "bytes": 26467
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\SOURCE-INTEGRATION.json",
+        "sha256": "a1070ee840a671a2691b6624b68a11269fa6411979edd317407a8fad04071acd",
+        "bytes": 4234
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DECISION.json",
+        "sha256": "faf76fd3964aba3537888634b33710424dca3bf29c5d6a00f5f39abc60c5243c",
+        "bytes": 1681
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\DRAFT-REPORT.md",
+        "sha256": "2cdeced35ac1e87c347df76749809e407bb6e26c33ae466b4f8258dc3aba2782",
+        "bytes": 5612
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DRAFT-REVIEW.json",
+        "sha256": "75fdb0c33fa7cea9fae274165588a5bf52d4d6ff8e076a0c3d4d39ea710ddb0f",
+        "bytes": 1904
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\draft-evidence.json",
+        "sha256": "1648c08bd55c49d5fb85c088907b62c39b067d19d6fac33c11ad13c158aa1473",
+        "bytes": 6380
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
+        "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961",
+        "bytes": 2588
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\ROOT-V3-FOCUSED-PREPARATION-REVIEW.json",
+        "sha256": "eb4b5e346c1bf090927954666ca9909053585ef0195a6d3958d8351f884d4472",
+        "bytes": 1917
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\binding-inputs.json",
+        "sha256": "5af6deda6bea75904d83b101b250102c87f9b896ceab8bcef869a0dc786f0f22",
+        "bytes": 476098
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\evidence.json",
+        "sha256": "b30aa4270edab8e0cd879a175628397a71a3075b91a1a503770aaa7a045db0d0",
+        "bytes": 9487
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\README.md",
+        "sha256": "79fd7c9234805ef7da690edb11a7ef35918f69aaaa13361dfd97eebc3034aa1c",
+        "bytes": 14125
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\focus.py",
+        "sha256": "e8225c5fd762fec4b1096e5e94f6967b21529bccfc37147a1c54a8fc91a5de14",
+        "bytes": 22118
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\helpers.ps1",
+        "sha256": "cda326153821c33b05b76e002f18a4b96ce69a012cfa1c2455d8237d6f75d67d",
+        "bytes": 4010
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\binding.template.json",
+        "sha256": "d4898540b61b55441555cbebdade7b245dafe14a7da377b8d830fd7a449ae2c5",
+        "bytes": 1070
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3\\v2-to-v3.patch",
+        "sha256": "3afff4c89696aeb0e08b011fe15ed33740ac331efeb5a51426e4af539ccd0f52",
+        "bytes": 16258
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\REPORT.md",
+        "sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835",
+        "bytes": 3646
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\evidence.json",
+        "sha256": "2da3b15169682a77aff71a381f6e66636a08be928506a60d8a989783a25ad813",
+        "bytes": 10453
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\DEPENDENCY-REFRESH.json",
+        "sha256": "777518527937caedd2a06105dbcfe95cdb59ed265d9f8735577f78cc73286bf5",
+        "bytes": 226742
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\integration.patch",
+        "sha256": "733b6a6f0f4ce3c98a1bcc4135e7f113155d0d8434d5a9d9553c72df4c81b56c",
+        "bytes": 43818
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\windows.py",
+        "sha256": "b8f1cce81c4ae0f18af6c0fa634d9c692f8b8c7d6b561fd288f4087c6fa8e1f7",
+        "bytes": 11382
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\inside.py",
+        "sha256": "82cbc37d1d256b8f935624d8a165e80058f367c4971877c5624d7a3c634821a8",
+        "bytes": 9777
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\launch.py",
+        "sha256": "4a8935faa013dbfc981f917a284388840aae0874dc9fc3660501c7d5e6fed2d4",
+        "bytes": 8810
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\ownership.py",
+        "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+        "bytes": 6006
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\settlement.py",
+        "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+        "bytes": 1113
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\quality.ps1",
+        "sha256": "c7de2c191911d31ba191a7c4564ff8b37ff972034e831dbf19b06609ba62a444",
+        "bytes": 1761
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\qualification\\bindings.py",
+        "sha256": "6058deb44e3363601dbee7b520146e961508c410fcbdc487fe30259aec03236c",
+        "bytes": 6031
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\aggregate\\inside.py",
+        "sha256": "97d7f0f1fe0e0ed50f0de0dd6dad20ffb78e6263b3e9329b282d746d03851d7e",
+        "bytes": 18159
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\aggregate\\launch.py",
+        "sha256": "451da02a6af861d13a1b00eff6594ead6e8caec2225ef874bd33466e2d16efe8",
+        "bytes": 13264
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\aggregate\\ownership.py",
+        "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+        "bytes": 6006
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\aggregate\\settlement.py",
+        "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+        "bytes": 1113
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\endpoints\\transport-prefix.py",
+        "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+        "bytes": 4238
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\private-harness\\endpoints\\run-stage.py",
+        "sha256": "6c351361d07ed98f5bd105ef087b94f71a3aa1a75eac1b4d19a494a494860795",
+        "bytes": 3407
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\runner.py",
+        "sha256": "32a89cc6506ea935748246bc4f1985a7da9ea6f669f92dc8476f3d1178f549c7",
+        "bytes": 21305
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
+        "sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+        "bytes": 400393
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\REPORT.md",
+        "sha256": "37a049f27ceab7c7e8fd1ee1b95b30970f49c0dc084290e6b736f934fa854ca1",
+        "bytes": 9086
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\evidence.json",
+        "sha256": "febccc6df9abff0994564dd9db54b9908095c9637171d3c05a371586610614a0",
+        "bytes": 6520
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\recovery.patch",
+        "sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209",
+        "bytes": 44414
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\HANDOFF.md",
+        "sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8",
+        "bytes": 4121
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+        "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+        "bytes": 134145
+      }
+    ],
+    "metadata": {
+      "HEAD": "150d1620b5ce6c88233533c17d6a4b67057666d6ea9309605ac4f98470edb2c2",
+      "index": "3eab4a5798e0b74f8cd2a2a18bb1035724aba25dabd338ccd13250acb7121165",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    }
+  },
+  "after": {
+    "time": "2026-10-07T07:02:14.378858+00:00",
+    "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "branch": "codex/b99-accepted-main",
+    "index_sha256": "743b420dec5782d4aea24ba9efffc5ac283ea2363d86b8507f94e6040ce2a276",
+    "refs_sha256": "6111ea30474fc0bec4602ec9bab8830dc999894e90d859dbf01722e0ff50963a",
+    "unstaged": "",
+    "untracked": "",
+    "all_1992_source_dependency_hashes_match": true,
+    "four_scope_pre_post_images_match": true,
+    "metadata": {
+      "HEAD": "150d1620b5ce6c88233533c17d6a4b67057666d6ea9309605ac4f98470edb2c2",
+      "index": "3eab4a5798e0b74f8cd2a2a18bb1035724aba25dabd338ccd13250acb7121165",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "snapshot_references": [
+      {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+        "sha256": "cd87f7509311ac34f19e8c3794b5cf9df1687450d317623f3954279682f59235",
+        "bytes": 11087,
+        "snapshot_only": true
+      },
+      {
+        "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide\\AGENTS.md",
+        "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+        "bytes": 32654,
+        "snapshot_only": true
+      },
+      {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-release\\QUALIFICATION-RELEASE.json",
+        "sha256": "1a15f53c466bdf43bc80babc557916cb53f53f1cab873a5f95af6f19358e86fc",
+        "bytes": 2586,
+        "snapshot_only": true
+      }
+    ]
+  },
+  "material_findings": [],
+  "tests_executed_by_reviewer": false,
+  "terminal_results_reviewed": false,
+  "source_comparison": {
+    "validator_unchanged_functions": 71,
+    "selftest_unchanged_functions": 17,
+    "outside_finite_regions_exact": true,
+    "range_definition": "Whole top-level functions including trailing separating LF bytes; only script version and exact main guard/comment insertion additionally excluded.",
+    "v2_equal_except_version": [
+      "Get-AgentPreCommitHookContext",
+      "Get-TrackedCompiledPythonFailure",
+      "Assert-ClassificationAdmissionGitFixture"
+    ],
+    "unchanged_109_with_trailing_separators_sha256": "b06ce06f30adbc2fc095b0da557e0b25348de22fd381cdd23154ac74c64056b0"
+  },
+  "pending": [
+    "Actual four-cell focused/quality terminal results",
+    "Owned cleanup and unchanged guards",
+    "Full ordinary aggregate/SelfTest",
+    "Normal commit and actual-H endpoint/audit evidence",
+    "Native reviews/CI and normal landing",
+    "Genuine PS service selection"
+  ],
+  "parent_reported_release_manifest_sha256": "e4c632c1b826dd0b9a0eb5e10d8403a3ba2317b691ee69bf46345c2f0455399d",
+  "transport_acceptance": "Root-owned; no independent composed-transport acceptance claimed",
+  "mutable_snapshot_note": "STATUS and execution-state references bind observations; subsequent root progress permitted."
+}

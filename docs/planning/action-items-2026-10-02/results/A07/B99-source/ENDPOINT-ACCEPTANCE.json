@@ -1,0 +1,39 @@
+{
+  "status": "ACTUAL_ENDPOINTS_AND_AUDIT_ACCEPTED",
+  "at": "2026-10-07T08:37:26.0383285Z",
+  "session": 51289,
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "result_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\endpoint-preparation\\bound-one\\execution-run\\result.json",
+  "result_sha256": "08629662abe450071ee8178e532fb955e1614c71a4ff5a80d1e2b12e473ee950",
+  "stages": 9,
+  "five_modes_passed": true,
+  "audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
+  },
+  "native_main_reads": 3,
+  "native_main_equal_base": true,
+  "guards_equal": true,
+  "owned_cleanup_empty": true,
+  "short_temp_absent": true,
+  "pr_body": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\PR-BODY.md",
+  "pr_body_sha256": "3f4bb58809c4b034cf863a435eebc827b0a71cce609119e62b000758f99762d8",
+  "remaining": "Independent final quality, publication, both native reviews, hosted CI, source landing, counterpart comparison and repair.",
+  "prior_pr_body": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\PR-BODY-before-audit-clarification.md",
+    "sha256": "ce7c714d09e65477e4993913fc3adcc5d99e2bf3f81dd9035060e7b79748df66",
+    "reason": "Independent review requested explicit audit-authority limitation."
+  }
+}

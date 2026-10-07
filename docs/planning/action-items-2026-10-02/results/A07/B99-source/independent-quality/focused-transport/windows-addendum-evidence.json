@@ -1,0 +1,165 @@
+{
+  "observed_utc": "2026-10-07T08:15:45.419000+00:00",
+  "status": "PASS_WINDOWS_FOCUSED_RECONCILIATION_AND_AGGREGATE_STATIC_DELTA",
+  "main_cases": 64,
+  "commands": 381,
+  "streams_verified": 762,
+  "same_byte_yaml_cases": 14,
+  "helper_reads": 66,
+  "native_and_wrapper_exit": 0,
+  "windows_symlinks_materialized": true,
+  "job_before": {
+    "total": 6794,
+    "active": 0,
+    "terminated": 0
+  },
+  "job_after": {
+    "total": 6794,
+    "active": 0,
+    "terminated": 0
+  },
+  "host_guard_equal": true,
+  "complete_candidate_copy_after_rows": 1992,
+  "complete_exercised_copy_rows": 1992,
+  "exercised_exception": "exact saved activation YAML only",
+  "output_regular_bytes": 24842111,
+  "aggregate_patch_matches_actual_delta": true,
+  "aggregate_other_five_executable_files_byte_equal": true,
+  "runtime_comment_equivalence_raw_bytes_verified": true,
+  "references": [
+    {
+      "path": "C:\\b99-wf04\\output\\result.json",
+      "sha256": "2b861bbf0c2171b495db87803d3b94c0b36b39816a1d74da8c0a6735179f47ea",
+      "bytes": 2527
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-v5\\manifest.root-authorized.json",
+      "sha256": "d496fff8793a344060e5bdb2e73ea33511b850fc4bf066b23880fce25b6da7ef",
+      "bytes": 476800
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focus-release-v5\\focus-windows.root-authorized.json",
+      "sha256": "0a856b974282557a10197e6344f73f76856988abfe14a74aa8efd358b6e2f24e",
+      "bytes": 463439
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\candidate\\native-result.json",
+      "sha256": "d0ef938c4f4b3d7c4149ac47bd0c773b73fa3b7457d23b40c416a703b207b0d2",
+      "bytes": 760
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\candidate\\transport.json",
+      "sha256": "32fa746bf51c00e6dfb9d877972a7bf4ffe214d17d5c6834bf2f38c721615623",
+      "bytes": 1878
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\candidate\\command.json",
+      "sha256": "856bceabc83f7ca63f2b52f9c4cbf2853fd3145c16a03c36993a7d8a2d16ddaf",
+      "bytes": 985
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\candidate\\log.txt",
+      "sha256": "f370e889c761b567bc017c4149fd5217c32585758a9dae39193ce3b95184fa23",
+      "bytes": 42
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\source-before.json",
+      "sha256": "ea2637b49bbb4cad6e8ac538e0b965e0a56a77b30510074645af014b049957ca",
+      "bytes": 869
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91",
+      "bytes": 949
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\commands.json",
+      "sha256": "0594f355e246823ca3d2b7a304e22f676420a24515efdadb7efade4c9533f7ba",
+      "bytes": 440009
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\main-checks.json",
+      "sha256": "9fc7a8502b985e98ae3568cd2fed2f9119642057c6b970c7c51cbc200f2ca09f",
+      "bytes": 6157
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\result.json",
+      "sha256": "005371aa2a99d6cf153cfcd93d8dbf9b9fe0796d2bab362f1fc6741121a91529",
+      "bytes": 12564
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\helpers.json",
+      "sha256": "96abf10c87ed12c623d6ba40d51951ca28411e91857fcf1f429a346d7319abf0",
+      "bytes": 64633
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\yaml-cases.json",
+      "sha256": "f55624b3136fa933a339a37aa5acb6cb751ea5c610372eec5fabaaf885ba37ee",
+      "bytes": 3182
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\native-yaml.json",
+      "sha256": "a2d1e70a53a5931b62e642a2db5d8bfa8cbfee0aae7c6c578d3e002884141e46",
+      "bytes": 4712
+    },
+    {
+      "path": "C:\\b99-wf04\\output\\payload\\symlink-materialization.json",
+      "sha256": "faede4e61bd851544c89fd22d4fb6ccd19bd9ed4e4a91b6fedacbb1269c699f4",
+      "bytes": 162
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\runtime-comment.patch",
+      "sha256": "2e2a2353b24f1c35bab480d9224ea23afbf4e2f98ba0a61f1233464c7a3a203a",
+      "bytes": 1717
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\evidence.json",
+      "sha256": "afb430e6bfaeef821b1f2a2e646f0411ca0b07a68455cdec3876920f1625abf9",
+      "bytes": 2769
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\common.py",
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\inside.py",
+      "sha256": "8a6e9c28fcf2ad5545f692f528eb96979e9c3f87c55bbff70787242e257ec898",
+      "bytes": 18966
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\launch.py",
+      "sha256": "1db24f60de01e23c48fe845ec97240344747540f294889641bf237a737e70d89",
+      "bytes": 13309
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\manifest.template.json",
+      "sha256": "3300139c5d8511abbccb5ec76a46a3dae1dbcb27d20d7913191c702f2f00c382",
+      "bytes": 3618
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\release_gate.py",
+      "sha256": "d179fb61174c3ef24d956a0101568cb18a42f07cc71531b18a90a4ecdda2cb32",
+      "bytes": 2166
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\runtime-comment.patch",
+      "sha256": "2e2a2353b24f1c35bab480d9224ea23afbf4e2f98ba0a61f1233464c7a3a203a",
+      "bytes": 1717
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\aggregate-preparation-v2\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    }
+  ],
+  "scope": "Windows focused runtime reconciliation and private aggregate v2 setup delta only",
+  "tests_run_by_reviewer": false,
+  "aggregate_result_accepted": false,
+  "final_candidate_acceptance": false
+}

@@ -1,0 +1,26 @@
+{
+  "status": "PRIVATE_CORRECTIONS_ROOT_REVIEW_AND_QUALIFICATION_PASSED",
+  "at": "2026-10-07T07:45:41.749219+00:00",
+  "full_deltas_read": [
+    "v3-to-v4.patch",
+    "v4-to-v5.patch"
+  ],
+  "reviewed_changes": [
+    "single combined native/mounted Linux budget; unchanged limits and process ownership",
+    "terminal export only after exact-owned descendants settle",
+    "compressed PAX full-member verification; all originals retained; incomplete export refuses removal",
+    "Windows native Git controls use explicit LF; sparse-control parent created"
+  ],
+  "qualifications": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\alternates-qualification\\result.json",
+      "sha256": "de247bd4f2c8e9baaa15e21d9b149b63c82baec9b5e5fac4ebd42cf6f53169b8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\export-qualification-v5\\result.json",
+      "sha256": "00d68962daf22575dc0b2267da11c1e4db87c14e58f4b8bded88c32448dbe69f"
+    }
+  ],
+  "product_bytes_changed": false,
+  "quality_replay_needed": false
+}

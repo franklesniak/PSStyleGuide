@@ -1,0 +1,62 @@
+{
+  "status": "WINDOWS_FOCUS_TWO_FAILED_PRIVATE_GIT_FIXTURE_CLEANUP_VERIFIED",
+  "observed_utc": "2026-10-07T07:22:54.575255+00:00",
+  "session": 79776,
+  "exit": 1,
+  "successful_main_checks": 40,
+  "failed_command_number": 213,
+  "failure_scope": "Private initialized-gitlink fixture setup, before its next candidate invocation. Git could not resolve base object through the alternates path.",
+  "stderr": "error: object directory C:/b99-wf02/output/payload/r/.git/objects? does not exist; check .git/objects/info/alternates\nfatal: update_ref failed for ref 'HEAD': trying to write ref 'HEAD' with nonexistent object a1192d354984a757f64ad98cc3c59afb986d1258\n",
+  "alternates_bytes_hex": "433a5c6239392d776630325c6f75747075745c7061796c6f61645c725c2e6769745c6f626a656374730d0a",
+  "alternates_has_crlf": true,
+  "suspected_cause": "Windows text newline translation left CR in the Git alternates path; narrow causal confirmation and correction pending.",
+  "job_active_before_cleanup": 0,
+  "job_active_after_cleanup": 0,
+  "cleanup_failures": [],
+  "source_guard_unchanged": true,
+  "product_pass": false,
+  "quality_cells_remain_valid": true,
+  "linux_v3": "Prepared; root export qualification and execution release pending.",
+  "evidence": [
+    {
+      "path": "C:\\b99-wf02\\output\\result.json",
+      "sha256": "c9873695327a52b53a77f2981f7c0eaafe5ed6adaad68178fa0f016513b7d346",
+      "bytes": 3440
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\source-before.json",
+      "sha256": "ea2637b49bbb4cad6e8ac538e0b965e0a56a77b30510074645af014b049957ca",
+      "bytes": 869
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91",
+      "bytes": 949
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\candidate\\log.txt",
+      "sha256": "e5bfc9eeba1e0e0ec44c83e939554a386691fa4dfba8300f8a0b5feed9985227",
+      "bytes": 1165
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\payload\\commands.json",
+      "sha256": "af6b409b8c7f756075d230be6724e0d2161212ff9da088222ca57a6691dedd74",
+      "bytes": 245744
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\payload\\main-checks.json",
+      "sha256": "9e58a4ed950d2dbad1d884c57783018fd0d40fb927a335be0f3ece1d80a83885",
+      "bytes": 3871
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\payload\\0212.stderr",
+      "sha256": "d7095a752278a897bab864c3b0125e76d4b3d4e6aa7ecfdd36eec0f82df468c3",
+      "bytes": 251
+    },
+    {
+      "path": "C:\\b99-wf02\\output\\payload\\r\\pkg\\__PYCACHE__\\entry\\.git\\objects\\info\\alternates",
+      "sha256": "64d913639b724ad775a6fe33c6fa7e900196d9ccc0f0a2dd9b488f372524dccd",
+      "bytes": 43
+    }
+  ]
+}

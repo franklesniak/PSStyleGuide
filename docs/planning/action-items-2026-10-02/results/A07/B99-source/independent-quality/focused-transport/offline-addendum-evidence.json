@@ -1,0 +1,100 @@
+{
+  "status": "PASS_FINITE_LINUX_BEHAVIOR_REUSE_ORIGINAL_WRAPPER_FAILED",
+  "case_inventory_exact": 64,
+  "oracle_controls": {
+    "positive": 3,
+    "negative": 8
+  },
+  "exercised_rows_reconciled": 1992,
+  "specific_size_observations": 1,
+  "successful_optional_observations": 1,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\evidence.json",
+      "sha256": "923bb6fe2dbba80b06f39b8688bbc6b9288979bfbe65417b5bc80b3d5345ce79",
+      "bytes": 4381
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-composition-v5\\focus.py",
+      "sha256": "89ab55c70c6e9b6055f40ac85ff73a79a5591afec1193d3c5eebdceea535ecfa",
+      "bytes": 22461
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-composition-v5\\helpers.ps1",
+      "sha256": "cda326153821c33b05b76e002f18a4b96ce69a012cfa1c2455d8237d6f75d67d",
+      "bytes": 4010
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-composition-v5\\inside.py",
+      "sha256": "682887afbb82401c200b4fb59cf200f61d34160f452ebfe282659e5423b69874",
+      "bytes": 11277
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\inputs\\focus-binding.json",
+      "sha256": "6222ee8fc0b7e806aa6efb4e3ba4b7ae3e7052d69b0145a4825d2ec19dc93635",
+      "bytes": 445497
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\native-payload.tar.gz",
+      "sha256": "7d926c4adf4d3455c7bd8649968f7b558c72a4ffdf6e06727c155dd27cf07554",
+      "bytes": 8906808
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\result.json",
+      "sha256": "9957d36d587338b1e763324492a90ce85e44bb8ebc1a3d36ac970ee5c4b3991b",
+      "bytes": 63347
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\host-source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91",
+      "bytes": 949
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\host-status.json",
+      "sha256": "493d37a9ccaebbb53567e4943cce3777c0c0e88fce63af2b5ffbc7ba54a0905d",
+      "bytes": 45180
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\offline-oracle.py",
+      "sha256": "829e6715d603e6ab63c2c28bc7bf620a98f3f388b7856c955f42a205ff3e94cd",
+      "bytes": 7122
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\offline-result.json",
+      "sha256": "eb58db1faa16ef7beb103b50f38cd68e890d722b94dd7949bb7af8eca5b7c4a0",
+      "bytes": 33001
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\proposed-oracle-only.patch",
+      "sha256": "fe287b4ee5454e1b9e0f1bdca7eaafa6596d633126a2bb7ef6d870d7f841b46c",
+      "bytes": 1310
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\REPORT.md",
+      "sha256": "f582710e7373ea5c929cb392e68614d9bd7bf2f69af3fdf5ed9649cd26387070",
+      "bytes": 3330
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\sealed-0380.stderr",
+      "sha256": "5193e571f7860774ef859260c24775acfb2e3c919e3409c9000e7fe08f76e8c4",
+      "bytes": 504
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\sealed-0380.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\native-export.json",
+      "sha256": "0235740934870dcafb90f25d1ade9c8afad47eefb43203a4050f8b98930ae31c",
+      "bytes": 725832
+    }
+  ],
+  "original_wrapper_exit": 1,
+  "skipped_guards_claimed_passed": false,
+  "offline_controls_rerun_by_reviewer": false,
+  "candidate_tests_run_by_reviewer": false,
+  "windows_result_accepted": false,
+  "aggregate_acceptance": false,
+  "needed_native_continuation_for_whitespace_only": false
+}

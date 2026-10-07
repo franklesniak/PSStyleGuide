@@ -1,0 +1,130 @@
+{
+  "status": "FOCUSED_BEHAVIOR_ACCEPTED_ORIGINAL_FAILED_RUNS_PRESERVED",
+  "at": "2026-10-07T08:07:00.158257+00:00",
+  "candidate_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "both_platforms_accepted": true,
+  "scope": "Focused behavior only; both prior analyzer results retained. No aggregate, committed endpoint, PR, hosted CI or merge acceptance.",
+  "windows": {
+    "session": 87952,
+    "wrapper_exit": 0,
+    "result": "C:\\b99-wf04\\output\\result.json",
+    "sha256": "2b861bbf0c2171b495db87803d3b94c0b36b39816a1d74da8c0a6735179f47ea",
+    "main_checks": 64,
+    "helper_reads": 66,
+    "yaml_cases": 14,
+    "source_guard_equal": true,
+    "owned_active": 0,
+    "payload_final_guard_executed": true,
+    "root_sampled_streams": [
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0008.stdout",
+        "sha256": "e6f84eade18a96876ccae3ed170dae47a613383e7e7c177c7b075f7fc22ef9e2"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0008.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0016.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0016.stderr",
+        "sha256": "9d6c0d5310bd4e2727d838d6f3732aff7013b5b6f5a3e7c8367293ccecc5c991"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0023.stdout",
+        "sha256": "c0c55fd27f53b2daed2b06277d3d74d5706dddb7dee5c58e0154c48345227f19"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0023.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0218.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0218.stderr",
+        "sha256": "33ade3149c1ce32f75490fc166ec1e2fd7aef200e9f0667f4be1df6e51028078"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0235.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0235.stderr",
+        "sha256": "cc630eb13c2eb6da30ecac245aa8351139f1d5e31159be701b47de6645da8e09"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0307.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0307.stderr",
+        "sha256": "9d6c0d5310bd4e2727d838d6f3732aff7013b5b6f5a3e7c8367293ccecc5c991"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0318.stdout",
+        "sha256": "c2d7c6a66ee312a771a5c5d5c399aba952384c1adfaa82c8bc6c7db673530758"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0318.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0378.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0378.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0380.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "C:\\b99-wf04\\output\\payload\\0380.stderr",
+        "sha256": "1dffef5c61f94cc4221080bd5d341410d1535a621ca2de2ec5489c60f83752ef"
+      }
+    ]
+  },
+  "linux": {
+    "session": 16656,
+    "original_wrapper_state": "FAILED_PRIVATE_ORACLE",
+    "original_wrapper_exit": 1,
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-focus-three\\output\\result.json",
+    "sha256": "9957d36d587338b1e763324492a90ce85e44bb8ebc1a3d36ac970ee5c4b3991b",
+    "archive_sha256": "7d926c4adf4d3455c7bd8649968f7b558c72a4ffdf6e06727c155dd27cf07554",
+    "main_checks": 64,
+    "helper_reads": 66,
+    "yaml_cases": 14,
+    "adjudication": "Independent complete evidence reconciliation supports finite behavior reuse. PowerShell display wrap caused old exact-substring oracle failure. Original failed run is unchanged.",
+    "unexecuted": [
+      "Final payload source loop",
+      "Separate container candidate-copy-after guard"
+    ],
+    "source_equivalence": "Independent reader reconciled all 78 exercised source files and 1914 dependencies; sole exercised mutation equals saved activation fixture. Host after-guard and reviewed write boundary retained.",
+    "terminal_cleanup_empty": true
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\REPORT.md",
+      "sha256": "f582710e7373ea5c929cb392e68614d9bd7bf2f69af3fdf5ed9649cd26387070"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\activation-oracle-repair\\evidence.json",
+      "sha256": "923bb6fe2dbba80b06f39b8688bbc6b9288979bfbe65417b5bc80b3d5345ce79"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\focused-transport\\OFFLINE-ADDENDUM.md",
+      "sha256": "c71f0ae36606fc5584b1335eebbca63c010fa34c8656837dcab5a078782c39b7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\independent-quality\\focused-transport\\offline-addendum-evidence.json",
+      "sha256": "9b286ecf0b1526cc933e50d9701e60449c9dd6460c18d4a0f1e95770f69aa1e2"
+    }
+  ],
+  "next_gate": "One ordinary aggregate must independently enforce complete final source guards. No native replay solely for display wrapping."
+}

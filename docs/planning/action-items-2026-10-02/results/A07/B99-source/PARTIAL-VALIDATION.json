@@ -1,0 +1,97 @@
+{
+  "status": "BOTH_PLATFORM_PARSE_AND_PSSA_PASS_FOCUS_INCOMPLETE",
+  "at": "2026-10-07T07:01:38.659254+00:00",
+  "manifest_sha256": "e4c632c1b826dd0b9a0eb5e10d8403a3ba2317b691ee69bf46345c2f0455399d",
+  "two_scripts": {
+    "Test-AgentInstructions.SelfTest.ps1": "395492f21890b4ad16b05aaf43d996224534fa753ad204f1a4d10691774196ad",
+    "Test-AgentInstructions.ps1": "fc5ff6d8554e2edb11c3ebf0059b2e4488c53d494671493ab9fcf7edc2658b3a"
+  },
+  "platforms": {
+    "Windows": "pwsh7.6.5/PSSA1.24.0; zero parser errors/Warning/Error diagnostics",
+    "Linux": "pwsh7.6.3/PSSA1.24.0; zero parser errors/Warning/Error diagnostics"
+  },
+  "direct_wrapper_exits_cleanup_guards_verified": true,
+  "windows_focus": {
+    "status": "PRIVATE_OUTPUT_SCAN_RACE_BEFORE_CANDIDATE_EXECUTION",
+    "session": 57018,
+    "exit": 1,
+    "owned_job_empty": true,
+    "source_guard_equal": true,
+    "retry_authorized": false
+  },
+  "linux_focus": {
+    "session": 67363,
+    "state": "running_at_last_handle_poll"
+  },
+  "refs": [
+    {
+      "path": "C:\\b99-wq01\\output\\quality.json",
+      "sha256": "0ed996361ea33eac3f3b3b33d17328d0e297666d1603452009bb14edff4def5f"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\result.json",
+      "sha256": "abae063404ed6713cb32303648a449aec21267e1a918a1390af62a85156a1c89"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\quality\\native-result.json",
+      "sha256": "e6767bf6c539cd05e474538da578c2baffd60dc1a877eba869bccc13347f6c5e"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\source-before.json",
+      "sha256": "ea2637b49bbb4cad6e8ac538e0b965e0a56a77b30510074645af014b049957ca"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\quality\\transport.json",
+      "sha256": "3ec73926f619bc4181c4fd646acf4811d93b121dc7b25ae0313d9574a06122de"
+    },
+    {
+      "path": "C:\\b99-wq01\\output\\quality\\log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\quality.json",
+      "sha256": "71a6fc0e917e97a670a58fcb50fc28716f61aac71ac8dea287ac976261975bf1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\result.json",
+      "sha256": "93ef425156b68e85a7eb2898e315e90eb62e553bac7d094f4b35c0e2925537a1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\status.json",
+      "sha256": "f737143ae657dc6e08ce0f70d126fe94f89bc59374d7b544301ecdee62e4512a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\host-source-before.json",
+      "sha256": "ea2637b49bbb4cad6e8ac538e0b965e0a56a77b30510074645af014b049957ca"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\host-source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\quality\\transport.json",
+      "sha256": "285935c002e34ee2f126a179beacd32557006e5881c0f1e2abb09996b9400b4a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-runs\\linux-quality-one\\output\\quality\\log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\b99-wf01\\output\\result.json",
+      "sha256": "9a97c9d24f89847e2eadd5a0c76170ae26cee04841fecf5a2dbeddd5cd6ab31f"
+    },
+    {
+      "path": "C:\\b99-wf01\\output\\source-after.json",
+      "sha256": "de1eafa283ec72f338f3cb0e7d28438195806e675d92b1719f730a6387045f91"
+    },
+    {
+      "path": "C:\\b99-wf01\\output\\payload\\commands.json",
+      "sha256": "d3c2d59431c17d5ef071181ee197ea9879c001192ed815ce63a4dee9a127f400"
+    }
+  ],
+  "limitations": "Quality cells are reusable at unchanged script/runtime bytes. Behavior, full aggregate, committed endpoints, final independent quality and native lifecycle remain incomplete."
+}

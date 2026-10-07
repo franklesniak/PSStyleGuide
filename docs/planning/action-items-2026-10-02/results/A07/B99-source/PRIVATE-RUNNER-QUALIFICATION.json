@@ -1,0 +1,26 @@
+{
+  "status": "PRIVATE_CORRECTIONS_ROOT_REVIEW_AND_QUALIFICATION_PASSED",
+  "at": "2026-10-07T07:32:12.165546+00:00",
+  "full_deltas_read": [
+    "v2-to-v3.patch",
+    "v3-to-v4.patch"
+  ],
+  "reviewed_changes": [
+    "single combined native/mounted Linux budget; unchanged limits and process ownership",
+    "terminal export only after exact-owned descendants settle",
+    "archive readback/journal before regular unlink; incomplete export retains exact-owned stopped container",
+    "Windows native Git control files use explicit LF bytes"
+  ],
+  "qualifications": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\alternates-qualification\\result.json",
+      "sha256": "de247bd4f2c8e9baaa15e21d9b149b63c82baec9b5e5fac4ebd42cf6f53169b8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\export-qualification\\result.json",
+      "sha256": "e8e1158320e18b52c11d81eff58341e7f3d8765be9d9db7ccf09449f2c74eaf7"
+    }
+  ],
+  "product_bytes_changed": false,
+  "quality_replay_needed": false
+}
