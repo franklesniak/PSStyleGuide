@@ -1,0 +1,46 @@
+{
+  "status": "accepted_current_head_result_pending",
+  "intent_at": "2026-10-07T03:34:57.956150+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "round": 2,
+  "first_request_at": "2026-10-06T20:09:39.767792+00:00",
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "channel_attempt": 2,
+  "channel_attempt_limit": 3,
+  "channel": "GitHub Reviewers Re-request Copilot review",
+  "selected_effort": "Balanced",
+  "observed_result_effort": null,
+  "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two-baseline.json",
+  "baseline_sha256": "0a6e2e0c6e7b86dc3f02b7e05bc4b1b8b543e0d54d1b7c7ef799eaf8c4c0923c",
+  "reason": "Recover terminal current-input cancelled CI; not a request solely to replace Lite or evade an exhausted old-input limit.",
+  "prior_cancelled_run": 37562640212,
+  "prior_review": 5437075963,
+  "codex_clean_result_reused": 6029735383,
+  "ui_request_issued": true,
+  "next_attempt_not_before": "2026-10-07T04:35:21+00:00",
+  "ambiguity_rule": "After one UI click, reconcile authenticated request events/reviewers/reviews/runs. Never repeat an ambiguous write.",
+  "accepted": true,
+  "native_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two-running.json",
+  "native_readback_sha256": "8b8c172ab876bdc42311ea025843e46c67928154322b074cb7580d03c49ed36f",
+  "confirmed_request_events": [
+    {
+      "id": 32656445338,
+      "created_at": "2026-10-07T03:35:21Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472
+    }
+  ],
+  "confirmed_runs": [
+    {
+      "id": 37567459621,
+      "created_at": "2026-10-07T03:35:32Z",
+      "status": "in_progress",
+      "conclusion": null,
+      "run_attempt": 1
+    }
+  ],
+  "recorded_at": "2026-10-07T03:37:05.895272+00:00",
+  "confirmed_at": "2026-10-07T03:35:21Z"
+}

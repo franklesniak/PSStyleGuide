@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round2_findings_resolved_CI_cancelled_hold",
+  "status": "round2_Copilot_recovery2_pending_CI_hold",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,7 +89,18 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [],
+  "pending_native_operations": [
+    {
+      "kind": "Copilot current-input service recovery",
+      "status": "accepted_current_head_result_pending",
+      "round": 2,
+      "channel_attempt": 2,
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "request_event_id": 32656445338,
+      "run_id": 37567459621,
+      "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json"
+    }
+  ],
   "local_operation": {
     "kind": "non_force_topic_publication_and_PR_body",
     "status": "completed",
@@ -97,7 +108,7 @@
     "reconciled_at": "2026-10-07T02:32:20.614Z"
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "At or after2026-10-07T03:34:29Z, recheck fixed deadline and current native input, capture complete fresh baselines, then issue at most one supported Balanced UI service-recovery request (current channel2/3, same round2). Reuse unchanged Codex result; no merge while CI fails.",
+  "next_action": "Collect the confirmed same-input recovery; preserve prior results and CI hold. Do not repeat a pending or ambiguous request.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -366,7 +377,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "80816b49f9935498f728a523cbef5b2cb8a0f36a",
+  "planning_checkpoint": "6c2f160d7d67a3a2159d22b1c6107dcce527c415",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -391,7 +402,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-07T03:23:16.269606+00:00",
+  "updated_at": "2026-10-07T03:38:17.676028+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -858,7 +869,7 @@
     },
     {
       "round": 2,
-      "status": "findings_resolved_CI_cancelled_hold",
+      "status": "service_recovery_pending_CI_hold",
       "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
       "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
       "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
@@ -902,7 +913,61 @@
         "warning": "Full agentic review did not start before timeout; dynamic workflow later cancelled at20-minute job maximum.",
         "workflow_conclusion": "cancelled",
         "workflow_terminal_at": "2026-10-07T02:55:09Z",
-        "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json"
+        "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
+        "service_recovery": {
+          "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+          "round": 2,
+          "channel_attempts_used": 2,
+          "channel_attempt_limit": 3,
+          "last_request_at": "2026-10-07T03:35:21Z",
+          "next_attempt_not_before": "2026-10-07T04:35:21+00:00",
+          "old_input_history": "review_rounds[0].copilot.service_recovery; exhausted3/3 unchanged",
+          "rule": "Never duplicate pending or ambiguous requests. At most one CI relaunch per PR per hour.",
+          "status": "accepted_current_head_result_pending",
+          "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
+          "next_request_kind": "Supported Balanced UI service recovery; no duplicate pending request and no request solely to replace Lite",
+          "retry_released_now": false,
+          "support_inquiry_current": {
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-support\\UNSENT-PROVIDER-INQUIRY.md",
+            "sha256": "02e23abe5ff23e818e58a22088da423f3346b04b743d5087ddd936f9b9bcc048",
+            "status": "prepared_unsent",
+            "selection": "Existing P95.0 inquiry preparation; current factual update only",
+            "sending_authority": "Not granted; no inquiry sent",
+            "draft_bound_to_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+          },
+          "attempts": [
+            {
+              "ordinal": 1,
+              "request_event_id": 32653656598,
+              "requested_at": "2026-10-07T02:34:29Z",
+              "run_id": 37562640212,
+              "conclusion": "cancelled",
+              "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json"
+            },
+            {
+              "ordinal": 2,
+              "intent_at": "2026-10-07T03:34:57.956150+00:00",
+              "outcome": "accepted_current_head_result_pending",
+              "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+              "request_event_id": 32656445338,
+              "run_id": 37567459621,
+              "confirmed_at": "2026-10-07T03:35:21Z"
+            }
+          ],
+          "pending_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+          "last_request_intent_at": "2026-10-07T03:34:57.956150+00:00",
+          "accepted": true,
+          "latest_request_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+          "live_job_observation": {
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-live-jobs.json",
+            "sha256": "ca70ddbab0acd7a615429d60cede2afbb8078fb1d7dab1df6cb0bdc1eb377416",
+            "run_id": 37567459621,
+            "job_id": 112618337044,
+            "active_step": "Run complete repository validation",
+            "started_at": "2026-10-07T03:36:21Z",
+            "dedicated_service_selection_proved": false
+          }
+        }
       },
       "codex": {
         "status": "clean",
@@ -978,7 +1043,7 @@
       }
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-post-disposition.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two-running.json",
   "CI_observation": {
     "captured_at": "2026-10-06T22:48:43.172089+00:00",
     "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-R2-R3-post-disposition.json",
@@ -1843,13 +1908,13 @@
   "current_input_review_retry": {
     "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
     "round": 2,
-    "channel_attempts_used": 1,
+    "channel_attempts_used": 2,
     "channel_attempt_limit": 3,
-    "last_request_at": "2026-10-07T02:34:29Z",
-    "next_attempt_not_before": "2026-10-07T03:34:29+00:00",
+    "last_request_at": "2026-10-07T03:35:21Z",
+    "next_attempt_not_before": "2026-10-07T04:35:21+00:00",
     "old_input_history": "review_rounds[0].copilot.service_recovery; exhausted3/3 unchanged",
     "rule": "Never duplicate pending or ambiguous requests. At most one CI relaunch per PR per hour.",
-    "status": "terminal_failure_one_of_three_used_wait_hourly_interval",
+    "status": "accepted_current_head_result_pending",
     "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
     "next_request_kind": "Supported Balanced UI service recovery; no duplicate pending request and no request solely to replace Lite",
     "retry_released_now": false,
@@ -1860,12 +1925,45 @@
       "selection": "Existing P95.0 inquiry preparation; current factual update only",
       "sending_authority": "Not granted; no inquiry sent",
       "draft_bound_to_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+    },
+    "attempts": [
+      {
+        "ordinal": 1,
+        "request_event_id": 32653656598,
+        "requested_at": "2026-10-07T02:34:29Z",
+        "run_id": 37562640212,
+        "conclusion": "cancelled",
+        "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json"
+      },
+      {
+        "ordinal": 2,
+        "intent_at": "2026-10-07T03:34:57.956150+00:00",
+        "outcome": "accepted_current_head_result_pending",
+        "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+        "request_event_id": 32656445338,
+        "run_id": 37567459621,
+        "confirmed_at": "2026-10-07T03:35:21Z"
+      }
+    ],
+    "pending_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+    "last_request_intent_at": "2026-10-07T03:34:57.956150+00:00",
+    "accepted": true,
+    "latest_request_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+    "live_job_observation": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-live-jobs.json",
+      "sha256": "ca70ddbab0acd7a615429d60cede2afbb8078fb1d7dab1df6cb0bdc1eb377416",
+      "run_id": 37567459621,
+      "job_id": 112618337044,
+      "active_step": "Run complete repository validation",
+      "started_at": "2026-10-07T03:36:21Z",
+      "dedicated_service_selection_proved": false
     }
   },
   "current_input_CI": {
     "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
-    "captured_at": "2026-10-07T03:12:21.060402+00:00",
+    "captured_at": "2026-10-07T03:36:34.341431+00:00",
     "successful_runs": [
+      37565487714,
       37562193726,
       37562192514,
       37562192513,
@@ -1879,14 +1977,15 @@
       37562189589,
       37562189611,
       37562189624,
-      37562189656,
-      37565487714
+      37562189656
     ],
-    "active_runs": [],
+    "active_runs": [
+      37567459621
+    ],
     "failed_or_cancelled_runs": [
       37562640212
     ],
-    "acceptance": "CI HOLD; current cancelled dynamic workflow prohibits merge",
+    "acceptance": "CI HOLD: current-input service recovery pending; prior cancelled attempt retained.",
     "historical_failed_runs": "review_rounds[0] retains two cancelled dynamic runs and exhausted3/3same-input recovery",
     "body_validation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-body-validation.json"
   },
