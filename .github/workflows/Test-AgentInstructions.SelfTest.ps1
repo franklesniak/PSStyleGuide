@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.12.20261007.0
+# Version: 1.14.20261007.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -1416,7 +1416,7 @@ function Assert-ClassificationAdmissionGitFixture {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -1469,6 +1469,79 @@ function Assert-ClassificationAdmissionGitFixture {
         $strBaseline = & $scriptblockCommit
         # This accepted fixture installs the proposed checker; it is not native first-install authority.
         & $scriptblockCheck $strBaseline $strBaseline $true 'Metadata classification data validated'
+        # Complete-name rejection precedes metadata-only's return and uses H,
+        # never historical B or the filesystem's type/existence filters.
+        $strArtifactBlob = ([string](& git -C $strFixtureRoot rev-parse 'HEAD:README.md')).Trim()
+        if ($LASTEXITCODE -ne 0 -or $strArtifactBlob -cnotmatch '^[0-9a-f]{40}$') {
+            throw 'Compiled-name fixture blob identity failed.'
+        }
+        foreach ($arrArtifact in @(
+                ,@('100644', 'compiled.PYC')
+                ,@('100755', 'compiled.PYO')
+                ,@('120000', 'compiled.PYD')
+                ,@('160000', 'pkg/__PYCACHE__/entry')
+            )) {
+            $strMode = $arrArtifact[0]
+            $strArtifactPath = $arrArtifact[1]
+            $strArtifactObject = if ($strMode -ceq '160000') { $strBaseline } else { $strArtifactBlob }
+            & git -C $strFixtureRoot update-index --add --cacheinfo "$strMode,$strArtifactObject,$strArtifactPath"
+            if ($LASTEXITCODE -ne 0) { throw 'Compiled-name fixture indexing failed.' }
+            $strIndexedEntry = [string](& git -C $strFixtureRoot ls-files --stage -- $strArtifactPath)
+            if ($LASTEXITCODE -ne 0 -or $strIndexedEntry -cne "$strMode $strArtifactObject 0`t$strArtifactPath") {
+                throw 'Compiled-name fixture index mode or object changed.'
+            }
+            $strArtifactFullPath = [IO.Path]::Combine($strFixtureRoot, $strArtifactPath)
+            if ([IO.File]::Exists($strArtifactFullPath) -or [IO.Directory]::Exists($strArtifactFullPath)) {
+                throw 'Compiled-name fixture unexpectedly materialized a payload.'
+            }
+            $arrIndexedPaths = @(Read-GitTrackedPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 1048576)
+            if ($arrIndexedPaths -cnotcontains $strArtifactPath) { throw 'Compiled-name fixture omitted an indexed path.' }
+            $strLocalOutput = (& $strHostPath -NoProfile -File $strValidatorPath `
+                    -RequireStagedInputMatch 2>&1 | Out-String)
+            $intLocalExit = $LASTEXITCODE
+            if ($intLocalExit -eq 0 -or
+                -not $strLocalOutput.Contains('Compiled Python artifacts must not be committed:', [StringComparison]::Ordinal) -or
+                -not $strLocalOutput.Contains($strArtifactPath, [StringComparison]::Ordinal)) {
+                throw "Local complete-name admission failed for $strMode $strArtifactPath`: $strLocalOutput"
+            }
+            $strArtifactTree = ([string](& git -C $strFixtureRoot write-tree)).Trim()
+            if ($LASTEXITCODE -ne 0 -or $strArtifactTree -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Compiled-name fixture tree identity failed.'
+            }
+            $strArtifactCandidate = ([string](& git -C $strFixtureRoot -c user.name=AdmissionFixture `
+                    -c user.email=admission-fixture@example.invalid -c commit.gpgsign=false `
+                    commit-tree $strArtifactTree -p $strBaseline -m compiled-name)).Trim()
+            if ($LASTEXITCODE -ne 0 -or $strArtifactCandidate -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Compiled-name fixture candidate identity failed.'
+            }
+            $strArtifactObjectType = if ($strMode -ceq '160000') { 'commit' } else { 'blob' }
+            $strRevisionEntry = [string](& git -C $strFixtureRoot ls-tree $strArtifactCandidate -- $strArtifactPath)
+            if ($LASTEXITCODE -ne 0 -or
+                $strRevisionEntry -cne "$strMode $strArtifactObjectType $strArtifactObject`t$strArtifactPath") {
+                throw 'Compiled-name fixture exact H mode or object changed.'
+            }
+            $arrRevisionPaths = @(Read-GitTrackedPath -RepositoryRootPath $strFixtureRoot `
+                    -Revision $strArtifactCandidate -MaximumBytes 1048576)
+            if ($arrRevisionPaths -cnotcontains $strArtifactPath) { throw 'Compiled-name fixture omitted an exact H path.' }
+            & git -C $strFixtureRoot read-tree $strBaseline
+            if ($LASTEXITCODE -ne 0) { throw 'Compiled-name fixture index restoration failed.' }
+            & $scriptblockCheck $strBaseline $strArtifactCandidate $false `
+                ('Compiled Python artifacts must not be committed: ' + [regex]::Escape($strArtifactPath))
+            if ($strMode -ceq '100644') {
+                # A matching historical B cannot reject a clean target H.
+                & $scriptblockCheck $strArtifactCandidate $strBaseline $true 'Metadata classification data validated'
+                [IO.File]::Delete($strArtifactFullPath)
+                $strUnchangedOutput = (& $strHostPath -NoProfile -File $strValidatorPath `
+                        -RequireStagedInputMatch 2>&1 | Out-String)
+                $intUnchangedExit = $LASTEXITCODE
+                if ($intUnchangedExit -eq 0 -or -not $strUnchangedOutput.Contains(
+                        'Compiled Python artifacts must not be committed: compiled.PYC', [StringComparison]::Ordinal)) {
+                    throw 'An unchanged indexed artifact with an unstaged deletion bypassed the name rule.'
+                }
+            }
+            & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+            if ($LASTEXITCODE -ne 0) { throw 'Compiled-name fixture baseline restoration failed.' }
+        }
         $strGeneratedManifest = '{"schemaVersion":2,"authorizedExemptionPaths":[],"tier2Paths":[],"generatedPaths":["README.md"]}'
         [IO.File]::WriteAllText($strManifestPath, $strGeneratedManifest, [Text.UTF8Encoding]::new($false))
         [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'README.md'),
@@ -3624,7 +3697,7 @@ function Assert-AgentSetupSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20261006.0
+    # Version: 1.3.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -3696,6 +3769,301 @@ function Assert-AgentSetupSelfTest {
         ($hashtableContent['.pre-commit-config.yaml'] + "`n        additional_dependencies: []`n") 'separate dependency environment'
     & $scriptblockReject 'extra hook group' '.pre-commit-config.yaml' `
         ($hashtableContent['.pre-commit-config.yaml'] + "`n  - repo: local`n    hooks: []`n") 'two local groups'
+    $strConfig = $hashtableContent['.pre-commit-config.yaml'].Replace("`r`n", "`n")
+    foreach ($strCanonicalConfig in @($strConfig, $strConfig.Replace("`n", "`r`n"))) {
+        $hashtableCanonical = $hashtableContent.Clone()
+        $hashtableCanonical['.pre-commit-config.yaml'] = $strCanonicalConfig
+        $arrCanonicalFailures = @(Get-AgentSetupContractFailure -Content $hashtableCanonical)
+        if ($arrCanonicalFailures.Count -ne 0) {
+            throw "Canonical LF or CRLF configuration was rejected: $($arrCanonicalFailures -join '; ')"
+        }
+    }
+    $objHookContext = Get-AgentPreCommitHookContext -Content $strConfig
+    if ($null -ne $objHookContext.Failure -or $objHookContext.HookBodies.Count -ne 11 -or
+        -not $objHookContext.HookBodies.ContainsKey('agent-instruction-contract')) {
+        throw 'Active instruction-hook mutation fixture is unavailable.'
+    }
+    $strInstructionHook = '      - id: agent-instruction-contract' + "`n" +
+        $objHookContext.HookBodies['agent-instruction-contract'] + "`n"
+    if (-not $strConfig.Contains($strInstructionHook, [StringComparison]::Ordinal)) {
+        throw 'Active instruction-hook mutation fixture does not match the source configuration.'
+    }
+    $strCommentedConfig = $strConfig.Replace('    hooks:', "    # reviewed hooks`n`n    hooks:").Replace(
+        '        language: system', "`n        # reviewed runtime`n`n        language: system")
+    $hashtableCommented = @{}
+    foreach ($strKey in $hashtableContent.Keys) { $hashtableCommented[$strKey] = $hashtableContent[$strKey] }
+    $hashtableCommented['.pre-commit-config.yaml'] = $strCommentedConfig
+    if (@(Get-AgentSetupContractFailure -Content $hashtableCommented).Count -ne 0) {
+        throw 'Ordinary configuration comments and blank lines were rejected.'
+    }
+    # Exercise complete behavior fields through the unchanged finite envelope.
+    # These tests mutate actual input; they do not copy the production contracts.
+    $scriptblockRejectBehavior = {
+        param([string] $Name, [string] $Text, [string] $Id, [string] $Field)
+        if ($Text -ceq $strConfig) { throw "Behavior mutation did not change input: $Name" }
+        $objMutatedContext = Get-AgentPreCommitHookContext -Content $Text
+        if ($null -ne $objMutatedContext.Failure) {
+            throw "Behavior mutation failed before its field contract: $Name"
+        }
+        $arrFailures = @(Get-AgentPreCommitBehaviorFailure -HookBodies $objMutatedContext.HookBodies)
+        if (-not ($arrFailures -cmatch ([regex]::Escape('reviewed behavior: ' + $Id + ' (') +
+                    '[^)]*' + [regex]::Escape($Field) + '\)'))) {
+            throw "Behavior mutation was not rejected for its field: $Name ($($arrFailures -join '; '))"
+        }
+    }
+    $hashtableOverrides = @{
+        entry = "        entry: >-`n          node .github/workflows/lint-staged-markdown.mjs`n          --help"
+        language = '        language: system'
+        files = '        files: ^$'
+        types = "        types:`n          - python"
+        stages = "        stages:`n          - manual"
+        minimum_pre_commit_version = '        minimum_pre_commit_version: "999.0.0"'
+        args = "        args:`n          - --help"
+        pass_filenames = '        pass_filenames: false'
+        always_run = '        always_run: false'
+    }
+    foreach ($strId in $objHookContext.HookBodies.Keys) {
+        $strBody = $objHookContext.HookBodies[$strId]
+        $strOriginalHook = '      - id: ' + $strId + "`n" + $strBody
+        if (-not $strConfig.Contains($strOriginalHook, [StringComparison]::Ordinal)) {
+            throw "Hook behavior fixture does not match source: $strId"
+        }
+        $arrFields = @([regex]::Matches($strBody, '(?m)^        (?<Key>[a-z_]+):'))
+        $hashtableFields = @{}
+        $listFields = [Collections.Generic.List[string]]::new()
+        for ($intField = 0; $intField -lt $arrFields.Count; $intField++) {
+            $intEnd = if ($intField + 1 -lt $arrFields.Count) { $arrFields[$intField + 1].Index } else { $strBody.Length }
+            $strField = $strBody.Substring($arrFields[$intField].Index, $intEnd - $arrFields[$intField].Index).TrimEnd([char]10)
+            $strKey = $arrFields[$intField].Groups['Key'].Value
+            $hashtableFields[$strKey] = $strField
+            $listFields.Add($strField)
+            if ($strKey -cne 'name') {
+                $strMutation = $strConfig.Replace($strOriginalHook, $strOriginalHook.Replace($strField, ''))
+                & $scriptblockRejectBehavior ('missing ' + $strId + ' ' + $strKey) $strMutation $strId $strKey
+            }
+        }
+        foreach ($strKey in $hashtableOverrides.Keys) {
+            $strReplacement = $hashtableOverrides[$strKey]
+            if ($hashtableFields.ContainsKey($strKey)) {
+                if ($strKey -ceq 'language') { continue } # Only system is in the finite grammar; removal is tested above.
+                if ($strKey -ceq 'pass_filenames' -and $hashtableFields[$strKey] -ceq $strReplacement) {
+                    $strReplacement = '        pass_filenames: true'
+                }
+                $strMutatedBody = $strBody.Replace($hashtableFields[$strKey], $strReplacement)
+            } else {
+                $strMutatedBody = $strBody + "`n" + $strReplacement
+            }
+            $strMutation = $strConfig.Replace($strOriginalHook, '      - id: ' + $strId + "`n" + $strMutatedBody)
+            & $scriptblockRejectBehavior ('override ' + $strId + ' ' + $strKey) $strMutation $strId $strKey
+            if ($strKey -ceq 'stages') {
+                # All eleven also pass through the actual setup caller. This
+                # catches removal of the behavior checker from that caller.
+                & $scriptblockReject ('manual activation ' + $strId) '.pre-commit-config.yaml' $strMutation `
+                    ('reviewed behavior: ' + [regex]::Escape($strId) + ' .*stages')
+            }
+        }
+        if ($strId -cne 'agent-instruction-contract') {
+            $arrReordered = $listFields.ToArray()
+            [array]::Reverse($arrReordered)
+            $strReordered = $arrReordered -join "`n"
+            if ($hashtableFields.ContainsKey('name')) {
+                $strReordered = $strReordered.Replace($hashtableFields['name'], '        name: harmless display name')
+            } else {
+                $strReordered += "`n        name: harmless display name"
+            }
+            $hashtableLayout = $hashtableContent.Clone()
+            $hashtableLayout['.pre-commit-config.yaml'] = $strConfig.Replace($strOriginalHook,
+                '      - id: ' + $strId + "`n" + $strReordered)
+            if (@(Get-AgentSetupContractFailure -Content $hashtableLayout).Count -ne 0) {
+                throw "Harmless hook field order or name was rejected: $strId"
+            }
+        }
+        foreach ($strKey in @('types', 'stages')) {
+            if (-not $hashtableFields.ContainsKey($strKey)) { continue }
+            $arrTokens = $hashtableFields[$strKey] -split "`n"
+            $strDuplicate = $hashtableFields[$strKey] + "`n" + $arrTokens[1]
+            & $scriptblockRejectBehavior ('duplicate token ' + $strId + ' ' + $strKey) `
+                ($strConfig.Replace($strOriginalHook, $strOriginalHook.Replace($hashtableFields[$strKey], $strDuplicate))) `
+                $strId $strKey
+            if ($arrTokens.Count -gt 2) {
+                $arrReversedTokens = $arrTokens[1..($arrTokens.Count - 1)]
+                [array]::Reverse($arrReversedTokens)
+                $strReversed = $arrTokens[0] + "`n" + ($arrReversedTokens -join "`n")
+                $objSetContext = Get-AgentPreCommitHookContext -Content ($strConfig.Replace($strOriginalHook,
+                        $strOriginalHook.Replace($hashtableFields[$strKey], $strReversed)))
+                if ($null -ne $objSetContext.Failure -or
+                    @(Get-AgentPreCommitBehaviorFailure -HookBodies $objSetContext.HookBodies).Count -ne 0) {
+                    throw "Equivalent type/stage set order was rejected: $strId $strKey"
+                }
+            }
+        }
+    }
+    & $scriptblockReject 'extra entry text retains launcher anchors' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('          -Module pre_commit_hooks.check_json' + "`n",
+                '          -Module pre_commit_hooks.check_json' + "`n          --help`n")) `
+        'reviewed behavior: check-json .*entry'
+    & $scriptblockReject 'comment-looking command scalar data' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('          -Module pre_commit_hooks.check_yaml' + "`n",
+                '          -Module pre_commit_hooks.check_yaml' + "`n          # literal command data`n")) `
+        'reviewed behavior: check-yaml .*entry'
+    & $scriptblockReject 'extra arguments retain schema anchors' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('          - vendor.dependabot' + "`n",
+                '          - vendor.dependabot' + "`n          - --help`n")) `
+        'reviewed behavior: check-dependabot .*args'
+    & $scriptblockReject 'argument order is significant' '.pre-commit-config.yaml' `
+        ($strConfig.Replace("          - --builtin-schema`n          - vendor.dependabot",
+                "          - vendor.dependabot`n          - --builtin-schema")) `
+        'reviewed behavior: check-dependabot .*args'
+    & $scriptblockReject 'empty selector retains manifest anchor' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('          (?x)^(', '          (?x)^(?!)( ')) `
+        'reviewed behavior: check-json .*files'
+    foreach ($strScalarKey in @('description', 'unreviewed')) {
+        & $scriptblockReject ('scalar-hidden guard ' + $strScalarKey) '.pre-commit-config.yaml' `
+            ($strConfig.Replace($strInstructionHook, "    $strScalarKey`: |`n$strInstructionHook")) 'finite active-hook envelope'
+    }
+    & $scriptblockReject 'quoted scalar hides guard in prior hook' '.pre-commit-config.yaml' `
+        ($strConfig.Replace($strInstructionHook, '        description: "' + "`n" +
+                $strInstructionHook + '        #"' + "`n")) 'finite active-hook envelope'
+    # Move the prior hook's existing name, so duplicate-key rejection cannot
+    # substitute for rejecting a multiline quoted scalar in a known field.
+    $strWithoutPriorName = $strConfig.Replace('        name: workflow policy contract' + "`n", '')
+    if ($strWithoutPriorName -ceq $strConfig) {
+        throw 'Known prior-name mutation fixture did not remove the existing field.'
+    }
+    foreach ($intSeparator in @(0x000D, 0x0085, 0x2028, 0x2029)) {
+        $strSeparator = [string][char]$intSeparator
+        & $scriptblockReject ('hidden known-name opener after YAML line break U+' + $intSeparator.ToString('X4')) `
+            '.pre-commit-config.yaml' `
+            ($strWithoutPriorName.Replace($strInstructionHook, '        # comment' + $strSeparator +
+                    '        name: "' + "`n" + $strInstructionHook + '        #"' + "`n")) `
+            'only LF or CRLF line endings'
+    }
+    foreach ($arrScalarForm in @(
+            ,@('        name: "', '        #"')
+            ,@("        name: '", "        #'")
+            ,@('        name: [', '        #]')
+            ,@('        name: {', '        #}')
+            ,@('        name: &alias "', '        #"')
+            ,@('        name: !tag "', '        #"')
+        )) {
+        & $scriptblockReject ('known prior field hides guard ' + $arrScalarForm[0]) '.pre-commit-config.yaml' `
+            ($strWithoutPriorName.Replace($strInstructionHook, $arrScalarForm[0] + "`n" +
+                    $strInstructionHook + $arrScalarForm[1] + "`n")) 'finite active-hook envelope'
+    }
+    & $scriptblockReject 'comment-looking literal data changes guard entry' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('        entry: >-' + "`n" +
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File' + "`n" +
+                '          .github/workflows/Test-AgentInstructions.ps1',
+                '        entry: >-' + "`n" + '          # literal scalar data' + "`n" +
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File' + "`n" +
+                '          .github/workflows/Test-AgentInstructions.ps1')) 'exact active always-run instruction guard'
+    & $scriptblockReject 'missing active guard' '.pre-commit-config.yaml' `
+        ($strConfig.Replace($strInstructionHook, '')) 'finite active-hook envelope'
+    & $scriptblockReject 'duplicate active guard' '.pre-commit-config.yaml' `
+        ($strConfig + $strInstructionHook) 'finite active-hook envelope'
+    & $scriptblockReject 'active guard case alias' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('id: agent-instruction-contract', 'id: AGENT-INSTRUCTION-CONTRACT')) 'finite active-hook envelope'
+    & $scriptblockReject 'active guard wrong indentation' '.pre-commit-config.yaml' `
+        ($strConfig.Replace('      - id: agent-instruction-contract', '        - id: agent-instruction-contract')) `
+        'finite active-hook envelope'
+    & $scriptblockReject 'active guard in a comment' '.pre-commit-config.yaml' `
+        ($strConfig.Replace($strInstructionHook, '# ' + $strInstructionHook.Replace("`n", "`n# "))) `
+        'finite active-hook envelope'
+    & $scriptblockReject 'active guard in remote group' '.pre-commit-config.yaml' `
+        ($strConfig.Replace($strInstructionHook, '').Replace('      - id: actionlint',
+                $strInstructionHook + '      - id: actionlint')) 'finite active-hook envelope'
+    foreach ($strReplacement in @('    description: |', '    hooks: &alias', '    hooks: *alias',
+            '    hooks: !tag', '    hooks: []', '    hooks: {}', "    hooks:`n    hooks:",
+            "    rev: local`n    hooks:", '    <<: *alias')) {
+        & $scriptblockReject ('invalid hooks envelope ' + $strReplacement) '.pre-commit-config.yaml' `
+            ($strConfig.Replace('    hooks:', $strReplacement)) 'finite active-hook envelope'
+    }
+    foreach ($strReplacement in @('repos: []', 'repos: &alias', "repos:`nrepos:", "---`nrepos:")) {
+        & $scriptblockReject ('invalid root envelope ' + $strReplacement) '.pre-commit-config.yaml' `
+            ($strConfig.Replace('repos:', $strReplacement)) 'finite active-hook envelope'
+    }
+    foreach ($arrNearMiss in @(
+            ,@('language: system', 'language: fail')
+            ,@('always_run: true', 'always_run: false')
+            ,@('pass_filenames: false', 'pass_filenames: true')
+            ,@(' -SelfTest', '')
+            ,@(' -RequireStagedInputMatch', '')
+            ,@('entry: >-', 'entry: |')
+            ,@('agent instruction contract and mutation tests', 'compiled Python check')
+            ,@('        language: system', "        language: system`n        language: system")
+        )) {
+        & $scriptblockReject ('active guard ' + $arrNearMiss[0]) '.pre-commit-config.yaml' `
+            ($strConfig.Replace($strInstructionHook, $strInstructionHook.Replace($arrNearMiss[0], $arrNearMiss[1]))) `
+            'exact active always-run instruction guard'
+    }
+    foreach ($strOverride in @(
+            '        exclude: .*'
+            "        types:`n          - python"
+            "        types_or:`n          - python"
+            "        stages:`n          - manual"
+            '        description: ignored'
+            '        pass_filenames: false'
+            '        files: ^source\.py$'
+        )) {
+        & $scriptblockReject ('active guard override ' + $strOverride) '.pre-commit-config.yaml' `
+            ($strConfig.Replace($strInstructionHook, $strInstructionHook.TrimEnd([char]10) + "`n$strOverride`n")) `
+            'exact active always-run instruction guard'
+    }
+    foreach ($strOverride in @(
+            'files: ^docs/'
+            'exclude: .*'
+            "'exclude': .*"
+            "default_stages:`n  - manual"
+            "default_install_hook_types:`n  - manual"
+        )) {
+        & $scriptblockReject ('global instruction-guard override ' + $strOverride) '.pre-commit-config.yaml' `
+            ("$strOverride`n$strConfig") 'reviewed root mapping'
+    }
+    $strIgnore = $hashtableContent['.gitignore'].Replace("`r`n", "`n")
+    $arrCompiledIgnoreRules = @('*.[pP][yY][cCoOdD]', '!*.[pP][yY][cCoOdD]/',
+        '__[pP][yY][cC][aA][cC][hH][eE]__/')
+    foreach ($strRequiredRule in $arrCompiledIgnoreRules) {
+        & $scriptblockReject ('missing ignore rule ' + $strRequiredRule) '.gitignore' `
+            ([regex]::Replace($strIgnore, '(?m)^' + [regex]::Escape($strRequiredRule) + '$',
+                    '# disabled compiled-artifact rule')) 'compiled-artifact rule'
+        & $scriptblockReject ('duplicate ignore rule ' + $strRequiredRule) '.gitignore' `
+            ($strIgnore + "$strRequiredRule`n") 'compiled-artifact rule'
+    }
+    foreach ($strLateRule in @('!*.PYC', '*.PYC', '!CLAUDE.local.md')) {
+        & $scriptblockReject ('late ignore override ' + $strLateRule) '.gitignore' `
+            ($strIgnore + $strLateRule + "`n") 'must end with the reviewed compiled-artifact rules'
+    }
+    & $scriptblockReject 'reordered compiled ignore rules' '.gitignore' `
+        ($strIgnore.Replace(($arrCompiledIgnoreRules -join "`n"),
+                (@($arrCompiledIgnoreRules[0], $arrCompiledIgnoreRules[2], $arrCompiledIgnoreRules[1]) -join "`n"))) `
+        'must end with the reviewed compiled-artifact rules'
+    $hashtableIgnoreLayout = $hashtableContent.Clone()
+    $hashtableIgnoreLayout['.gitignore'] = 'unrelated-cache/' + "`n" +
+        [regex]::Replace($strIgnore, '(?m)^' + [regex]::Escape($arrCompiledIgnoreRules[0]) + '$',
+            '# compiled rules' + "`n`n" + $arrCompiledIgnoreRules[0]) +
+        "`n# final comment`n"
+    if (@(Get-AgentSetupContractFailure -Content $hashtableIgnoreLayout).Count -ne 0 -or
+        -not (Test-RecursivePersonalMemoryIgnoreContract -GitIgnoreContent $hashtableIgnoreLayout['.gitignore'] `
+            -TrackedPath @('.gitignore'))) {
+        throw 'Harmless ignore rules, comments or personal-memory ordering were rejected.'
+    }
+    foreach ($strForbiddenPath in @('module.pyc', 'module.PYC', 'module.pyo', 'module.PYO', 'module.pyd', 'module.PYD',
+            '__pycache__/entry', 'pkg/__PYCACHE__/entry', 'nested/module.pyd')) {
+        $arrFailures = @(Get-TrackedCompiledPythonFailure -TrackedPath @('safe.py', $strForbiddenPath))
+        if ($arrFailures.Count -ne 1 -or -not $arrFailures[0].Contains($strForbiddenPath, [StringComparison]::Ordinal) -or
+            -not $arrFailures[0].Contains('Remove the tracked artifact;', [StringComparison]::Ordinal)) {
+            throw "Complete tracked-name predicate missed its corrective failure: $strForbiddenPath"
+        }
+    }
+    foreach ($arrSafePaths in @(
+            ,@()
+            ,@('safe.py', 'module.pyc.txt', 'pkg/__pycache__-source/entry',
+                '__pycache__', 'module.py', 'nested/example.pyd.md')
+        )) {
+        if (@(Get-TrackedCompiledPythonFailure -TrackedPath $arrSafePaths).Count -ne 0) {
+            throw 'The complete tracked-name predicate rejected a valid near-match or empty inventory.'
+        }
+    }
     $strReviewSetupPath = '.github/workflows/copilot-code-review.yml'
     if (-not $hashtableContent.ContainsKey($strReviewSetupPath)) {
         # Historical absence is valid, but both present-file security contracts
@@ -3753,6 +4121,63 @@ function Assert-AgentSetupSelfTest {
             [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($strTarget))
             [IO.File]::WriteAllText($strTarget, $hashtableContent[$strPath], $objEncoding)
         }
+        # One finite native batch covers all ASCII case spellings, not a copy
+        # of the filename predicate. Remove the private prefix before creating
+        # any source-fixture index or historical revision.
+        $strIgnoreProbeRoot = Join-Path $strFixtureRoot 'compiled-ignore-fixture'
+        [void][IO.Directory]::CreateDirectory($strIgnoreProbeRoot)
+        $strEmptyExcludes = Join-Path $strIgnoreProbeRoot 'empty-excludes'
+        [IO.File]::WriteAllText($strEmptyExcludes, '', $objEncoding)
+        $listIgnoredPaths = [Collections.Generic.List[string]]::new()
+        foreach ($strSuffix in @('pyc', 'pyo', 'pyd')) {
+            for ($intCase = 0; $intCase -lt 8; $intCase++) {
+                $arrLetters = $strSuffix.ToCharArray()
+                for ($intLetter = 0; $intLetter -lt 3; $intLetter++) {
+                    if (($intCase -band (1 -shl $intLetter)) -ne 0) {
+                        $arrLetters[$intLetter] = [char]::ToUpperInvariant($arrLetters[$intLetter])
+                    }
+                }
+                $listIgnoredPaths.Add('compiled-ignore-fixture/suffix-' + $strSuffix + '-' + $intCase + '.' + (-join $arrLetters))
+            }
+        }
+        for ($intCase = 0; $intCase -lt 128; $intCase++) {
+            $arrLetters = 'pycache'.ToCharArray()
+            for ($intLetter = 0; $intLetter -lt 7; $intLetter++) {
+                if (($intCase -band (1 -shl $intLetter)) -ne 0) {
+                    $arrLetters[$intLetter] = [char]::ToUpperInvariant($arrLetters[$intLetter])
+                }
+            }
+            $listIgnoredPaths.Add('compiled-ignore-fixture/cache-' + $intCase + '/__' + (-join $arrLetters) + '__/entry')
+        }
+        $listIgnoredPaths.Add('compiled-ignore-fixture/bundle.PYC/__PyCaChE__/entry')
+        $listIgnoredPaths.Add('compiled-ignore-fixture/CLAUDE.local.md')
+        $listIgnoredPaths.Add('compiled-ignore-fixture/nested/CLAUDE.local.md')
+        $arrVisibleFiles = @('compiled-ignore-fixture/safe.py', 'compiled-ignore-fixture/module.pyc.txt',
+            'compiled-ignore-fixture/standalone/__pycache__', 'compiled-ignore-fixture/__pycache__-source/entry',
+            'compiled-ignore-fixture/bundle.PYC/readme.txt', 'compiled-ignore-fixture/CLAUDE.md',
+            'compiled-ignore-fixture/nested/CLAUDE.md')
+        foreach ($strProbePath in @($listIgnoredPaths.ToArray()) + $arrVisibleFiles) {
+            $strTarget = Join-Path $strFixtureRoot $strProbePath
+            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($strTarget))
+            [IO.File]::WriteAllText($strTarget, 'inert', $objEncoding)
+        }
+        $arrIgnoredOutput = @(& git -C $strFixtureRoot -c core.ignoreCase=false `
+                -c "core.excludesFile=$strEmptyExcludes" check-ignore --no-index -- $listIgnoredPaths.ToArray())
+        if ($LASTEXITCODE -ne 0 -or $arrIgnoredOutput.Count -ne $listIgnoredPaths.Count -or
+            ($arrIgnoredOutput -join "`n") -cne ($listIgnoredPaths -join "`n")) {
+            throw 'Native compiled-artifact or personal-memory case coverage failed.'
+        }
+        $arrVisiblePaths = @($arrVisibleFiles) + @('compiled-ignore-fixture/bundle.PYC')
+        $arrVisibleOutput = @(& git -C $strFixtureRoot -c core.ignoreCase=false `
+                -c "core.excludesFile=$strEmptyExcludes" check-ignore --no-index -- $arrVisiblePaths)
+        if ($LASTEXITCODE -ne 1 -or $arrVisibleOutput.Count -ne 0) {
+            throw 'Native ignore rules hid a legitimate file or suffix-named directory.'
+        }
+        if ([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($strIgnoreProbeRoot)) -cne
+            [IO.Path]::GetFullPath($strFixtureRoot)) {
+            throw 'Refusing ignore-probe cleanup outside the owned setup fixture.'
+        }
+        Remove-Item -LiteralPath $strIgnoreProbeRoot -Recurse -Force
         & git -C $strFixtureRoot -c core.autocrlf=false add --all
         if ($LASTEXITCODE -ne 0) { throw 'Setup fixture indexing failed.' }
         & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
@@ -3792,19 +4217,47 @@ function Assert-AgentSetupSelfTest {
             & git -C $strFixtureRoot -c core.autocrlf=false add -- $strPath
             if ($LASTEXITCODE -ne 0) { throw 'Setup fixture restoration failed.' }
         }
-        foreach ($strMissing in @('requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1')) {
+        foreach ($strMissing in @('requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1', '.gitignore')) {
             $strTarget = Join-Path $strFixtureRoot $strMissing
             [IO.File]::Delete($strTarget)
             $boolRejected = $false
             try {
                 $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
-            } catch { $boolRejected = $true }
+            } catch {
+                if ($strMissing -ceq '.gitignore' -and
+                    -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
+                $boolRejected = $true
+            }
             if (-not $boolRejected) { throw "Required installed setup input was silently omitted: $strMissing" }
             [IO.File]::WriteAllText($strTarget, $hashtableContent[$strMissing], $objEncoding)
         }
-        foreach ($strBoundPath in @('.github/workflows/copilot-setup-steps.yml', $strReviewSetupPath)) {
+        [IO.File]::Delete((Join-Path $strFixtureRoot '.gitignore'))
+        & git -C $strFixtureRoot add --all
+        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture indexing failed.' }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m missing-ignore
+        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture revision failed.' }
+        $strMissingRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+        if ($LASTEXITCODE -ne 0) { throw 'Missing ignore fixture identity failed.' }
+        $boolRejected = $false
+        try {
+            $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+                -Revision $strMissingRevision -StagedInputPaths $setEmpty
+        } catch {
+            if (-not $_.Exception.Message.Contains('Git revision input is not one regular 100644 blob:', [StringComparison]::Ordinal) -or
+                -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
+            $boolRejected = $true
+        }
+        if (-not $boolRejected) { throw 'Missing immutable ignore input was accepted.' }
+        [IO.File]::WriteAllText((Join-Path $strFixtureRoot '.gitignore'), $hashtableContent['.gitignore'], $objEncoding)
+        & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
+        if ($LASTEXITCODE -ne 0) { throw 'Ignore fixture restoration indexing failed.' }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m restore-ignore
+        if ($LASTEXITCODE -ne 0) { throw 'Ignore fixture restoration revision failed.' }
+        foreach ($strBoundPath in @('.github/workflows/copilot-setup-steps.yml', $strReviewSetupPath, '.gitignore')) {
             $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
-            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw 'Setup workflow read bound changed.' }
+            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw "Setup input read bound changed: $strBoundPath" }
             foreach ($intExtra in @(0, 1)) {
                 [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
                 $boolRejected = $false
@@ -3812,13 +4265,38 @@ function Assert-AgentSetupSelfTest {
                     $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
                     if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
                 } catch {
-                    if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed') { throw }
+                    if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
+                        -not $_.Exception.Message.Contains($strBoundPath, [StringComparison]::Ordinal)) { throw }
                     $boolRejected = $true
                 }
-                if ($intExtra -eq 1 -and -not $boolRejected) { throw 'One-byte oversized setup input was accepted.' }
+                if ($intExtra -eq 1 -and -not $boolRejected) { throw "One-byte oversized setup input was accepted: $strBoundPath" }
+                if ($strBoundPath -ceq '.gitignore') {
+                    & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
+                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture indexing failed.' }
+                    & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+                        -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m bounded-ignore
+                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture revision failed.' }
+                    $strBoundRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture identity failed.' }
+                    $boolRevisionRejected = $false
+                    try {
+                        $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+                            -Revision $strBoundRevision -StagedInputPaths $setEmpty
+                        if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Immutable ignore bound did not preserve bytes.' }
+                    } catch {
+                        if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
+                            -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
+                        $boolRevisionRejected = $true
+                    }
+                    if ($intExtra -eq 1 -and -not $boolRevisionRejected) { throw 'One-byte oversized immutable ignore input was accepted.' }
+                }
             }
-            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath),
-                $hashtableContent[$strBoundPath], $objEncoding)
+            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), $hashtableContent[$strBoundPath], $objEncoding)
+            if ($strBoundPath -ceq '.gitignore') {
+                # The later optional-file revision must inherit canonical required input.
+                & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
+                if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture index restoration failed.' }
+            }
         }
         $strReviewTarget = Join-Path $strFixtureRoot $strReviewSetupPath
         $scriptblockRejectRead = {

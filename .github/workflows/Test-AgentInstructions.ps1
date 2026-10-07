@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.21.20261007.0
+# Version: 1.23.20261007.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -483,7 +483,7 @@ function Get-AgentSetupInputSpec {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; there are no parameters.
-    # Version: 1.1.20261006.0
+    # Version: 1.2.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param()
@@ -499,6 +499,7 @@ function Get-AgentSetupInputSpec {
             ,@('.github/workflows/install-husky.mjs', 16384)
             ,@('.husky/pre-commit', 16384)
             ,@('.pre-commit-config.yaml', 16384)
+            ,@('.gitignore', 65536)
             ,@('.github/workflows/scripts-README.md', 32768)
             ,@('requirements-dev.txt', 16384)
         )) {
@@ -720,6 +721,518 @@ function Get-AgentBootstrapCommandFailure {
     }
 }
 
+function Get-AgentPreCommitHookContext {
+    # .SYNOPSIS
+    # Gets actual hooks from the admitted finite pre-commit envelope.
+    #
+    # .DESCRIPTION
+    # Recognizes the reviewed root, repository groups and hooks sequences only.
+    # Unknown or duplicate envelope fields and alternate YAML forms fail closed.
+    # Hook text in comments or scalar containers cannot become an active hook.
+    # LF and CRLF are admitted; alternate YAML line breaks fail before parsing.
+    # This finite reader is not a general YAML parser.
+    #
+    # .PARAMETER Content
+    # The safely read bounded pre-commit configuration.
+    #
+    # .EXAMPLE
+    # Get-AgentPreCommitHookContext -Content $strConfig
+    #
+    # # Returns active hook bodies or a finite-envelope failure.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [pscustomobject] Failure is null for an admitted envelope, otherwise one
+    # diagnostic. HookBodies maps each unique admitted ID to its active body.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261007.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param([Parameter(Mandatory)][string] $Content)
+
+    $strNormalizedContent = $Content.Replace("`r`n", "`n")
+    if ([regex]::IsMatch($strNormalizedContent, '[\r\u0085\u2028\u2029]')) {
+        return [pscustomobject]@{
+            Failure = 'Pre-commit accepts only LF or CRLF line endings in the reviewed finite active-hook envelope.'
+            HookBodies = @{}
+        }
+    }
+    $arrRepositoryNames = @('local', 'https://github.com/rhysd/actionlint', 'local')
+    $hashtableHookGroups = @{
+        'check-json' = 0
+        'check-yaml' = 0
+        'end-of-file-fixer' = 0
+        'trailing-whitespace' = 0
+        yamllint = 0
+        actionlint = 1
+        'check-dependabot' = 2
+        'check-github-workflows' = 2
+        'staged-markdown' = 2
+        'workflow-policy-contract' = 2
+        'agent-instruction-contract' = 2
+    }
+    $setHookIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $setHookFields = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $hashtableHookBodies = @{}
+    $listBodyLines = [Collections.Generic.List[string]]::new()
+    $listPendingBlankLines = [Collections.Generic.List[string]]::new()
+    $intGroup = -1
+    $boolRootSeen = $false
+    $boolHooksSeen = $false
+    $boolRevisionSeen = $false
+    $strHookId = ''
+    $strBodyForm = ''
+    $strBodyField = ''
+    $strFailure = $null
+    foreach ($strLine in ($strNormalizedContent -split "`n")) {
+        if ($strLine.Contains("`t", [StringComparison]::Ordinal)) {
+            $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+            break
+        }
+        if ([string]::IsNullOrWhiteSpace($strLine)) {
+            if ($strBodyForm -ceq 'block' -or $strBodyForm -ceq 'array-block') { $listPendingBlankLines.Add($strLine) }
+            continue
+        }
+        if ($listPendingBlankLines.Count -gt 0) {
+            if (($strBodyForm -ceq 'block' -and $strLine.StartsWith('          ', [StringComparison]::Ordinal)) -or
+                ($strBodyForm -ceq 'array-block' -and $strLine.StartsWith('            ', [StringComparison]::Ordinal))) {
+                foreach ($strBlankLine in $listPendingBlankLines) { $listBodyLines.Add($strBlankLine) }
+            }
+            $listPendingBlankLines.Clear()
+        }
+        if ($strLine -cmatch '^ *#') {
+            $intScalarIndent = if ($strBodyForm -ceq 'block') { 10 } elseif ($strBodyForm -ceq 'array-block') { 12 } else { 0 }
+            if ($intScalarIndent -eq 0 -or -not $strLine.StartsWith((' ' * $intScalarIndent), [StringComparison]::Ordinal)) {
+                if ($strBodyForm -ceq 'block') { $strBodyForm = '' }
+                if ($strBodyForm -ceq 'array-block') { $strBodyForm = 'array' }
+                continue
+            }
+        }
+        if (-not $boolRootSeen) {
+            if ($strLine -cne 'repos:') {
+                $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                break
+            }
+            $boolRootSeen = $true
+            continue
+        }
+        $objRepository = [regex]::Match($strLine, '^  - repo: (?<Name>[^\s]+)$')
+        if ($objRepository.Success) {
+            if ($intGroup -ge 0 -and (-not $boolHooksSeen -or [string]::IsNullOrEmpty($strHookId) -or
+                    ($intGroup -eq 1 -and -not $boolRevisionSeen))) {
+                $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                break
+            }
+            if (-not [string]::IsNullOrEmpty($strHookId)) {
+                $hashtableHookBodies[$strHookId] = $listBodyLines -join "`n"
+            }
+            $intGroup++
+            if ($intGroup -ge $arrRepositoryNames.Count -or
+                $objRepository.Groups['Name'].Value -cne $arrRepositoryNames[$intGroup]) {
+                $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                break
+            }
+            $boolHooksSeen = $false
+            $boolRevisionSeen = $false
+            $strHookId = ''
+            $strBodyForm = ''
+            $strBodyField = ''
+            $setHookFields.Clear()
+            $listBodyLines.Clear()
+            $listPendingBlankLines.Clear()
+            continue
+        }
+        if ($intGroup -lt 0) {
+            $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+            break
+        }
+        if ($strLine -ceq '    hooks:') {
+            if ($boolHooksSeen -or ($intGroup -eq 1 -and -not $boolRevisionSeen)) {
+                $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                break
+            }
+            $boolHooksSeen = $true
+            continue
+        }
+        if ($strLine -cmatch '^    rev: "[0-9a-f]{40}"(?: # [^\n]+)?$' -and
+            $intGroup -eq 1 -and -not $boolRevisionSeen -and -not $boolHooksSeen) {
+            $boolRevisionSeen = $true
+            continue
+        }
+        $objHook = [regex]::Match($strLine, '^      - id: (?<Id>[a-z][a-z0-9-]*)$')
+        if ($boolHooksSeen -and $objHook.Success) {
+            $strNextId = $objHook.Groups['Id'].Value
+            if (-not $hashtableHookGroups.ContainsKey($strNextId) -or
+                $hashtableHookGroups[$strNextId] -ne $intGroup -or -not $setHookIds.Add($strNextId)) {
+                $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                break
+            }
+            if (-not [string]::IsNullOrEmpty($strHookId)) {
+                $hashtableHookBodies[$strHookId] = $listBodyLines -join "`n"
+            }
+            $strHookId = $strNextId
+            $strBodyForm = ''
+            $strBodyField = ''
+            $setHookFields.Clear()
+            $listBodyLines.Clear()
+            $listPendingBlankLines.Clear()
+            continue
+        }
+        if ($boolHooksSeen -and -not [string]::IsNullOrEmpty($strHookId)) {
+            # Admit only the actual one-line fields, block scalars and arrays.
+            # Quoted/flow scalars can cross an apparent six-space ID boundary.
+            $objField = [regex]::Match($strLine,
+                '^        (?<Key>name|entry|language|files|types|stages|minimum_pre_commit_version|args|pass_filenames|always_run):(?<Value>.*)$')
+            if ($objField.Success) {
+                $strKey = $objField.Groups['Key'].Value
+                $strValue = $objField.Groups['Value'].Value
+                $boolAdmitted = switch ($strKey) {
+                    'name' { $strValue -cmatch '^ [A-Za-z][A-Za-z0-9 ()/-]*$' }
+                    'entry' { $strValue -ceq ' >-' -or $strValue -ceq ' node .github/workflows/lint-staged-markdown.mjs' }
+                    'language' { $strValue -ceq ' system' }
+                    'files' { $strValue -ceq ' >-' -or $strValue -cmatch '^ \^[^\r\n]+$' }
+                    'types' { $strValue.Length -eq 0 }
+                    'stages' { $strValue.Length -eq 0 }
+                    'args' { $strValue.Length -eq 0 }
+                    'minimum_pre_commit_version' { $strValue -cmatch '^ "[0-9]+\.[0-9]+\.[0-9]+"$' }
+                    'pass_filenames' { $strValue -cmatch '^ (?:true|false)$' }
+                    'always_run' { $strValue -cmatch '^ (?:true|false)$' }
+                }
+                if ($boolAdmitted -and $setHookFields.Add($strKey)) {
+                    $strBodyField = $strKey
+                    $strBodyForm = if ($strValue -ceq ' >-') { 'block' } elseif (
+                        $strKey -cin @('types', 'stages', 'args')) { 'array' } else { '' }
+                    $listBodyLines.Add($strLine)
+                    continue
+                }
+            } elseif (($strBodyForm -ceq 'array' -or $strBodyForm -ceq 'array-block') -and
+                $strLine -cmatch '^          - (?:[-a-z0-9][a-z0-9.,=_-]*|\|)$') {
+                if ($strLine -ceq '          - |' -and $strBodyField -cne 'args') {
+                    $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+                    break
+                }
+                $strBodyForm = if ($strLine -ceq '          - |') { 'array-block' } else { 'array' }
+                $listBodyLines.Add($strLine)
+                continue
+            } elseif (($strBodyForm -ceq 'block' -and $strLine -cmatch '^ {10,}\S') -or
+                ($strBodyForm -ceq 'array-block' -and $strLine -cmatch '^ {12,}\S')) {
+                $listBodyLines.Add($strLine)
+                continue
+            }
+        }
+        $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+        break
+    }
+    if ($null -eq $strFailure -and (-not $boolRootSeen -or $intGroup -ne 2 -or
+            -not $boolHooksSeen -or [string]::IsNullOrEmpty($strHookId) -or
+            $setHookIds.Count -ne $hashtableHookGroups.Count)) {
+        $strFailure = 'Pre-commit requires the reviewed finite active-hook envelope.'
+    }
+    if ($null -eq $strFailure) { $hashtableHookBodies[$strHookId] = $listBodyLines -join "`n" }
+    return [pscustomobject]@{ Failure = $strFailure; HookBodies = $hashtableHookBodies }
+}
+
+
+function Get-AgentPreCommitBehaviorFailure {
+    # .SYNOPSIS
+    # Checks complete behavior fields of the eleven reviewed active hooks.
+    #
+    # .DESCRIPTION
+    # Uses trusted literal contracts after the finite envelope is admitted.
+    # Field order and benign display names do not change executable behavior.
+    # Types and stages are duplicate-free sets; commands, arguments and scalar
+    # data retain exact reviewed bytes. This helper does not parse arbitrary YAML.
+    #
+    # .PARAMETER HookBodies
+    # Active bodies returned by a successful Get-AgentPreCommitHookContext call.
+    #
+    # .EXAMPLE
+    # Get-AgentPreCommitBehaviorFailure -HookBodies $objContext.HookBodies
+    #
+    # # Emits hook-specific failures for missing, extra or changed fields.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One diagnostic for each invalid behavior field.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261007.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][hashtable] $HookBodies)
+
+    # These values are reviewed source constants, never candidate-derived defaults.
+    $hashtableContracts = @{
+        'check-json' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.check_json'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('json')
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            package(-lock)?\.json|'
+                '            \.github/workflows/[^/]+\.json|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'check-yaml' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.check_yaml'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('yaml')
+            files = '        files: ^.*\.ya?ml$'
+        }
+        'end-of-file-fixer' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.end_of_file_fixer'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('text')
+            stages = @('pre-commit', 'pre-push', 'manual')
+            minimum_pre_commit_version = '        minimum_pre_commit_version: "3.2.0"'
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            \.codex/config\.toml|'
+                '            .*\.(md|mdc)|'
+                '            package(-lock)?\.json|'
+                '            \.pre-commit-config\.yaml|'
+                '            \.github/actionlint\.yaml|'
+                '            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'trailing-whitespace' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.trailing_whitespace_fixer'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('text')
+            stages = @('pre-commit', 'pre-push', 'manual')
+            minimum_pre_commit_version = '        minimum_pre_commit_version: "3.2.0"'
+            args = @(
+                '        args:'
+                '          - --markdown-linebreak-ext=md,mdc'
+            ) -join "`n"
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            \.codex/config\.toml|'
+                '            .*\.(md|mdc)|'
+                '            package(-lock)?\.json|'
+                '            \.pre-commit-config\.yaml|'
+                '            \.github/actionlint\.yaml|'
+                '            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'yamllint' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module yamllint'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('file', 'yaml')
+            args = @(
+                '        args:'
+                '          - --config-data'
+                '          - |'
+                '            extends: default'
+                '            rules:'
+                '              line-length:'
+                '                level: warning'
+                '              truthy:'
+                '                check-keys: false'
+            ) -join "`n"
+            files = '        files: ^.*\.ya?ml$'
+        }
+        'actionlint' = @{
+            files = '        files: ^\.github/workflows/.*\.ya?ml$'
+        }
+        'check-dependabot' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module check_jsonschema'
+            ) -join "`n"
+            language = '        language: system'
+            args = @(
+                '        args:'
+                '          - --builtin-schema'
+                '          - vendor.dependabot'
+            ) -join "`n"
+            types = @('yaml')
+            files = '        files: ^\.github/dependabot\.yml$'
+        }
+        'check-github-workflows' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module check_jsonschema'
+            ) -join "`n"
+            language = '        language: system'
+            args = @(
+                '        args:'
+                '          - --builtin-schema'
+                '          - vendor.github-workflows'
+            ) -join "`n"
+            types = @('yaml')
+            files = '        files: ^\.github/workflows/.*\.ya?ml$'
+        }
+        'staged-markdown' = @{
+            entry = '        entry: node .github/workflows/lint-staged-markdown.mjs'
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            files = '        files: ^(\.github/workflows/lint-staged-markdown\.mjs|.*\.(md|mdc))$'
+        }
+        'workflow-policy-contract' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive'
+                '          -WorkingDirectory .github/workflows -Command'
+                '          node Validate-WorkflowPolicy.mjs'
+                '          build.yml markdownlint.yml'
+            ) -join "`n"
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            always_run = '        always_run: true'
+        }
+        'agent-instruction-contract' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch'
+            ) -join "`n"
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            always_run = '        always_run: true'
+        }
+    }
+    foreach ($strId in $hashtableContracts.Keys) {
+        if (-not $HookBodies.ContainsKey($strId)) {
+            Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (missing body)"
+            continue
+        }
+        $hashtableFields = @{}
+        $strField = ''
+        foreach ($strLine in ($HookBodies[$strId] -split "`n")) {
+            $objField = [regex]::Match($strLine, '^        (?<Key>[a-z_]+):')
+            if ($objField.Success) {
+                $strField = $objField.Groups['Key'].Value
+                $hashtableFields[$strField] = $strLine
+            } elseif (-not [string]::IsNullOrEmpty($strField)) {
+                $hashtableFields[$strField] += "`n" + $strLine
+            }
+        }
+        $hashtableExpected = $hashtableContracts[$strId]
+        foreach ($strKey in $hashtableFields.Keys) {
+            # Name grammar is already finite. The instruction guard retains its
+            # separate exact body/name check in Get-AgentSetupContractFailure.
+            if ($strKey -cne 'name' -and -not $hashtableExpected.ContainsKey($strKey)) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (extra $strKey)"
+            }
+        }
+        foreach ($strKey in $hashtableExpected.Keys) {
+            if (-not $hashtableFields.ContainsKey($strKey)) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (missing $strKey)"
+                continue
+            }
+            $boolMatches = $false
+            if ($strKey -cin @('types', 'stages')) {
+                $arrLines = $hashtableFields[$strKey] -split "`n"
+                $setValues = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+                $boolMatches = $arrLines[0] -ceq ('        ' + $strKey + ':')
+                for ($intIndex = 1; $intIndex -lt $arrLines.Count; $intIndex++) {
+                    $objValue = [regex]::Match($arrLines[$intIndex], '^          - (?<Value>[-a-z0-9][a-z0-9.,=_-]*)$')
+                    if (-not $objValue.Success -or -not $setValues.Add($objValue.Groups['Value'].Value)) {
+                        $boolMatches = $false
+                    }
+                }
+                $boolMatches = $boolMatches -and $setValues.SetEquals([string[]]$hashtableExpected[$strKey])
+            } else {
+                $boolMatches = $hashtableFields[$strKey] -ceq $hashtableExpected[$strKey]
+            }
+            if (-not $boolMatches) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (changed $strKey)"
+            }
+        }
+    }
+}
+
+
+function Get-TrackedCompiledPythonFailure {
+    # .SYNOPSIS
+    # Rejects compiled Python names in a complete target Git inventory.
+    #
+    # .DESCRIPTION
+    # Checks every decoded target-index or exact target-revision name without
+    # filesystem, Git-mode, ignore, metadata or generated-path exemptions.
+    # The caller supplies the already bounded and fully validated Git inventory.
+    #
+    # .PARAMETER TrackedPath
+    # The complete target inventory from Read-GitTrackedPath.
+    #
+    # .EXAMPLE
+    # Get-TrackedCompiledPythonFailure -TrackedPath $arrTrackedRepositoryPaths
+    #
+    # # Emits one corrective diagnostic per forbidden target name.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One diagnostic for each matching tracked name; no output if none.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261007.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TrackedPath)
+
+    foreach ($strPath in $TrackedPath) {
+        if ([regex]::IsMatch($strPath, '(?i)(^|/)__pycache__/|\.py[cod]$')) {
+            Write-Output ("Compiled Python artifacts must not be committed: $strPath. " +
+                'Remove the tracked artifact; .gitignore does not untrack files.')
+        }
+    }
+}
+
+
 function Get-AgentSetupContractFailure {
     # .SYNOPSIS
     # Checks the retained local hook, lock and setup contracts.
@@ -747,7 +1260,7 @@ function Get-AgentSetupContractFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20261006.0
+    # Version: 1.3.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][hashtable] $Content)
@@ -767,6 +1280,12 @@ function Get-AgentSetupContractFailure {
         } else { $intPrevious = $arrMatches[0].Index }
     }
     $strConfig = $Content['.pre-commit-config.yaml'].Replace("`r`n", "`n")
+    $objHookContext = Get-AgentPreCommitHookContext -Content $strConfig
+    if ($null -ne $objHookContext.Failure) { Write-Output $objHookContext.Failure }
+    if ([regex]::Matches($strConfig, '(?m)^repos:$').Count -ne 1 -or
+        $strConfig -cmatch '(?m)^(?!#|repos:$)[^\s]') {
+        Write-Output 'Pre-commit must retain only the reviewed root mapping without global selectors or stage overrides.'
+    }
     $arrRepositories = @([regex]::Matches($strConfig,
             '(?ms)^  - repo: (?<Name>[^\n]+)\n(?<Body>.*?)(?=^  - repo:|\z)'))
     $arrLocal = @($arrRepositories | Where-Object { $_.Groups['Name'].Value -ceq 'local' })
@@ -793,14 +1312,15 @@ function Get-AgentSetupContractFailure {
         'check-dependabot' = 'check_jsonschema'
         'check-github-workflows' = 'check_jsonschema'
     }
-    $hashtableHookBodies = @{}
+    $hashtableHookBodies = $objHookContext.HookBodies
+    if ($null -eq $objHookContext.Failure) {
+        Get-AgentPreCommitBehaviorFailure -HookBodies $hashtableHookBodies
+    }
     foreach ($strId in @($hashtableModules.Keys) + @('staged-markdown', 'agent-instruction-contract')) {
-        $arrHooks = @([regex]::Matches($strConfig,
-                '(?ms)^      - id: ' + [regex]::Escape($strId) + '\n(?<Body>.*?)(?=^      - id:|^  - repo:|\z)'))
-        if ($arrHooks.Count -ne 1) {
+        if ($null -ne $objHookContext.Failure -or -not $hashtableHookBodies.ContainsKey($strId)) {
             Write-Output "Pre-commit requires one hook definition: $strId"
             $hashtableHookBodies[$strId] = ''
-        } else { $hashtableHookBodies[$strId] = $arrHooks[0].Groups['Body'].Value }
+        }
     }
     foreach ($strId in $hashtableModules.Keys) {
         $strBody = $hashtableHookBodies[$strId]
@@ -840,6 +1360,37 @@ function Get-AgentSetupContractFailure {
                 '(?m)^' + [regex]::Escape($arrRequiredLine[1]) + '$').Count -ne 1) {
             Write-Output "Hook must retain its reviewed activation and selector: $($arrRequiredLine[0])"
         }
+    }
+    $strExpectedInstructionHookBody = @(
+        '        name: agent instruction contract and mutation tests'
+        '        entry: >-'
+        '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+        '          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch'
+        '        language: system'
+        '        pass_filenames: false'
+        '        always_run: true'
+    ) -join "`n"
+    if ($hashtableHookBodies['agent-instruction-contract'] -cne $strExpectedInstructionHookBody) {
+        Write-Output 'Pre-commit requires the exact active always-run instruction guard without extra fields or overrides.'
+    }
+    $strIgnore = ([string]$Content['.gitignore']).Replace("`r`n", "`n")
+    $arrCompiledIgnoreRules = @('*.[pP][yY][cCoOdD]', '!*.[pP][yY][cCoOdD]/',
+        '__[pP][yY][cC][aA][cC][hH][eE]__/')
+    foreach ($strRequiredIgnoreLine in $arrCompiledIgnoreRules) {
+        if ([regex]::Matches($strIgnore, '(?m)^' + [regex]::Escape($strRequiredIgnoreLine) + '$').Count -ne 1) {
+            Write-Output "Git ignore must contain one compiled-artifact rule: $strRequiredIgnoreLine"
+        }
+    }
+    # Git uses the last matching rule. Keep this policy suffix after unrelated
+    # rules so no later negation or positive pattern can change its behavior.
+    $arrOperativeIgnoreRules = @($strIgnore -split "`n" | Where-Object {
+            -not [string]::IsNullOrWhiteSpace($_) -and -not $_.StartsWith('#', [StringComparison]::Ordinal)
+        })
+    $arrExpectedIgnoreSuffix = @($arrCompiledIgnoreRules) + @('CLAUDE.local.md')
+    if ($arrOperativeIgnoreRules.Count -lt 4 -or
+        ($arrOperativeIgnoreRules[($arrOperativeIgnoreRules.Count - 4)..($arrOperativeIgnoreRules.Count - 1)] -join "`n") -cne
+        ($arrExpectedIgnoreSuffix -join "`n")) {
+        Write-Output 'Git ignore must end with the reviewed compiled-artifact rules and personal-memory rule.'
     }
     foreach ($strSetupPath in @('.github/workflows/copilot-setup-steps.yml',
             '.github/workflows/copilot-code-review.yml')) {
@@ -8177,6 +8728,13 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
+
+# Apply the name-wide rule before classification-only can return. The complete
+# target inventory is independent of checkout state and metadata exemptions.
+$arrCompiledPythonFailures = @(Get-TrackedCompiledPythonFailure -TrackedPath $arrTrackedRepositoryPaths)
+if ($arrCompiledPythonFailures.Count -gt 0) {
+    throw ($arrCompiledPythonFailures -join [Environment]::NewLine)
+}
 
 # Classification is candidate data. Use only the existing bounded safe readers.
 $strDocumentClassificationRelativePath = '.github/document-metadata-classification.json'
