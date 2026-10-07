@@ -1,0 +1,12 @@
+PREPARATION TEXT ONLY — ROOT RELEASE REQUIRED
+Working directory: C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide
+Environment: ordinary existing user identity/time; PATH prepend C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64. Reject skip/Git override/date variables; preserve core.hooksPath=.husky/_. No custom bypass.
+
+& 'C:/Program Files/Git/cmd/git.exe' -C 'C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide' add -- '.github/workflows/Test-AgentInstructions.ps1' '.github/workflows/Test-AgentInstructions.SelfTest.ps1' 'docs/dependency-maintenance.md'
+
+& 'C:/Program Files/Git/cmd/git.exe' -C 'C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide' write-tree
+Require exactly: 821a952c9d4be1395cab3b2af8da7a679987e4a6, precisely3 staged paths, no unstaged/untracked data and unchanged guarded sources/dependencies.
+
+& 'C:/Program Files/Git/cmd/git.exe' -C 'C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide' commit -m 'Avoid redundant validation of empty Markdown arrays'
+
+Require actual zero exit; record actual new H, parent504cd7672ac9604ace765a4f451346f801f09ddd/tree821a952, clean state and exact3-path diff. No push or acceptance. On failure reconcile actual HEAD/log/owned cleanup before any retry.

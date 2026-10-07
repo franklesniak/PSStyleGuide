@@ -1,0 +1,2 @@
+Agent-instruction content contract passed; maintenance authority is checked separately.
+Author finalization UTC date checked: 2026-10-07; B=98177628b7bc02c646724bfc8aa0fd73fed0cd24 H=5e8ccbbe45679ab58a202c672554ffda56a0a9f5.

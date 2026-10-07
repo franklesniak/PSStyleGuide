@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_CI_hold_D94.1_finalized_net_packet_preparation",
+  "status": "optimization_local_final_pass_publication_review_pending",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -91,19 +91,18 @@
   "pr": 235,
   "pending_native_operations": [],
   "local_operation": {
-    "kind": "D94.1_one_shot_ABBA",
-    "status": "completed_scoped_benefit_pass",
-    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one",
-    "manifest_sha256": "27970d06833a0e35bd0d44f37be9f8600b4e1b67e1d4e481a592792c6bbc1ca6",
-    "run_status": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\status.json",
-    "no_auto_repeat": true,
-    "session_id": 41852,
+    "kind": "actual_head_endpoint_continuation_current_audit",
+    "status": "completed_pass",
+    "session_id": 1347,
     "session_terminal_exit": 0,
-    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-BENEFIT-RESULT.json",
-    "container_absent": true
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\result.json",
+    "result_sha256": "d72f0c82ae0c0bd92346fce3748ef069f5a5c521aa00a63ce398c88c5093cdb3",
+    "owned_jobs_empty": true,
+    "owned_temp_absent": true,
+    "no_auto_repeat": true
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Publish the owned final qualification, scoped benefit, independent reviews and selected final-validation evidence. Then prepare the one B/A net-suite packet on finalized common data; no payload or product publication released.",
+  "next_action": "Review prepared PR body, publish owned planning evidence, reconcile remote head/base and outgoing one-commit scope, then non-force publish5e8ccbb and update PR235. Capture complete review/request/run baselines and request a new-head reviewer pair within original deadline; no failing/cancelled-CI merge, no old-input retry or counter reset.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -112,7 +111,7 @@
     "No acceptance of S1/task/affected pair before legitimate service activation proof"
   ],
   "applied_at": "2026-10-06T18:45:48.069788+00:00",
-  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
   "postimages": [
     {
       "path": ".github/workflows/package.json",
@@ -224,7 +223,7 @@
     "sha256": "47d92ea4290782b8957dfd9b631af5dabe13d252c596a3e89536e474106db63e",
     "files": 78
   },
-  "candidate_tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "candidate_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
   "staged_at": "2026-10-06T18:53:41.394481+00:00",
   "validation_preparation": {
     "windows": {
@@ -372,7 +371,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "dbfdb37177c6cbc38637b01728bc92ad92de7799",
+  "planning_checkpoint": "61e4d95832fafca1df829cfe9aa3e36ec75d39a4",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -397,7 +396,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-06T23:10:56.402304+00:00",
+  "updated_at": "2026-10-07T02:24:31.754843+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -1166,7 +1165,7 @@
     },
     "interpretation_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
     "current_source_trial": {
-      "status": "metadata_finalized_full_suite_net_packet_preparation_pending",
+      "status": "local_final_candidate_ready_for_publication_review",
       "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial",
       "writer": "a06_conversion_cold_packet",
       "allowed_paths": [
@@ -1381,7 +1380,7 @@
         "whole_PR_candidate_binding": "invalidated by required guide metadata finalization; fixed-case historical result only"
       },
       "final_validation_preparation": {
-        "status": "plan_selected_no_packet_or_execution_release",
+        "status": "selected_private_packet_construction_active",
         "worker": "a06_conversion_cold_packet",
         "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-validation-preparation",
         "execution_released": false,
@@ -1401,7 +1400,11 @@
         "net_minimum_percent": 5,
         "net_minimum_seconds": 0.5,
         "net_resampling": false,
-        "packet_preparation_released": false
+        "packet_preparation_released": true,
+        "packet_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one",
+        "planning_ref_boundary": "61e4d95832fafca1df829cfe9aa3e36ec75d39a4",
+        "fixture_HEAD": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "fixture_origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
       },
       "metadata_finalization": {
         "status": "complete_root_verified",
@@ -1424,6 +1427,123 @@
         "root_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\metadata-finalization-one\\ROOT-VERIFICATION.json",
         "source_after": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\metadata-finalization-one\\source-after.json",
         "source_after_sha256": "b8fd6537e5e015fef768617e03056274d91690ff31763884c2a0b03035983ba6"
+      },
+      "net_suite": {
+        "status": "scoped_net_pass_root_and_independent_review",
+        "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one",
+        "run_id": "ps235-final-net-suite-one",
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\manifest.authorized.json",
+        "manifest_sha256": "ee5c4b5dc0e0e8f70b0cb13f60e07c4290096b92eb4d4ae0d53e37c371442eb6",
+        "prepared_manifest_sha256": "ec30899f47c2fbc57d01a2129cd951c52b6d8287669c5220b6ee2620bef61f59",
+        "readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-NET-READINESS.json",
+        "order": [
+          "B",
+          "A"
+        ],
+        "run_status": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\status.json",
+        "no_auto_repeat": true,
+        "release_utc": "2026-10-07T01:25:39.024547+00:00",
+        "whole_timeout_seconds": 6600,
+        "root_observed_other_task_validation_containers": 0,
+        "root_read_full_changed_private_source_and_diff": true,
+        "root_source_payload_execution": false,
+        "session_id": 4135,
+        "session_terminal_exit": 0,
+        "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-NET-RESULT.json",
+        "result_sha256": "f5a257e8a4a205ce0e5094c91c887125d554d4759de2ccce7f0edea8ddfb1d16",
+        "reduction_seconds": 31.480257055000948,
+        "reduction_percent": 5.483971014768159,
+        "margin_above_5_percent_seconds": 2.7781933768509113,
+        "container_absent": true,
+        "independent_review": {
+          "status": "passed_no_material_findings_root_sample_verified",
+          "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-result-review\\REPORT.md",
+          "report_sha256": "0e74f8d98359d050bba020342ff7be172039081a62ddd23fe2acff23a6cc8f78",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-result-review\\evidence.json",
+          "evidence_sha256": "d08b881ad1fed17eae2e204071d2874bbbae477437757b6e574ec0804c1367cd",
+          "root_sample_count": 5
+        },
+        "limits": [
+          "Single observed pair, no variance or confidence interval, narrow threshold margin",
+          "B preflight and later A shared-cache history are disclosed; equal cold-machine preconditioning not proven",
+          "No runtime per-case counter;109 inclusion follows bound normal hook and unconditional final SelfTest call",
+          "No historical aggregate used as matched control; no resampling",
+          "Actual committed-H endpoints/current audit/final binding/publication/CI/service/paired gates remain"
+        ]
+      },
+      "final_commit_preparation": {
+        "status": "complete_normal_commit_pass",
+        "worker": "a06_conversion_cold_packet",
+        "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-commit-preparation",
+        "product_commit_released": false,
+        "endpoint_execution_released": false,
+        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-commit-preparation\\REPORT.md",
+        "report_sha256": "2bb7a419ea077c4929bb0454d3e58d86efd0962f0ec331ba758987f3a0e64f2a",
+        "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-commit-preparation\\evidence.json",
+        "evidence_sha256": "5ca6f965800a3e542f2d32db6b72fae60270b8e4f8f0fccbc2a60830d9aaa905"
+      },
+      "product_commit_released": false,
+      "actual_head_validation": {
+        "status": "local_final_validation_and_independent_quality_pass",
+        "worker": "a06_conversion_cold_packet",
+        "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one",
+        "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+        "execution_released": false,
+        "interim_independent_quality": {
+          "status": "passed_no_material_findings_final_endpoints_pending",
+          "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\REPORT.md",
+          "report_sha256": "81c99354906a485cef3fb20b2dd052c4eb723a6fe9db65fcad31b2e3df47fb88",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\evidence.json",
+          "evidence_sha256": "a6d7e85adb4a18abb8a3b4fb0f092a08b1585d32bf6e6167e4d47dbc9fbad144",
+          "root_reference_sample": 5
+        },
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\manifest.authorized.json",
+        "manifest_sha256": "849c934baa7c41fcc53403b26e5bb4f7f20676ac2a0da5ed0ff38db6e871469e",
+        "prepared_manifest_sha256": "49b021f07af3d0bffd8e4004ca3cb8b07c6872a8cdcfb87f16e46442dc65c75a",
+        "root_release_utc": "2026-10-07T02:06:57.046977+00:00",
+        "root_read_full_driver_commands_and_transport": true,
+        "syntax_compile_only_pass": true,
+        "qualified_transport_byte_identical": true,
+        "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\result.json",
+        "session_id": 6395,
+        "session_terminal_exit": 1,
+        "original_result_sha256": "d7fbc5ae3ab0ac7ba9c33c855a4c2d474879ea2d19bce407426e6fc1bbf7aeea",
+        "continuation_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one",
+        "completed_classifier_reused": true,
+        "continuation": {
+          "status": "passed_root_verified",
+          "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one",
+          "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\manifest.authorized.json",
+          "manifest_sha256": "a5b11e9bf5124ba01f181b59a89f67866f7da8e6430e674c54f05d8894ae5b2e",
+          "prepared_manifest_sha256": "b61e6fa2f1ec28963648bbd408513fbe3b8794c12cc36e3beb1d10fc6391cf2b",
+          "evidence_sha256": "74e556dc614b3efa982bfd383a5b40ebb22fcba478729bedeeba876c78c90dbe",
+          "execution_released": false,
+          "release_utc": "2026-10-07T02:14:43.818475+00:00",
+          "root_read_full_driver": true,
+          "root_syntax_compile_pass": true,
+          "qualified_transport_unchanged": true,
+          "completed_classifier_reused": true,
+          "session_id": 1347,
+          "session_terminal_exit": 0,
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\result.json",
+          "result_sha256": "d72f0c82ae0c0bd92346fce3748ef069f5a5c521aa00a63ce398c88c5093cdb3",
+          "owned_temp_absent": true,
+          "guards_equal": true
+        },
+        "final_local_validation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION.json",
+        "final_local_validation_sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0",
+        "final_independent_quality": {
+          "status": "passed_no_material_findings_root_bound",
+          "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+          "report_sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\final-evidence.json",
+          "evidence_sha256": "7ca2e74f7fadcc1796966cf139369e6e257e125fae4b78dc8f660349b96a41e9",
+          "root_sample_count": 5,
+          "verified_at": "2026-10-07T02:24:31.754843+00:00"
+        }
       }
     }
   },
@@ -1474,6 +1594,109 @@
       },
       "sessions_terminal_exit": 0,
       "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINAL-QUALIFICATION-RESULT.json"
+    },
+    {
+      "kind": "D94.1_one_shot_ABBA",
+      "status": "completed_scoped_benefit_pass",
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one",
+      "manifest_sha256": "27970d06833a0e35bd0d44f37be9f8600b4e1b67e1d4e481a592792c6bbc1ca6",
+      "run_status": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\status.json",
+      "no_auto_repeat": true,
+      "session_id": 41852,
+      "session_terminal_exit": 0,
+      "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-BENEFIT-RESULT.json",
+      "container_absent": true
     }
-  ]
+  ],
+  "optimization_commit": {
+    "state": "committed_unpublished",
+    "started_utc": "2026-10-07T01:58:24.829404+00:00",
+    "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "published_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "docs/dependency-maintenance.md"
+    ],
+    "stages": [
+      {
+        "name": "normal-commit",
+        "command": [
+          "C:\\Program Files\\Git\\cmd\\git.exe",
+          "-C",
+          "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+          "commit",
+          "-m",
+          "Avoid redundant validation of empty Markdown arrays"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+        "started_utc": "2026-10-07T01:58:29.064474+00:00",
+        "timeout_seconds": 900,
+        "exit": 0,
+        "state": "passed",
+        "cleanup": [],
+        "worker_pid": 31548,
+        "wrapper_exit": 0,
+        "job_before_cleanup": {
+          "total": 100,
+          "active": 0,
+          "terminated": 0
+        },
+        "job_after_cleanup": {
+          "total": 100,
+          "active": 0,
+          "terminated": 0
+        },
+        "finished_utc": "2026-10-07T01:58:41.730219+00:00",
+        "log_sha256": "1fde1f9f6d0bcd18b099778993cf25ff893cfc39352c9d871320005e7ff937eb"
+      }
+    ],
+    "primary_failure": null,
+    "cleanup_failures": [],
+    "stage_exit": 0,
+    "observed_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "source_dependency_runtime_guards_passed": true,
+    "only_expected_ref_change": true,
+    "clean": true,
+    "finished_utc": "2026-10-07T01:58:46.668167+00:00",
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\normal-commit-one\\execution-run\\result.json",
+    "result_sha256": "130c4b023bcbd9204d536a95e20172cba837633bdbdefec642f1f52d2f84d591",
+    "session_id": 55239,
+    "session_terminal_exit": 0
+  },
+  "published_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "optimization_validation": {
+    "status": "passed_root_and_independent_final_quality",
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION.json",
+    "sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0",
+    "current_audit_status": "CLEAN",
+    "accepted_exceptions": 0,
+    "committed_modes": 5,
+    "original_attempt_retained": "failed_private_TEMP_path_limit",
+    "classifier_reused": true,
+    "independent_quality": {
+      "status": "passed_no_material_findings_root_bound",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+      "report_sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\final-evidence.json",
+      "evidence_sha256": "7ca2e74f7fadcc1796966cf139369e6e257e125fae4b78dc8f660349b96a41e9",
+      "root_sample_count": 5,
+      "verified_at": "2026-10-07T02:24:31.754843+00:00"
+    }
+  },
+  "optimization_publication_preparation": {
+    "status": "DRAFT_NOT_POSTED",
+    "title": "Carry shared validation and review setup fixes back to PowerShell",
+    "body": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\publication-preparation\\proposed-body.md",
+    "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+    "expected_old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "new_local_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "remote_reviews_and_CI_required": true,
+    "old_input_recovery_clocks_preserved": true
+  }
 }

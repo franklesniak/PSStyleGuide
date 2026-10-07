@@ -1,0 +1,329 @@
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\common.py
++++ net-suite-one/common.py
+@@ -1,7 +1,7 @@
+ """Small shared identity helpers. No operation runs on import."""
+ import time
+ IMPORT_STARTED=time.monotonic()
+-IMPORT_DEADLINE=IMPORT_STARTED+580
++IMPORT_DEADLINE=IMPORT_STARTED+6580
+ import hashlib,json,os,pathlib,subprocess
+ if not __debug__:raise RuntimeError('Safety checks require ordinary, non-optimized Python.')
+ IMAGE='sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4'
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\bindings.py
++++ net-suite-one/bindings.py
+@@ -61,23 +61,29 @@
+ def packet_guard(here,m):
+     for name,digest in m['packet_files'].items():
+         assert pathlib.PurePath(name).name==name and sha(ordinary(pathlib.Path(here)/name).read_bytes())==digest,name
+-    assert len(m['candidate_rows'])==78 and len(m['original_rows'])==78 and len(m['dependency_rows'])==1914
++    assert len(m['candidate_rows'])==78 and len(m['control_rows'])==78 and len(m['dependency_rows'])==1914
+     assert len(m['runtime_rows'])==54 and len(m['windows_runtimes'])==9
+-    assert m['maximum_output_bytes']==2097152 and m['event_limit']==2000
+-    assert (m['whole_timeout_seconds'],m['child_timeout_seconds'],m['driver_timeout_seconds'])==(600,120,520)
+-    for key in ['original_archive','dependency_archive','history_bundle']:
++    assert (m['whole_timeout_seconds'],m['fixture_timeout_seconds'],m['preflight_timeout_seconds'],m['aggregate_timeout_seconds'])==(6600,3300,300,3000)
++    assert (m['maximum_stream_bytes'],m['maximum_output_bytes'],m['event_limit'])==(8388608,67108864,2000)
++    for key in ['candidate_archive','control_archive','dependency_archive','history_bundle']:
+         row=m[key];data=ordinary(row['path']).read_bytes();assert sha(data)==row['sha256'] and len(data)==row['bytes'],key
+-
++    assert [a['path'] for a,b in zip(m['control_rows'],m['candidate_rows']) if a!=b]==sorted(m['two_paths'])
++    assert len(m['expected_hook_names'])==len(set(m['expected_hook_names']))==11
++    assert len(m['expected_hook_ids'])==len(set(m['expected_hook_ids']))==11
++    assert m['preflight_command']==['pwsh','-NoLogo','-NoProfile','-NonInteractive','-File','.github/workflows/Test-AgentInstructions.ps1','-RequireStagedInputMatch']
++    assert m['aggregate_command']==['/opt/psstyleguide-runtime/venv/bin/python','-m','pre_commit','run','--all-files']
+ 
+ def release(here,args):
+     raw=pathlib.Path(args.manifest).read_bytes();assert sha(raw)==args.approved_manifest_sha256
+     m=json.loads(raw)
+     assert args.execute_root_approved and m['execution_authorized'] is True and m['prepared'] is True
+-    assert m['authorizing_coordinator']=='root' and m['policy_role']=='D94.1-one-current-author-ABBA-benefit-only'
+-    assert m['release_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release date'
++    assert m['authorizing_coordinator']=='root' and m['policy_role']=='D94.1-final-current-net-suite-one'
++    assert m['release_utc_date']==m['source_finalization_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release/source date'
+     assert not any(os.environ.get(k) for k in ['SKIP','CI','GITHUB_ACTIONS','GIT_INDEX_FILE','GIT_DIR','GIT_WORK_TREE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])
+     assert not any(k.startswith('GIT_CONFIG_') or k in ['GIT_COMMON_DIR','HUSKY'] for k in os.environ)
+-    assert m['execution_count']==1 and m['auto_repeat'] is False and m['order']==['A1','B1','B2','A2']
+-    assert m['benefit_gate']=={'both_matched_pairs_faster':True,'minimum_median_reduction_percent':5.0,'minimum_median_reduction_seconds':0.5,'root_interference_and_pair_consistency_required':True,'later_net_full_suite_cost_required':True,'absent_or_inconclusive':'NO CHANGE','resampling':False}
++    assert m['execution_count']==1 and m['auto_repeat'] is False and m['order']==['B','A']
++    assert m['fixture_head']==m['source_head']=='504cd7672ac9604ace765a4f451346f801f09ddd'
++    assert m['fixture_origin_main']==m['accepted_base']=='98177628b7bc02c646724bfc8aa0fd73fed0cd24'
++    assert m['benefit_gate']=={'minimum_reduction_percent':5.0,'minimum_reduction_seconds':0.5,'root_interference_judgment_required':True,'absent_or_inconclusive':'NO CHANGE','resampling':False}
+     packet_guard(here,m)
+     return m,sha(raw)
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\launch.py
++++ net-suite-one/launch.py
+@@ -1,34 +1,34 @@
+-"""Root-only single ABBA transport; false preparation release flags prohibit execution."""
++"""Root-only single net-suite transport; false preparation release flags prohibit execution."""
+ import argparse,datetime,json,os,pathlib,queue,shutil,subprocess,sys,threading,time
+ from common import IMAGE,IMPORT_DEADLINE,IMPORT_STARTED,save,sha
+ from bindings import host_guard,ordinary,output_guard,release
+ parser=argparse.ArgumentParser();parser.add_argument('--execute-root-approved',action='store_true');parser.add_argument('--manifest',type=pathlib.Path,required=True);parser.add_argument('--approved-manifest-sha256',required=True);args=parser.parse_args()
+ here=pathlib.Path(__file__).resolve().parent;m,label=release(here,args)
+ assert os.path.normcase(str(pathlib.Path(sys.executable).resolve()))==os.path.normcase(str(pathlib.Path(m['windows_runtimes']['python']['path']).resolve())),'Qualified orchestration Python required'
+-assert m['image']==IMAGE and m['host_git_guard']['refs_sha256']=='ae902f4f42fecd65743d635ce35925e9b0540f98210267a5c2484b4489f0b170'
+-assert m['run_id']=='ps235-empty-array-benefit-abba-one'
++assert m['image']==IMAGE
++assert m['run_id']=='ps235-final-net-suite-one'
+ start=IMPORT_STARTED;whole_end=IMPORT_DEADLINE+20;work_end=whole_end-20
+ before=host_guard(m,work_end)
+ image=json.loads(subprocess.check_output(['docker','image','inspect',IMAGE],timeout=min(10,max(.01,work_end-time.monotonic()))))[0]
+ assert image['Id']==IMAGE and image['Os']=='linux' and image['Architecture']=='amd64'
+ run=here/'runs'/m['run_id'];run.mkdir(parents=True,exist_ok=False);inputs=run/'inputs';outputs=run/'output';inputs.mkdir();outputs.mkdir()
+-container_name='ps235-empty-array-benefit-'+m['run_id'];primary=None;process=None;record={'state':'preparing','manifest_sha256':label,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'order':m['order'],'image':IMAGE,'role':m['policy_role']}
++container_name='ps235-final-net-suite-'+m['run_id'];primary=None;process=None;record={'state':'preparing','manifest_sha256':label,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'order':m['order'],'image':IMAGE,'role':m['policy_role']}
+ def bound():
+     # Immutable payload/archive/manifest copies are inputs; every generated identity,
+-    # log and terminal receipt shares the same 2MiB output envelope.
++    # log and terminal receipt shares the same 64MiB output envelope.
+     generated=[p for p in run.rglob('*') if p.is_file() and (inputs not in p.parents or p.name=='source-before.json')]
+     total=sum(p.stat().st_size for p in generated);assert total+262144<=m['maximum_output_bytes'],('Whole output reserve exceeded',total)
+     return total
+ save(run/'status.json',record);save(outputs/'host-source-before.json',before)
+ try:
+-    for name,row in [('history.bundle',m['history_bundle']),('original.tar',m['original_archive']),('dependencies.tar',m['dependency_archive'])]:
++    for name,row in [('history.bundle',m['history_bundle']),('candidate.tar',m['candidate_archive']),('control.tar',m['control_archive']),('dependencies.tar',m['dependency_archive'])]:
+         assert sha(ordinary(row['path']).read_bytes())==row['sha256'];shutil.copyfile(row['path'],inputs/name)
+-    runtime=['common.py','inside.py','ownership.py','settlement.py','control.ps1','candidate.ps1','current-SelfTest.ps1','candidate-SelfTest.ps1','load-functions.ps1','author-one-case.ps1','pair-driver.ps1','observers.ps1','observer-catalog.json','variant-catalog.json','run-child.py','validate-abba.py']
++    runtime=['common.py','inside.py','ownership.py','settlement.py','validate_net.py']
+     for name in runtime:shutil.copyfile(here/name,inputs/name)
+     remaining=work_end-time.monotonic();assert remaining>30,'Insufficient bounded setup/cleanup budget'
+     execution_manifest={**m,'remaining_execution_seconds':remaining};save(inputs/'manifest.json',execution_manifest)
+-    save(inputs/'source-before.json',{'head':m['source_head'],'origin_main':m['accepted_base'],'tree':m['head_tree'],'files':m['original_rows'],'dependencies':m['dependency_rows'],'host_current_identity_reference':'../output/host-source-before.json'})
+-    save(inputs/'payload-hashes.json',{name:sha((inputs/name).read_bytes()) for name in runtime+['history.bundle','original.tar','dependencies.tar','manifest.json','source-before.json']})
++    save(inputs/'source-before.json',{'head':m['source_head'],'origin_main':m['accepted_base'],'tree':m['head_tree'],'files':m['candidate_rows'],'dependencies':m['dependency_rows'],'host_current_identity_reference':'../output/host-source-before.json'})
++    save(inputs/'payload-hashes.json',{name:sha((inputs/name).read_bytes()) for name in runtime+['history.bundle','candidate.tar','control.tar','dependencies.tar','manifest.json','source-before.json']})
+     assert host_guard(m,work_end)==before;bound()
+     command=['docker','run','--rm','--pull','never','--name',container_name,'--label','psstyleguide.validation-manifest='+label,'--network','none','--mount',f'type=bind,source={inputs},target=/input,readonly','--mount',f'type=bind,source={outputs},target=/output','--entrypoint','python',IMAGE,'/input/inside.py']
+     record.update(state='running',command=command);save(run/'status.json',record)
+@@ -51,8 +51,8 @@
+             total+=len(data);assert total<=m['maximum_stream_bytes'];log.write(data);log.flush();bound()
+         process.wait(timeout=max(.01,work_end-time.monotonic()));record['container_exit']=process.returncode
+     result=json.loads((outputs/'result.json').read_bytes());assert process.returncode==0 and result['state']=='passed',result
+-    judgment=json.loads((outputs/'abba-judgment.json').read_bytes());record['benefit_disposition']=judgment['disposition']
+-    record['state']='collected';record['scope']='Not product acceptance; numerical benefit provisional until root consistency/interference and later full-suite net-cost gates.'
++    judgment=json.loads((outputs/'net-judgment.json').read_bytes());record['benefit_disposition']=judgment['disposition']
++    record['state']='collected';record['scope']='Not product acceptance; numerical net benefit provisional until root interference judgment and separate actual committed-H endpoints/audit/publication gates.'
+ except BaseException as error:
+     primary=error;record.update(state='failed',failure_type=type(error).__name__,failure=str(error),benefit_disposition='NO CHANGE')
+ finally:
+@@ -88,7 +88,7 @@
+     except BaseException as error:
+         record['host_terminal_guard_failure']=str(error)
+         if primary is None:primary=error
+-    try:bound();assert time.monotonic()<whole_end,'Whole 600s envelope exceeded'
++    try:bound();assert time.monotonic()<whole_end,'Whole 6600s envelope exceeded'
+     except BaseException as error:
+         record['terminal_bound_failure']=str(error)
+         if primary is None:primary=error
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\linux-final-aggregate\inside.py
++++ net-suite-one/inside.py
+@@ -7,8 +7,10 @@
+ inputs=pathlib.Path('/input');output=pathlib.Path('/output')
+ record={'state':'preparing','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'commands':[],'cleanup_receipts':[]}
+ save(output/'result.json',record)
+-overall_deadline=time.monotonic()+7170;active_direct=[];primary=None;m={}
+-def date_guard():assert datetime.datetime.now(datetime.timezone.utc).date().isoformat()==m['finalization_utc_date'],'Actual UTC date changed; reconcile finalization without a clock override.'
++overall_deadline=time.monotonic()+min(6570,json.loads((inputs/'manifest.json').read_bytes())['remaining_execution_seconds']-10);active_direct=[];primary=None;m={};fixture_deadline=overall_deadline;variant=None
++import common
++common.IMPORT_DEADLINE=overall_deadline
++def date_guard():assert datetime.datetime.now(datetime.timezone.utc).date().isoformat()==m['release_utc_date'],'Actual UTC date changed; reconcile finalization without a clock override.'
+ def unpack(name,rows):
+     expected={row['path']:row for row in rows};seen=set()
+     with tarfile.open(inputs/name,'r:') as archive:
+@@ -33,18 +35,18 @@
+ 
+ def after_guard(name,before):
+     try:
+-        after=identity();save(output/(name+'-after.json'),after);assert after==before,'Candidate/index/dependency input drift.'
++        after=identity();save(output/(name+'-after.json'),{'identity_sha256':sha((json.dumps(after,sort_keys=True,separators=(',',':'))).encode()),'equal_before':after==before,'complete_identity_reference':variant+'-before.json'});assert after==before,'Candidate/index/dependency input drift.'
+     except BaseException as error:
+         # Preserve observable drift instead of hiding a formatter mutation or blindly restaging it.
+         save(output/(name+'-drift.json'),{'error':str(error),'status':git(repo,'status','--porcelain=v1').decode('utf-8'),'index':index_rows(repo)})
+-        (output/(name+'-unstaged.patch')).write_bytes(git(repo,'diff','--binary'))
++        save(output/(name+'-drift-identity.json'),identity())
+         raise
+ def output_guard():
+-    total=sum(p.stat().st_size for p in output.iterdir() if p.is_file())
+-    assert total<=m['maximum_output_bytes'],'Total output bound exceeded'
++    total=sum(p.stat().st_size for p in output.iterdir() if p.is_file())+(inputs/'source-before.json').stat().st_size
++    assert total+262144<=m['maximum_output_bytes'],'Total output bound exceeded'
+ 
+ def settle(name,protected=()):
+-    try:receipt=own.cleanup_owned(set(protected),min(overall_deadline,time.monotonic()+2))
++    try:receipt=own.cleanup_owned(set(protected),min(overall_deadline,fixture_deadline,time.monotonic()+2))
+     except BaseException as error:
+         receipt={'failure':str(error),'judgment':'failed','collection_unavailable':True,'protected_direct_pids':sorted(protected)}
+         save(output/(name+'-cleanup.json'),receipt);record.setdefault('cleanup_receipts',[]).append({'phase':name,'receipt':receipt});save(output/'result.json',record)
+@@ -54,6 +56,7 @@
+     save(output/(name+'-cleanup.json'),receipt)
+     record.setdefault('cleanup_receipts',[]).append({'phase':name,'receipt':receipt})
+     save(output/'result.json',record)
++    assert sum(len(r['receipt'].get('waits',[]))+len(r['receipt'].get('signals',[])) for r in record['cleanup_receipts'])<=m['event_limit'],'Owned event bound exceeded'
+     assert receipt['judgment']=='successful_exited_children_only',receipt.get('judgment_failure')
+     return receipt
+ 
+@@ -69,9 +72,10 @@
+     date_guard();item={'name':name,'command':command,'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'timeout_seconds':timeout,'state':'running','anchor':own.anchor()}
+     record['commands'].append(item);save(output/'result.json',record)
+     process=None;identity_row=None;primary=None;stream=None;selector=None;count=0;direct_finished=None
+-    end=min(time.monotonic()+timeout,overall_deadline-5)
++    end=min(time.monotonic()+timeout,overall_deadline-5,fixture_deadline-3)
+     try:
+         assert end>time.monotonic(),'Overall validation deadline reached'
++        launched=time.monotonic();item['launch_monotonic']=launched
+         process=subprocess.Popen(command,cwd=repo,env=os.environ,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,start_new_session=True)
+         active_direct.append(process)
+         identity_row=own.pid_record(process.pid);assert identity_row is not None,'Missing direct process identity'
+@@ -94,6 +98,8 @@
+                 # descendant. Direct status remains with this Popen owner.
+                 if direct_finished is not None and not ready and time.monotonic()-direct_finished>=.1:break
+         item['exit']=process.wait(timeout=max(.01,end-time.monotonic()))
++        if direct_finished is None:direct_finished=time.monotonic()
++        item['direct_completed_monotonic']=direct_finished;item['elapsed_seconds']=direct_finished-launched
+         assert item['exit']==0,name+' direct exit failed'
+     except BaseException as error:
+         primary=error;item.update(state='failed',failure_type=type(error).__name__,failure=str(error))
+@@ -124,32 +130,24 @@
+         if process is not None and process.returncode is not None:active_direct.remove(process)
+     if primary:raise primary
+     after_guard(name,before)
+-    if name=='affected-node':
+-        text=(output/(name+'.log')).read_bytes().decode('utf-8',errors='strict');summary={}
+-        for field in ['tests','pass','fail','cancelled','skipped','todo']:
+-            matches=re.findall(r'(?m)^'+field+r' (\d+)\s*$|^# '+field+r' (\d+)\s*$',text)
+-            assert len(matches)==1,(field,matches)
+-            summary[field]=int(next(value for value in matches[0] if value))
+-        assert summary['tests']==m['expected_node_tests'] and summary['pass']==summary['tests'] and all(summary[x]==0 for x in ['fail','cancelled','skipped','todo']),summary
+-        item['node_summary']=summary
+-    if name=='aggregate':
+-        text=(output/(name+'.log')).read_bytes().decode('utf-8',errors='replace')
+-        item['passed_hooks']=len(re.findall(r'Passed\s*$',text,re.M));item['skipped_hooks']=len(re.findall(r'Skipped\s*$',text,re.M))
+-        assert item['passed_hooks']==m['expected_hook_count'] and item['skipped_hooks']==0,item
++    if name.endswith('-aggregate'):
++        text=(output/(name+'.log')).read_bytes().decode('utf-8',errors='strict')
++        statuses=re.findall(r'(?m)^(.+?)\.{2,}(Passed|Failed|Skipped)\s*$',text)
++        assert statuses==[(hook,'Passed') for hook in m['expected_hook_names']],('Exact eleven required hook rows failed',statuses)
++        assert len(re.findall(r'(?m)(?:Passed|Failed|Skipped)\s*$',text))==11,'Unknown extra hook status'
++        item['hook_rows']=[{'name':hook,'status':status} for hook,status in statuses]
+     item['state']='passed';save(output/'result.json',record)
+ 
+-try:
+-    record['subreaper']=own.enable_subreaper();record['setup_anchor']=own.anchor()
+-    for name,digest in json.loads((inputs/'payload-hashes.json').read_bytes()).items():assert sha((inputs/name).read_bytes())==digest
+-    m=json.loads((inputs/'manifest.json').read_bytes());original=json.loads((inputs/'source-before.json').read_bytes())
+-    assert m['execution_authorized'] is True and m['policy_role']=='proposed-staged-candidate-against-accepted-base'
+-    workspace=pathlib.Path(tempfile.mkdtemp(prefix='validation-'+m['run_id']+'-',dir='/work'));repo=workspace/'repository';repo.mkdir()
++def prepare_fixture():
++    global repo,workspace,original
++    original={'files':m['candidate_rows'] if variant=='B' else m['control_rows'],'dependencies':m['dependency_rows']}
++    workspace=pathlib.Path(tempfile.mkdtemp(prefix='validation-'+m['run_id']+'-'+variant+'-',dir='/work'));repo=workspace/'repository';repo.mkdir()
+     for name in ['home','tmp','npm-cache']:(workspace/name).mkdir()
+     # Do not inherit credentials, host agent flags, hook skips or arbitrary Git configuration.
+     os.environ.clear();os.environ.update(PATH=RUNTIME_PATH,HOME=str(workspace/'home'),USER='root',LOGNAME='root',LANG='C.UTF-8',LC_ALL='C.UTF-8',TZ='UTC',TMPDIR=str(workspace/'tmp'),TEMP=str(workspace/'tmp'),TMP=str(workspace/'tmp'),PRE_COMMIT_HOME='/opt/psstyleguide-runtime/pre-commit-cache',GOTOOLCHAIN='local',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_NOSYSTEM='1',GIT_TERMINAL_PROMPT='0',PYTHONNOUSERSITE='1',PIP_CONFIG_FILE='/dev/null',PIP_DISABLE_PIP_VERSION_CHECK='1',NPM_CONFIG_UPDATE_NOTIFIER='false',npm_config_cache=str(workspace/'npm-cache'))
+-    record.update(role=m['policy_role'],accepted_base=m['accepted_base'],candidate_tree=m['candidate_tree'],workspace=str(workspace))
++    record.update(role=m['policy_role'],accepted_base=m['accepted_base'],candidate_tree=m['variant_trees'][variant],workspace=str(workspace))
+     save(output/'result.json',record)
+-    assert (m['whole_container_timeout_seconds'],m['preflight_timeout_seconds'],m['node_timeout_seconds'],m['aggregate_timeout_seconds'])==(7200,300,3600,3000)
++    assert (m['whole_timeout_seconds'],m['fixture_timeout_seconds'],m['preflight_timeout_seconds'],m['aggregate_timeout_seconds'])==(6600,3300,300,3000)
+     date_guard()
+     git(repo,'init','--quiet');git(repo,'config','core.autocrlf','false');git(repo,'config','core.filemode','true')
+     git(repo,'bundle','verify',str(inputs/'history.bundle'))
+@@ -161,14 +159,14 @@
+     assert (repo/'.git').is_dir() and value(repo,'rev-parse','--is-shallow-repository')=='false'
+     assert not (repo/'.git/objects/info/alternates').exists()
+     git(repo,'fsck','--full','--no-reflogs')
+-    # The PS repair is staged over actual accepted B981. B stays origin/main.
+-    # Changed PowerShell scripts carry genuine edit-day metadata. Whole-PR B/H finalization
+-    # is also mandatory after the normal commit; parent H never replaces B there.
+-    # Only this disposable repository is changed. Candidate bytes come from the approved catalog.
+-    git(repo,'rm','-r','--quiet','--ignore-unmatch','.')
++    # Preserve actual H HEAD; stage only this variant's current dataset over H.
++    assert value(repo,'rev-parse','HEAD^{tree}')==m['head_tree']
+     assert not set(row['path'] for row in original['files']) & set(row['path'] for row in original['dependencies'])
+-    unpack('candidate.tar',original['files']);unpack('dependencies.tar',original['dependencies'])
+-    git(repo,'add','--all');assert value(repo,'write-tree')==m['candidate_tree']
++    unpack(('candidate.tar' if variant=='B' else 'control.tar'),original['files']);unpack('dependencies.tar',original['dependencies'])
++    git(repo,'add','--all')
++    assert value(repo,'write-tree')==m['variant_trees'][variant]
++    assert git(repo,'diff','--cached','--name-only').decode().splitlines()==m['variant_staged_paths'][variant]
++    assert value(repo,'rev-parse','HEAD')==m['source_head']
+     assert index_rows(repo)==[{key:row[key] for key in ['path','mode','blob']} for row in original['files']]
+     git(repo,'diff','--cached','--check')
+     # This runtime profile only qualifies these unchanged Python/hook definitions.
+@@ -180,12 +178,12 @@
+     new_header=b'# Pre-commit configuration for PSStyleGuide.'
+     assert profile_hooks.count(old_header)==1
+     assert (repo/'.pre-commit-config.yaml').read_bytes()==profile_hooks.replace(old_header,new_header,1),'Only the approved first comment may differ; all hook bodies must match'
+-    save(output/'hook-profile-identity.json',{'profile_sha256':sha(profile_hooks),'candidate_sha256':sha((repo/'.pre-commit-config.yaml').read_bytes()),'old_header':old_header.decode(),'new_header':new_header.decode(),'exactly_one_comment_replacement':True})
++    save(output/(variant+'-hook-profile-identity.json'),{'profile_sha256':sha(profile_hooks),'candidate_sha256':sha((repo/'.pre-commit-config.yaml').read_bytes()),'old_header':old_header.decode(),'new_header':new_header.decode(),'exactly_one_comment_replacement':True})
+     package=json.loads((repo/'package.json').read_bytes())
+     assert package['engines']=={'node':'24.18.1','npm':'11.16.0'} and package['packageManager']=='npm@11.16.0','Runtime profile requires renewed qualification.'
+     versions={}
+     for name,command,expected in [('node',['node','--version'],'v24.18.1'),('npm',['npm','--version'],'11.16.0'),('python',['python','--version'],'Python 3.12.3'),('pwsh',['pwsh','-NoLogo','-NoProfile','-NonInteractive','-Command','$PSVersionTable.PSVersion.ToString()'],'7.6.3')]:
+-        result=subprocess.check_output(command,env=os.environ,timeout=30).decode().strip();assert result==expected,(name,result);versions[name]=result
++        result=subprocess.check_output(command,env=os.environ,timeout=max(.01,min(30,fixture_deadline-3-time.monotonic()))).decode().strip();assert result==expected,(name,result);versions[name]=result
+     assert sha(pathlib.Path('/usr/local/bin/shellcheck').read_bytes())=='4da528ddb3a4d1b7b24a59d4e16eb2f5fd960f4bd9a3708a15baddbdf1d5a55b'
+     # Windows dependency transport records bytes, not Unix execute bits. Restore
+     # only this pinned package's declared executable for its real legacy fixture.
+@@ -195,12 +193,31 @@
+     assert json.loads((husky_bin.parent/'package.json').read_bytes())['bin']=={'husky':'bin.js'}
+     original_mode=oct(husky_bin.stat().st_mode & 0o777)
+     husky_bin.chmod(0o755)
+-    save(output/'fixture-adaptation.json',{'path':'.github/workflows/node_modules/husky/bin.js','sha256':sha(husky_bin.read_bytes()),'before_mode':original_mode,'mode':'0o755','scope':'Disposable Linux fixture only; package-declared executable; bytes unchanged. Mode is included in each subsequent identity guard.'})
++    save(output/(variant+'-fixture-adaptation.json'),{'path':'.github/workflows/node_modules/husky/bin.js','sha256':sha(husky_bin.read_bytes()),'before_mode':original_mode,'mode':'0o755','scope':'Disposable Linux fixture only; package-declared executable; bytes unchanged. Mode is included in each subsequent identity guard.'})
+     before=identity();assert before['head']==m['source_head'] and not before['untracked'] and not before['unstaged'] and before['fixture_executable_mode']=='0o755'
+-    save(output/'before.json',before);save(output/'runtime.json',{'versions':versions,'path':RUNTIME_PATH,'pyflakes':'absent in qualified image','network':'none','role':m['policy_role']})
+-    record['setup_cleanup']=settle('setup')
++    save(output/(variant+'-before.json'),before);save(output/(variant+'-runtime.json'),{'versions':versions,'path':RUNTIME_PATH,'pyflakes':'absent in qualified image','network':'none','role':m['policy_role']})
++    record['setup_cleanup']=settle(variant+'-setup')
+     output_guard()
+-    run('aggregate',['/opt/psstyleguide-runtime/venv/bin/python','-m','pre_commit','run','--all-files'],m['aggregate_timeout_seconds'],before)
++    assert time.monotonic()<fixture_deadline-3,'Fixture setup/cleanup budget exhausted'
++    return before
++
++try:
++    record['subreaper']=own.enable_subreaper();record['setup_anchor']=own.anchor()
++    for name,digest in json.loads((inputs/'payload-hashes.json').read_bytes()).items():assert sha((inputs/name).read_bytes())==digest
++    m=json.loads((inputs/'manifest.json').read_bytes());original=json.loads((inputs/'source-before.json').read_bytes())
++    assert m['execution_authorized'] is True and m['policy_role']=='D94.1-final-current-net-suite-one'
++    for variant in m['order']:
++        fixture_started=time.monotonic();fixture_deadline=min(overall_deadline-3,fixture_started+m['fixture_timeout_seconds'])
++        common.IMPORT_DEADLINE=fixture_deadline-3
++        before=prepare_fixture()
++        if variant=='B':run('B-preflight',m['preflight_command'],m['preflight_timeout_seconds'],before)
++        run(variant+'-aggregate',m['aggregate_command'],m['aggregate_timeout_seconds'],before)
++        after_guard(variant+'-terminal',before);settle(variant+'-fixture-terminal')
++        elapsed=time.monotonic()-fixture_started;assert elapsed<m['fixture_timeout_seconds'],'Fixture envelope exceeded'
++        record.setdefault('fixtures',[]).append({'variant':variant,'seconds_including_setup_guards_cleanup':elapsed,'head':m['source_head'],'origin_main':m['accepted_base'],'staged_tree':m['variant_trees'][variant],'staged_paths':m['variant_staged_paths'][variant]})
++        save(output/'result.json',record)
++    from validate_net import evaluate
++    judgment=evaluate(record,m);save(output/'net-judgment.json',judgment)
+     date_guard();record['state']='passed'
+ except BaseException as error:
+     primary=error;record.update(state='failed',failure_type=type(error).__name__,failure=str(error))
+@@ -215,6 +232,8 @@
+             record.setdefault('terminal_direct_cleanup_failures',[]).append(str(error))
+             if primary is None:primary=error;record.update(state='failed',failure=str(error))
+         if process.returncode is not None:active_direct.remove(process)
++    common.IMPORT_DEADLINE=overall_deadline
++    fixture_deadline=overall_deadline
+     try:
+         record['terminal_cleanup']=settle('terminal',{process.pid for process in active_direct})
+         date_guard();output_guard()
+--- /dev/null
++++ net-suite-one/validate_net.py
+@@ -0,0 +1,13 @@
++"""Single finite net judgment. No execution or source modification on import."""
++import math
++
++def evaluate(record,m):
++    assert record.get('failure') is None and [x['name'] for x in record['commands']]==['B-preflight','B-aggregate','A-aggregate']
++    for item in record['commands']:
++        assert item['state']=='passed' and item['exit']==0 and not any(key in item for key in ['cleanup_failure','direct_cleanup_failure','stream_cleanup_failure','terminal_receipt_failure'])
++        assert math.isfinite(item['elapsed_seconds']) and item['elapsed_seconds']>0
++        if item['name'].endswith('-aggregate'):
++            assert item['hook_rows']==[{'name':hook,'status':'Passed'} for hook in m['expected_hook_names']]
++    times={x['name'][0]:x['elapsed_seconds'] for x in record['commands'] if x['name'].endswith('-aggregate')}
++    gain=times['A']-times['B'];percent=100*gain/times['A'];numeric=times['B']<times['A'] and gain>=.5 and percent>=5.0
++    return {'state':'SCOPED_NET_MEASUREMENT_COLLECTED','order':['B','A'],'aggregate_seconds':times,'reduction_seconds':gain,'reduction_percent':percent,'numeric_gate_passed':numeric,'disposition':'PROVISIONAL_NUMERIC_NET_BENEFIT_ROOT_JUDGMENT_REQUIRED' if numeric else 'NO CHANGE','root_interference_judgment_required':True,'single_pair_variance_not_established':True,'cold_bootstrap_and_full_SelfTest_included':True,'B_new109_test_cost_included':True,'cleanup_separate':True,'resampling':False,'committed_endpoint_audit_acceptance_not_established':True}

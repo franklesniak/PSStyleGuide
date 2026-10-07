@@ -1,0 +1,44 @@
+{
+  "state": "ROOT_NET_PACKET_READINESS_PASS_NO_PAYLOAD",
+  "utc": "2026-10-07T01:24:33.515747+00:00",
+  "manifest_sha256": "ec30899f47c2fbc57d01a2129cd951c52b6d8287669c5220b6ee2620bef61f59",
+  "new_private_python_compile": [
+    "launch.py",
+    "bindings.py",
+    "common.py",
+    "inside.py",
+    "validate_net.py"
+  ],
+  "qualified_ownership_settlement_unchanged": true,
+  "source_archives_each": 78,
+  "only_variant_differences": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "guide_common_finalized": true,
+  "A_original_H_pair_B_exact_final_pair": true,
+  "host_guard": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "branch": "codex/tf68-compareback",
+    "refs_sha256": "f0a5f1fef9f6e575db912a6547294d59eaf249f9a3cee03edb17170594026f53",
+    "index_entries_sha256": "3f88327bc2229cefc25e98962070c4697dfc6fa598322cc55bbe39ba75be8100",
+    "metadata": {
+      "HEAD": "844b5d9b22786dc7d876789d284cee6242ffa2e1dfb0e20e7006d53acb0b4576",
+      "index": "841b9851673a12917660caf2d2ef27709b48da3568b0e047ab2eaedf2b8af693",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "unstaged": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "docs/dependency-maintenance.md"
+    ],
+    "staged": [],
+    "untracked": []
+  },
+  "source_runtime_dependency_guards_passed": true,
+  "old_dependency_bundle_evidence_reused_by_hash": true,
+  "payload_executed": false,
+  "execution_release_separate": true
+}

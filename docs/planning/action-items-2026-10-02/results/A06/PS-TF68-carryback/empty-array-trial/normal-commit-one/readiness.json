@@ -1,0 +1,38 @@
+{
+  "state": "ROOT_NORMAL_COMMIT_READY_NO_PRODUCT_WRITE",
+  "utc": "2026-10-07T01:58:24.827891+00:00",
+  "source_guard": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "branch": "codex/tf68-compareback",
+    "refs_sha256": "f0a5f1fef9f6e575db912a6547294d59eaf249f9a3cee03edb17170594026f53",
+    "index_entries_sha256": "3f88327bc2229cefc25e98962070c4697dfc6fa598322cc55bbe39ba75be8100",
+    "metadata": {
+      "HEAD": "844b5d9b22786dc7d876789d284cee6242ffa2e1dfb0e20e7006d53acb0b4576",
+      "index": "841b9851673a12917660caf2d2ef27709b48da3568b0e047ab2eaedf2b8af693",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "unstaged": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "docs/dependency-maintenance.md"
+    ],
+    "staged": [],
+    "untracked": []
+  },
+  "native_refs": {
+    "refs/heads/codex/tf68-compareback": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "refs/heads/main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+  },
+  "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    "docs/dependency-maintenance.md"
+  ],
+  "normal_hooks": true,
+  "source_count": 78,
+  "dependency_count": 1914
+}

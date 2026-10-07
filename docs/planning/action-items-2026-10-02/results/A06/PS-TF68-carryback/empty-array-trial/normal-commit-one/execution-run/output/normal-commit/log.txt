@@ -1,0 +1,41 @@
+Running staged Markdown lint against the Git index...
+
+Total nested Markdown blocks found: 0
+
+[32m✓[0m No issues found in nested Markdown code fences
+Running markdownlint with the repository configuration...
+
+> psstyleguide@1.0.0 lint:md
+> node lint-markdown.mjs
+
+[1mLinting outer Markdown...[0m
+
+Found 24 Markdown file(s) to scan
+
+npm notice
+npm notice New major version of npm available! 11.16.0 -> 12.2.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.0
+npm notice To update run: npm install -g npm@12.2.0
+npm notice
+Running nested Markdown lint (code fences) with the repository configuration...
+
+> psstyleguide@1.0.0 lint:md:nested
+> node lint-nested-markdown.js
+
+[1mLinting nested Markdown in code fences...[0m
+
+Found 24 Markdown file(s) to scan
+
+[36mSTYLE_GUIDE_CHAT.md[0m: Found 1 nested Markdown block(s)
+[36msamples\test-recursive-nested-markdown.md[0m: Found 10 nested Markdown block(s)
+[36msamples\test-nested-markdown-linting.md[0m: Found 5 nested Markdown block(s)
+[36mdocs\ISSUE_EVALUATION_PROMPT.md[0m: Found 2 nested Markdown block(s)
+[36m.github\instructions\docs.instructions.md[0m: Found 5 nested Markdown block(s)
+
+Total nested Markdown blocks found: 23
+
+[32m✓[0m No issues found in nested Markdown code fences
+[32m[1m✓[0m [32mNested Markdown linting passed[0m
+
+[codex/tf68-compareback 5e8ccbb] Avoid redundant validation of empty Markdown arrays
+ 3 files changed, 265 insertions(+), 10 deletions(-)

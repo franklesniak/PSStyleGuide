@@ -1,0 +1,138 @@
+{
+  "schema": 1,
+  "state": "READ_ONLY_COMMIT_READINESS_NOT_RELEASE",
+  "prepared_utc": "2026-10-07T01:50:43.042704+00:00",
+  "source_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "current_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "actual_new_head": null,
+  "expected_new_parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "expected_new_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    "docs/dependency-maintenance.md"
+  ],
+  "candidate_hashes": {
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+    ".github/workflows/Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+    "docs/dependency-maintenance.md": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd"
+  },
+  "read_only_guard": {
+    "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+    "branch": "codex/tf68-compareback",
+    "refs_sha256": "f0a5f1fef9f6e575db912a6547294d59eaf249f9a3cee03edb17170594026f53",
+    "index_entries_sha256": "3f88327bc2229cefc25e98962070c4697dfc6fa598322cc55bbe39ba75be8100",
+    "metadata": {
+      "HEAD": "844b5d9b22786dc7d876789d284cee6242ffa2e1dfb0e20e7006d53acb0b4576",
+      "index": "841b9851673a12917660caf2d2ef27709b48da3568b0e047ab2eaedf2b8af693",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "unstaged": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "docs/dependency-maintenance.md"
+    ],
+    "staged": [],
+    "untracked": []
+  },
+  "source78_raw_equality_checked": true,
+  "core_hooksPath": ".husky/_",
+  "default_user_hook_initializers_observed_absent": [
+    "C:/Users/flesniak/.huskyrc",
+    "C:/Users/flesniak/.config/husky/init.sh"
+  ],
+  "accepted_fixture_observation": {
+    "path": "C:/Users/flesniak/.codex/worktrees/ps-tf67-accepted-policy/PSStyleGuide",
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "porcelain": "",
+    "shared_common_directory": "C:/Users/flesniak/GitHub/PSStyleGuide/.git",
+    "complete_dependency_guard_still_required_before_future_execution": true
+  },
+  "normal_commit_timeout_seconds": 900,
+  "endpoint_limits": {
+    "per_command_seconds": 600,
+    "overall_seconds": 3900,
+    "cleanup_reserve_seconds": 30,
+    "maximum_stream_bytes": 8388608,
+    "maximum_output_bytes": 67108864
+  },
+  "prerequisites_remaining": [
+    "root final independent net-result binding and normal-commit release",
+    "actual normal commit hooks/recorded new H",
+    "five actual-H endpoint modes and current ordinary two-root audit",
+    "final result binding/publication/new-head review and CI/service/paired acceptance"
+  ],
+  "new_tests_or_payload_executions": 0,
+  "product_git_native_mutations": false,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\commit-validated-carryback.py",
+      "sha256": "a90eae8fe42542c79ac38452fd31a4df4e54c7b741d550859ceb9912c9796375"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+      "sha256": "59cbda866821219f47e27d0619bc3cd5bb510b57d2fd11c055b5e1958515c2d1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINAL-QUALIFICATION-RESULT.json",
+      "sha256": "1ec3f88b5ab8ef71ef58340ea4da7bdca2e39a90fe1e038771650157530c73a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-NET-RESULT.json",
+      "sha256": "f5a257e8a4a205ce0e5094c91c887125d554d4759de2ccce7f0edea8ddfb1d16"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-result-review\\REPORT.md",
+      "sha256": "0e74f8d98359d050bba020342ff7be172039081a62ddd23fe2acff23a6cc8f78"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-result-review\\evidence.json",
+      "sha256": "d08b881ad1fed17eae2e204071d2874bbbae477437757b6e574ec0804c1367cd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\manifest.prepared.json",
+      "sha256": "ec30899f47c2fbc57d01a2129cd951c52b6d8287669c5220b6ee2620bef61f59"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\FINAL-VALIDATION.json",
+      "sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\driver-body.py",
+      "sha256": "ef3ad9c35dcf4aeb4bc1c8db3131ddce9cc63f59ceea9608066e0d4584116218"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\manifest.authorized.json",
+      "sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-preparation\\root-helper-template.py",
+      "sha256": "bf010a4b35dabe7eccc6131f57e5da4ed3b42b0e3b52fdc960d36afee41aaf7f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.husky\\pre-commit",
+      "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.husky\\_\\pre-commit",
+      "sha256": "34fe496008be71d8fdd446b2cce81e4bb0406109c130eafc583fbd9fe33244e2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.husky\\_\\h",
+      "sha256": "70200b200ca709b0622784f93839a5b2872333a917a09afddefd7dc2d8cdc680"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+    }
+  ],
+  "files": {
+    "REPORT.md": "2bb7a419ea077c4929bb0454d3e58d86efd0962f0ec331ba758987f3a0e64f2a",
+    "COMMANDS.txt": "95b76b6547cae946bfc376468f13729dde453fa17b0e869cdf37ae2e74c9cfae",
+    "REVIEW-UPDATE.md": "24828d3d382447037edeaf871b7ee36a9ada9abdf4d7bbdb764e5130e84404a9"
+  }
+}

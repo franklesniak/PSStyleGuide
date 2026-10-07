@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "state": "FROZEN_PRIVATE_PREPARATION_ONLY_NO_EXECUTION",
+  "sealed_utc": "2026-10-07T01:23:00.086086+00:00",
+  "manifest": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\manifest.prepared.json",
+    "sha256": "ec30899f47c2fbc57d01a2129cd951c52b6d8287669c5220b6ee2620bef61f59"
+  },
+  "files": {
+    "common.py": "0340709bbef700ec8d300914a87f97c03bfe714509e2c9cfa736c967054a3658",
+    "inside.py": "46166688c42dabdd9c18fc8b7a7db85f438c2115ab645837835c7a16ba17ddc0",
+    "launch.py": "04db659cc965ed150f4f848feed9aa974615ac4f8ec4720c2e42ad9ca9342f07",
+    "bindings.py": "7594379199f3b87491ff201ca1495be03d2d04981dd1a9748df677aa5d6f3e21",
+    "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+    "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+    "validate_net.py": "310305b7a580288bfa2f8e809a2b8ca1b54850c274d679faaa9eceb311d2175f",
+    "source-binding.json": "4fea1447635bf1d1c89c1e24c41c053b337a71d1e57681cab82805117c432902",
+    "reuse-binding.json": "39fc8faaf035009210a8102d69ac1ffc5a8c60af2bf26f95daa9d541001bdf71",
+    "refs-current.txt": "f0a5f1fef9f6e575db912a6547294d59eaf249f9a3cee03edb17170594026f53",
+    "refs-recovered.txt": "ae902f4f42fecd65743d635ce35925e9b0540f98210267a5c2484b4489f0b170",
+    "TRANSPORT-DIFF.patch": "4b01babeb5e7dc4d949d208c85243e8b968fa185e4c3eb46e7818d5e66a900de",
+    "ROOT-COMMAND.txt": "fc24d70cdd36fa206cf6691791d0b4697822db856cdc59f7c344fcc90050c6ee",
+    "PREPARATION.md": "5a2f57035d813ba09aa9be97cf29fef894b341cd98dc339f65b6edd9cb559559"
+  },
+  "archives": {
+    "B": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\candidate.tar",
+      "sha256": "e4626bb3f62b256fb5eb9da99029d74e7e9925a61aecdeb752ddf2f1e5a9dae5",
+      "bytes": 3778560
+    },
+    "A": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\control.tar",
+      "sha256": "1889b2b58ce5fa5198ba462f6816a62a5bcb82fd0d9e8a576fb54c3432d86e35",
+      "bytes": 3768320
+    },
+    "dependencies": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\dependencies.tar",
+      "sha256": "c09f273178c5d18b1da93878f6c7badf2fca9f7deaca503dff395da1d1badd8b",
+      "bytes": 20316160
+    },
+    "history": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\runs\\ps235-h504-current-author-pair-one\\inputs\\history.bundle",
+      "sha256": "8498c2efd3d97cf66c9720aea792931da7bf6c20ee64c8f7c1e7971f2512eb1f",
+      "bytes": 4159684
+    }
+  },
+  "source_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "staged_trees": {
+    "B": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "A": "6a641edb874a47574836653d66ee2a05fb8d0cc9"
+  },
+  "host_source_changed_during_preparation": false,
+  "product_writes": false,
+  "payload_executions": 0,
+  "syntax_or_analyzer_executions": 0,
+  "containers": 0,
+  "no_running_session": true,
+  "root_command_file": "ROOT-COMMAND.txt",
+  "root_authorized_manifest_required": true,
+  "static_checks": "Raw files/hash/modes/catalog equality; only two cross-variant script paths; ordinary caller source inspection; pure Git tree hashing; existing archive hashes; exactly two planning-ref reversals; no parser/import or runtime test.",
+  "mandatory_limit": "Collected numerical net result is provisional; no acceptance or variance/hosted speed claim."
+}

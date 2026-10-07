@@ -1,0 +1,95 @@
+{
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\manifest.authorized.json",
+      "sha256": "849c934baa7c41fcc53403b26e5bb4f7f20676ac2a0da5ed0ff38db6e871469e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\input-guard.json",
+      "sha256": "ab7574a63cc424f16eab0e33560654be9712de0e56da07762d21dfb7e4e53220"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\result.json",
+      "sha256": "d7fbc5ae3ab0ac7ba9c33c855a4c2d474879ea2d19bce407426e6fc1bbf7aeea"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\before.json",
+      "sha256": "ab7574a63cc424f16eab0e33560654be9712de0e56da07762d21dfb7e4e53220"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\after.json",
+      "sha256": "ab7574a63cc424f16eab0e33560654be9712de0e56da07762d21dfb7e4e53220"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\output\\AcceptedMaintenance\\result.json",
+      "sha256": "fa3a7f7beb5048373a8529410c0a17402ce8cf3acfc46aef33ed03d7a87ec852"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\output\\AcceptedMaintenance\\native-result.json",
+      "sha256": "1492b24e3411ca4f3c2b86e2ab36f5a4d336e9799cfd67029b7000d075480bcd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\output\\AcceptedMaintenance\\log.txt",
+      "sha256": "f28fe2729c11cb9527f59a28bf6556f4657656822e7e7aab196c11ab4bb214a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\output\\AcceptedMaintenance\\command.json",
+      "sha256": "8aa37b65a5c12b809b4ab955f88dd08106ee48c19a38e917f61b2b1bb469a275"
+    }
+  ],
+  "classification": {
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "policy": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "classification": "maintenance_required",
+    "maintenancePaths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json"
+    ]
+  },
+  "original_packet_stays_failed": true,
+  "original_run_immutable": true,
+  "matching_current_source_guard": {
+    "accepted": {
+      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+      "index_entries_sha256": "75f9d1df83f84e05deff97269129655e920cb6c753937e1b68740cc549a27454",
+      "refs_sha256": "07740f2c0ec9f8e2f54e0b0b8c45d6a43e4a27e17900e9621b8618b035d0ab96",
+      "config_sha256": "58267819b953ef7fbc079f543b139a8064c32d6d9d3de767c8c54792d88ec18b",
+      "physical_metadata_sha256": {
+        "HEAD": "a76172623950e1a8ae143edb1746dc98633b8403d441fa7d5fdad3bddaac8e71",
+        "index": "6d8a233697a64828ca0808ca6fa59c1acc4d6212d736b6e65fa53099c2490817",
+        "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+        "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+      },
+      "branch": "",
+      "origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "origin_url": "https://github.com/franklesniak/PSStyleGuide.git",
+      "clean": true
+    },
+    "candidate": {
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "index_entries_sha256": "ce5ae8f43cbbd0cfcb638162ccafc0c42ef2bc2548d3a249b79e1f8340f8d16f",
+      "refs_sha256": "07740f2c0ec9f8e2f54e0b0b8c45d6a43e4a27e17900e9621b8618b035d0ab96",
+      "config_sha256": "e2f36ee9a5de4d73b817e670295cd9f578b38a51ca46d1006ad9ee651fb4c1c9",
+      "physical_metadata_sha256": {
+        "HEAD": "844b5d9b22786dc7d876789d284cee6242ffa2e1dfb0e20e7006d53acb0b4576",
+        "index": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+        "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+        "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+      },
+      "branch": "codex/tf68-compareback",
+      "origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "origin_url": "https://github.com/franklesniak/PSStyleGuide.git",
+      "clean": true
+    }
+  },
+  "reuse_scope": "AcceptedMaintenance only; exact B/H/policy, source/runtime/catalog binding and owned zero exits. No other endpoint claimed passed."
+}

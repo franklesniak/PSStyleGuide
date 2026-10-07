@@ -1,0 +1,50 @@
+{
+  "state": "ROOT_SCOPED_FULL_SUITE_NET_PASS_INDEPENDENT_REVIEW_PENDING",
+  "utc": "2026-10-07T01:46:59.851149+00:00",
+  "session_id": 4135,
+  "session_terminal_exit": 0,
+  "manifest_sha256": "ee5c4b5dc0e0e8f70b0cb13f60e07c4290096b92eb4d4ae0d53e37c371442eb6",
+  "aggregate_seconds": {
+    "B": 542.5610165079997,
+    "A": 574.0412735630007
+  },
+  "reduction_seconds": 31.480257055000948,
+  "reduction_percent": 5.483971014768159,
+  "selected_threshold_percent": 5,
+  "selected_threshold_seconds": 0.5,
+  "both_exact_eleven_hooks_passed": true,
+  "B_preflight_passed": true,
+  "A_original_SelfTest_B_added109_cost_included": true,
+  "raw_aggregate_logs_identical": true,
+  "owned_zero_exit_waits": {
+    "B-setup": 0,
+    "B-preflight": 0,
+    "B-aggregate": 67,
+    "B-fixture-terminal": 0,
+    "A-setup": 0,
+    "A-aggregate": 67,
+    "A-fixture-terminal": 0,
+    "terminal": 0
+  },
+  "no_signals_or_residue": true,
+  "container_absent": true,
+  "all_saved_host_fixture_identity_hashes_verified": true,
+  "total_generated_output_bytes": 1894135,
+  "whole_host_seconds": 1154.375,
+  "interference_judgment": "No other task-owned test, source/Git mutation or heavy operation ran during the timed pair; only light status reads and initial execution-state recording. No identified interference invalidates this scoped result. Unmeasured external scheduling and one-pair variance remain unquantified.",
+  "interpretation": "5.483971 percent narrowly exceeds the predeclared practical threshold; retain provisionally, without a stable-benchmark, hosted-timeout-remedy or final-acceptance claim. No resampling.",
+  "pending": [
+    "independent net result and final delta review",
+    "separately released normal local commit",
+    "actual final-H five endpoint modes and ordinary current audit",
+    "final result binding, remote review/current CI, genuine dedicated-service proof and paired acceptance"
+  ],
+  "references": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\status.json": "61b5eb84cbf75d45b6e750ab78d77cd521b92deba15dca3e0735c3f4e2b1f274",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\output\\result.json": "c2ec1d3fd391e5e095eada5a523625bb5209ca54929456b945e2450cc3f81ddd",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\output\\net-judgment.json": "c565e22a49f81bb10787f9077324765f6e890c7ad6f0eb93d7d44a55b543242a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\output\\B-preflight.log": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\output\\B-aggregate.log": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-one\\runs\\ps235-final-net-suite-one\\output\\A-aggregate.log": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+  }
+}

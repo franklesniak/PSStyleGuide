@@ -1,0 +1,6 @@
+fatal: cannot stat 'C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-one/execution-run/tmp/agent-instruction-gitignore-51cefb19d33a4fa5a9dd5117b9ea00d5/.git/hooks/fsmonitor-watchman.sample': Filename too long
+Exception: C:\Users\flesniak\.codex\worktrees\ps-tf67-accepted-policy\PSStyleGuide\.github\workflows\Test-AgentInstructions.ps1:4717
+Line |
+4717 |              throw 'Could not initialize the effective-ignore fixture. .
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | Could not initialize the effective-ignore fixture.

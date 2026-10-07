@@ -1,0 +1,4 @@
+PROPOSED_POLICY_TRANSITION: B=98177628b7bc02c646724bfc8aa0fd73fed0cd24 H=5e8ccbbe45679ab58a202c672554ffda56a0a9f5. Candidate checker code supplies diagnostics, not accepted-policy, owner or merge authority.
+Agent-instruction content contract passed; maintenance authority is checked separately.
+Finalization date not verified by this invocation; structural, calendar, baseline and version checks passed: B=98177628b7bc02c646724bfc8aa0fd73fed0cd24 H=5e8ccbbe45679ab58a202c672554ffda56a0a9f5.
+Proposed-policy transition checks passed: B=98177628b7bc02c646724bfc8aa0fd73fed0cd24 H=5e8ccbbe45679ab58a202c672554ffda56a0a9f5.

@@ -1,0 +1,10 @@
+{
+  "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps235-e5e8-c1",
+  "exclusive_owned": true,
+  "owner_sha256": "d2acf67ce2b90de829e74de3d640dead277be04e55ce85479e4de8e70968ec35",
+  "residue_before_cleanup": [],
+  "recursive_cleanup": false,
+  "outside_owned_root_cleanup": false,
+  "removed": true,
+  "absent_after": true
+}

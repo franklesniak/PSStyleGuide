@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "state": "FROZEN_D07_PRIVATE_SETUP_CONTINUATION_UNEXECUTED",
+  "sealed_utc": "2026-10-07T02:13:58.715484+00:00",
+  "manifest_sha256": "b61e6fa2f1ec28963648bbd408513fbe3b8794c12cc36e3beb1d10fc6391cf2b",
+  "files": {
+    "transport-prefix.py": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+    "run-stage.py": "b782816211fc9245376aac4f25930dafbb8d5a9339f2ea17a7164ac989467ab1",
+    "driver-body.py": "f4540012b9ea297a3b212ce66c34fb7d1efe834b5c558a2d03eb4751c62db79f",
+    "runner.py": "32a89cc6506ea935748246bc4f1985a7da9ea6f669f92dc8476f3d1178f549c7",
+    "input-guard.json": "ab7574a63cc424f16eab0e33560654be9712de0e56da07762d21dfb7e4e53220",
+    "classifier-reuse.json": "30546b72d02e2d2349bf04b10a093d6ba8383b88bb93f9a24494816bc9cc30d2",
+    "accepted_source-catalog.json": "f5f4f8eae8ae4719271a923e2068abbeec88d966cb7e9897d31f031086ba59fa",
+    "accepted_dependency-catalog.json": "da3f6f9308eb0a70c5682d2f48ed9c2371d10a19cff5bc71256251e0201c2e0e",
+    "candidate_source-catalog.json": "fb030e089180b5be22dbafe21c304cdbe35f7241532f1358b9444f3cc7311a97",
+    "candidate_dependency-catalog.json": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+    "DRIVER-DIFF.patch": "f638b4c1b6522065656190f78db9620512691b332acc52008010c7fcfac29024",
+    "CORRECTION.md": "61474a7e871dafada29e90e326068b36070513b544fb9f6bf27b97baf1b190c7",
+    "ROOT-COMMAND.txt": "e09bb7fcfb1d16df6983d54fbe05dd2d3ea4eb95bc9a38e48c359fdf1ea46661",
+    "PREPARATION.md": "2f2bc54c6add498de272f30b8daad75224735cecb9a1d9ca70c6a5e7ea18e9e7",
+    "reuse-binding.json": "7341aff4cc30ea4093b512ee6cd100d6cd477005c3f2eb7b1ffc7d974bc4434a"
+  },
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "commands": [
+    {
+      "mode": "AcceptedContent",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "FinalizeMetadataNow",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-FinalizeMetadataNow"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "MetadataClassificationOnly",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-MetadataClassificationOnly"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "ProposedPolicy",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-ProposedPolicy"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "CurrentAudit",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "oracle": "ordinary no-argument current two-root audit; exit0/statusCLEAN/authorityB981/local-origin-main/roots[.,.github/workflows]; preserve full findings/limitations"
+    }
+  ],
+  "classifier_reused_not_replayed": true,
+  "short_temp_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps235-e5e8-c1",
+  "short_temp_observed_absent": true,
+  "original_run_stays_failed_immutable": true,
+  "product_git_native_state_mutations": false,
+  "payload_or_compile_import_executions": 0,
+  "material_preparation_impediments": [],
+  "launch": "& 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe' -I -B 'C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-continuation-one/runner.py' --run-once '<ROOT_AUTHORIZED_MANIFEST_SHA256>'",
+  "limits": {
+    "overall_seconds": 3900,
+    "per_command_seconds": 600,
+    "native_read_seconds": 60,
+    "cleanup_reserve_seconds": 30,
+    "maximum_stream_bytes": 8388608,
+    "maximum_output_bytes": 67108864
+  },
+  "qualified_ownership_unchanged": true,
+  "stop_writes": true
+}

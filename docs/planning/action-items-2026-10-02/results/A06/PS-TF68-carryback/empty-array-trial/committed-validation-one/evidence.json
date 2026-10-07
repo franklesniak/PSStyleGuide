@@ -1,0 +1,136 @@
+{
+  "schema": 1,
+  "state": "SEALED_PREPARATION_ONLY_UNAPPROVED_NO_EXECUTION",
+  "sealed_utc": "2026-10-07T02:04:56.861310+00:00",
+  "manifest_sha256": "49b021f07af3d0bffd8e4004ca3cb8b07c6872a8cdcfb87f16e46442dc65c75a",
+  "files": {
+    "transport-prefix.py": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+    "run-stage.py": "b782816211fc9245376aac4f25930dafbb8d5a9339f2ea17a7164ac989467ab1",
+    "driver-body.py": "c51143e03c1676afe74fea5a4c1a1184514455a9b278877219d4e721432e77f7",
+    "runner.py": "1d70b66675e3822e67210575a9917420882150f709c6a54e12d1152cc2cb4f74",
+    "input-guard.json": "ab7574a63cc424f16eab0e33560654be9712de0e56da07762d21dfb7e4e53220",
+    "accepted_source-catalog.json": "f5f4f8eae8ae4719271a923e2068abbeec88d966cb7e9897d31f031086ba59fa",
+    "accepted_dependency-catalog.json": "da3f6f9308eb0a70c5682d2f48ed9c2371d10a19cff5bc71256251e0201c2e0e",
+    "candidate_source-catalog.json": "fb030e089180b5be22dbafe21c304cdbe35f7241532f1358b9444f3cc7311a97",
+    "candidate_dependency-catalog.json": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
+    "DRIVER-DIFF.patch": "dd6e7707d396f562bb4e2741815b4d24df81988cacb32bdf19baa1ddd832f6d4",
+    "ROOT-COMMAND.txt": "64a253ad796e1c88bbf7c53438205e192473eca7ddf5e071884204457d72bd74",
+    "PREPARATION.md": "dfaa2a9b473d59f955d37ce3afca8cb7af5f0a542c1ae095899d65903a03130a",
+    "reuse-binding.json": "ccc0cbc48ad357bcdc056b6d6ed974f1bf77dac0ed1dc1a6f90e0339fed4fcf9"
+  },
+  "source_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "accepted_fixture": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "qualified_transport_unchanged": true,
+  "source_snapshots_guarded": true,
+  "graph_catalogs_reused_with_release_byte_guard": true,
+  "commands": [
+    {
+      "mode": "AcceptedMaintenance",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+      ],
+      "oracle": "exit0; exact base/head/policy=B981, classification=maintenance_required"
+    },
+    {
+      "mode": "AcceptedContent",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "FinalizeMetadataNow",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-FinalizeMetadataNow"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "MetadataClassificationOnly",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-MetadataClassificationOnly"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "ProposedPolicy",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-ProposedPolicy"
+      ],
+      "oracle": "exit0; actual exact-H/B content/finalization/classification/proposed mode, no SelfTest"
+    },
+    {
+      "mode": "CurrentAudit",
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "oracle": "ordinary no-argument current two-root audit; exit0/statusCLEAN/authorityB981/local-origin-main/roots[.,.github/workflows]; preserve full findings/limitations"
+    }
+  ],
+  "launch": "& 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe' -I -B 'C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-one/runner.py' --run-once '<ROOT_AUTHORIZED_MANIFEST_SHA256>'",
+  "source_git_native_state_mutations": false,
+  "payload_import_compile_test_native_executions": 0,
+  "material_preparation_impediments": [],
+  "pending": [
+    "root private syntax/hash/source qualification",
+    "separate explicit authorized manifest/release",
+    "fresh actual native main and ordinary registry audit observations",
+    "five actual endpoint outcomes",
+    "final independent result/input binding and new-head review/CI/service acceptance"
+  ],
+  "static_inspection_scope": "Only read-only local Git and raw file/data/hash inspection; no native API, product, parser, import, compile or audit execution."
+}

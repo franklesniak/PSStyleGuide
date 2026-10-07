@@ -1,0 +1,36 @@
+{
+  "accepted": {
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "index_entries_sha256": "75f9d1df83f84e05deff97269129655e920cb6c753937e1b68740cc549a27454",
+    "refs_sha256": "07740f2c0ec9f8e2f54e0b0b8c45d6a43e4a27e17900e9621b8618b035d0ab96",
+    "config_sha256": "58267819b953ef7fbc079f543b139a8064c32d6d9d3de767c8c54792d88ec18b",
+    "physical_metadata_sha256": {
+      "HEAD": "a76172623950e1a8ae143edb1746dc98633b8403d441fa7d5fdad3bddaac8e71",
+      "index": "6d8a233697a64828ca0808ca6fa59c1acc4d6212d736b6e65fa53099c2490817",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "branch": "",
+    "origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "origin_url": "https://github.com/franklesniak/PSStyleGuide.git",
+    "clean": true
+  },
+  "candidate": {
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "index_entries_sha256": "ce5ae8f43cbbd0cfcb638162ccafc0c42ef2bc2548d3a249b79e1f8340f8d16f",
+    "refs_sha256": "07740f2c0ec9f8e2f54e0b0b8c45d6a43e4a27e17900e9621b8618b035d0ab96",
+    "config_sha256": "e2f36ee9a5de4d73b817e670295cd9f578b38a51ca46d1006ad9ee651fb4c1c9",
+    "physical_metadata_sha256": {
+      "HEAD": "844b5d9b22786dc7d876789d284cee6242ffa2e1dfb0e20e7006d53acb0b4576",
+      "index": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+      "config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+      "config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529"
+    },
+    "branch": "codex/tf68-compareback",
+    "origin_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "origin_url": "https://github.com/franklesniak/PSStyleGuide.git",
+    "clean": true
+  }
+}

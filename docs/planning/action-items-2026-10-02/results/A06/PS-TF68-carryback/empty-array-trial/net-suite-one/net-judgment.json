@@ -1,0 +1,22 @@
+{
+  "state": "SCOPED_NET_MEASUREMENT_COLLECTED",
+  "order": [
+    "B",
+    "A"
+  ],
+  "aggregate_seconds": {
+    "B": 542.5610165079997,
+    "A": 574.0412735630007
+  },
+  "reduction_seconds": 31.480257055000948,
+  "reduction_percent": 5.483971014768159,
+  "numeric_gate_passed": true,
+  "disposition": "PROVISIONAL_NUMERIC_NET_BENEFIT_ROOT_JUDGMENT_REQUIRED",
+  "root_interference_judgment_required": true,
+  "single_pair_variance_not_established": true,
+  "cold_bootstrap_and_full_SelfTest_included": true,
+  "B_new109_test_cost_included": true,
+  "cleanup_separate": true,
+  "resampling": false,
+  "committed_endpoint_audit_acceptance_not_established": true
+}

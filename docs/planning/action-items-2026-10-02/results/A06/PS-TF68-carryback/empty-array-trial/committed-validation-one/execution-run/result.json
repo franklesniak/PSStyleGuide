@@ -1,0 +1,142 @@
+{
+  "state": "failed",
+  "started_utc": "2026-10-07T02:07:07.351016+00:00",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "stages": [
+    {
+      "name": "NativeMainInitial",
+      "command": [
+        "C:\\Program Files\\GitHub CLI\\gh.EXE",
+        "api",
+        "repos/franklesniak/PSStyleGuide/git/ref/heads/main"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "started_utc": "2026-10-07T02:07:40.122728+00:00",
+      "timeout_seconds": 60,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 41232,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 6,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 6,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-07T02:07:40.749344+00:00",
+      "log_sha256": "e3baabb695069047e828c802d5c0f178bf0c549d75a46dbc5e460ead9e4350c5"
+    },
+    {
+      "name": "AcceptedMaintenance",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-07T02:07:54.501213+00:00",
+      "timeout_seconds": 600,
+      "exit": 0,
+      "state": "passed",
+      "cleanup": [],
+      "worker_pid": 23288,
+      "wrapper_exit": 0,
+      "job_before_cleanup": {
+        "total": 16,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 16,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-07T02:07:55.065843+00:00",
+      "log_sha256": "f28fe2729c11cb9527f59a28bf6556f4657656822e7e7aab196c11ab4bb214a0"
+    },
+    {
+      "name": "AcceptedContent",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "started_utc": "2026-10-07T02:08:11.348857+00:00",
+      "timeout_seconds": 600,
+      "exit": 1,
+      "state": "failed",
+      "cleanup": [],
+      "worker_pid": 52648,
+      "wrapper_exit": 1,
+      "job_before_cleanup": {
+        "total": 460,
+        "active": 0,
+        "terminated": 0
+      },
+      "job_after_cleanup": {
+        "total": 460,
+        "active": 0,
+        "terminated": 0
+      },
+      "finished_utc": "2026-10-07T02:08:31.344181+00:00",
+      "log_sha256": "c0c08918796514baf7af7beb2273e1f9e74fbdb8002498589564a9bf836f8f78"
+    }
+  ],
+  "primary_failure": {
+    "message": "Stage failed: AcceptedContent; primary native exit=1; None",
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\runner.py\", line 212, in <module>\n    run_stage(item['mode'],item['command'],M['limits']['per_command_seconds'],Path(item['cwd']))\n  File \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\runner.py\", line 187, in run_stage\n    if record['state']!='passed':raise RuntimeError('Stage failed: '+label+'; primary native exit='+str(record['exit'])+'; '+str(record.get('primary_error')))\n                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Stage failed: AcceptedContent; primary native exit=1; None\n"
+  },
+  "cleanup_failures": [],
+  "manifest_sha256": "849c934baa7c41fcc53403b26e5bb4f7f20676ac2a0da5ed0ff38db6e871469e",
+  "native_initial": {
+    "observed_at": "2026-10-07T02:07:40.757929+00:00",
+    "native": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    },
+    "owned_stage": "NativeMainInitial"
+  },
+  "classification": {
+    "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "policy": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "classification": "maintenance_required",
+    "maintenancePaths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json"
+    ]
+  },
+  "guards_equal": true,
+  "finished_utc": "2026-10-07T02:08:50.166638+00:00",
+  "whole_seconds": 104.51600000000326
+}
