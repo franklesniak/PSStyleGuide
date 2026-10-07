@@ -1,0 +1,483 @@
+{
+  "schema": 1,
+  "state": "PREPARATION_ONLY_NOT_RELEASED",
+  "execution_authorized": false,
+  "tests_executed": 0,
+  "native_requests": 0,
+  "product_mutations": 0,
+  "prepared_utc": "2026-10-07T04:20:16.1511360Z",
+  "owner": "root",
+  "report": "PREPARATION.md",
+  "source": {
+    "repository": "franklesniak/PSStyleGuide",
+    "reviewed_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "merged_commit": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "landing_acceptance": "ROOT_MUST_BIND_TERMINAL_SUCCESS"
+  },
+  "target": {
+    "repository": "franklesniak/TerraformStyleGuide",
+    "accepted_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+    "existing_checkout_head": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+    "existing_checkout": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+    "candidate_head": null,
+    "candidate_tree": null,
+    "candidate_branch": null,
+    "accepted_fixture": null
+  },
+  "allowed_paths": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "docs/dependency-maintenance.md"
+  ],
+  "mode": "100644",
+  "decision": "D94.1 mechanical propagation; D07 date reconciliation; R4 README no-change retained",
+  "transfer_advice": {
+    "current": {
+      "A06": 2,
+      "A03": 4,
+      "A07": 6,
+      "A21": 6
+    },
+    "before_three_path_implementation": {
+      "A06": 3,
+      "A03": 4,
+      "A07": 7,
+      "A21": 7
+    },
+    "cap": 12,
+    "root_only": true,
+    "A03_reason": "No changed workflow/admission/freshness contracts",
+    "A07_reason": "Touched dependency-maintenance metadata carryback",
+    "no_change_spends": 0
+  },
+  "runtime": {
+    "windows_named": {
+      "python": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+        "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+      },
+      "python_base": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+        "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a"
+      },
+      "python_dll": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.dll",
+        "sha256": "9a0e3435aaa680d868150f87ab3e388ad2eebc22f87e036155c7b4eda8cd2120"
+      },
+      "pwsh": {
+        "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+      },
+      "node": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+      },
+      "git": {
+        "path": "C:\\Program Files\\Git\\cmd\\git.exe",
+        "sha256": "78211c7ed73988da93a6d8a33d47ec6187f464d7ea2a9a00c182bbd7a1ecf30f"
+      },
+      "bash": {
+        "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+        "sha256": "0010d7d71a94b0441028eea42381589483836d2c097f24940d282f5c4eba7919"
+      },
+      "cmd": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "sha256": "15cd209c995b7d3009c91ca40892d5b8f1fb162f3e5f10716642ea278e8e0d7b"
+      },
+      "analyzer": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1",
+        "sha256": "b65f47ef115a4f68b562ca2ed749d3aab48d16a478f30e30a43df5d22ba54ac3"
+      }
+    },
+    "windows_rows_source": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/manifest.root-authorized.json",
+    "linux_image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "linux": {
+      "node": "24.18.1",
+      "pwsh": "7.6.3",
+      "network": "none",
+      "python_path": "/opt/psstyleguide-runtime/venv/bin/python",
+      "module_import": "Explicit task-owned analyzer/PSScriptAnalyzer.psd1",
+      "npm": "11.16.0",
+      "python": "3.12.3"
+    },
+    "analyzer_archive": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\analyzer.tar",
+      "sha256": "c7a69a6f7d8eb881657822c6566b0f8eb1ab2b5d1d1e6109e5d37d6ac684e32e",
+      "bytes": 347166720
+    },
+    "analyzer_rows_source": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/manifest.root-authorized.json",
+    "target_dependency_catalog": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R2/dependency-catalog.json",
+    "dependency_count": 1914,
+    "dependency_roots": [
+      "node_modules",
+      ".github/workflows/node_modules"
+    ],
+    "actual_current_inventory_required": true
+  },
+  "commands": [
+    {
+      "overall_seconds": 600,
+      "harness": "Adapt qualified windows.py",
+      "argv": [
+        "<PYTHON>",
+        "-I",
+        "-B",
+        "<TF_PACKET>/windows.py",
+        "--execute-root-approved",
+        "--manifest",
+        "<NEW_AUTHORIZED_MANIFEST>",
+        "--approved-manifest-sha256",
+        "<NEW_SHA256>",
+        "--mode",
+        "focus"
+      ],
+      "phase": "focus-windows",
+      "child_seconds": 300,
+      "expected_cases": 109
+    },
+    {
+      "overall_seconds": 600,
+      "harness": "Adapt qualified launch.py",
+      "argv": [
+        "<PYTHON>",
+        "-I",
+        "-B",
+        "<TF_PACKET>/launch.py",
+        "--execute-root-approved",
+        "--manifest",
+        "<NEW_AUTHORIZED_MANIFEST>",
+        "--approved-manifest-sha256",
+        "<NEW_SHA256>",
+        "--mode",
+        "focus"
+      ],
+      "phase": "focus-linux",
+      "child_seconds": 300,
+      "expected_cases": 109
+    },
+    {
+      "phase": "quality-each-platform",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "<TF_PACKET>/quality.ps1",
+        "-SourceRoot",
+        "<TF_CANDIDATE>",
+        "-AnalyzerPath",
+        "<PINNED_PSD1>",
+        "-OutputPath",
+        "<OUTPUT>",
+        "-PacketRoot",
+        "<TF_PACKET>"
+      ],
+      "oracle": "Both changed ps1 files exact-byte ParseFile errors0/PSSA1.24.0 Warning+Error0",
+      "overall_seconds": 180,
+      "child_seconds": 150
+    },
+    {
+      "phase": "staged-preflight",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "oracle": "native0; exact unchanged source/index/dependency guards",
+      "seconds": 300,
+      "cwd": "<TF_PRIVATE_STAGED_FIXTURE>"
+    },
+    {
+      "cwd": "<TF_PRIVATE_STAGED_FIXTURE>",
+      "oracle": "11Passed/0Skipped including actual complete SelfTest and unconditional109 cases; native0; guards equal",
+      "phase": "aggregate",
+      "overall_shared_seconds": 3900,
+      "seconds": 3000,
+      "argv": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ]
+    },
+    {
+      "phase": "AcceptedMaintenance",
+      "argv": [
+        "<NODE>",
+        "<TF_ACCEPTED_FIXTURE>/.github/workflows/Classify-InstructionMaintenance.mjs",
+        "<TF_ACCEPTED_FIXTURE>",
+        "<TF_B>",
+        "<TF_H>"
+      ],
+      "oracle": "native0/wrapper0; exact B,H,policyB; maintenance_required and exact3maintenance paths",
+      "seconds": 600,
+      "cwd": "<TF_ACCEPTED_FIXTURE>"
+    },
+    {
+      "phase": "AcceptedContent",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "<TF_H>",
+        "-PublishedBaselineRevision",
+        "<TF_B>"
+      ],
+      "oracle": "native0/wrapper0",
+      "seconds": 600,
+      "cwd": "<TF_ACCEPTED_FIXTURE>"
+    },
+    {
+      "phase": "FinalizeMetadataNow",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "<TF_H>",
+        "-PublishedBaselineRevision",
+        "<TF_B>",
+        "-FinalizeMetadataNow"
+      ],
+      "oracle": "native0/wrapper0; actual UTC day",
+      "seconds": 600,
+      "cwd": "<TF_ACCEPTED_FIXTURE>"
+    },
+    {
+      "phase": "MetadataClassificationOnly",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "<TF_H>",
+        "-PublishedBaselineRevision",
+        "<TF_B>",
+        "-MetadataClassificationOnly"
+      ],
+      "oracle": "native0/wrapper0",
+      "seconds": 600,
+      "cwd": "<TF_ACCEPTED_FIXTURE>"
+    },
+    {
+      "phase": "ProposedPolicy",
+      "argv": [
+        "<PWSH>",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "<TF_H>",
+        "-PublishedBaselineRevision",
+        "<TF_B>",
+        "-ProposedPolicy"
+      ],
+      "oracle": "native0/wrapper0",
+      "seconds": 600,
+      "cwd": "<TF_CANDIDATE>"
+    },
+    {
+      "phase": "CurrentAudit",
+      "argv": [
+        "<NODE>",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "oracle": "native0/wrapper0 CLEAN; both roots; authorityB; no findings/unresolved/unused exceptions; preserve offline limitation",
+      "seconds": 600,
+      "cwd": "<TF_CANDIDATE>"
+    },
+    {
+      "phase": "ordinary-markdown",
+      "argv": [
+        "<NPM>",
+        "run",
+        "lint:md"
+      ],
+      "oracle": "native0; normal caller limits retained",
+      "cwd": "<TF_CANDIDATE>"
+    },
+    {
+      "phase": "ordinary-nested-markdown",
+      "argv": [
+        "<NPM>",
+        "run",
+        "lint:md:nested"
+      ],
+      "oracle": "native0; normal caller limits retained",
+      "cwd": "<TF_CANDIDATE>"
+    }
+  ],
+  "guards": {
+    "focus": {
+      "converter_events": 0,
+      "helper_restoration": true,
+      "passed_matrices": 1,
+      "maximum_output_bytes": 2097152,
+      "required_parser_calls": 109,
+      "event_limit": 2000,
+      "required_decoder_calls": 109,
+      "blob_bytes": 65536
+    },
+    "aggregate": {
+      "maximum_output_bytes": 67108864,
+      "maximum_stream_bytes": 8388608,
+      "cleanup_reserve_seconds": 30
+    },
+    "endpoints": {
+      "overall_seconds": 3900,
+      "per_command_seconds": 600,
+      "maximum_stream_bytes": 8388608,
+      "native_read_seconds": 60,
+      "maximum_output_bytes": 67108864,
+      "cleanup_reserve_seconds": 30
+    },
+    "windows": "Qualified gated Job Object; preserve direct Popen native exit; no live residue; primary and observer errors distinct",
+    "linux": "Qualified subreaper/identity-aware escaped-session collection; settlement.require_successful_exited_children; every collected native status0; exact owned container absent",
+    "short_temp": "New absent task-owned short TEMP/TMP/TMPDIR; reject reparse parents; exclusive owner marker; only remove marker and empty owned root; preserve any residue; no recursive cleanup",
+    "input": "Complete raw source/mode/index/config/fullrefs/dependency/runtime before-after equality; actual UTC date; native-main/revocation rebind around audit",
+    "cold_and_foreign_cache": "Preserve all prior fail-closed parser/cache/native-exit semantics unchanged"
+  },
+  "reuse": [
+    "Other7 source paths,10 coupled contracts,4 generated-output input identities from accepted peer map",
+    "Unchanged converter/decoder/reuse/security/classifier/Node600/platform generator evidence at exact input coverage",
+    "Qualified ownership and settlement transports, not old success results",
+    "Existing finite109 expected-case data after confirming T1 fixture outside test function"
+  ],
+  "not_selected": [
+    "Performance replay",
+    "Broad Node/classifier/security replay",
+    "Generator platform replay solely for unchanged generator inputs",
+    "New framework or documentation architecture",
+    "Closed TF68 review or fabricated PR",
+    "Any product/native/test execution during preparation"
+  ],
+  "freeze_inputs_required": [
+    "Terminal PS landed success/current source and TF refs",
+    "Actual edit UTC date",
+    "TF clean base/branch/accepted fixture/H reachability",
+    "Exact raw candidate catalog and committedH/tree/parent",
+    "Current dependency/runtime/module/image identities",
+    "New adapted private driver hashes and success-reader qualification",
+    "New owned run names and short-root absence",
+    "Complete host Git/index/config/fullrefs guard",
+    "Exact child PATH/environment and command budgets",
+    "Current audit known-revocation/native-main readback",
+    "Independent final quality and current review baselines"
+  ],
+  "final_gates": [
+    "Fresh same-input Copilot and Codex results; observed Balanced/fallback",
+    "Current ordinaryCI success",
+    "Independent actual-candidate quality",
+    "Normal merge and landedCI",
+    "Actual dedicated-service selection plus success on legitimate newTFPR",
+    "Fresh PS/TF reverse comparison; justified finite exceptions"
+  ],
+  "clocks": {
+    "preserve_all_history": true,
+    "TF68_deadline": "2026-10-13T23:47:31Z",
+    "TF68_rounds": 7,
+    "replacement_does_not_reset": true,
+    "PS235_rounds": 2,
+    "PS235_deadline": "2026-10-14T20:09:39.767792Z"
+  },
+  "references": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round2-peer-delta-readiness/REPORT.md",
+      "sha256": "143c3598fc2bc3688dc6c47a85de25c98328c19f6845b0b25c21480c69221454"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round2-peer-delta-readiness/evidence.json",
+      "sha256": "9d0ddb1dc0ee9fa5ddefdbc6ca1a44678bc3cbfcf95f1b5d7421dfa3f2289349"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/FINAL-VALIDATION.json",
+      "sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/manifest.root-authorized.json",
+      "sha256": "27463d3e733383250ab7722bca8ebf1fc3af426ce0d446971312459b854de8ed"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/commands.json",
+      "sha256": "922610fd884f539e5aa30d9b121f69262d977908108352685ce695447104e9bd"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/focus.ps1",
+      "sha256": "709e4a50410f873183a43f9af009b0a423399f8b2aa75335c22c4c821bb248dc"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/quality.ps1",
+      "sha256": "c7de2c191911d31ba191a7c4564ff8b37ff972034e831dbf19b06609ba62a444"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/finalization-one/qualification/compare.py",
+      "sha256": "d5bbeb8d51a6802a2fe75e2135c82ec3cf147edfd769348a680016d063897daf"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-one/manifest.authorized.json",
+      "sha256": "849c934baa7c41fcc53403b26e5bb4f7f20676ac2a0da5ed0ff38db6e871469e"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-continuation-one/manifest.authorized.json",
+      "sha256": "a5b11e9bf5124ba01f181b59a89f67866f7da8e6430e674c54f05d8894ae5b2e"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-continuation-one/driver-body.py",
+      "sha256": "f4540012b9ea297a3b212ce66c34fb7d1efe834b5c558a2d03eb4751c62db79f"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-continuation-one/transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/round1-recovery-exhaustion/empty-array-trial/committed-validation-continuation-one/run-stage.py",
+      "sha256": "b782816211fc9245376aac4f25930dafbb8d5a9339f2ea17a7164ac989467ab1"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-round6-timeout-remedy/implementation/final-validation/manifest.authorized.json",
+      "sha256": "775e0aa4d786f27a1e46baf0945f3f435e4b1710684ed7121e4f86c33b7410e4"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-round6-timeout-remedy/implementation/final-validation/ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-round6-timeout-remedy/implementation/final-validation/settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-round6-timeout-remedy/implementation/final-validation/ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-PS-carryback-20261006/linux-final-aggregate/inside.py",
+      "sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-R2/dependency-catalog.json",
+      "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1"
+    }
+  ],
+  "next_action": "Root verifies remaining landed PS gates, refreshes accepted refs/date and unchanged identities, records scoped transfer increments, then releases exactly3TF paths and separately hash-bound validation."
+}

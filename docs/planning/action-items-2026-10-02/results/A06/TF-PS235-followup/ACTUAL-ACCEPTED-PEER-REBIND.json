@@ -1,0 +1,597 @@
+{
+  "schema": 1,
+  "status": "ACTUAL_ACCEPTED_PEER_REBOUND_THREE_PATH_REPAIR_REQUIRED",
+  "verified_at": "2026-10-07T04:33:17.331250+00:00",
+  "edit_utc_date": "2026-10-07",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+  "source_acceptance_sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+  "prior_mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\evidence.json",
+  "prior_mapping_sha256": "9d0ddb1dc0ee9fa5ddefdbc6ca1a44678bc3cbfcf95f1b5d7421dfa3f2289349",
+  "native_refs_before": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    }
+  },
+  "native_refs_after": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    }
+  },
+  "raw_entries": [
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+      "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "bytes": 936
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "blob": "670083e767627cfed90a61f788021dba88de1091",
+      "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "bytes": 994
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+      "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "bytes": 38820
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "bytes": 38834
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+      "sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+      "bytes": 10446
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+      "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+      "bytes": 10453
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+      "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+      "bytes": 285263
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "bytes": 13541
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+      "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+      "bytes": 13470
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+      "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "bytes": 36084
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+      "bytes": 36081
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "bytes": 510470
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "bytes": 130003
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+      "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "bytes": 12865
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "bytes": 12893
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/copilot-code-review.yml",
+      "mode": "100644",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "bytes": 51809
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "bytes": 51830
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "bytes": 6095
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "bytes": 6095
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/NpmTools.mjs",
+      "mode": "100644",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "bytes": 7656
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/NpmTools.mjs",
+      "mode": "100644",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "bytes": 7656
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "bytes": 91
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "bytes": 91
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+      "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "bytes": 816
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "package.json",
+      "mode": "100644",
+      "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+      "bytes": 837
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "bytes": 5405
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".husky/pre-commit",
+      "mode": "100644",
+      "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+      "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "bytes": 3249
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".husky/pre-commit",
+      "mode": "100644",
+      "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+      "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "bytes": 3249
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/document-metadata-classification.json",
+      "mode": "100644",
+      "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+      "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      "bytes": 388
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/document-metadata-classification.json",
+      "mode": "100644",
+      "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+      "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+      "bytes": 387
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "bytes": 1517
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "bytes": 1496
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "copilot-instructions.md",
+      "mode": "100644",
+      "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "copilot-instructions.md",
+      "mode": "100644",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "bytes": 152868
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "powershell.instructions.md",
+      "mode": "100644",
+      "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "bytes": 148831
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "terraform.instructions.md",
+      "mode": "100644",
+      "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "bytes": 153067
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "STYLE_GUIDE_CHAT.md",
+      "mode": "100644",
+      "blob": "556538c7664327652bc42875b63a5bf6bc16783f",
+      "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "bytes": 148852
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "STYLE_GUIDE_CHAT.md",
+      "mode": "100644",
+      "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+      "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+      "bytes": 152962
+    },
+    {
+      "repository": "PS",
+      "revision": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+      "path": "STYLE_GUIDE_FULL.md",
+      "mode": "100644",
+      "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+      "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "bytes": 257290
+    },
+    {
+      "repository": "TF",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": "STYLE_GUIDE_FULL.md",
+      "mode": "100644",
+      "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+      "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+      "bytes": 222292
+    }
+  ],
+  "candidate_postimages": [
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "post_sha256": "6cdf45bf178fe4e27e3ff063ec93e7e1277a604cef8f83ac7e68f7f361e88787",
+      "post_bytes": 10453,
+      "accepted_source_blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+      "exact_substitutions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "post_sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+      "post_bytes": 299417,
+      "accepted_source_blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "exact_substitutions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository.",
+          "TF_regions": [
+            {
+              "start_line": 2729,
+              "end_line": 2729
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2977,
+              "end_line": 2977
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "post_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "post_bytes": 510837,
+      "accepted_source_blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "exact_substitutions": []
+    }
+  ],
+  "dependency_catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+  "dependency_catalog_sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+  "dependency_files_verified": 1914,
+  "source_head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "source_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "target_base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "target_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "new_material_finding": false,
+  "product_changes": 0,
+  "transfer_spent": false,
+  "limits": "Same actual trees and every mapped raw blob/mode preserve the prior finite exception reasoning. No whole audit or tests repeated. Root must record transfer and establish clean base/branch before product edits."
+}

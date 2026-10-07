@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "status": "THREE_PATH_SOURCE_EDIT_RELEASED",
+  "released_at": "2026-10-07T04:34:47.428231+00:00",
+  "objective": "Carry accepted D94.1 validator/109-case repair and touched guide metadata into TF; preserve finite exceptions and prove paired convergence.",
+  "repository": "franklesniak/TerraformStyleGuide",
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "branch": "codex/ps235-validator-followup",
+  "base": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "base_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+  "source": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "source_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+  "source_acceptance_sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+  "actual_peer_rebind": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ACTUAL-ACCEPTED-PEER-REBIND.json",
+  "actual_peer_rebind_sha256": "1c7a2120d241c6721244e4f5aca3260ff4081f20e185d4e7e6692da9aba21124",
+  "scope": [
+    "docs/dependency-maintenance.md",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "postimages": [
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "post_sha256": "6cdf45bf178fe4e27e3ff063ec93e7e1277a604cef8f83ac7e68f7f361e88787",
+      "post_bytes": 10453,
+      "accepted_source_blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+      "exact_substitutions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "post_sha256": "0fe96e979f7168cfc4aad91d87214607f3ad9188575b995b40d2d42c4c18f95f",
+      "post_bytes": 299417,
+      "accepted_source_blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "exact_substitutions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository.",
+          "TF_regions": [
+            {
+              "start_line": 2729,
+              "end_line": 2729
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2977,
+              "end_line": 2977
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ]
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "preimage": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "post_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "post_bytes": 510837,
+      "accepted_source_blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "exact_substitutions": []
+    }
+  ],
+  "edit_utc_date": "2026-10-07",
+  "transfers_before": {
+    "A06": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 6,
+      "cap": 12
+    },
+    "A07": {
+      "used": 6,
+      "cap": 12
+    }
+  },
+  "transfers": {
+    "A06": {
+      "used": 3,
+      "cap": 12
+    },
+    "A03": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 7,
+      "cap": 12
+    },
+    "A07": {
+      "used": 7,
+      "cap": 12
+    }
+  },
+  "transfer_basis": "A06 coupled peer transfer; A21 changed validator/SelfTest; A07 touched dependency-guide metadata; A03 unchanged workflow/admission contracts.",
+  "prior_TF_history": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\execution-state.json",
+    "sha256": "9727f513952b56ef5a7007af9218520f9f229ec3a2c316a59566f0ee3b9c927e",
+    "pr": 68
+  },
+  "source_review_history": {
+    "pr": 235,
+    "rounds_used": 2,
+    "deadline": "2026-10-14T20:09:39.767792+00:00"
+  },
+  "first_request_at": "2026-10-05T23:47:31+00:00",
+  "deadline": "2026-10-13T23:47:31+00:00",
+  "rounds_used": 7,
+  "inherited_rounds": 7,
+  "review_rounds": [],
+  "pr": null,
+  "clock_basis": "Continue the unresolved paired TF outcome with the original TF68 clock and seven consumed rounds; next request consumes round8. No new request issued.",
+  "pending_native_operations": [],
+  "local_operation": null,
+  "product_edit_authorized": true,
+  "validation_execution_authorized": false,
+  "write_owner": "tf_ps235_followup_preparation; root retains Git/native/planning authority",
+  "restrictions": [
+    "Only the three listed product paths; preserve all other files and finite exceptions.",
+    "No test execution until actual private validation inputs are bound.",
+    "Root owns Git/index/config/refs, native requests, planning and counters.",
+    "No new framework, benchmark, broad unchanged suite, protected-file edit or bypass.",
+    "Retain original rounds/deadlines, all failed history, hourly CI rule and pending-operation suppression."
+  ],
+  "next_action": "Read applicable current instructions and apply only the exact three postimages; then freeze actual validation inputs.",
+  "branch_created_at": "2026-10-07T04:34:47.952447+00:00"
+}

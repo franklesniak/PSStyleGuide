@@ -1,0 +1,184 @@
+{
+  "status": "PREPARATION_IDENTITIES_VERIFIED_NOT_RELEASED",
+  "verified_at": "2026-10-07T04:25:22.696536+00:00",
+  "packet": {
+    "PREPARATION.md": "8308bc8d0479d674c2a0f53a00a100fe810f3dca28f1ff956f377d700d0fdb26",
+    "validation-plan.json": "85be3b39cf48ed4c78c773225641c3f2b557d27f4db8380073f4e54993f6672e"
+  },
+  "checked_references_and_runtime_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\REPORT.md",
+      "sha256": "143c3598fc2bc3688dc6c47a85de25c98328c19f6845b0b25c21480c69221454",
+      "bytes": 8821
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\evidence.json",
+      "sha256": "9d0ddb1dc0ee9fa5ddefdbc6ca1a44678bc3cbfcf95f1b5d7421dfa3f2289349",
+      "bytes": 74406
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION.json",
+      "sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0",
+      "bytes": 16116
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\manifest.root-authorized.json",
+      "sha256": "27463d3e733383250ab7722bca8ebf1fc3af426ce0d446971312459b854de8ed",
+      "bytes": 505161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\commands.json",
+      "sha256": "922610fd884f539e5aa30d9b121f69262d977908108352685ce695447104e9bd",
+      "bytes": 4117
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\focus.ps1",
+      "sha256": "709e4a50410f873183a43f9af009b0a423399f8b2aa75335c22c4c821bb248dc",
+      "bytes": 17095
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\quality.ps1",
+      "sha256": "c7de2c191911d31ba191a7c4564ff8b37ff972034e831dbf19b06609ba62a444",
+      "bytes": 1761
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\compare.py",
+      "sha256": "d5bbeb8d51a6802a2fe75e2135c82ec3cf147edfd769348a680016d063897daf",
+      "bytes": 8441
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\manifest.authorized.json",
+      "sha256": "849c934baa7c41fcc53403b26e5bb4f7f20676ac2a0da5ed0ff38db6e871469e",
+      "bytes": 26763
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\manifest.authorized.json",
+      "sha256": "a5b11e9bf5124ba01f181b59a89f67866f7da8e6430e674c54f05d8894ae5b2e",
+      "bytes": 26670
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\driver-body.py",
+      "sha256": "f4540012b9ea297a3b212ce66c34fb7d1efe834b5c558a2d03eb4751c62db79f",
+      "bytes": 13755
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\transport-prefix.py",
+      "sha256": "8b2a7cc3168ff5bb47c6f2bf33089e5f8496478361fc60bfa6589578eeb0aa52",
+      "bytes": 4238
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\run-stage.py",
+      "sha256": "b782816211fc9245376aac4f25930dafbb8d5a9339f2ea17a7164ac989467ab1",
+      "bytes": 3332
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\manifest.authorized.json",
+      "sha256": "775e0aa4d786f27a1e46baf0945f3f435e4b1710684ed7121e4f86c33b7410e4",
+      "bytes": 3398
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ownership.py",
+      "sha256": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+      "bytes": 6006
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\settlement.py",
+      "sha256": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+      "bytes": 1113
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\final-validation\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3308174f15320e26e32e5d4c1aa4bb906066077cf6fd432960690410c34e2e2f",
+      "bytes": 9020
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\inside.py",
+      "sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643",
+      "bytes": 18205
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R2\\dependency-catalog.json",
+      "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "bytes": 411879
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\python-venv\\Scripts\\python.exe",
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+      "bytes": 274424
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python.exe",
+      "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+      "bytes": 104952
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\python312.dll",
+      "sha256": "9a0e3435aaa680d868150f87ab3e388ad2eebc22f87e036155c7b4eda8cd2120",
+      "bytes": 6945272
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+      "bytes": 301368
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582",
+      "bytes": 92540232
+    },
+    {
+      "path": "C:\\Program Files\\Git\\cmd\\git.exe",
+      "sha256": "78211c7ed73988da93a6d8a33d47ec6187f464d7ea2a9a00c182bbd7a1ecf30f",
+      "bytes": 43352
+    },
+    {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "sha256": "0010d7d71a94b0441028eea42381589483836d2c097f24940d282f5c4eba7919",
+      "bytes": 43368
+    },
+    {
+      "path": "C:\\Windows\\System32\\cmd.exe",
+      "sha256": "15cd209c995b7d3009c91ca40892d5b8f1fb162f3e5f10716642ea278e8e0d7b",
+      "bytes": 339968
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1",
+      "sha256": "b65f47ef115a4f68b562ca2ed749d3aab48d16a478f30e30a43df5d22ba54ac3",
+      "bytes": 17822
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round6-timeout-remedy\\implementation\\linux-quality\\analyzer.tar",
+      "sha256": "c7a69a6f7d8eb881657822c6566b0f8eb1ab2b5d1d1e6109e5d37d6ac684e32e",
+      "bytes": 347166720
+    }
+  ],
+  "scope": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "docs/dependency-maintenance.md"
+  ],
+  "counter_advice": {
+    "current": {
+      "A06": 2,
+      "A03": 4,
+      "A07": 6,
+      "A21": 6
+    },
+    "before_three_path_implementation": {
+      "A06": 3,
+      "A03": 4,
+      "A07": 7,
+      "A21": 7
+    },
+    "cap": 12,
+    "root_only": true,
+    "A03_reason": "No changed workflow/admission/freshness contracts",
+    "A07_reason": "Touched dependency-maintenance metadata carryback",
+    "no_change_spends": 0
+  },
+  "limits": [
+    "No source or native mutation, test execution, transfer increment, or acceptance grant.",
+    "Current dependency inventories, full module identity, Linux image and adapted runners still need actual-candidate binding.",
+    "PS landed terminal success and fresh PS/TF native refs are required before implementation."
+  ]
+}

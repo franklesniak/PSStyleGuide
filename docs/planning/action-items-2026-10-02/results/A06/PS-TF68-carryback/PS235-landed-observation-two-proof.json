@@ -1,0 +1,127 @@
+{
+  "status": "LANDED_LOG_PROGRESS_VERIFIED_NOT_PAIRED_ACCEPTANCE",
+  "verified_at": "2026-10-07T04:17:45.460086+00:00",
+  "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "source_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "source_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-observation-two.json",
+  "snapshot_sha256": "06ab0446f1b7a1bbe047690d7c4d115e13fdbd36b127971a1558917451251d44",
+  "normal_merge": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-normal-merge.json",
+  "normal_merge_sha256": "732ba8b400cebd615a0a3cc88e8008129e6b1dde98497bd635e704a0bdf9b1d4",
+  "terminal_runs_verified": [
+    {
+      "id": 37570120429,
+      "attempt": 1,
+      "name": "Dev container boundary",
+      "event": "push",
+      "conclusion": "success",
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120429\\attempt-1\\run.json": "ebe3a5ba9a6ab71f3646e1a7f5fa9803f90d2f9655d05f912be18c30157af940",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120429\\attempt-1\\jobs.json": "60c3c1333cf5e9da53012913446e7363b6eddfa069ca0ed602be5416f05c7686",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120429\\attempt-1\\log.txt": "a6fd4a27bfeeaec9d756231d6db4ddf23fb8de80f3f39da6b7dbf20014d7796e",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120429\\attempt-1\\summary.json": "767d2f18a736e2dd4efa4feacdb5779d3f9ac0fafcd00c96aba07eb2446feaa3"
+      },
+      "skipped_jobs": [],
+      "boundary_step": "success"
+    },
+    {
+      "id": 37570120599,
+      "attempt": 1,
+      "name": "Copilot code review preparation",
+      "event": "push",
+      "conclusion": "success",
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120599\\attempt-1\\run.json": "763f6a4bea2d2d9f9d890a8527f05419e71fdccb6bae50026182ff5d3fcbb88e",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120599\\attempt-1\\jobs.json": "1ff3f2a90f8e96175e0c8b55e270500b525e2a4dccca86cff0e12991185fce37",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120599\\attempt-1\\log.txt": "666ca1fdc1b493eea3d89ef6c19c9808a1898ac4d7a077fe31a10e71cae86be4",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120599\\attempt-1\\summary.json": "dadf6d61252ad95ad6696fb99535cb55aee71838dce94a65e3a40197cf710c11"
+      },
+      "skipped_jobs": [],
+      "ordinary_preparation_steps": 14,
+      "dedicated_service_selection_proved": false
+    },
+    {
+      "id": 37570120503,
+      "attempt": 1,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "conclusion": "success",
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120503\\attempt-1\\run.json": "6ef4ff6b5424aa367cb3b57470b901c022180934414102aeb60722e39fccc037",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120503\\attempt-1\\jobs.json": "d0237fa8905e472726a4d4c56a3ee8f14d682108b5d8e99e8a6d2feb300c1903",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120503\\attempt-1\\log.txt": "63d182463602e36088c3a8f6242a058d0da76819c9af49a4efd8924cc9e34983",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570120503\\attempt-1\\summary.json": "311c9f0dd7679addab3e5a888e01b6d0a9dd6558083505204257285217ed0428"
+      },
+      "skipped_jobs": [],
+      "generator_platform_proof": {
+        "generator_windows_51": {
+          "job_id": 112626631127,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_windows_7": {
+          "job_id": 112626630986,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        "generator_linux_7": {
+          "job_id": 112626631157,
+          "results": [
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20261004.327.1.",
+            "Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20261004.327.1."
+          ]
+        }
+      },
+      "artifact_bytes": "equal",
+      "same_revision_admission": "success"
+    },
+    {
+      "id": 37570118398,
+      "attempt": 1,
+      "name": "Markdown Lint",
+      "event": "push",
+      "conclusion": "success",
+      "files": {
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570118398\\attempt-1\\run.json": "4ad446d9c094b18b1b239db2eddbd362ea6ba47c0900529b73683c4b6c52cf81",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570118398\\attempt-1\\jobs.json": "006fe4be151bf84a50cee78c12f16c108da680e10b38c7fe0bd36599df19d57f",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570118398\\attempt-1\\log.txt": "763ae7c60dd92584d1622a46d6055d637fd557d0b2ac6bc1d3095a554c3a9f8c",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-58a1345\\37570118398\\attempt-1\\summary.json": "8106153ce68f86b0a5c1c91335b9dc10daebe8a24b288702da194622ac9fde66"
+      },
+      "skipped_jobs": [],
+      "audit": {
+        "status": "CLEAN",
+        "unresolved": [],
+        "acceptedPackages": 0,
+        "unusedExceptions": [],
+        "proposedState": false,
+        "authority": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "authoritySource": "event-main",
+        "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+        "installedGraphRoots": [
+          ".github/workflows"
+        ],
+        "findings": [],
+        "applicable": true
+      },
+      "audit_limit": "Hosted workflow dependency-root audit; exact reviewed-tree local two-root evidence is separately retained."
+    }
+  ],
+  "pending_runs": [
+    {
+      "id": 37570120509,
+      "name": "Agent instruction validation",
+      "event": "push"
+    },
+    {
+      "id": 37570118386,
+      "name": "Copilot setup steps",
+      "event": "push"
+    }
+  ],
+  "limit": "No test replay or acceptance release. All six actual landed runs and unchanged current native refs still required for source acceptance; dedicated native service proof and paired convergence remain distinct."
+}

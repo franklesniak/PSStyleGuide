@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "PS235_merged_landed_CI_pending",
+  "status": "LANDED_SOURCE_CI_ACCEPTED_DEDICATED_ACTIVATION_PENDING",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,29 +89,7 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [
-    {
-      "kind": "Landed push CI",
-      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
-      "run_id": 37570120509,
-      "name": "Agent instruction validation",
-      "status": "in_progress"
-    },
-    {
-      "kind": "Landed push CI",
-      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
-      "run_id": 37570120503,
-      "name": "Build Style Guide Artifacts",
-      "status": "in_progress"
-    },
-    {
-      "kind": "Landed push CI",
-      "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
-      "run_id": 37570118386,
-      "name": "Copilot setup steps",
-      "status": "in_progress"
-    }
-  ],
+  "pending_native_operations": [],
   "local_operation": {
     "kind": "non_force_topic_publication_and_PR_body",
     "status": "completed",
@@ -119,7 +97,7 @@
     "reconciled_at": "2026-10-07T02:32:20.614Z"
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Collect and verify all actual landed push CI, bind native merge/main/tree, then rebind existing peer delta on accepted refs. S1 dedicated-service proof remains required; no fabricated service input or closed-PR review.",
+  "next_action": "Continue the actual TF follow-up in its linked execution state; source accepted, paired acceptance still incomplete.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -388,7 +366,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "c5f73069d46e9c40bd6b7efdd717bc76f875a589",
+  "planning_checkpoint": "baa03629864dd5a72df54e69eb7380e15ca2a344",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -413,7 +391,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-07T04:10:55.998423+00:00",
+  "updated_at": "2026-10-07T04:30:58.030290+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -2154,29 +2132,23 @@
     "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
     "merged_at": "2026-10-07T04:09:44Z",
     "normal_method": "merge",
-    "source_acceptance": "Landed CI pending; not yet accepted paired foundation."
+    "source_acceptance": "LANDED_SOURCE_CI_ACCEPTED_DEDICATED_ACTIVATION_PENDING"
   },
   "landed_CI": {
     "head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
-    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-observation-one.json",
-    "sha256": "64a0d5b4644c841ba65775d5a3117ac5d828f51cb41a249302b2ee8ec45a4990",
-    "captured_at": "2026-10-07T04:10:55.998423+00:00",
+    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-terminal.json",
+    "sha256": "56e3da50d7356170504f2e684971f966517d40be32032d7d5f691ec47f1701f0",
+    "captured_at": "2026-10-07T04:30:40.591014+00:00",
     "runs": [
-      {
-        "id": 37570120509,
-        "name": "Agent instruction validation",
-        "status": "in_progress",
-        "conclusion": null
-      },
       {
         "id": 37570120503,
         "name": "Build Style Guide Artifacts",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
-        "id": 37570120599,
-        "name": "Copilot code review preparation",
+        "id": 37570120509,
+        "name": "Agent instruction validation",
         "status": "completed",
         "conclusion": "success"
       },
@@ -2187,10 +2159,16 @@
         "conclusion": "success"
       },
       {
+        "id": 37570120599,
+        "name": "Copilot code review preparation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
         "id": 37570118386,
         "name": "Copilot setup steps",
-        "status": "in_progress",
-        "conclusion": null
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 37570118398,
@@ -2199,6 +2177,53 @@
         "conclusion": "success"
       }
     ],
-    "acceptance": false
+    "acceptance": true
+  },
+  "peer_followup_preparation": {
+    "status": "ROOT_VERIFIED_PREPARATION_ONLY",
+    "artifacts": {
+      "PREPARATION.md": {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF-PS235-followup-preparation\\PREPARATION.md",
+        "sha256": "8308bc8d0479d674c2a0f53a00a100fe810f3dca28f1ff956f377d700d0fdb26"
+      },
+      "validation-plan.json": {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF-PS235-followup-preparation\\validation-plan.json",
+        "sha256": "85be3b39cf48ed4c78c773225641c3f2b557d27f4db8380073f4e54993f6672e"
+      },
+      "ROOT-PREPARATION-VERIFICATION.json": {
+        "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF-PS235-followup-preparation\\ROOT-PREPARATION-VERIFICATION.json",
+        "sha256": "d95ad22c873cfe0dab81ee93fa12f2e9720cd55521936489b266663c050c37ac"
+      }
+    },
+    "implementation_released": false,
+    "transfer_counters_changed": false,
+    "next_action": "Collect final landed PS run; then bind accepted PS/TF refs and actual TF candidate before focused implementation."
+  },
+  "landed_source_acceptance": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+    "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
+    "accepted_at": "2026-10-07T04:30:58.030290+00:00"
+  },
+  "peer_followup_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\execution-state.json",
+    "transfers": {
+      "A06": {
+        "used": 3,
+        "cap": 12
+      },
+      "A03": {
+        "used": 4,
+        "cap": 12
+      },
+      "A21": {
+        "used": 7,
+        "cap": 12
+      },
+      "A07": {
+        "used": 7,
+        "cap": 12
+      }
+    },
+    "recorded_at": "2026-10-07T04:34:47.428231+00:00"
   }
 }
