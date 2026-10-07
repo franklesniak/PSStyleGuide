@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "parser_basis": "ROOT-SYNTAX-RESULT.json: exact archived bytes; no repeated Windows ParseFile",
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "name": "Test-AgentInstructions.ps1",
+      "parser_errors": [],
+      "diagnostics": []
+    },
+    {
+      "parser_basis": "ROOT-SYNTAX-RESULT.json: exact archived bytes; no repeated Windows ParseFile",
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "name": "Test-AgentInstructions.SelfTest.ps1",
+      "parser_errors": [],
+      "diagnostics": []
+    }
+  ],
+  "analyzer_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1",
+  "pwsh": "7.6.5",
+  "analyzer": "1.24.0"
+}

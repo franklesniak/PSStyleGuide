@@ -1,0 +1,23 @@
+{
+  "state": "ROOT_FINALIZATION_SOURCE_VERIFIED",
+  "utc": "2026-10-07T00:27:50.007348+00:00",
+  "candidate": {
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837,
+      "snapshot_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398,
+      "snapshot_sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8"
+    }
+  },
+  "source_rows_verified": 78,
+  "only_changes_from_qualified_trial": "Five literal null refusals, durable help, actual UTC metadata; deterministic in-memory reversal recovers qualified raw bytes.",
+  "all_other_inputs_unchanged": true,
+  "raw_git_patch_equal": true,
+  "finalization_references_verified": 22,
+  "independent_focus_review_references_verified": 724,
+  "final_payload_not_executed": true
+}

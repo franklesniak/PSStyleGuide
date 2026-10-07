@@ -1,0 +1,74 @@
+--- qualified-trial/.github/workflows/Test-AgentInstructions.ps1
++++ finalization-one/.github/workflows/Test-AgentInstructions.ps1
+@@ -23,7 +23,7 @@
+ #
+ # .NOTES
+ # Positional parameters are not supported.
+-# Version: 1.21.20261006.0
++# Version: 1.21.20261007.0
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([string])]
+@@ -3547,7 +3547,7 @@
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.3.20261006.0
++    # Version: 1.3.20261007.0
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([pscustomobject])]
+     param(
+--- qualified-trial/.github/workflows/Test-AgentInstructions.SelfTest.ps1
++++ finalization-one/.github/workflows/Test-AgentInstructions.SelfTest.ps1
+@@ -33,7 +33,7 @@
+ # None. The script throws when a self-test fails.
+ #
+ # .NOTES
+-# Version: 1.12.20261006.0
++# Version: 1.12.20261007.0
+ 
+ [CmdletBinding(PositionalBinding = $false)]
+ [OutputType([void])]
+@@ -211,8 +211,8 @@
+     # .DESCRIPTION
+     # Delegates to the real parser before changing one raw field per case.
+     # Requires explicit valid and invalid outcomes, no partial output on refusal,
+-    # and exact string-array types and values. Null-element semantics are
+-    # characterized separately against the frozen prior source before release.
++    # and exact string-array types and values. Nonstring elements, including
++    # null, are refused in prose blocks, table cells and top-level list items.
+     #
+     # .EXAMPLE
+     # Assert-MarkdownStringArrayContextSelfTest
+@@ -229,7 +229,7 @@
+     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+     # Parameters, return shape, and positional contract can change without notice.
+     # Positional parameters are disabled; internal callers use named arguments.
+-    # Version: 1.0.20261006.0
++    # Version: 1.0.20261007.0
+     [CmdletBinding(PositionalBinding = $false)]
+     [OutputType([void])]
+     param()
+@@ -265,7 +265,7 @@
+         # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+         # Parameters, return shape, and positional contract can change without notice.
+         # Positional parameters are disabled; internal callers use named arguments.
+-        # Version: 1.0.20261006.0
++        # Version: 1.0.20261007.0
+         [CmdletBinding(PositionalBinding = $false)]
+         [OutputType([pscustomobject])]
+         param(
+@@ -322,7 +322,12 @@
+         @{ Name = 'nested array'; Json = '[["text"]]'; Outcome = 'reject' },
+         @{ Name = 'object element'; Json = '[{}]'; Outcome = 'reject' },
+         @{ Name = 'bad first'; Json = '[1,"text"]'; Outcome = 'reject' },
+-        @{ Name = 'bad last'; Json = '["text",false]'; Outcome = 'reject' }
++        @{ Name = 'bad last'; Json = '["text",false]'; Outcome = 'reject' },
++        @{ Name = 'null element'; Json = '[null]'; Outcome = 'reject' },
++        @{ Name = 'null first string'; Json = '[null,"text"]'; Outcome = 'reject' },
++        @{ Name = 'null last string'; Json = '["text",null]'; Outcome = 'reject' },
++        @{ Name = 'null first number'; Json = '[null,1]'; Outcome = 'reject' },
++        @{ Name = 'null last number'; Json = '[1,null]'; Outcome = 'reject' }
+     )
+     try {
+         $strPlainMarkdown = $strMarkdown.Replace('`code`', 'code').Replace(

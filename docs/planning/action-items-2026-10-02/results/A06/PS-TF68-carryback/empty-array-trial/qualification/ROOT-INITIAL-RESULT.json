@@ -1,0 +1,33 @@
+{
+  "state": "QUALITY_PASS_FOCUS_FAILED_PRIVATE_RECORDER",
+  "verified_utc": "2026-10-07T00:12:32.784026+00:00",
+  "runs": {
+    "windows": {
+      "focus_state": "failed_private_observer_empty_object",
+      "baseline_finite_cases_verified": 79,
+      "baseline_reuse_test": "passed",
+      "converter_test": "unverified_observer_failed",
+      "null_cases": "not_run",
+      "candidate_focus": "not_run",
+      "quality": "passed",
+      "quality_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\windows-quality-one\\output\\quality.json",
+      "inputs_unchanged": true,
+      "cleanup_pass": true
+    },
+    "linux": {
+      "focus_state": "failed_private_observer_empty_object",
+      "baseline_finite_cases_verified": 79,
+      "baseline_reuse_test": "passed",
+      "converter_test": "unverified_observer_failed",
+      "null_cases": "not_run",
+      "candidate_focus": "not_run",
+      "quality": "passed",
+      "quality_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\linux-quality-one\\output\\quality.json",
+      "inputs_unchanged": true,
+      "cleanup_pass": true
+    }
+  },
+  "current_windows_named_runtime_files_verified": 9,
+  "next_action": "Minimally repair empty-object property enumeration in private observer, then rerun the bounded same-observer baseline/candidate pairs; reuse unchanged quality results.",
+  "product_changed": false
+}

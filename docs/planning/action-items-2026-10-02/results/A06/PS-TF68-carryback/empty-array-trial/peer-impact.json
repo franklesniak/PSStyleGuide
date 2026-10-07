@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "at": "2026-10-06T23:57:08.804486+00:00",
+  "status": "CONDITIONAL_SHARED_PEER_IMPACT_CONFIRMED",
+  "native_TF_main_before_and_after": "a840f21b03f0dcac0815e2f7f044928667402b42",
+  "source": {
+    "PS": {
+      "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "tree_entry": "100644 blob 67e0c1ce95ff6b99c76f1959b5c284e208b450dd\t.github/workflows/Test-AgentInstructions.ps1",
+      "helper_sha256": "05a0e3209f83f032324dd89b125cfc9e05ee190f8f9b723173d949406d8b8ee3",
+      "helper_bytes": 30692
+    },
+    "TF": {
+      "head": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "tree_entry": "100644 blob 67e0c1ce95ff6b99c76f1959b5c284e208b450dd\t.github/workflows/Test-AgentInstructions.ps1",
+      "helper_sha256": "05a0e3209f83f032324dd89b125cfc9e05ee190f8f9b723173d949406d8b8ee3",
+      "helper_bytes": 30692
+    }
+  },
+  "raw_common_helper_equal": true,
+  "scope": "Only Get-MarkdownParseContext in Git blobs; not full-file equality, trial benefit, product acceptance or final paired convergence.",
+  "consequence": "If D94.1 proves useful and PS235 is genuinely accepted, these shared six predicates have no language-only exception. Reconcile then-current TF main and carry the accepted shared delta/tests through the existing paired loop before declaring A06 complete.",
+  "peer_implementation_started": false,
+  "transfer_consumed": false,
+  "current_A06_transfers": 2,
+  "transfer_cap": 12,
+  "rounds_and_deadlines_reset": false
+}

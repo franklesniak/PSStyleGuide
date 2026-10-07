@@ -1,0 +1,21 @@
+{
+  "pwsh": "7.6.3",
+  "rows": [
+    {
+      "parser_basis": "current Linux ParseFile",
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "name": "Test-AgentInstructions.ps1"
+    },
+    {
+      "parser_basis": "current Linux ParseFile",
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "name": "Test-AgentInstructions.SelfTest.ps1"
+    }
+  ],
+  "analyzer_path": "/work/empty-array-me6bkh_f/analyzer/PSScriptAnalyzer.psd1",
+  "analyzer": "1.24.0"
+}

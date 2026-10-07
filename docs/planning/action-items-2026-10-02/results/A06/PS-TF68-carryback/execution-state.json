@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round1_CI_hold_D94.1_source_frozen_correctness_preparation",
+  "status": "round1_CI_hold_D94.1_final_source_frozen_final_checks_preparation",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -378,7 +378,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "baa21da8e8309e9999d8f5f79b975a16bad9cdda",
+  "planning_checkpoint": "3413d8548e42588a7d1d3589463943309365d638",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -1172,7 +1172,7 @@
     },
     "interpretation_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
     "current_source_trial": {
-      "status": "independent_source_pass_correctness_packet_preparation_active",
+      "status": "final_source_frozen_final109_quality_preparation",
       "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial",
       "writer": "a06_conversion_cold_packet",
       "allowed_paths": [
@@ -1187,18 +1187,20 @@
       "source_writer_stopped": true,
       "candidate": {
         ".github/workflows/Test-AgentInstructions.ps1": {
-          "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+          "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
           "bytes": 510837,
+          "snapshot_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
           "preimage_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
         },
         ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
-          "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
-          "bytes": 298994,
+          "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+          "bytes": 299398,
+          "snapshot_sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
           "preimage_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8"
         }
       },
       "source_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-SOURCE-VERIFICATION.json",
-      "focused_qualification": "preparation_active",
+      "focused_qualification": "trial_independent_pass_final109_and_final_quality_pending",
       "qualification_writer": "a06_conversion_cold_packet",
       "source_review_worker": "ps_carryback_final_quality",
       "source_review_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-review",
@@ -1219,6 +1221,83 @@
         "files": 2,
         "errors": 0,
         "product_executed": false
+      },
+      "conditional_peer_impact": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\peer-impact.json",
+        "sha256": "e95cf8b9d4e5b5dbdc198592ed24fc17855baafe7a60482a923eed4a4e76e6dc",
+        "shared_helper_equal": true,
+        "peer_write_released": false
+      },
+      "qualification_writer_stopped": false,
+      "qualification_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\manifest.root-authorized.json",
+      "qualification_manifest_sha256": "00b708ca61c562fb49508cb5ce58d048c3365b4dbcaf6de83d0531bdee302237",
+      "qualification_prepared_manifest_sha256": "0cfaf16a951558c4ea95ee7b8f7d13f751c5e5bbc7b0392f32f17b6ec208ba84",
+      "qualification_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-QUALIFICATION-READINESS.json",
+      "qualification_runs": {
+        "windows-focus": {
+          "session_id": 77557,
+          "state": "failed_private_observer",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\windows-focus-one\\output\\result.json",
+          "exit_code": 1
+        },
+        "linux-quality": {
+          "session_id": 41940,
+          "state": "passed",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\linux-quality-one\\status.json",
+          "exit_code": 0
+        },
+        "linux-focus": {
+          "session_id": 6289,
+          "state": "failed_private_observer",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\linux-focus-one\\status.json",
+          "exit_code": 1
+        },
+        "windows-quality": {
+          "session_id": 22320,
+          "state": "passed",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\runs\\windows-quality-one\\output\\result.json",
+          "exit_code": 0
+        },
+        "windows-focus-continuation-one": {
+          "session_id": 53538,
+          "state": "passed",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\result.json",
+          "exit_code": 0
+        },
+        "linux-focus-continuation-one": {
+          "session_id": 83443,
+          "state": "passed",
+          "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\status.json",
+          "exit_code": 0
+        }
+      },
+      "qualification_last_observed_utc": "2026-10-07T00:21:48.756538+00:00",
+      "qualification_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-QUALIFICATION-INITIAL-RESULT.json",
+      "qualification_continuation_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\manifest.root-authorized.json",
+      "qualification_continuation_manifest_sha256": "0333576c65b3f81826a1023361c821ab36cb31f4bd1bb90b307f1c7b0a567e95",
+      "qualification_final_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FOCUS-RESULT.json",
+      "final_source_finalization": "existing_null_cases_durable_help_actual_UTC_metadata_only",
+      "qualified_trial_candidate": {
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+          "bytes": 510837,
+          "preimage_sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c"
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+          "bytes": 298994,
+          "preimage_sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8"
+        }
+      },
+      "final_source_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one",
+      "final_source_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINALIZATION-VERIFICATION.json",
+      "final_qualification_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification",
+      "focused_independent_review": {
+        "state": "INDEPENDENT_FROZEN_FOCUSED_CORRECTNESS_PASS",
+        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\focused-result-review\\REPORT.md",
+        "report_sha256": "0bf51457e59495b4c7b40ba39194e21623544ff298e4c7c4257a680ebc12d264",
+        "evidence_sha256": "37df75b37bd9dd3115bdfdf5689d89851be4d4b338a28696cb1323c5193a39ac",
+        "root_reference_count": 724
       }
     }
   },

@@ -1,0 +1,50 @@
+{
+  "state": "OBSERVED_EXISTING_FROZEN_TRIAL_EVIDENCE",
+  "root_receipt_sha256": "c3dd11dfcaca1117fe2ac8abcb544df911c80cbd6b8926dc2b5255e8580451f3",
+  "fragments": [
+    "[\"text\",null]",
+    "[1,null]",
+    "[null,\"text\"]",
+    "[null,1]",
+    "[null]"
+  ],
+  "case_receipts": [
+    {
+      "platform": "windows",
+      "variant": "baseline",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\baseline\\focus.json",
+      "sha256": "132e3f5786fbadfb93754841c4cad3126f93e47993da4b9e77d68f22314d1ee7",
+      "cases": 30,
+      "refusals": 30,
+      "partial_output": 0
+    },
+    {
+      "platform": "windows",
+      "variant": "candidate",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\candidate\\focus.json",
+      "sha256": "dea06aa8d4d2b6799fd458402426d0fef511a83ca720d1d40d5ff8ac67c5a46d",
+      "cases": 30,
+      "refusals": 30,
+      "partial_output": 0
+    },
+    {
+      "platform": "linux",
+      "variant": "baseline",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\baseline\\focus.json",
+      "sha256": "6aa9ea03e987613efd637474b42ccbd3577f6e2f61ad4e0fe0fe598d70d8c1f6",
+      "cases": 30,
+      "refusals": 30,
+      "partial_output": 0
+    },
+    {
+      "platform": "linux",
+      "variant": "candidate",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\candidate\\focus.json",
+      "sha256": "fdf71ddd5be3eb7c2034b862f884c41a7ba52d140a1d65409421ebadf1006006",
+      "cases": 30,
+      "refusals": 30,
+      "partial_output": 0
+    }
+  ],
+  "limit": "These old private cases establish semantics; the final18-row product test integration itself is not yet executed."
+}

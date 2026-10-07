@@ -1,0 +1,177 @@
+{
+  "schema": 1,
+  "state": "FINAL_SOURCE_PREPARATION_ONLY_FROZEN",
+  "created_utc": "2026-10-07T00:25:38.686936+00:00",
+  "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "accepted_base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "a716a1f8ff7e4f385e089b0f056adbcde9c973cb",
+  "allowed_paths": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "candidate": {
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837,
+      "snapshot_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398,
+      "snapshot_sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8"
+    }
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FOCUS-RESULT.json",
+      "sha256": "c3dd11dfcaca1117fe2ac8abcb544df911c80cbd6b8926dc2b5255e8580451f3",
+      "bytes": 5841
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-QUALIFICATION-INITIAL-RESULT.json",
+      "sha256": "90f01c0994d9ce8b8b2b882735d62f908bfd04897cc42d65d13203be37852a83",
+      "bytes": 1620
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-SOURCE-VERIFICATION.json",
+      "sha256": "9196246ceea6d435b06f7fde0e13bd79a5c80c22e136f8198a056b9e5016fecf",
+      "bytes": 1445
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-review\\REPORT.md",
+      "sha256": "e37e5b447c4c596fd79400139970900f4327e5e2c7eee6a4397ceaef04812e4a",
+      "bytes": 4897
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\source-review\\evidence.json",
+      "sha256": "5f8fd3669b795c43dd76143f899c35652cffff0d9581da98ef69f8be90c67950",
+      "bytes": 9684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\evidence.json",
+      "sha256": "3a8c9a6da8c78497848a23752f999e48e5bee254666c5e71d15c720c455f2472",
+      "bytes": 8070
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\manifest.prepared.json",
+      "sha256": "3b82466baadca00d1e1d35174be9346d5f7953ab4efccbe23f9fe6e8b8d19d55",
+      "bytes": 495211
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\evidence.json",
+      "sha256": "f159db26af1e547e8b8b326f90ebddfd231b0b275e5dca28dbf6a10f8e739fbc",
+      "bytes": 11850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\manifest.prepared.json",
+      "sha256": "0cfaf16a951558c4ea95ee7b8f7d13f751c5e5bbc7b0392f32f17b6ec208ba84",
+      "bytes": 495689
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
+      "sha256": "4b62332550246304186353badb936f4364db9e662a84ebd74a0e960f72eabf45",
+      "bytes": 3684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\AGENTS.md",
+      "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "bytes": 32654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\STYLE_GUIDE.md",
+      "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "bytes": 148759
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "before.json",
+      "sha256": "0715fa8938f12ca92c2ba5d8ff30b7f3539713268d286998ca10b32f3ab3ee6a",
+      "bytes": 20377
+    },
+    {
+      "path": "source-after.json",
+      "sha256": "d1383b279dab4c11d89f69a705369da3e3e6debc7332129f65ee8f29019c0968",
+      "bytes": 20738
+    },
+    {
+      "path": "observed-null-expectations.json",
+      "sha256": "226801829325444a66bdd1068bf1876ef33fa305a17cbc4bc8f57b83cf30b9f8",
+      "bytes": 2288
+    },
+    {
+      "path": "recovery.patch",
+      "sha256": "1ab930ddeb5055bf658e13eb0fc3345c3d77a523dd8c2a7f48101aca97eae275",
+      "bytes": 19183
+    },
+    {
+      "path": "FINALIZATION-DIFF.patch",
+      "sha256": "8994b09df6d161c955cff2eba753b1a513e70895fa059f19aa0699c83fcab66a",
+      "bytes": 3467
+    },
+    {
+      "path": "REPORT.md",
+      "sha256": "500abb7208a987b38c1fa83dab5d8f40d1a8bcb2f2808f8072ecc6d0a13c0507",
+      "bytes": 6233
+    },
+    {
+      "path": "candidate/.github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    },
+    {
+      "path": "candidate/.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398
+    },
+    {
+      "path": "trial-preimage/.github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "d40dc6dc3987fbc464da71555fe7c0a74353aa589ff3ed6af75b14cbedc12c60",
+      "bytes": 510837
+    },
+    {
+      "path": "trial-preimage/.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "952ad3a6a56a97e75a2169fec46acb1c2be41fac46b21f0efd03b2362f25df25",
+      "bytes": 298994
+    }
+  ],
+  "exact_delta_from_qualified_trial": [
+    "Append five literal null-containing array refusal cases to existing matrix",
+    "Replace temporary characterization help with observed null-refusal contract",
+    "Current unpublished script/function/new-wrapper Build metadata20261007 with existing assigned minors/revision0"
+  ],
+  "preservation": {
+    "six_predicates_byte_identical": true,
+    "all_other_production_code_byte_identical": true,
+    "76_bystanders_equal": true,
+    "raw_index_refs_config_equal_before_after": true,
+    "literal_H_recovery_patch_in_memory_byte_exact": true,
+    "private_original_continuation_packets_and_receipts_unchanged": true
+  },
+  "reuse_limits": {
+    "old_pair": "Actual completed baseline/candidate behavior/converter/reuse/null semantic proof only",
+    "old_quality": "Exact old trial bytes only; final bytes need syntax/PSSA",
+    "null_receipts": 120,
+    "no_source_acceptance_or_speed_verdict": true
+  },
+  "prospective_behavior_calls": 109,
+  "additional_permanent_parser_calls": 30,
+  "execution": {
+    "worker_tests": false,
+    "worker_parsers": false,
+    "worker_imports": false,
+    "worker_pssa": false,
+    "worker_performance": false,
+    "worker_containers": false,
+    "git_writes": false,
+    "native_writes": false
+  },
+  "pending": [
+    "Two final permanent109-case candidate SelfTests under qualified platforms",
+    "Exact final-source parser/PSSA",
+    "Prepare/release four-child plain ABBA with5percent AND0.5second/both-pairs gate",
+    "Measure final complete SelfTest/aggregate including30 added calls",
+    "Final quality/endpoints/audit/review/CI acceptance"
+  ],
+  "product_writes_stopped": true
+}

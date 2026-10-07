@@ -1,0 +1,34 @@
+{
+  "state": "READINESS_CHECKS_PASS_NO_PAYLOAD_EXECUTED",
+  "checked_utc": "2026-10-07T00:08:31.646980+00:00",
+  "manifest_sha256": "0cfaf16a951558c4ea95ee7b8f7d13f751c5e5bbc7b0392f32f17b6ec208ba84",
+  "compiled_private_python": {
+    "bindings.py": "d5af1682efc3b8780ff28c4c7d334b6d3f1e8a3898e4fc5519ea1c2957fb4fa0",
+    "compare.py": "5032da50da686931683acd3e656bece4fcc7b75c4ef2ef425dedd12e195f1d13",
+    "inside.py": "a4df7ffbb142fa3270cdc2b8fdf39978dad63b484a7e5bbbc70cf4b9163c2f4a",
+    "launch.py": "6507b42294e081ea210e8121845fd7da80aa6db02d71662458aa13abf4233e2b",
+    "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+    "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+    "windows.py": "4917081aaf91ac3c1d57920567b063a7226b2e827f8e6ba8ab29346b78b77ec6"
+  },
+  "private_powershell_parser": [
+    {
+      "name": "focus.ps1",
+      "errors": []
+    },
+    {
+      "name": "quality.ps1",
+      "errors": []
+    }
+  ],
+  "archives_members_verified": {
+    "baseline_archive": 78,
+    "candidate_archive": 78,
+    "dependency_archive": 1914,
+    "analyzer_archive": 51
+  },
+  "baseline_matches_original_saved_78_files": true,
+  "candidate_matches_frozen_78_files": true,
+  "host_inputs_unchanged": true,
+  "product_source_parse_reused": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-SYNTAX-RESULT.json"
+}

@@ -1,0 +1,96 @@
+--- frozen/focus.ps1
++++ continuation-one/focus.ps1
+@@ -47,13 +47,16 @@
+         return [ordered]@{ kind = 'array'; type = $Value.GetType().FullName; items = $listItems.ToArray() }
+     }
+     if ($Value -is [pscustomobject]) {
+-        $arrNames = [string[]]@($Value.PSObject.Properties.Name)
++        $listPropertyNames = [Collections.Generic.List[string]]::new()
++        foreach ($objProperty in $Value.PSObject.Properties) { $listPropertyNames.Add($objProperty.Name) }
++        $arrPropertyOrder = $listPropertyNames.ToArray()
++        $arrNames = [string[]]$arrPropertyOrder.Clone()
+         [Array]::Sort($arrNames, [StringComparer]::Ordinal)
+         $listProperties = [Collections.Generic.List[object]]::new()
+         foreach ($strName in $arrNames) {
+             $listProperties.Add([ordered]@{ name = $strName; node = ConvertTo-TypedData -Value $Value.$strName })
+         }
+-        return [ordered]@{ kind = 'object'; type = $Value.GetType().FullName; type_names = [string[]]$Value.PSObject.TypeNames; property_order = [string[]]$Value.PSObject.Properties.Name; properties = $listProperties.ToArray() }
++        return [ordered]@{ kind = 'object'; type = $Value.GetType().FullName; type_names = [string[]]$Value.PSObject.TypeNames; property_order = $arrPropertyOrder; properties = $listProperties.ToArray() }
+     }
+     return [ordered]@{ kind = 'scalar'; type = $Value.GetType().FullName; value = $Value }
+ }
+@@ -69,8 +72,10 @@
+             ConvertTo-TypedLedger -Value $Value[$intItem] -Path ($Path + @($intItem)) -Nodes $Nodes
+         }
+     } elseif ($Value -is [pscustomobject]) {
++        $listPropertyNames = [Collections.Generic.List[string]]::new()
++        foreach ($objProperty in $Value.PSObject.Properties) { $listPropertyNames.Add($objProperty.Name) }
+         $Nodes.Add(@{ path = $Path; kind = 'object'; type = $Value.GetType().FullName;
+-                type_names = [string[]]$Value.PSObject.TypeNames; property_order = [string[]]$Value.PSObject.Properties.Name })
++                type_names = [string[]]$Value.PSObject.TypeNames; property_order = $listPropertyNames.ToArray() })
+         foreach ($objProperty in $Value.PSObject.Properties) {
+             ConvertTo-TypedLedger -Value $objProperty.Value -Path ($Path + @($objProperty.Name)) -Nodes $Nodes
+         }
+--- frozen/bindings.py
++++ continuation-one/bindings.py
+@@ -42,6 +42,8 @@
+     assert dependency_inventory=={row['path'] for row in m['dependency_rows']},'Dependency inventory changed'
+     for row in m['runtime_rows']:
+         assert sha(ordinary(row['path']).read_bytes())==row['sha256'],row['path']
++    for name,row in m['windows_runtimes'].items():
++        assert sha(ordinary(row['path']).read_bytes())==row['sha256'],('Named Windows runtime identity changed',name,row['path'])
+     def git(*args):
+         env={**os.environ,'GIT_OPTIONAL_LOCKS':'0','GIT_NO_LAZY_FETCH':'1','GIT_TERMINAL_PROMPT':'0'}
+         return subprocess.check_output([m['windows_runtimes']['git']['path'],'--no-optional-locks','--no-replace-objects','-c','core.fsmonitor=false','-c','gc.auto=0','-c','maintenance.auto=false','-C',str(root),*args],env=env,timeout=max(.01,min(20,deadline-time.monotonic())))
+@@ -72,7 +74,7 @@
+     m=json.loads(raw)
+     assert args.execute_root_approved and m['execution_authorized'] is True and m['prepared'] is True
+     assert m['authorizing_coordinator']=='root' and m['policy_role']=='empty-array-focused-correctness-only'
+-    assert args.mode in ['focus','quality']
++    assert args.mode=='focus' and m['continuation_role']=='D07-private-recorder-repair-focus-only'
+     assert not any(os.environ.get(k) for k in ['SKIP','CI','GITHUB_ACTIONS','GIT_INDEX_FILE','GIT_DIR','GIT_WORK_TREE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])
+     assert m['release_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release date'
+     assert not any(k.startswith('GIT_CONFIG_') or k in ['GIT_COMMON_DIR','HUSKY'] for k in os.environ)
+--- frozen/windows.py
++++ continuation-one/windows.py
+@@ -18,7 +18,7 @@
+  except BaseException as error:r.update(exit=125,failure=str(error))
+  r['finished_utc']=now();save(spec['worker_result'],r)
+  raise SystemExit(r['exit'] if 0<=r['exit']<=255 else 1)
+-p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus','quality'],required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus'],required=True);a=p.parse_args()
+ m,label=release(HERE,a)
+ assert os.name=='nt' and sys.version_info[:3]==(3,12,10)
+ assert Path(sys.executable).resolve()==Path(m['windows_runtimes']['python']['path']).resolve()
+@@ -51,7 +51,7 @@
+  def close(self):checked(K.CloseHandle(self.handle));self.handle=None
+ 
+ started=LAUNCH_START;deadline=started+(m['focus_total_seconds'] if a.mode=='focus' else m['quality_total_seconds'])
+-run=HERE/'runs'/('windows-'+a.mode+'-one');run.mkdir(parents=True,exist_ok=False)
++run=HERE/'runs'/('windows-'+a.mode+'-continuation-one');run.mkdir(parents=True,exist_ok=False)
+ out=run/'output';out.mkdir();tmp=run/'tmp';tmp.mkdir();home=run/'home';home.mkdir()
+ record={'state':'preparing','platform':'Windows','mode':a.mode,'started_utc':now(),'manifest_sha256':label,'stages':[],'primary_failure':None,'cleanup_failures':[]}
+ save(out/'result.json',record)
+--- frozen/launch.py
++++ continuation-one/launch.py
+@@ -4,7 +4,7 @@
+ from bindings import host_guard,output_guard,packet_guard,release,save,sha
+ HERE=pathlib.Path(__file__).resolve().parent
+ START=time.monotonic()
+-p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus','quality'],required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus'],required=True);a=p.parse_args()
+ m,label=release(HERE,a)
+ assert os.name=='nt' and sys.version_info[:3]==(3,12,10)
+ assert pathlib.Path(sys.executable).resolve()==pathlib.Path(m['windows_runtimes']['python']['path']).resolve()
+@@ -12,9 +12,9 @@
+ assert m['image']==IMAGE
+ now=lambda:datetime.datetime.now(datetime.timezone.utc).isoformat()
+ deadline=START+(m['focus_total_seconds'] if a.mode=='focus' else m['quality_total_seconds'])
+-run=HERE/'runs'/('linux-'+a.mode+'-one');run.mkdir(parents=True,exist_ok=False)
++run=HERE/'runs'/('linux-'+a.mode+'-continuation-one');run.mkdir(parents=True,exist_ok=False)
+ inputs=run/'inputs';out=run/'output';inputs.mkdir();out.mkdir()
+-name='ps235-empty-array-'+a.mode+'-one'
++name='ps235-empty-array-'+a.mode+'-continuation-one'
+ record={'state':'preparing','mode':a.mode,'manifest_sha256':label,'started_utc':now(),'primary_failure':None,'cleanup_failures':[],'container_absent':False}
+ primary=None;before=None;process=None;stream=None;reader=None;launched=False;owned_id=None
+ save(run/'status.json',record)

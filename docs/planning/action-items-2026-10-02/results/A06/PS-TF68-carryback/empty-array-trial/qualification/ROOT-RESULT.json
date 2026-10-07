@@ -1,0 +1,113 @@
+{
+  "state": "ROOT_VERIFIED_FOCUSED_CORRECTNESS_PASS",
+  "verified_utc": "2026-10-07T00:20:02.984347+00:00",
+  "platforms": {
+    "windows": {
+      "state": "passed",
+      "complete_decoded_differential_equal": true,
+      "variants": [
+        {
+          "variant": "baseline",
+          "pwsh": "7.6.5",
+          "context_events": 157,
+          "converter_cases": 78,
+          "null_refusals": 30
+        },
+        {
+          "variant": "candidate",
+          "pwsh": "7.6.5",
+          "context_events": 157,
+          "converter_cases": 78,
+          "null_refusals": 30
+        }
+      ],
+      "elapsed_seconds": 138.38999999999942,
+      "all_owned_operations_terminal": true,
+      "all_host_inputs_unchanged": true,
+      "null_semantics": "All five null-containing arrays refuse in all six fields, with no partial output."
+    },
+    "linux": {
+      "state": "passed",
+      "complete_decoded_differential_equal": true,
+      "variants": [
+        {
+          "variant": "baseline",
+          "pwsh": "7.6.3",
+          "context_events": 157,
+          "converter_cases": 78,
+          "null_refusals": 30
+        },
+        {
+          "variant": "candidate",
+          "pwsh": "7.6.3",
+          "context_events": 157,
+          "converter_cases": 78,
+          "null_refusals": 30
+        }
+      ],
+      "elapsed_seconds": 250.03199999999197,
+      "all_owned_operations_terminal": true,
+      "all_host_inputs_unchanged": true,
+      "null_semantics": "All five null-containing arrays refuse in all six fields, with no partial output."
+    }
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\result.json",
+      "sha256": "e7c4fa695b323ff73171dee75ec1243f1eedf7ae3b52ab24994a2dbc91df9f84",
+      "bytes": 6956
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\source-after.json",
+      "sha256": "e277fd811e7985a1fb3994a00c3343658d7f20a7f36df544017b664f77472787",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\differential.json",
+      "sha256": "f04e7ac4248eacd4146db04e2afa7405c141bfc28a42c363a04b7db062ef8604",
+      "bytes": 386
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\baseline\\focus.json",
+      "sha256": "132e3f5786fbadfb93754841c4cad3126f93e47993da4b9e77d68f22314d1ee7",
+      "bytes": 206477
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\windows-focus-continuation-one\\output\\candidate\\focus.json",
+      "sha256": "dea06aa8d4d2b6799fd458402426d0fef511a83ca720d1d40d5ff8ac67c5a46d",
+      "bytes": 206478
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\status.json",
+      "sha256": "3ba224e9758a7eada7849889de62fb6d5f45037a2e91d93bf43c805c122e386f",
+      "bytes": 1449
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\result.json",
+      "sha256": "3ad8f587dbec83b2f137f13ddf9de3b2c2c2a8f0e5cc966674c39c1291e67597",
+      "bytes": 11551
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\host-source-after.json",
+      "sha256": "e277fd811e7985a1fb3994a00c3343658d7f20a7f36df544017b664f77472787",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\differential.json",
+      "sha256": "f04e7ac4248eacd4146db04e2afa7405c141bfc28a42c363a04b7db062ef8604",
+      "bytes": 386
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\baseline\\focus.json",
+      "sha256": "6aa9ea03e987613efd637474b42ccbd3577f6e2f61ad4e0fe0fe598d70d8c1f6",
+      "bytes": 206477
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\continuation-one\\runs\\linux-focus-continuation-one\\output\\candidate\\focus.json",
+      "sha256": "fdf71ddd5be3eb7c2034b862f884c41a7ba52d140a1d65409421ebadf1006006",
+      "bytes": 206478
+    }
+  ],
+  "independent_reader_pending": true,
+  "limits": "Correctness on frozen trial bytes only. No measured performance gain, final null-test source, full-suite or CI acceptance."
+}
