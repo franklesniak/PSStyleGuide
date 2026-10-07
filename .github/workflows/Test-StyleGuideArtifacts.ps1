@@ -12,7 +12,7 @@
 # None. A success diagnostic uses the Information stream; failures terminate.
 #
 # .NOTES
-# Version: 2.0.20261005.0
+# Version: 2.0.20261006.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -176,14 +176,14 @@ function ConvertFrom-NulPathRecordStream {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 2.0.20261005.0
+    # Version: 2.0.20261006.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
     #
     #   Position 0: PathRecordBytes
     [CmdletBinding(PositionalBinding = $true)]
-    [OutputType([System.Array])]
+    [OutputType([byte[]])]
     param([byte[]]$PathRecordBytes)
     if ($PathRecordBytes.Length -eq 0) {
         return

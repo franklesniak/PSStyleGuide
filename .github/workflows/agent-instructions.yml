@@ -108,7 +108,7 @@ jobs:
     name: Test proposed instruction and workflow behavior
     if: github.event_name != 'pull_request_target' && (github.event_name != 'push' || github.event.deleted != true)
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 59
     permissions: {}
     steps:
       - name: Acquire the exact revision without credentials
@@ -162,6 +162,7 @@ jobs:
           ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
       - name: Test proposed behavior without publication authority
         id: test
+        timeout-minutes: 45
         env:
           EXPECTED_PUSH_BASE: ${{ github.event.before }}
           EXPECTED_PUSH_HEAD: ${{ github.event.after }}

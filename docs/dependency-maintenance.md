@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-05
+- **Last Updated:** 2026-10-07
 - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
 Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux CI bootstrap verifies its Node archive with `linuxX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:
@@ -32,6 +32,8 @@ Each audit child has a two-minute deadline and a two-MiB output limit. A recogni
 | `PROPOSAL` | 3 | The candidate changes exception authority. The ordinary check does not approve that change. |
 
 Prefer a maintained compatible package fix. Use the normal reviewed dependency PR and locked installation. Do not use `npm audit fix --force` to obtain a green result. Run the affected lint, instruction and hook tests; changes to a parser or file-discovery package require behavior checks, not only a zero audit count. Keep raw advisory objects separate from package-level node lists. npm's `via` package references do not establish an individual advisory-to-path mapping.
+
+The workflow package overrides KaTeX to 0.18.2 only under `micromark-extension-math@3.1.0` to resolve [GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7). This crosses that parent's declared `^0.16.0` range; clean installation, imports and the existing Markdown lint behavior must pass before the change is accepted. The lint engine uses math tokenization, not KaTeX HTML rendering, but the installed affected package still requires repair. Keep the override until a reviewed parent release supplies a fixed KaTeX range and the same checks pass without it.
 
 The current [exception record](../.github/workflows/npm-risk-exceptions.json) is empty; an absent record also means no grants. Other read or parse failures remain errors. The `--ci` command selects hosted authority: PR checks read the trusted event's base commit, and main and scheduled runs read their acquired main commit. Unsupported hosted events remain errors. An already available exact commit needs no repeated fetch. The ordinary command without `--ci` uses the fetched `origin/main` commit and prints its identity, including inside a coding-agent environment that inherits GitHub Actions variables. It cannot discover later remote updates or external revocations while offline. Fetch main before relying on an ordinary result for acceptance. The merge executor must also check known owner revocations.
 

@@ -30,5 +30,10 @@
     "markdown-it": "14.3.2",
     "markdownlint": "0.41.1",
     "yaml": "2.9.0"
+  },
+  "overrides": {
+    "micromark-extension-math@3.1.0": {
+      "katex": "0.18.2"
+    }
   }
 }

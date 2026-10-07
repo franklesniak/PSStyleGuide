@@ -20,6 +20,34 @@ const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 
+// Private fixture discovery follows the contributor's required PowerShell7 PATH.
+// Production acquisition keeps its fixed Git application paths unchanged.
+function discoverFixtureGit({ env = process.env, run = spawnSync } = {}) {
+  const result = run('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command',
+    "$ErrorActionPreference = 'Stop'; if ($PSVersionTable.PSVersion.Major -lt 7) { throw 'PowerShell7 is required.' }; " +
+    "(Get-Command git -CommandType Application -All -TotalCount 1 -ErrorAction Stop).Source | ConvertTo-Json -Compress"],
+  { env, encoding: 'utf8', timeout: 30000, windowsHide: true });
+  assert.equal(result.error, undefined, 'The fixture requires PowerShell7 on PATH.');
+  assert.equal(result.status, 0, `Required Git application discovery failed: ${result.stderr}`);
+  let application;
+  try { application = JSON.parse(result.stdout); }
+  catch (error) { assert.fail(`Git discovery did not return one JSON application path: ${error.message}`); }
+  assert.equal(typeof application, 'string', 'Git discovery must return one application path.');
+  assert.ok(path.isAbsolute(application), 'The fixture Git application path must be absolute.');
+  assert.ok(fs.statSync(application).isFile(), 'The fixture Git application must be a file.');
+  return application;
+}
+
+test('fixture Git discovery requires native success and one absolute application', () => {
+  const application = discoverFixtureGit();
+  for (const result of [{ error: new Error('missing pwsh') }, { status: 1, stdout: '', stderr: 'missing git' },
+    { status: 0, stdout: '{' }, { status: 0, stdout: 'null' }, { status: 0, stdout: JSON.stringify([application]) },
+    { status: 0, stdout: JSON.stringify('git') }, { status: 0, stdout: JSON.stringify(directory) }]) {
+    assert.throws(() => discoverFixtureGit({ run: () => result }));
+  }
+  assert.equal(discoverFixtureGit({ run: () => ({ status: 0, stdout: JSON.stringify(application) }) }), application);
+});
+
 test('generator proof preserves each child exit before revision publication', t => {
   // Actual proof bodies launch a fixture harness in a real current-host process.
   // Only foreign fixed Git paths are adapted; this does not simulate hosted
@@ -29,8 +57,7 @@ test('generator proof preserves each child exit before revision publication', t 
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows');
   fs.mkdirSync(scripts, { recursive: true });
-  const git = process.platform === 'win32' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git';
-  assert.ok(fs.existsSync(git), 'The fixture requires the platform fixed Git application.');
+  const git = discoverFixtureGit();
   const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null',
     GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1' };
   for (const name of Object.keys(env)) if (/^GIT_(?:CONFIG_(?:COUNT|KEY_|VALUE_|PARAMETERS)|DIR$|WORK_TREE$|INDEX_FILE$|OBJECT_DIRECTORY$|ALTERNATE_OBJECT_DIRECTORIES$)/u.test(name)) delete env[name];
@@ -913,151 +940,154 @@ for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've
   });
 }
 
-for (const mode of ['fetch-failure', 'retry-success', 'checkout-failure']) {
-  test(`Copilot acquisition retry: ${mode}`, { skip: !linux }, t => {
-    const source = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'].steps.find(step => step.id === 'acquire').run;
-    const f = fixture(t), result = f.run(source, { TEST_MODE: mode });
-    assert.equal(result.status === 0, mode === 'retry-success', result.stderr);
-    const fetches = f.calls().filter(row => row.includes('fetch'));
-    assert.equal(fetches.length, mode === 'checkout-failure' ? 1 : 3);
-    assert.ok(fetches.every(row => row.at(-1) === head && row.includes('--no-tags') && row.includes('--no-recurse-submodules')));
-    assert.equal(f.calls().filter(row => row.includes('checkout')).length, mode === 'fetch-failure' ? 0 : 1);
-    if (mode === 'fetch-failure') assert.match(result.stderr, /git fetch exited 7 after three attempts/);
-    if (mode === 'checkout-failure') assert.match(result.stderr, /git checkout exited 23/);
-  });
-}
-
-for (const mode of ['', 'identity-native-failure', 'identity-multiline', 'empty-output', 'wrong-head']) {
-  test(`Copilot Git identity failure: ${mode || 'success'}`, { skip: !linux }, t => {
-    const source = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'].steps.find(step => step.id === 'acquire').run;
-    const f = fixture(t), result = f.run(source, { TEST_MODE: mode });
-    assert.equal(result.status === 0, mode === '', result.stderr);
-    assert.equal(f.calls().filter(row => row.includes('checkout')).length, 1);
-    if (mode === 'identity-native-failure') assert.match(result.stderr, /git rev-parse exited 31/);
-    if (['identity-multiline', 'empty-output'].includes(mode)) assert.match(result.stderr, /exactly one line/);
-    if (mode === 'wrong-head') assert.match(result.stderr, /not the triggering revision/);
-  });
-}
-
-for (const mode of ['', 'download-failure', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
-  test(`Copilot runtime failure: ${mode || 'success'}`, { skip: !linux }, t => {
-    const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
-    fs.mkdirSync(workflows, { recursive: true });
-    const manifest = JSON.parse(fs.readFileSync(path.resolve(directory, '../../package.json')));
-    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify(manifest));
-    const archiveRoot = path.join(f.root, 'archive'), bin = path.join(archiveRoot, 'runtime/bin');
-    fs.mkdirSync(bin, { recursive: true });
-    fs.writeFileSync(path.join(bin, 'node'), `#!${process.execPath}
-const mode = process.env.TEST_MODE;
-if (mode === 'version-failure') process.exit(29);
-if (mode === 'version-empty') process.exit(0);
-if (mode === 'version-multiline') console.log('v${manifest.engines.node}');
-console.log(mode === 'version-wrong' ? 'v0.0.0' : 'v${manifest.engines.node}');
-`, { mode: 0o700 });
-    fs.writeFileSync(path.join(bin, 'npm'), '#!/bin/sh\nexit 0\n', { mode: 0o700 });
-    const archive = path.join(f.root, 'runtime.tar.xz');
-    const packed = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
-    assert.equal(packed.status, 0, packed.stderr);
-    fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
-      linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
-    const curl = path.join(f.root, 'curl');
-    fs.writeFileSync(curl, `#!${process.execPath}
-const fs = require('node:fs'), args = process.argv.slice(2);
-fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl', ...args])+'\\n');
-if (process.env.TEST_MODE === 'download-failure') process.exit(28);
-fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output') + 1]);
-`, { mode: 0o700 });
-    const source = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'].steps
-      .find(step => step.name === 'Set up verified official Node.js runtime').run
-      .replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl));
-    const result = f.run(source, { TOOLCHAIN_LAYOUT: 'modern', TEST_MODE: mode });
-    assert.equal(result.status === 0, mode === '', result.stderr);
-    const request = f.calls().find(row => row[0] === 'curl');
-    assert.equal(request[1], '--disable');
-    assert.ok(request.includes('--retry-all-errors'));
-    assert.ok(request.includes('--tlsv1.2'));
-    assert.equal(request.at(-1), `https://nodejs.org/dist/v${manifest.engines.node}/node-v${manifest.engines.node}-linux-x64.tar.xz`);
-    for (const [flag, value] of [['--proto', '=https'], ['--proto-redir', '=https'], ['--retry', '3'], ['--connect-timeout', '20'], ['--max-time', '120'], ['--retry-max-time', '300']]) {
-      assert.ok(request.includes(flag), `Missing curl option: ${flag}`);
-      assert.equal(request[request.indexOf(flag) + 1], value);
-    }
-    if (mode === 'download-failure') assert.match(result.stderr, /download exited 28/);
-    if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
-    if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
-    if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
-    if (mode) assert.equal(fs.existsSync(path.join(f.root, 'path')), false);
-    else assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
-  });
-}
-
-for (const [stepName, commands] of [
-  ['Verify selected Node.js runtime', 1],
-  ['Install locked Node.js validation tools', 3],
-  ['Verify locked dependency trees and immutable manifests', 3],
-]) {
-  test(`Copilot npm configuration in each process: ${stepName}`, { skip: !linux }, t => {
-    const f = fixture(t), bin = path.join(f.root, 'bin'); fs.mkdirSync(bin);
-    const log = path.join(f.root, 'npm-calls');
-    for (const executable of ['node', 'npm', 'git']) {
-      fs.writeFileSync(path.join(bin, executable), `#!${process.execPath}
-const fs = require('node:fs'), args = process.argv.slice(2);
-if ('${executable}' === 'npm') {
-  if (Object.keys(process.env).some(key => /^npm_config_/i.test(key) &&
-      !['npm_config_userconfig', 'npm_config_globalconfig'].includes(key)) ||
-      process.env.npm_config_userconfig !== '/dev/null' ||
-      process.env.npm_config_globalconfig !== '/etc/npmrc-absent-by-policy' ||
-      process.env.UNRELATED_FIXTURE !== 'keep this value') process.exit(97);
-  fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify(args)+'\\n');
-  if (args.includes('--version')) console.log('11.16.0');
-} else if ('${executable}' === 'node') console.log(args.includes('--version') ? 'v24.18.1' : args.join(' ').includes('engines.npm') ? '11.16.0' : '24.18.1');
-`, { mode: 0o700 });
-    }
-    const steps = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'].steps;
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, TOOLCHAIN_LAYOUT: 'modern',
-      GITHUB_ENV: path.join(f.root, 'step-env'), NPM_CONFIG_SCRIPT_SHELL: 'hostile',
-      npm_Config_Registry: 'https://invalid.example', npm_config_ignore_scripts: 'false',
-      npm_config_userconfig: '/hostile', UNRELATED_FIXTURE: 'keep this value',
-      'npm_config_@audit:registry': 'https://example.invalid',
-      'npm_config_//registry.npmjs.org/:_authToken': 'dummy-fixture-token',
-      'NPM_CONFIG_unsafe-name': 'line one\nline two' };
-    for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
-    const run = (name, stepEnv) => spawnSync('bash', ['--noprofile', '--norc', '-c', steps.find(step => step.name === name).run],
-      { cwd: f.work, env: stepEnv, encoding: 'utf8' });
-    const first = run('Verify selected Node.js runtime', env);
-    assert.equal(first.status, 0, first.stderr);
-    const published = Object.fromEntries(fs.readFileSync(env.GITHUB_ENV, 'utf8').trim().split('\n').map(line => {
-      const separator = line.indexOf('='); return [line.slice(0, separator), line.slice(separator + 1)];
-    }));
-    assert.deepEqual(published, { npm_config_userconfig: '/dev/null', npm_config_globalconfig: '/etc/npmrc-absent-by-policy' });
-    if (stepName !== 'Verify selected Node.js runtime') {
-      const next = run(stepName, { ...env, ...published });
-      assert.equal(next.status, 0, `${stepName}: ${next.stderr}`);
-    }
-    assert.equal(fs.readFileSync(log, 'utf8').trim().split('\n').length, commands);
-  });
-}
-
-test('Copilot npm rejects failed or partial environment enumeration before npm', { skip: !linux }, t => {
-  const steps = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'].steps;
-  for (const name of ['Verify selected Node.js runtime', 'Install locked Node.js validation tools', 'Verify locked dependency trees and immutable manifests']) {
-    for (const partial of [false, true]) {
-      const f = fixture(t), bin = path.join(f.root, 'bin'); fs.mkdirSync(bin);
-      fs.writeFileSync(path.join(bin, 'npm'), `#!/bin/sh
-printf '%s\\n' 'unexpected npm invocation' >> "$TEST_LOG"
-exit 98
-`, { mode: 0o700 });
-      const source = steps.find(step => step.name === name).run.replace('/usr/bin/env -0',
-        (partial ? "printf 'npm_config_registry=fixture\\0'; " : '') + 'exit 71');
-      const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, TEST_LOG: f.log,
-        TOOLCHAIN_LAYOUT: 'modern', GITHUB_ENV: path.join(f.root, 'step-env') };
-      for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
-      const result = spawnSync('bash', ['--noprofile', '--norc', '-c', source], { cwd: f.work, env, encoding: 'utf8' });
-      assert.notEqual(result.status, 0);
-      assert.match(result.stdout + result.stderr, /Unable to read the package-manager environment/);
-      assert.equal(fs.existsSync(f.log), false);
-    }
+for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  for (const mode of ['fetch-failure', 'retry-success', 'checkout-failure']) {
+    test(`${setupWorkflowName}: Copilot acquisition retry: ${mode}`, { skip: !linux }, t => {
+      const source = parse(read(setupWorkflowName)).jobs['copilot-setup-steps'].steps.find(step => step.id === 'acquire').run;
+      const f = fixture(t), result = f.run(source, { TEST_MODE: mode });
+      assert.equal(result.status === 0, mode === 'retry-success', result.stderr);
+      const fetches = f.calls().filter(row => row.includes('fetch'));
+      assert.equal(fetches.length, mode === 'checkout-failure' ? 1 : 3);
+      assert.ok(fetches.every(row => row.at(-1) === head && row.includes('--no-tags') && row.includes('--no-recurse-submodules')));
+      assert.equal(f.calls().filter(row => row.includes('checkout')).length, mode === 'fetch-failure' ? 0 : 1);
+      if (mode === 'fetch-failure') assert.match(result.stderr, /git fetch exited 7 after three attempts/);
+      if (mode === 'checkout-failure') assert.match(result.stderr, /git checkout exited 23/);
+    });
   }
-});
+
+  for (const mode of ['', 'identity-native-failure', 'identity-multiline', 'empty-output', 'wrong-head']) {
+    test(`${setupWorkflowName}: Copilot Git identity failure: ${mode || 'success'}`, { skip: !linux }, t => {
+      const source = parse(read(setupWorkflowName)).jobs['copilot-setup-steps'].steps.find(step => step.id === 'acquire').run;
+      const f = fixture(t), result = f.run(source, { TEST_MODE: mode });
+      assert.equal(result.status === 0, mode === '', result.stderr);
+      assert.equal(f.calls().filter(row => row.includes('checkout')).length, 1);
+      if (mode === 'identity-native-failure') assert.match(result.stderr, /git rev-parse exited 31/);
+      if (['identity-multiline', 'empty-output'].includes(mode)) assert.match(result.stderr, /exactly one line/);
+      if (mode === 'wrong-head') assert.match(result.stderr, /not the triggering revision/);
+    });
+  }
+
+  for (const mode of ['', 'download-failure', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
+    test(`${setupWorkflowName}: Copilot runtime failure: ${mode || 'success'}`, { skip: !linux }, t => {
+      const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
+      fs.mkdirSync(workflows, { recursive: true });
+      const manifest = JSON.parse(fs.readFileSync(path.resolve(directory, '../../package.json')));
+      fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify(manifest));
+      const archiveRoot = path.join(f.root, 'archive'), bin = path.join(archiveRoot, 'runtime/bin');
+      fs.mkdirSync(bin, { recursive: true });
+      fs.writeFileSync(path.join(bin, 'node'), `#!${process.execPath}
+  const mode = process.env.TEST_MODE;
+  if (mode === 'version-failure') process.exit(29);
+  if (mode === 'version-empty') process.exit(0);
+  if (mode === 'version-multiline') console.log('v${manifest.engines.node}');
+  console.log(mode === 'version-wrong' ? 'v0.0.0' : 'v${manifest.engines.node}');
+  `, { mode: 0o700 });
+      fs.writeFileSync(path.join(bin, 'npm'), '#!/bin/sh\nexit 0\n', { mode: 0o700 });
+      const archive = path.join(f.root, 'runtime.tar.xz');
+      const packed = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
+      assert.equal(packed.status, 0, packed.stderr);
+      fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
+        linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
+      const curl = path.join(f.root, 'curl');
+      fs.writeFileSync(curl, `#!${process.execPath}
+  const fs = require('node:fs'), args = process.argv.slice(2);
+  fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl', ...args])+'\\n');
+  if (process.env.TEST_MODE === 'download-failure') process.exit(28);
+  fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output') + 1]);
+  `, { mode: 0o700 });
+      const source = parse(read(setupWorkflowName)).jobs['copilot-setup-steps'].steps
+        .find(step => step.name === 'Set up verified official Node.js runtime').run
+        .replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl));
+      const result = f.run(source, { TOOLCHAIN_LAYOUT: 'modern', TEST_MODE: mode });
+      assert.equal(result.status === 0, mode === '', result.stderr);
+      const request = f.calls().find(row => row[0] === 'curl');
+      assert.equal(request[1], '--disable');
+      assert.ok(request.includes('--retry-all-errors'));
+      assert.ok(request.includes('--tlsv1.2'));
+      assert.equal(request.at(-1), `https://nodejs.org/dist/v${manifest.engines.node}/node-v${manifest.engines.node}-linux-x64.tar.xz`);
+      for (const [flag, value] of [['--proto', '=https'], ['--proto-redir', '=https'], ['--retry', '3'], ['--connect-timeout', '20'], ['--max-time', '120'], ['--retry-max-time', '300']]) {
+        assert.ok(request.includes(flag), `Missing curl option: ${flag}`);
+        assert.equal(request[request.indexOf(flag) + 1], value);
+      }
+      if (mode === 'download-failure') assert.match(result.stderr, /download exited 28/);
+      if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
+      if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
+      if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
+      if (mode) assert.equal(fs.existsSync(path.join(f.root, 'path')), false);
+      else assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
+    });
+  }
+
+  for (const [stepName, commands] of [
+    ['Verify selected Node.js runtime', 1],
+    ['Install locked Node.js validation tools', 3],
+    ['Verify locked dependency trees and immutable manifests', 3],
+  ]) {
+    test(`${setupWorkflowName}: Copilot npm configuration in each process: ${stepName}`, { skip: !linux }, t => {
+      const f = fixture(t), bin = path.join(f.root, 'bin'); fs.mkdirSync(bin);
+      const log = path.join(f.root, 'npm-calls');
+      for (const executable of ['node', 'npm', 'git']) {
+        fs.writeFileSync(path.join(bin, executable), `#!${process.execPath}
+  const fs = require('node:fs'), args = process.argv.slice(2);
+  if ('${executable}' === 'npm') {
+    if (Object.keys(process.env).some(key => /^npm_config_/i.test(key) &&
+        !['npm_config_userconfig', 'npm_config_globalconfig'].includes(key)) ||
+        process.env.npm_config_userconfig !== '/dev/null' ||
+        process.env.npm_config_globalconfig !== '/etc/npmrc-absent-by-policy' ||
+        process.env.UNRELATED_FIXTURE !== 'keep this value') process.exit(97);
+    fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify(args)+'\\n');
+    if (args.includes('--version')) console.log('11.16.0');
+  } else if ('${executable}' === 'node') console.log(args.includes('--version') ? 'v24.18.1' : args.join(' ').includes('engines.npm') ? '11.16.0' : '24.18.1');
+  `, { mode: 0o700 });
+      }
+      const steps = parse(read(setupWorkflowName)).jobs['copilot-setup-steps'].steps;
+      const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, TOOLCHAIN_LAYOUT: 'modern',
+        GITHUB_ENV: path.join(f.root, 'step-env'), NPM_CONFIG_SCRIPT_SHELL: 'hostile',
+        npm_Config_Registry: 'https://invalid.example', npm_config_ignore_scripts: 'false',
+        npm_config_userconfig: '/hostile', UNRELATED_FIXTURE: 'keep this value',
+        'npm_config_@audit:registry': 'https://example.invalid',
+        'npm_config_//registry.npmjs.org/:_authToken': 'dummy-fixture-token',
+        'NPM_CONFIG_unsafe-name': 'line one\nline two' };
+      for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
+      const run = (name, stepEnv) => spawnSync('bash', ['--noprofile', '--norc', '-c', steps.find(step => step.name === name).run],
+        { cwd: f.work, env: stepEnv, encoding: 'utf8' });
+      const first = run('Verify selected Node.js runtime', env);
+      assert.equal(first.status, 0, first.stderr);
+      const published = Object.fromEntries(fs.readFileSync(env.GITHUB_ENV, 'utf8').trim().split('\n').map(line => {
+        const separator = line.indexOf('='); return [line.slice(0, separator), line.slice(separator + 1)];
+      }));
+      assert.deepEqual(published, { npm_config_userconfig: '/dev/null', npm_config_globalconfig: '/etc/npmrc-absent-by-policy' });
+      if (stepName !== 'Verify selected Node.js runtime') {
+        const next = run(stepName, { ...env, ...published });
+        assert.equal(next.status, 0, `${stepName}: ${next.stderr}`);
+      }
+      assert.equal(fs.readFileSync(log, 'utf8').trim().split('\n').length, commands);
+    });
+  }
+
+  test(`${setupWorkflowName}: Copilot npm rejects failed or partial environment enumeration before npm`, { skip: !linux }, t => {
+    const steps = parse(read(setupWorkflowName)).jobs['copilot-setup-steps'].steps;
+    for (const name of ['Verify selected Node.js runtime', 'Install locked Node.js validation tools', 'Verify locked dependency trees and immutable manifests']) {
+      for (const partial of [false, true]) {
+        const f = fixture(t), bin = path.join(f.root, 'bin'); fs.mkdirSync(bin);
+        fs.writeFileSync(path.join(bin, 'npm'), `#!/bin/sh
+  printf '%s\\n' 'unexpected npm invocation' >> "$TEST_LOG"
+  exit 98
+  `, { mode: 0o700 });
+        const source = steps.find(step => step.name === name).run.replace('/usr/bin/env -0',
+          (partial ? "printf 'npm_config_registry=fixture\\0'; " : '') + 'exit 71');
+        const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, TEST_LOG: f.log,
+          TOOLCHAIN_LAYOUT: 'modern', GITHUB_ENV: path.join(f.root, 'step-env') };
+        for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
+        const result = spawnSync('bash', ['--noprofile', '--norc', '-c', source], { cwd: f.work, env, encoding: 'utf8' });
+        assert.notEqual(result.status, 0);
+        assert.match(result.stdout + result.stderr, /Unable to read the package-manager environment/);
+        assert.equal(fs.existsSync(f.log), false);
+      }
+    }
+  });
+
+}
 
 function devcontainerWorkflow() {
   const workflow = parse(read('devcontainer-ci.yml'));
@@ -1366,7 +1396,7 @@ test('Copilot setup declares its input closure, supported environment and finite
   assert.match(copilotStep('Run complete repository validation').run, /-m pre_commit run --all-files/);
 });
 
-function copilotBodyFixture(t, workName = 'work') {
+function copilotBodyFixture(t, workName = 'work', job = copilotJob) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'copilot-convergence-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const work = path.join(root, workName); fs.mkdirSync(work);
@@ -1376,7 +1406,9 @@ function copilotBodyFixture(t, workName = 'work') {
     'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_GLOBAL', 'GIT_TERMINAL_PROMPT']) delete env[key];
   const put = (name, text = 'fixture\n') => { const p = path.join(work, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, text); };
   function run(name, extra = {}, transform = value => value) {
-    const step = copilotStep(name), file = path.join(root, step.shell === 'pwsh' ? 'body.ps1' : 'body.sh');
+    const step = job.steps.find(item => item.name === name);
+    assert.ok(step, `The selected setup workflow has no step: ${name}`);
+    const file = path.join(root, step.shell === 'pwsh' ? 'body.ps1' : 'body.sh');
     // Observe successful-body isolation in the same process, with no job.env seed.
     const isolationProbe = step.shell === 'pwsh'
       ? '\nif ($env:GIT_CONFIG_NOSYSTEM -cne "1" -or $env:GIT_CONFIG_GLOBAL -cne "/dev/null" -or $env:GIT_TERMINAL_PROMPT -cne "0") { throw "Fixture: body depends on job.env isolation" }\n'
@@ -1544,37 +1576,41 @@ else if(a.includes('check')&&${JSON.stringify(mode)}==='check-failure')process.e
   });
 }
 
-for (const mode of ['clean', 'npm-failure', 'hook-wrong', 'suite-failure']) {
-  test(`Copilot explicit hook and full-validation caller: ${mode}`, { skip: !linux }, t => {
-    const f = copilotBodyFixture(t), bin = path.join(f.root, 'bin'), log = path.join(f.root, 'calls'); fs.mkdirSync(bin);
-    f.git('init', '-q'); f.put('fixture'); f.commit();
-    f.git('update-ref', 'refs/remotes/origin/main', 'HEAD');
-    const fixturePython = copilotFixturePython();
-    for (const name of ['npm', 'python']) fs.writeFileSync(path.join(bin, name), `#!${process.execPath}
-const fs=require('node:fs'),{spawnSync}=require('node:child_process'),a=process.argv.slice(2);
-if(${JSON.stringify(name)}==='python'&&a[2]==='-'){const r=spawnSync(${JSON.stringify(fixturePython)},a,{stdio:'inherit'});process.exit(r.status??99);}
-if(Object.keys(process.env).some(k=>/^npm_config_/i.test(k)&&!['npm_config_userconfig','npm_config_globalconfig'].includes(k)))process.exit(97);
-fs.appendFileSync(${JSON.stringify(log)},JSON.stringify([${JSON.stringify(name)},...a])+'\\n');
-if(${JSON.stringify(name)}==='npm') {
- if(${JSON.stringify(mode)}==='npm-failure')process.exit(31);
- spawnSync('/usr/bin/git',['config','core.hooksPath',${JSON.stringify(mode)}==='hook-wrong'?'.bad':'.husky/_']);
- fs.mkdirSync('.husky/_',{recursive:true});fs.writeFileSync('.husky/_/pre-commit','#!/bin/sh\\nexit 0\\n',{mode:0o700});
-} else if(${JSON.stringify(mode)}==='suite-failure')process.exit(37);
-`, { mode: 0o700 });
-    const env = { PATH: `${bin}:${process.env.PATH}`, VALIDATION_PYTHON: path.join(bin, 'python'),
-      GITHUB_SHA: f.git('rev-parse', 'HEAD'), GITHUB_WORKSPACE: f.work,
-      NPM_CONFIG_SCRIPT_SHELL: 'hostile', 'npm_config_unsafe-name': 'dummy' };
-    const hook = f.run('Activate repository hooks', env);
-    assert.equal(hook.status === 0, !['npm-failure', 'hook-wrong'].includes(mode), hook.stderr);
-    if (hook.status === 0) {
-      const suite = f.run('Run complete repository validation', env);
-      assert.equal(suite.status, mode === 'suite-failure' ? 37 : 0, suite.stderr);
-    }
-    const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
-    assert.deepEqual(calls[0], ['npm', '--prefix', '.github/workflows', 'run', 'prepare']);
-    if (hook.status === 0) assert.deepEqual(calls[1], ['python', '-E', '-P', '-m', 'pre_commit', 'run', '--all-files']);
-    else assert.equal(calls.length, 1);
-  });
+for (const reviewOnly of [false, true]) {
+  const selectedJob = reviewOnly ? parse(read('copilot-code-review.yml')).jobs['copilot-setup-steps'] : copilotJob;
+  for (const mode of (reviewOnly ? ['clean', 'npm-failure', 'hook-wrong'] : ['clean', 'npm-failure', 'hook-wrong', 'suite-failure'])) {
+    test(`${reviewOnly ? 'Review' : 'Coding'} Copilot explicit hook and full-validation caller: ${mode}`, { skip: !linux }, t => {
+      const f = copilotBodyFixture(t, 'work', selectedJob), bin = path.join(f.root, 'bin'), log = path.join(f.root, 'calls'); fs.mkdirSync(bin);
+      f.git('init', '-q'); f.put('fixture'); f.commit();
+      f.git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+      const fixturePython = copilotFixturePython();
+      for (const name of ['npm', 'python']) fs.writeFileSync(path.join(bin, name), `#!${process.execPath}
+  const fs=require('node:fs'),{spawnSync}=require('node:child_process'),a=process.argv.slice(2);
+  if(${JSON.stringify(name)}==='python'&&a[2]==='-'){const r=spawnSync(${JSON.stringify(fixturePython)},a,{stdio:'inherit'});process.exit(r.status??99);}
+  if(Object.keys(process.env).some(k=>/^npm_config_/i.test(k)&&!['npm_config_userconfig','npm_config_globalconfig'].includes(k)))process.exit(97);
+  fs.appendFileSync(${JSON.stringify(log)},JSON.stringify([${JSON.stringify(name)},...a])+'\\n');
+  if(${JSON.stringify(name)}==='npm') {
+   if(${JSON.stringify(mode)}==='npm-failure')process.exit(31);
+   spawnSync('/usr/bin/git',['config','core.hooksPath',${JSON.stringify(mode)}==='hook-wrong'?'.bad':'.husky/_']);
+   fs.mkdirSync('.husky/_',{recursive:true});fs.writeFileSync('.husky/_/pre-commit','#!/bin/sh\\nexit 0\\n',{mode:0o700});
+  } else if(${JSON.stringify(mode)}==='suite-failure')process.exit(37);
+  `, { mode: 0o700 });
+      const env = { PATH: `${bin}:${process.env.PATH}`, VALIDATION_PYTHON: path.join(bin, 'python'),
+        GITHUB_SHA: f.git('rev-parse', 'HEAD'), GITHUB_WORKSPACE: f.work,
+        NPM_CONFIG_SCRIPT_SHELL: 'hostile', 'npm_config_unsafe-name': 'dummy' };
+      const hook = f.run('Activate repository hooks', env);
+      assert.equal(hook.status === 0, !['npm-failure', 'hook-wrong'].includes(mode), hook.stderr);
+      if (hook.status === 0 && !reviewOnly) {
+        const suite = f.run('Run complete repository validation', env);
+        assert.equal(suite.status, mode === 'suite-failure' ? 37 : 0, suite.stderr);
+      }
+      const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+      assert.deepEqual(calls[0], ['npm', '--prefix', '.github/workflows', 'run', 'prepare']);
+      if (hook.status === 0 && !reviewOnly) assert.deepEqual(calls[1], ['python', '-E', '-P', '-m', 'pre_commit', 'run', '--all-files']);
+      else assert.equal(calls.length, 1);
+    });
+  }
+
 }
 
 for (const mode of ['clean', 'worktree', 'index', 'index-masked', 'untracked', 'ignored-untracked']) {
@@ -1634,8 +1670,8 @@ for (const historical of [false, true]) {
 // Run the extracted install body with the real built-in-only policy helper and
 // current source inputs. Only npm is replaced; it records installs without
 // downloading packages. Fixtures intentionally have no installed YAML module.
-function copilotPreinstallFixture(t) {
-  const f = copilotBodyFixture(t);
+function copilotPreinstallFixture(t, job = copilotJob) {
+  const f = copilotBodyFixture(t, 'work', job);
   const inputs = ['package.json', 'package-lock.json', '.github/workflows/package.json',
     '.github/workflows/package-lock.json', '.github/workflows/ci-toolchain.json',
     '.github/workflows/workflow-policy-contract.json', '.github/workflows/Validate-WorkflowPolicy.mjs'];
@@ -1865,3 +1901,59 @@ test('Copilot isolated validation stops on native directory-change failure', { s
   assert.ok(!fs.existsSync(`${f.log}.dispatch`), 'A failed directory change must not dispatch validation.');
   assert.deepEqual(f.snapshot(), f.before);
 });
+
+// The dedicated service workflow prepares the same tools; ordinary CI and
+// coding setup retain the complete suite. Compare every retained actual step.
+const reviewSetup = parse(read('copilot-code-review.yml'));
+const reviewJob = reviewSetup.jobs['copilot-setup-steps'];
+test('dedicated review setup preserves every preparation guard and omits only the aggregate', () => {
+  const coding = parse(read('copilot-setup-steps.yml'));
+  assert.deepEqual(Object.keys(reviewSetup.jobs), ['copilot-setup-steps']);
+  assert.deepEqual(reviewSetup.on, coding.on);
+  assert.deepEqual(reviewSetup.permissions, {});
+  assert.deepEqual(reviewJob.permissions, {});
+  assert.equal(reviewJob.env, undefined);
+  assert.equal(reviewJob['runs-on'], copilotJob['runs-on']);
+  assert.equal(reviewJob['timeout-minutes'], copilotJob['timeout-minutes']);
+  const complete = copilotStep('Run complete repository validation');
+  assert.ok(complete);
+  assert.match(complete.run, /-m pre_commit run --all-files/u);
+  assert.deepEqual(reviewJob.steps, copilotJob.steps.filter(step => step !== complete));
+  assert.equal(reviewJob.steps.some(step => step.run.includes('-m pre_commit run --all-files')), false);
+});
+for (const mode of ['declared', 'historical', 'missing-current-input']) {
+  test(`dedicated review actual capability selection: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t, 'work', reviewJob);
+    copilotInputs(f, mode === 'historical' ? 'historical' : 'declared');
+    if (mode === 'missing-current-input') fs.rmSync(path.join(f.work, 'requirements-dev.txt'));
+    const result = f.run('Detect locked validation-tool layout');
+    assert.equal(result.status === 0, mode !== 'missing-current-input', result.stdout + result.stderr);
+    if (result.status === 0) assert.match(fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8'),
+      new RegExp(`validation=${mode === 'historical' ? 'node-only' : 'full'}`));
+  });
+}
+for (const mode of ['clean', 'bad-lock', 'native-failure']) {
+  test(`dedicated review actual locked install admission: ${mode}`, { skip: !linux }, t => {
+    const f = copilotPreinstallFixture(t, reviewJob);
+    if (mode === 'bad-lock') {
+      const lock = JSON.parse(fs.readFileSync(path.join(f.work, 'package-lock.json'), 'utf8'));
+      Object.values(lock.packages).find(entry => entry.resolved).resolved = 'https://example.invalid/package.tgz';
+      f.put('package-lock.json', JSON.stringify(lock));
+    }
+    if (mode === 'native-failure') f.put('.github/workflows/Validate-WorkflowPolicy.mjs', 'process.exit(37);\n');
+    const result = f.run('modern');
+    assert.equal(result.status, mode === 'clean' ? 0 : mode === 'native-failure' ? 37 : 1, result.stdout + result.stderr);
+    assert.deepEqual(f.calls(), mode === 'clean' ? [copilotCiArgs, [...copilotCiArgs, '--prefix', '.github/workflows']] : []);
+  });
+}
+for (const mode of ['clean', 'worktree', 'index-masked', 'untracked']) {
+  test(`dedicated review actual final immutable guard: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t, 'work', reviewJob); f.git('init', '-q'); copilotInputs(f, 'historical'); f.commit();
+    assert.equal(f.run('Verify acquired immutable setup inputs').status, 0);
+    if (mode === 'worktree' || mode === 'index-masked') f.put('package.json', 'changed\n');
+    if (mode === 'index-masked') { f.git('add', 'package.json'); f.put('package.json', f.git('show', 'HEAD:package.json')); }
+    if (mode === 'untracked') f.put('requirements-dev.txt');
+    const result = f.run('Verify final immutable setup inputs');
+    assert.equal(result.status === 0, mode === 'clean', result.stdout + result.stderr);
+  });
+}
