@@ -1,0 +1,126 @@
+{
+  "status": "PASS_SCOPED_R4_DISPOSITION_CI_HOLD",
+  "material_findings": [],
+  "reviewed_utc": "2026-10-07T03:12:29.540203+00:00",
+  "snapshot_utc": "2026-10-07T03:10:21.511017+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "selected_option": "A97.9 no product change",
+  "decision_basis": [
+    "Exact README date-only accepted-to-current transition",
+    "Accepted/current unchanged-rendered-content early return with retained date guards",
+    "Prior exact boundary selection and actual-H October7 finalization",
+    "No changed product inputs requiring renewed local qualification"
+  ],
+  "native_disposition": {
+    "finding": 4202576730,
+    "reply": 4202677252,
+    "thread": "PRRT_kwDOQkjdhM6pvNci",
+    "all_four_threads_resolved": true,
+    "copilot_review": 5437075963,
+    "observed_effort": "Lite",
+    "copilot_review_is_new_clean_review": false,
+    "codex_clean_summary": 6029735383
+  },
+  "current_ci": {
+    "dynamic_run": 37562640212,
+    "conclusion": "cancelled",
+    "explicit_limit_minutes": 20,
+    "aggregate_seconds": 899,
+    "hooks_passed": 11,
+    "final_guard": "success",
+    "new_body_triggered_ordinary_run": 37565487714,
+    "ordinary_status_at_snapshot": "in_progress"
+  },
+  "remaining_gates": [
+    "Successful current CI; no failed/cancelled CI merge",
+    "Fresh native premerge input/review/check binding",
+    "Legitimate dedicated-service selection and successful completion",
+    "Actual-landed reverse comparison and applicable peer delivery"
+  ],
+  "unchanged_constraints": {
+    "current_input_attempts": "1/3",
+    "old_input_attempts": "3/3 exhausted",
+    "earliest_manual_recovery_utc": "2026-10-07T03:34:29Z",
+    "deadline": "2026-10-14T20:09:39.767792Z",
+    "transfers": [
+      2,
+      4,
+      6,
+      6
+    ],
+    "B99": "held"
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\REPORT.md",
+      "sha256": "50d8db43326e044f150c6c45cb924b7d14aa023df8c5c778f3c21ef51bdbe69f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\evidence.json",
+      "sha256": "f2f228779a343c1982486dbc68278f3f8640a8eb11c78d2b5e80cebe46144924"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\SELECTION.md",
+      "sha256": "c296011dec11e6f6d1bea613dd822559fd202c9f6af9782804f9652fd9e8968d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-native-disposition.json",
+      "sha256": "00b193fa9e638b86b74feb8eeb1e2408946f79aef15e1e2d6766181eb2442b1b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-post-disposition.json",
+      "sha256": "22376ed7ec427bc57f1b99b9642f9cd2e68951fa126545b986f906efdc95b1fa"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-proposed-body.txt",
+      "sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-body-readback.json",
+      "sha256": "b76498e990683d22ed6b5058686b2a7d0815f753bfa2bc621c8c42a3edf7e326"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
+      "sha256": "836ab911f8d08b6142582610510d29625907681803522cdafe245feac75e3a20"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\REPORT.md",
+      "sha256": "0f59afbd16690750d2223d7497a61ed6724d2c0f2ff666a0e8cafc0cfc6dfaa8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\evidence.json",
+      "sha256": "8e7ca04d3ce1311310ca85a0bda71823b432cb80caa311b2e89ae536a7e4abc5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+      "sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+      "sha256": "59cbda866821219f47e27d0619bc3cd5bb510b57d2fd11c055b5e1958515c2d1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\output\\FinalizeMetadataNow\\log.txt",
+      "sha256": "2915e7f5cfd3a7bea575c60b5cb6e76ed2b0a945ed16446e3b00cc9c45faa1c6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\run.json",
+      "sha256": "8f7f6173e67397a506a9e8634c00019f70a83fd5edd6385d5743a27d7c41e12b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\jobs.json",
+      "sha256": "2b8ed655b2612b4eec03d55c627c5c4d996f7ceea1b96998359d5c7d46c6b4bf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\log.txt",
+      "sha256": "17b47a129f007099f7ec67c957de24a6808f0299ce1963891a009d2c908ade8e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\annotations.json",
+      "sha256": "cc729da2f2c6d34258d91ad99deba9891ceaa51d0579705618070a69d4a4bca0"
+    }
+  ],
+  "report_sha256": "d0038ed5ebd772ed0d901d6f1f08848201ba29dee0176f1b42cf6202b52e228b"
+}

@@ -1,0 +1,148 @@
+{
+  "status": "native_disposition_and_body_confirmed",
+  "recorded_at": "2026-10-07T03:08:57.958479+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "expected_body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+  "preimage": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-pre-disposition.json",
+  "decision_url": "https://github.com/franklesniak/PSStyleGuide/blob/6d6231260e6226d8a5b53685759d3ecfb7bc8d70/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round2-R4-metadata/SELECTION.md",
+  "reply": "The README's October 6 date was carried in `504cd76`; `5e8ccbb` leaves that file unchanged.\nAccepted/current checks retain that date for unchanged rendered content; actual October 7 finalization passed. [Decision, options, scores and evidence](https://github.com/franklesniak/PSStyleGuide/blob/6d6231260e6226d8a5b53685759d3ecfb7bc8d70/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round2-R4-metadata/SELECTION.md). Thread resolution uses the documented GraphQL fallback.\nGenerated with Codex",
+  "thread_id": "PRRT_kwDOQkjdhM6pvNci",
+  "comment_id": 4202576730,
+  "eyes_reaction_id": 451677460,
+  "eyes_readback_confirmed": true,
+  "proposed_body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "body_scope": "Factual current CI/review disposition only; no new material product scope.",
+  "retry_instructions": "Reconcile actual native reply/resolution/body before retrying any ambiguous operation.",
+  "reply_id": 4202677252,
+  "reply_readback": {
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4202677252",
+    "pull_request_review_id": 5437195136,
+    "id": 4202677252,
+    "node_id": "PRRC_kwDOQkjdhM76f8QE",
+    "diff_hunk": "@@ -5,7 +5,7 @@\n \n - **Status:** Active\n - **Owner:** Repository Maintainers\n-- **Last Updated:** 2026-10-05\n+- **Last Updated:** 2026-10-06",
+    "path": ".github/workflows/scripts-README.md",
+    "commit_id": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "original_commit_id": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "user": {
+      "login": "franklesniak",
+      "id": 11204406,
+      "node_id": "MDQ6VXNlcjExMjA0NDA2",
+      "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/franklesniak",
+      "html_url": "https://github.com/franklesniak",
+      "followers_url": "https://api.github.com/users/franklesniak/followers",
+      "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+      "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+      "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+      "repos_url": "https://api.github.com/users/franklesniak/repos",
+      "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "The README's October 6 date was carried in `504cd76`; `5e8ccbb` leaves that file unchanged.\nAccepted/current checks retain that date for unchanged rendered content; actual October 7 finalization passed. [Decision, options, scores and evidence](https://github.com/franklesniak/PSStyleGuide/blob/6d6231260e6226d8a5b53685759d3ecfb7bc8d70/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/round2-R4-metadata/SELECTION.md). Thread resolution uses the documented GraphQL fallback.\nGenerated with Codex",
+    "created_at": "2026-10-07T03:09:06Z",
+    "updated_at": "2026-10-07T03:09:06Z",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4202677252",
+    "pull_request_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4202677252"
+      },
+      "html": {
+        "href": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4202677252"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235"
+      }
+    },
+    "reactions": {
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/comments/4202677252/reactions",
+      "total_count": 0,
+      "+1": 0,
+      "-1": 0,
+      "laugh": 0,
+      "hooray": 0,
+      "confused": 0,
+      "heart": 0,
+      "rocket": 0,
+      "eyes": 0
+    },
+    "start_line": null,
+    "original_start_line": null,
+    "start_side": null,
+    "line": 8,
+    "original_line": 8,
+    "side": "RIGHT",
+    "in_reply_to_id": 4202576730,
+    "author_association": "OWNER",
+    "original_position": 5,
+    "position": 5,
+    "subject_type": "line"
+  },
+  "thread_before_resolution": {
+    "data": {
+      "node": {
+        "id": "PRRT_kwDOQkjdhM6pvNci",
+        "isResolved": false,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4202576730
+            },
+            {
+              "databaseId": 4202677252
+            }
+          ]
+        }
+      }
+    }
+  },
+  "resolution_intent_at": "2026-10-07T03:09:34.209329+00:00",
+  "resolution_response": {
+    "data": {
+      "resolveReviewThread": {
+        "thread": {
+          "id": "PRRT_kwDOQkjdhM6pvNci",
+          "isResolved": true
+        }
+      }
+    }
+  },
+  "thread_after_resolution": {
+    "data": {
+      "node": {
+        "id": "PRRT_kwDOQkjdhM6pvNci",
+        "isResolved": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4202576730
+            },
+            {
+              "databaseId": 4202677252
+            }
+          ]
+        }
+      }
+    }
+  },
+  "resolved_at": "2026-10-07T03:09:35.820208+00:00",
+  "body_update_intent_at": "2026-10-07T03:10:07.950499+00:00",
+  "eyes_removed_readback_confirmed": true,
+  "body_transport": "gh api PATCH fallback; GitHub connector has no PR-body update capability",
+  "body_update_exit": 0,
+  "body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "completed_at": "2026-10-07T03:10:09.940972+00:00"
+}
