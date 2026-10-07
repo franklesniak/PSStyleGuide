@@ -1,0 +1,15 @@
+{
+  "status": "publication_confirmed_by_native_readback",
+  "observed_at": "2026-10-07T02:32:20.614Z",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+  "original_response_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "explanation": "The successful body PATCH response still reported the previous PR head. Subsequent authenticated connector readback confirms the pushed head and exact intended body. No public write was repeated.",
+  "evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\publication-preparation\\native-pr-reconciled.json": "3b53bf5ae367b7d5a0dcf7a49fd292e5252c3e967ec30ea1c634a126a5259e7c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\publication-preparation\\body-update-response.json": "cd431f4775284028ae0f34d0ce665516db3b3a4f7c4db1dad606fa26f4ead9ba",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\publication-preparation\\body-update-request.json": "e826e5bfc88b5cab343c3a3a3614656bae8672af080dcf3c0d0bded0addcdb47",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\publication-preparation\\push.log": "76d9c4f1493d3b7649172750b6634474005892bb4c80c7873b382149e61c4cb8"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "status": "round2_reviews_and_CI_pending",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+  "round": 2,
+  "first_request_at": "2026-10-06T20:09:39.767792+00:00",
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "transfers": {
+    "A06": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 6,
+      "cap": 12
+    },
+    "A07": {
+      "used": 6,
+      "cap": 12
+    }
+  },
+  "copilot_event": 32653656598,
+  "copilot_requested_at": "2026-10-07T02:34:29Z",
+  "copilot_run": 37562640212,
+  "selected_effort": "Balanced",
+  "observed_completed_effort": null,
+  "codex_trigger": 6029695424,
+  "codex_requested_at": "2026-10-07T02:35:11Z",
+  "summary": {
+    "comment_id": 6024517148,
+    "updated_at": "2026-10-07T02:35:25Z",
+    "body_sha256": "360fa2d6b93b65d54db0a02c68e558a2d67ce7d157ff3fb52b8f5bf56914c87a",
+    "status": "Running",
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "trigger": "Manual request"
+  },
+  "CI": {
+    "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "captured_at": "2026-10-07T02:35:29.100077+00:00",
+    "successful_runs": [
+      37562193726,
+      37562192513,
+      37562191989,
+      37562192494,
+      37562192569,
+      37562192608,
+      37562189632,
+      37562189629,
+      37562189589,
+      37562189611
+    ],
+    "active_runs": [
+      37562640212,
+      37562192514,
+      37562192501,
+      37562189624,
+      37562189656
+    ],
+    "failed_or_cancelled_runs": [],
+    "acceptance": "pending; no merge until all applicable current CI/reviews and required acceptance gates pass",
+    "historical_failed_runs": "review_rounds[0] retains two cancelled dynamic runs and exhausted3/3same-input recovery"
+  },
+  "baselines": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-baseline.json": "975ab0b986a272e997082c5c43bced1e8be2ccd34be5b6e8567117cb9e90c0e2",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-copilot-readback.json": "86d0cf9a9967d6d29ce03fa871c069c89f2a1a443b0bbb6ba9d486b618a7ee6e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-codex-readback.json": "fb039c06d08458b15e0783a08f5a6933313de6df264663e880de8f37fd45bc08"
+  }
+}
