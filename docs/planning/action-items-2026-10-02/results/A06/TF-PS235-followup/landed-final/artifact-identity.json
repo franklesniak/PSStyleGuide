@@ -1,0 +1,32 @@
+{
+  "artifact_id": 11463534683,
+  "run": 37579626389,
+  "sha256": "d163b51ca1afa3a4b3a6208c50aedb828468baa02ec61ba335c36f7acf0a675e",
+  "bytes": 681751,
+  "entries": [
+    {
+      "path": "copilot-instructions.md",
+      "bytes": 152868,
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+      "exact_landed_blob_match": true
+    },
+    {
+      "path": "terraform.instructions.md",
+      "bytes": 153067,
+      "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "exact_landed_blob_match": true
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "bytes": 152962,
+      "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+      "exact_landed_blob_match": true
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "bytes": 222292,
+      "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+      "exact_landed_blob_match": true
+    }
+  ]
+}

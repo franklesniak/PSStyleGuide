@@ -1,0 +1,18 @@
+{
+  "finding": "B99-INTEGRATION-1",
+  "status": "C99.4_SELECTED_PRIVATE_DRAFT_RELEASED",
+  "selected_at": "2026-10-07T05:53:21.192739+00:00",
+  "selected_option": "C",
+  "score": 99.4,
+  "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\REPORT.md",
+  "report_sha256": "37a049f27ceab7c7e8fd1ee1b95b30970f49c0dc084290e6b736f934fa854ca1",
+  "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\evidence.json",
+  "evidence_sha256": "febccc6df9abff0994564dd9db54b9908095c9637171d3c05a371586610614a0",
+  "root_validation": "Read full proposal and exact frozen SelfTest2920-2965 plus accepted PS235 SelfTest3820-3870. Verified four accepted raw preimages, four consequential immutable references, report/evidence hashes and all six score totals. Source-traced index inheritance confirms the conflict; no executed reproduction claimed.",
+  "displayed_to_owner": "Validation, all six options, fresh weighted rubric, complete scoring table and controlled-English selection shown before release. Existing clear-winner authority applies.",
+  "scope": "Only private accepted-main semantic draft/candidate copies/evidence in this preparation directory. Restore and stage canonical fixture .gitignore after size cases with native exit check; preserve both control families and all accepted PS235 changes.",
+  "product_release": false,
+  "tests_released": false,
+  "serialization": "Root may integrate onto actual current accepted PS main after TF69 acceptance; no product/Git/native mutation or test from this private release.",
+  "counters_changed": false
+}

@@ -1,0 +1,76 @@
+{
+  "status": "ACCEPTED_MAIN_DRAFT_INTEGRATED_AND_STAGED_UNTESTED",
+  "started_at": "2026-10-07T06:35:00.590443+00:00",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+  "branch": "codex/b99-accepted-main",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "previous_clean_worktree": {
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "branch": "codex/tf67-compareback",
+    "index_sha256": "ca771d1ab293baa2629ff4bf7de991bf5cc21841b1e214b34d1cca6e9bff0768",
+    "unstaged_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "staged_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "preserved_worktrees": {
+    "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide": {
+      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "branch": "codex/no-tracked-compiled-python",
+      "index_sha256": "20abf18aaf81715036f13a3660ec6ba23c9079cff9a479328e1555bc67b6b020",
+      "unstaged_patch_sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209",
+      "staged_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "C:\\Users\\flesniak\\.codex\\worktrees\\a07-tooling\\PSStyleGuide": {
+      "head": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "branch": "codex/a07-tooling",
+      "index_sha256": "f2cf51afbe28157071d806a4d9c307355e122b2df24e6f3d9eab143cf445cd14",
+      "unstaged_patch_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "staged_patch_sha256": "91a539ca7532dfb2dd3c43fc779aa2398223d7fba1b720e5ca2340f014c1b304"
+    }
+  },
+  "preserved_ignored_file_count": 1927,
+  "native_refs": {
+    "PS": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TF": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+      }
+    }
+  },
+  "prerequisite": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-landed-source-acceptance.json",
+  "prerequisite_sha256": "b491a96efeb67241c57d3f95f8b2af514bde8e34ac88fc1422da17753a4cd6d5",
+  "draft_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DRAFT-REVIEW.json",
+  "draft_review_sha256": "75fdb0c33fa7cea9fae274165588a5bf52d4d6ff8e076a0c3d4d39ea710ddb0f",
+  "patch_sha256": "733b6a6f0f4ce3c98a1bcc4135e7f113155d0d8434d5a9d9553c72df4c81b56c",
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".gitignore"
+  ],
+  "tests_executed": false,
+  "recovery": "Inspect actual branch/HEAD/index/working bytes and this intent before retry. Old branches, dirty source and held A07 are preserved.",
+  "baseline_source_files": 78,
+  "completed_at": "2026-10-07T06:35:09.158581+00:00",
+  "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "candidate_sha256": {
+    ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+    ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+    ".github/workflows/Test-AgentInstructions.ps1": "fc5ff6d8554e2edb11c3ebf0059b2e4488c53d494671493ab9fcf7edc2658b3a",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "395492f21890b4ad16b05aaf43d996224534fa753ad204f1a4d10691774196ad"
+  },
+  "preserved_ignored_files_verified": true,
+  "preserved_other_worktrees_verified": true
+}

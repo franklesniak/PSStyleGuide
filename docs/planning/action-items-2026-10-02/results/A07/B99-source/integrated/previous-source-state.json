@@ -1,9 +1,9 @@
 {
-  "status": "ACCEPTED_MAIN_DRAFT_INTEGRATED_AND_STAGED_UNTESTED",
+  "status": "repair_v2_provisional_source_pass_integration_and_qualification_held",
   "created_at": "2026-10-06T21:24:16.646475+00:00",
-  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
-  "branch": "codex/b99-accepted-main",
-  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\governance-push-exit\\PSStyleGuide",
+  "branch": "codex/no-tracked-compiled-python",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
   "prior_branch": "codex/governance-push-exit",
   "prior_head": "a7b57b58d291068ed12575f66224e0e0a2f5f1af",
   "allowed_paths": [
@@ -13,7 +13,7 @@
     ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
   ],
   "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-current-readiness\\source-boundary-20261006\\ROOT-DECISION.json",
-  "writer": "root integration; source author stopped",
+  "writer": "a06_conversion_cold_packet",
   "local_source_released": true,
   "tests_released": false,
   "commit_publication_released": false,
@@ -21,17 +21,17 @@
   "held_A07_index": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
   "PS235_frozen_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
   "transfers": {
-    "A06": 3,
+    "A06": 2,
     "A03": 4,
-    "A21": 7,
-    "A07": 7,
+    "A21": 6,
+    "A07": 6,
     "cap": 12
   },
-  "next_action": "Review composed qualified transports, bind exact platform manifests, then execute one focus and one quality cell per platform.",
+  "next_action": "Retain frozen source. After genuine PS235 acceptance, integrate semantically onto actual accepted main; then run final-input qualification, admission, audit and normal review/CI lifecycle.",
   "branch_command_exit": 0,
-  "observed_head": "58a1345896da1a1e8794078e588e88e58a78e2eb",
-  "observed_branch": "codex/b99-accepted-main",
-  "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "observed_head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "observed_branch": "codex/no-tracked-compiled-python",
+  "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
   "source_baseline": {
     ".claude/commands/review-loop.md": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
     ".codex/config.toml": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
@@ -55,21 +55,20 @@
     ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
     ".github/workflows/NpmTools.mjs": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
     ".github/workflows/NpmTools.test.mjs": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
-    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
-    ".github/workflows/Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+    ".github/workflows/Test-AgentInstructions.ps1": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
     ".github/workflows/Test-BlankLineExamples.ps1": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
     ".github/workflows/Test-CheckoutCredentials.ps1": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
-    ".github/workflows/Test-CiHelpers.test.mjs": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+    ".github/workflows/Test-CiHelpers.test.mjs": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
     ".github/workflows/Test-ExactGitPathSet.ps1": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
     ".github/workflows/Test-LocalValidation.test.mjs": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
-    ".github/workflows/Test-StyleGuideArtifacts.ps1": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
     ".github/workflows/Test-StyleGuideGenerator.ps1": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
     ".github/workflows/Validate-WorkflowPolicy.mjs": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
     ".github/workflows/Validate-WorkflowPolicy.test.mjs": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
-    ".github/workflows/agent-instructions.yml": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+    ".github/workflows/agent-instructions.yml": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
     ".github/workflows/build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
     ".github/workflows/ci-toolchain.json": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
-    ".github/workflows/copilot-code-review.yml": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
     ".github/workflows/copilot-setup-steps.yml": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
     ".github/workflows/devcontainer-ci.yml": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
     ".github/workflows/historical-supply-profile.json": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
@@ -80,9 +79,9 @@
     ".github/workflows/lint-staged-markdown.mjs": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
     ".github/workflows/markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
     ".github/workflows/npm-risk-exceptions.json": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
-    ".github/workflows/package-lock.json": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
-    ".github/workflows/package.json": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
-    ".github/workflows/scripts-README.md": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+    ".github/workflows/package-lock.json": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+    ".github/workflows/package.json": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+    ".github/workflows/scripts-README.md": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
     ".github/workflows/workflow-policy-cases.json": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
     ".github/workflows/workflow-policy-contract.json": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
     ".gitignore": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
@@ -104,7 +103,7 @@
     "docs/P1-SUPPLY-FREEZE-v1.md": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
     "docs/decisions/0001-accept-in-repository-trust-root.md": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
     "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
-    "docs/dependency-maintenance.md": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+    "docs/dependency-maintenance.md": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
     "package-lock.json": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
     "package.json": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
     "powershell.instructions.md": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
@@ -112,16 +111,16 @@
     "samples/test-nested-markdown-linting.md": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
     "samples/test-recursive-nested-markdown.md": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
   },
-  "updated_at": "2026-10-07T06:48:55.815004+00:00",
+  "updated_at": "2026-10-07T06:28:11.185940+00:00",
   "source_writer_stopped": true,
   "candidate_sha256": {
-    ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
     ".pre-commit-config.yaml": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
-    ".github/workflows/Test-AgentInstructions.ps1": "fc5ff6d8554e2edb11c3ebf0059b2e4488c53d494671493ab9fcf7edc2658b3a",
-    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "395492f21890b4ad16b05aaf43d996224534fa753ad204f1a4d10691774196ad"
+    ".gitignore": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+    ".github/workflows/Test-AgentInstructions.ps1": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca"
   },
-  "bystanders_unchanged": true,
-  "source_index_unchanged": false,
+  "bystanders_unchanged": 73,
+  "source_index_unchanged": true,
   "handoff": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/repair-v2/HANDOFF.md",
   "handoff_sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8",
   "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\evidence.json",
@@ -275,7 +274,7 @@
     "not_final_acceptance": true
   },
   "accepted_main_preparation": {
-    "status": "ACCEPTED_MAIN_DRAFT_INTEGRATED_AND_STAGED_UNTESTED",
+    "status": "PRIVATE_DRAFT_ROOT_REVIEW_PASS_PRODUCT_AND_TEST_RELEASE_PENDING",
     "worker": "ps_carryback_final_quality",
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation",
     "accepted_PS_main": "58a1345896da1a1e8794078e588e88e58a78e2eb",
@@ -302,44 +301,5 @@
       "Honor selected P2 Windows private-index allowance when native symlink materialization is unavailable; preserve actual Linux symlink coverage and truthful platform limits."
     ],
     "execution_released": false
-  },
-  "integration": {
-    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\SOURCE-INTEGRATION.json",
-    "sha256": "a1070ee840a671a2691b6624b68a11269fa6411979edd317407a8fad04071acd",
-    "old_source_state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\previous-source-state.json",
-    "old_source_state_sha256": "b8c6ae4715e229f29410cdfc3e78e161d6b7462b7cd77769f9018c7566a77157",
-    "scope_limit": "Earlier source-only reviews apply to their unchanged regions; no final integrated quality or runtime pass is implied.",
-    "counter_basis": "Retains current cumulative counters. This integrates the already released initial PS B99 source onto its accepted prerequisite; no new opposite-repository repair batch or review request occurs. The eventual peer repair consumes the next applicable transfer."
-  },
-  "dependency_binding": {
-    "status": "EXACT_QUALIFIED_DEPENDENCIES_INSTALLED_OLD_CACHE_PRESERVED",
-    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\DEPENDENCY-REFRESH.json",
-    "sha256": "777518527937caedd2a06105dbcfe95cdb59ed265d9f8735577f78cc73286bf5",
-    "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\dependency-catalog.json",
-    "catalog_sha256": "b75f9a94e9a64d8d165321d27e4fb4e522e173752abdfeb8eaad86b7793d7e61",
-    "files": 1914,
-    "bytes": 18816883,
-    "old_cache_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\integrated\\dependency-history"
-  },
-  "qualification_preparation_v3": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation-v3",
-    "status": "ROOT_STATIC_REVIEW_PASSED_AWAITING_COMPOSED_TRANSPORT",
-    "files": {
-      "focus.py": "e8225c5fd762fec4b1096e5e94f6967b21529bccfc37147a1c54a8fc91a5de14",
-      "helpers.ps1": "cda326153821c33b05b76e002f18a4b96ce69a012cfa1c2455d8237d6f75d67d",
-      "README.md": "79fd7c9234805ef7da690edb11a7ef35918f69aaaa13361dfd97eebc3034aa1c",
-      "binding.template.json": "d4898540b61b55441555cbebdade7b245dafe14a7da377b8d830fd7a449ae2c5",
-      "v2-to-v3.patch": "3afff4c89696aeb0e08b011fe15ed33740ac331efeb5a51426e4af539ccd0f52",
-      "evidence.json": "b30aa4270edab8e0cd879a175628397a71a3075b91a1a503770aaa7a045db0d0"
-    },
-    "received_at": "2026-10-07T06:44:47.991925+00:00",
-    "executed": false,
-    "test_authorization": false,
-    "author_writes_stopped": true
-  },
-  "focused_input_binding": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\binding-inputs.json",
-    "sha256": "5af6deda6bea75904d83b101b250102c87f9b896ceab8bcef869a0dc786f0f22",
-    "status": "VERIFIED_INPUTS_NOT_AUTHORIZED"
   }
 }

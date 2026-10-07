@@ -1,0 +1,133 @@
+{
+  "status": "PRIVATE_SEMANTIC_DRAFT_READY_FOR_ROOT_INSPECTION_NO_EXECUTION",
+  "prepared_utc": "2026-10-07T05:55:15.363941+00:00",
+  "sealed_utc": "2026-10-07T05:57:41.453722+00:00",
+  "accepted_main": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "accepted_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "decisions": [
+    "P1 C97.0",
+    "P2 D98.4",
+    "B99-INTEGRATION-1 C99.4"
+  ],
+  "files": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "accepted_blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+      "accepted_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "draft_blob": "1dc3daeba6e1dea524ab4e5ef27bc6b969035b3c",
+      "draft_sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "draft_bytes": 370,
+      "changed": true
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "accepted_blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "accepted_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "draft_blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "draft_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "draft_bytes": 5398,
+      "changed": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "accepted_blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "accepted_sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "draft_blob": "a12785d268acd7bfa0c1d934c62bed221a70ea46",
+      "draft_sha256": "fc5ff6d8554e2edb11c3ebf0059b2e4488c53d494671493ab9fcf7edc2658b3a",
+      "draft_bytes": 524561,
+      "changed": true
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "accepted_blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "accepted_sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "draft_blob": "ab870af1d90d24a2f1a3d28ff664691b3e2b866c",
+      "draft_sha256": "395492f21890b4ad16b05aaf43d996224534fa753ad204f1a4d10691774196ad",
+      "draft_bytes": 318819,
+      "changed": true
+    }
+  ],
+  "patch": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\integration.patch",
+    "sha256": "733b6a6f0f4ce3c98a1bcc4135e7f113155d0d8434d5a9d9553c72df4c81b56c"
+  },
+  "static_preservation": {
+    "validator_outside_declared_regions_exact": true,
+    "selftest_outside_two_helpers_and_script_version_exact": true,
+    "accepted_optional_security_suffix_exact": true,
+    "accepted_optional_reader_suffix_exact": true,
+    "accepted_Get_MarkdownParseContext_exact": true,
+    "accepted_109_case_function_and_invocation_exact": true,
+    "new_helpers_equal_repair_v2_except_metadata": true,
+    "classification_fixture_equal_repair_v2_except_metadata": true,
+    "original_eleven_hook_config_exact": true,
+    "other_accepted_paths": "Retained by reference; only three patch paths, no whole-tree reconstruction."
+  },
+  "fixture_restoration": {
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "draft_lines": [
+      4095,
+      4100
+    ],
+    "operation": "Restore canonical worktree content, stage only .gitignore with core.autocrlf=false, check native exit before accepted optional controls",
+    "evidence_kind": "Static construction and source trace; unexecuted"
+  },
+  "versions": {
+    "validator": "1.22.20261007.0",
+    "SelfTest": "1.13.20261007.0",
+    "Get-AgentSetupInputSpec": "1.2.20261007.0",
+    "Get-AgentSetupContractFailure": "1.2.20261007.0",
+    "Get-AgentPreCommitHookContext": "1.0.20261007.0",
+    "Get-TrackedCompiledPythonFailure": "1.0.20261007.0",
+    "Assert-ClassificationAdmissionGitFixture": "1.1.20261007.0",
+    "Assert-AgentSetupSelfTest": "1.2.20261007.0"
+  },
+  "product_integration_released": false,
+  "tests_executed": false,
+  "remaining_gates": [
+    "Root review of private draft and serialized TF69 acceptance before integration",
+    "Rebind current accepted PS main and actual edit date",
+    "Focused fixture restoration and all selected finite/native/main-call qualification",
+    "Final exact-byte platform checks, full eleven-hook aggregate and all actual committed B/H endpoints/audit",
+    "Independent final quality and normal review/CI/source/peer/service gates"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\REPORT.md",
+      "sha256": "37a049f27ceab7c7e8fd1ee1b95b30970f49c0dc084290e6b736f934fa854ca1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\evidence.json",
+      "sha256": "febccc6df9abff0994564dd9db54b9908095c9637171d3c05a371586610614a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\accepted-main-preparation\\ROOT-DECISION.json",
+      "sha256": "faf76fd3964aba3537888634b33710424dca3bf29c5d6a00f5f39abc60c5243c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\recovery.patch",
+      "sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\HANDOFF.md",
+      "sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\REPORT.md",
+      "sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
+      "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+      "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed"
+    }
+  ],
+  "report_sha256": "2cdeced35ac1e87c347df76749809e407bb6e26c33ae466b4f8258dc3aba2782"
+}

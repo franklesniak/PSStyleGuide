@@ -177,3 +177,5 @@ Actual staged preflight passed on525147aa. The sole full aggregate is running in
 ## Coherent TF peer PR66
 
 The shared peer candidate is now committed as e2f0652/tree525147aa and published in [PR66](https://github.com/franklesniak/TerraformStyleGuide/pull/66). Full local11-hook validation, actual accepted-B/proposed-H diagnostics and the fresh two-root audit passed. [The canonical peer record](../A02/coherent-peer-candidate.json) owns current review and hosted-check state: round1/80, fixed deadline2026-10-12T16:41:24Z, both reviewer requests confirmed pending, transfer1 unchanged. Earlier source lifecycle records remain historical. No hosted, landed or paired acceptance is claimed; final quality and reverse comparison remain due.
+
+[TF69 landed-source and finite paired acceptance](../A06/TF-PS235-followup/TF69-landed-source-acceptance.json) now binds actualPS58a1345/TF33ec8a0 with six successful landed workflows and no further repair in that finite scope. Genuine PS dedicated-service selection and the broader runtime/recovery outcomes remain open. Prior results, original clocks and cumulative transfers are retained.

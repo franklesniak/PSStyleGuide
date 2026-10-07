@@ -1,0 +1,34 @@
+{
+  "status": "V3_STATIC_ROOT_REVIEW_PASSED_INPUTS_VERIFIED_NO_TEST_RELEASE",
+  "created_at": "2026-10-07T06:48:55.815004+00:00",
+  "review_scope": "Full v3 focus.py, helpers.ps1, README and complete executable/template delta from root-reviewed v2. Capture and Windows capability controls retained; actual verified fixture bytes plus fixed16MiB allowance selected.",
+  "packet_files": {
+    "focus.py": "e8225c5fd762fec4b1096e5e94f6967b21529bccfc37147a1c54a8fc91a5de14",
+    "helpers.ps1": "cda326153821c33b05b76e002f18a4b96ce69a012cfa1c2455d8237d6f75d67d",
+    "README.md": "79fd7c9234805ef7da690edb11a7ef35918f69aaaa13361dfd97eebc3034aa1c",
+    "binding.template.json": "d4898540b61b55441555cbebdade7b245dafe14a7da377b8d830fd7a449ae2c5",
+    "v2-to-v3.patch": "3afff4c89696aeb0e08b011fe15ed33740ac331efeb5a51426e4af539ccd0f52",
+    "evidence.json": "b30aa4270edab8e0cd879a175628397a71a3075b91a1a503770aaa7a045db0d0"
+  },
+  "input_binding": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\binding-inputs.json",
+    "sha256": "5af6deda6bea75904d83b101b250102c87f9b896ceab8bcef869a0dc786f0f22"
+  },
+  "retained_limitations": [
+    "Author preparation is not independent final quality.",
+    "README stale cache statement is superseded by completed DEPENDENCY-REFRESH.json; refreshed actual worktree closure was verified.",
+    "No candidate/PowerShell/fixture/transport execution.",
+    "Composition, authorized binding, actual platform runs and final result review remain."
+  ],
+  "source_count": 78,
+  "dependency_count": 1914,
+  "fixture_budget": {
+    "source_bytes": 3747753,
+    "dependency_bytes": 18816883,
+    "initial_fixture_bytes": 22564636,
+    "generated_allowance_bytes": 16777216,
+    "total_output_bytes": 39341852
+  },
+  "historical_v2_preserved": true,
+  "root_role": "coordinator source review and consequential input verification"
+}

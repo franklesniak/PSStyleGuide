@@ -1,0 +1,32 @@
+{
+  "status": "PRIVATE_DRAFT_ROOT_REVIEW_PASS_PRODUCT_AND_TEST_RELEASE_PENDING",
+  "reviewed_at": "2026-10-07T06:13:24.833099+00:00",
+  "accepted_main": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "report_sha256": "2cdeced35ac1e87c347df76749809e407bb6e26c33ae466b4f8258dc3aba2782",
+  "evidence_sha256": "1648c08bd55c49d5fb85c088907b62c39b067d19d6fac33c11ad13c158aa1473",
+  "patch_sha256": "733b6a6f0f4ce3c98a1bcc4135e7f113155d0d8434d5a9d9553c72df4c81b56c",
+  "root_review": "Read complete report, evidence and every patch hunk; verified four actual accepted raw blobs/four prospective candidate hashes and immutable report/evidence/patch identities; sampled exact preservation of parser and109-case SelfTest bodies. Selected C97.0/D98.4/C99.4 retained. No material finding identified in this static integration review. Not runtime or independent final acceptance.",
+  "sampled_preservation": {
+    "Get-MarkdownParseContext": "Exact accepted bytes retained",
+    "Assert-MarkdownStringArrayContextSelfTest": "Exact accepted bytes retained"
+  },
+  "changed_paths": [
+    ".gitignore",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "unchanged_scoped_path": ".pre-commit-config.yaml",
+  "product_integration_released": false,
+  "tests_released": false,
+  "remaining": [
+    "TF69 landed-source acceptance",
+    "fresh accepted PS main and actual UTC date binding",
+    "isolated integration preserving old B99 source and held A07",
+    "focused final-input qualification and full lifecycle"
+  ],
+  "qualification_preparation": {
+    "worker": "ps_carryback_final_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\qualification-preparation",
+    "scope": "Private code and binding plan only; no product or test execution; author cannot be final independent reviewer."
+  }
+}

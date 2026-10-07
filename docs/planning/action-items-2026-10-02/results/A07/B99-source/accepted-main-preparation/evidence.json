@@ -1,0 +1,208 @@
+{
+  "status": "INTEGRATION_PREPARATION_ONE_FIXTURE_CONFLICT_SELECTION_REQUIRED",
+  "prepared_utc": "2026-10-07T05:51:19.282407+00:00",
+  "accepted_main": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "accepted_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "accepted_raw_preimages": [
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+      "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+      "bytes": 289
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398
+    }
+  ],
+  "historical_frozen_repair_v2_postimages": [
+    {
+      "path": ".gitignore",
+      "sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "bytes": 370
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "3a8bd237ec53e3bdb777e0e873269b4b809ca8e45d1771d2688dce875fd1be70",
+      "bytes": 495899
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "de42a0407bf0462ec26f0cb963f144a0bdc89c618691b70b0fd063f2e90c78ca",
+      "bytes": 249243
+    }
+  ],
+  "product_files_equal_frozen_source": true,
+  "candidate_draft_created": false,
+  "payloads_or_tests_executed": false,
+  "missing_authoritative_input": null,
+  "material_finding": {
+    "id": "B99-INTEGRATION-1",
+    "property": "Oversized .gitignore remains indexed before accepted optional-workflow historical-absence commit",
+    "frozen_b99_lines": [
+      2924,
+      2943,
+      2960
+    ],
+    "accepted_ps235_lines": [
+      3823,
+      3857,
+      3861,
+      3863
+    ],
+    "evidence_kind": "Source-traced integration collision; no executed reproduction",
+    "recommendation": "C99.4 pending root selection",
+    "production_contract_change": false
+  },
+  "rubric_weights": {
+    "Isolation": 35,
+    "Preservation": 24,
+    "Security": 18,
+    "Clarity": 12,
+    "Evidence": 8,
+    "Cost": 3
+  },
+  "ratings": {
+    "A": [
+      2,
+      5,
+      4,
+      2,
+      2,
+      5
+    ],
+    "B": [
+      0,
+      1,
+      1,
+      1,
+      0,
+      5
+    ],
+    "C": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      4
+    ],
+    "D": [
+      5,
+      5,
+      5,
+      4,
+      4,
+      3
+    ],
+    "E": [
+      4,
+      5,
+      4,
+      3,
+      4,
+      4
+    ],
+    "F": [
+      5,
+      4,
+      5,
+      3,
+      5,
+      1
+    ]
+  },
+  "totals": {
+    "A": 63.4,
+    "B": 13.8,
+    "C": 99.4,
+    "D": 94.8,
+    "E": 82.4,
+    "F": 88.0
+  },
+  "integration_scope": [
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "expected_modified_paths": [
+    ".gitignore",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\execution-state.json",
+      "sha256": "ede4a3bcf41cf89f93d259f25eac2f10df4baceb17fd1c01ebcda68e6afd8841"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\HANDOFF.md",
+      "sha256": "e620b6dbf10184d600af0b0d78d124078fa8eb5ded82dd1095747aa10bea3da8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\evidence.json",
+      "sha256": "60ea1f5cac05c40002b8c465c2d6bc56ececb610379a788c5dfc2ace486b7f0b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\recovery.patch",
+      "sha256": "894508b0c1d4b6f6020a723ad76b0d4621a527a837131c8e8b9814e1ff756209"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\repair-v2\\provisional-review\\REPORT.md",
+      "sha256": "4572a9e4d0654fd3e1cd1fb750fd09933c1122e4090e8b3b9639a5d674f52835"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\ROOT-DECISION.json",
+      "sha256": "fbe9955fbbe811d7fff725e0fc4ea947909cfe66d9f854a6f8ea3c4614728961"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P1-active-hook-structure.md",
+      "sha256": "19479a8682cae822be75237f215546c4b9d1ab74db6ccb2f946955b7422b6514"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\decisions\\P2-filename-wide-enforcement.md",
+      "sha256": "ab665d9a1774ea9893afadb61233a6d1d43cdcfc6d5b12b4cb87e10389f0efc9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+      "sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "23d71b30f0bd4dbce33acf64c128d8ff96fad0cf18410b2a2f1973a0f30fef8b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A07.md",
+      "sha256": "63cb7d51f26adc12072ed82d63b3bc82c0b722a2d1a8dd817fc4afbc65538af9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\RESULT.md",
+      "sha256": "02600220496e8033d4cf3cbad11c8829ef39ad180965583210b53dbe6608be48"
+    }
+  ],
+  "report_sha256": "37a049f27ceab7c7e8fd1ee1b95b30970f49c0dc084290e6b736f934fa854ca1"
+}

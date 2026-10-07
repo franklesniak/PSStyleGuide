@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "TF69_MERGED_LANDED_CI_PENDING",
+  "status": "TF69_LANDED_SOURCE_AND_FINITE_PAIR_ACCEPTED_PS_SERVICE_PENDING",
   "released_at": "2026-10-07T04:34:47.428231+00:00",
   "objective": "Carry accepted D94.1 validator/109-case repair and touched guide metadata into TF; preserve finite exceptions and prove paired convergence.",
   "repository": "franklesniak/TerraformStyleGuide",
@@ -10,7 +10,14 @@
   "base_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
   "source": "58a1345896da1a1e8794078e588e88e58a78e2eb",
   "source_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
-  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\PS235-landed-source-acceptance.json",
+  "source_acceptance": {
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-landed-source-acceptance.json",
+    "sha256": "b491a96efeb67241c57d3f95f8b2af514bde8e34ac88fc1422da17753a4cd6d5",
+    "merge_commit": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+    "tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
+    "finite_pair_verified": true,
+    "additional_peer_repair_required": false
+  },
   "source_acceptance_sha256": "b98e8b1d638da7d6eb1b816b53320f0010af20edbbd5de8afd4cbc8b4b31aeed",
   "actual_peer_rebind": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\ACTUAL-ACCEPTED-PEER-REBIND.json",
   "actual_peer_rebind_sha256": "1c7a2120d241c6721244e4f5aca3260ff4081f20e185d4e7e6692da9aba21124",
@@ -219,29 +226,7 @@
   ],
   "pr": 69,
   "clock_basis": "TF69 continues unresolved paired TF outcome: seven prior rounds retained, round8 starts with authenticated automatic Codex PR-open review. Original first request/deadline unchanged.",
-  "pending_native_operations": [
-    {
-      "kind": "Landed push CI",
-      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
-      "run_id": 37579626338,
-      "name": "Copilot setup steps",
-      "status": "in_progress"
-    },
-    {
-      "kind": "Landed push CI",
-      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
-      "run_id": 37579626311,
-      "name": "Agent instruction validation",
-      "status": "in_progress"
-    },
-    {
-      "kind": "Landed push CI",
-      "head": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
-      "run_id": 37579626389,
-      "name": "Build Style Guide Artifacts",
-      "status": "in_progress"
-    }
-  ],
+  "pending_native_operations": [],
   "local_operation": {
     "kind": "planning checkpoint publication",
     "status": "passed",
@@ -261,9 +246,9 @@
     "No new framework, benchmark, broad unchanged suite, protected-file edit or bypass.",
     "Retain original rounds/deadlines, all failed history, hourly CI rule and pending-operation suppression."
   ],
-  "next_action": "Verify landed CI and native tree, then compare actual accepted source/peer bytes and finite exceptions. Preserve all counters and remaining broad outcomes.",
+  "next_action": "Continue initial PS B99 semantic integration/qualification, then remaining R5/B1 and broad outcomes; establish PS dedicated-service selection on next natural PR.",
   "branch_created_at": "2026-10-07T04:34:47.952447+00:00",
-  "planning_checkpoint": "6f098cb6179ed5ddd02217c1cc3e5d1d9ceaafb7",
+  "planning_checkpoint": "648ec1d97334578f2bae8a88375b7589c77aeb3b",
   "candidate_tree": "c19b92d54746aa4cdea4b6eee055b07de724b31a",
   "staged_at": "2026-10-07T04:40:36.596743+00:00",
   "source_catalog": {
@@ -275,7 +260,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\QUALIFICATION-RELEASE.json",
     "sha256": "6244e4eca25c7e0cc005d51ca64757a0a0099fe196b5653cd8bfd55c8fd5496b"
   },
-  "updated_at": "2026-10-07T06:06:06.953661+00:00",
+  "updated_at": "2026-10-07T06:34:18.685216+00:00",
   "focused_validation": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\FOCUSED-VALIDATION.json",
     "sha256": "97ee39d786c57b9227c85ea97f638cfe22ac0b4dae4063fea2904a73a3bb58f8"
@@ -604,28 +589,10 @@
     "source_acceptance": "Landed CI and paired comparison pending."
   },
   "landed_CI": {
-    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-landed-observation-one.json",
-    "sha256": "5fd22ec8dce24ced20f70a99412d3ada87d1764ac18251d86be28e35372f2167",
-    "captured_at": "2026-10-07T06:06:06.953661+00:00",
+    "latest_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\TF69-landed-observation-six.json",
+    "sha256": "680aacc857d1096ffb8ee2cf99305cb3912118887e08782ee1189d9a0f0e7083",
+    "captured_at": "2026-10-07T06:30:06.834573+00:00",
     "runs": [
-      {
-        "id": 37579626338,
-        "name": "Copilot setup steps",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37579626311,
-        "name": "Agent instruction validation",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37579626389,
-        "name": "Build Style Guide Artifacts",
-        "status": "in_progress",
-        "conclusion": null
-      },
       {
         "id": 37579626316,
         "name": "Dev container boundary",
@@ -643,7 +610,36 @@
         "name": "Copilot code review preparation",
         "status": "completed",
         "conclusion": "success"
+      },
+      {
+        "id": 37579626389,
+        "name": "Build Style Guide Artifacts",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37579626311,
+        "name": "Agent instruction validation",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37579626338,
+        "name": "Copilot setup steps",
+        "status": "completed",
+        "conclusion": "success"
       }
     ]
+  },
+  "landed_quality": {
+    "status": "passed",
+    "worker": "tf_ps235_candidate_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\landed-final",
+    "scope": "Independent actual landed logs and48raw-entry finite paired comparison; no broad outcome completion. One native instruction workflow remains live in latest root snapshot.",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\landed-final\\REPORT.md",
+    "report_sha256": "06a3e9d3e026b4b2e075f522b6b7489723e4f96caebbe3eaecfb5ddc754e8dcd",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-PS235-followup-20261007\\landed-final\\evidence.json",
+    "evidence_sha256": "d0464c529555151a1355cd36d79b96ee821c8765f87828fb5ea7fa7f30e54a2e",
+    "root_verified": true
   }
 }
