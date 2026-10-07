@@ -1,0 +1,76 @@
+{
+  "status": "CANCELLED_CI_HOLD",
+  "captured_at": "2026-10-07T02:55:50.839953+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+  "round": 2,
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "request_event_id": 32653656598,
+  "review_id": 5437075963,
+  "observed_effort": "Lite",
+  "finding": "PS235-R4 under proposal",
+  "workflow_run_id": 37562640212,
+  "attempt": 1,
+  "workflow_conclusion": "cancelled",
+  "terminal_at": "2026-10-07T02:55:09Z",
+  "job_id": 112603164453,
+  "phases": [
+    {
+      "name": "Run complete repository validation",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 77,
+      "started_at": "2026-10-07T02:35:29Z",
+      "completed_at": "2026-10-07T02:50:28Z"
+    },
+    {
+      "name": "Verify final immutable setup inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 82,
+      "started_at": "2026-10-07T02:50:30Z",
+      "completed_at": "2026-10-07T02:50:30Z"
+    },
+    {
+      "name": "Processing Request (Linux)",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "number": 94,
+      "started_at": "2026-10-07T02:50:34Z",
+      "completed_at": "2026-10-07T02:55:05Z"
+    }
+  ],
+  "successful_hook_lines": [
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:35:53.8328770Z check json...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:35:54.8856161Z check yaml...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:35:56.5587234Z fix end of files.........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:35:58.2137638Z trim trailing whitespace.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:35:59.3425142Z yamllint.................................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:36:00.4027041Z Lint GitHub Actions workflow files.......................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:36:01.5398488Z Validate Dependabot Config (v2)..........................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:36:02.8224323Z Validate GitHub Workflows................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:36:02.8610921Z staged Markdown..........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:36:03.6720138Z workflow policy contract.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T02:50:28.7117575Z agent instruction contract and mutation tests............................Passed"
+  ],
+  "aggregate_seconds": 899.0,
+  "annotations": [
+    "The job has exceeded the maximum execution time of 20m0s",
+    "The operation was canceled."
+  ],
+  "current_input_attempts_used": 1,
+  "current_input_attempt_limit": 3,
+  "next_request_not_before": "2026-10-07T03:34:29+00:00",
+  "old_input_history": "round1 retains3/3 exhausted",
+  "no_merge": true,
+  "dedicated_service_selection_proved": false,
+  "evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-terminal.json": "51093143ba83d9f3dffcdce44b276346d521b0a718dafd8d7ca82ef6c8ba4a41",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\run.json": "8f7f6173e67397a506a9e8634c00019f70a83fd5edd6385d5743a27d7c41e12b",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\jobs.json": "2b8ed655b2612b4eec03d55c627c5c4d996f7ceea1b96998359d5c7d46c6b4bf",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\log.txt": "17b47a129f007099f7ec67c957de24a6808f0299ce1963891a009d2c908ade8e",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37562640212\\attempt-1\\annotations.json": "cc729da2f2c6d34258d91ad99deba9891ceaa51d0579705618070a69d4a4bca0"
+  },
+  "interpretation": "Authenticated job annotation records its20-minute execution limit. Eleven hooks and final guard passed; review processing was cancelled. No billing cause is established. Source/ordinary checks and Lite review do not replace successful current CI."
+}

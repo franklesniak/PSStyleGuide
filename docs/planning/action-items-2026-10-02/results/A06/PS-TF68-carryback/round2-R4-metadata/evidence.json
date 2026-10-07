@@ -1,0 +1,445 @@
+{
+  "status": "R4_A97.9_PROPOSAL_ROOT_SELECTION_PENDING",
+  "UTC": "2026-10-07T03:01:56.952811+00:00",
+  "finding": {
+    "comment": {
+      "id": 4202576730,
+      "path": ".github/workflows/scripts-README.md",
+      "body": "This file is modified in the PR but the metadata `Last Updated` is set to `2026-10-06` while other touched metadata and the PR narrative reference `2026-10-07`. If this date is used by the repository’s metadata/finalization checks, please update it to the actual change date to avoid inconsistent document metadata.",
+      "line": 8,
+      "commit_id": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "created_at": "2026-10-07T02:51:33Z",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#discussion_r4202576730"
+    },
+    "review": 5437075963,
+    "thread": "PRRT_kwDOQkjdhM6pvNci"
+  },
+  "H": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "B": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "raw_sources": [
+    {
+      "repo": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "bytes": 13541
+    },
+    {
+      "repo": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "bytes": 13541
+    },
+    {
+      "repo": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "bytes": 13541
+    },
+    {
+      "repo": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+      "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+      "bytes": 13470
+    },
+    {
+      "repo": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "bytes": 482175
+    },
+    {
+      "repo": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    }
+  ],
+  "commits": [
+    {
+      "commit": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "raw_commit_sha256": "9c47011b24829aa0b4f93693f93411fc17213a19f3767eb10b2310d2cd371eaa",
+      "committer_epoch": 1791316108,
+      "committer_UTC": "2026-10-06T19:48:28+00:00",
+      "parents": [
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ]
+    },
+    {
+      "commit": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "raw_commit_sha256": "876a1bd5751a187a3075c9ea4a54d44a842dd138d9c389f67a0bbd6ae1e9aa26",
+      "committer_epoch": 1791338309,
+      "committer_UTC": "2026-10-07T01:58:29+00:00",
+      "parents": [
+        "504cd7672ac9604ace765a4f451346f801f09ddd"
+      ]
+    }
+  ],
+  "README_B_H_single_date_line": true,
+  "README_H504_H5e8_raw_equal": true,
+  "README_B_H_diff": "diff --git a/.github/workflows/scripts-README.md b/.github/workflows/scripts-README.md\nindex 8510f35..e6221de 100644\n--- a/.github/workflows/scripts-README.md\n+++ b/.github/workflows/scripts-README.md\n@@ -6,5 +6,5 @@\n - **Status:** Active\n - **Owner:** Repository Maintainers\n-- **Last Updated:** 2026-10-05\n+- **Last Updated:** 2026-10-06\n - **Scope:** Describes repository-owned workflow scripts, supported local entry points, setup, and Markdown lint behavior. It does not define repository-wide documentation policy.\n - **Related:** [Nested Markdown Linting Implementation Summary](MARKDOWN-LINTING-IMPLEMENTATION.md), [Documentation Writing Style](../instructions/docs.instructions.md)\n",
+  "H504_H5e8_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    "docs/dependency-maintenance.md"
+  ],
+  "function_regions": [
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "function": "ConvertTo-MetadataComparisonText",
+      "start": 4246,
+      "end": 4317,
+      "sha256": "b4ece0b72f5c95e8a9499789c28775dd3d64dee26fb3a1d2cb8763b8715cad55",
+      "bytes": 2690
+    },
+    {
+      "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "function": "Get-PublishedEndpointLastUpdatedFailure",
+      "start": 4318,
+      "end": 4456,
+      "sha256": "cb67334d5a7daffb9e2431261565a11315cdd8e74a80413bd55a549e5e245121",
+      "bytes": 5862
+    },
+    {
+      "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "function": "ConvertTo-MetadataComparisonText",
+      "start": 4687,
+      "end": 4758,
+      "sha256": "b4ece0b72f5c95e8a9499789c28775dd3d64dee26fb3a1d2cb8763b8715cad55",
+      "bytes": 2690
+    },
+    {
+      "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "function": "Get-PublishedEndpointLastUpdatedFailure",
+      "start": 4759,
+      "end": 4928,
+      "sha256": "6c442ac894c936a72bfa4c20274c1b980f380208d60d79e6afaa57c86f15445f",
+      "bytes": 7544
+    }
+  ],
+  "accepted_current_mask_raw_equal": true,
+  "early_return_before_event_date": {
+    "accepted_return": [
+      4438,
+      4440
+    ],
+    "accepted_enforcement_from": 4441,
+    "current_return": [
+      4898,
+      4900
+    ],
+    "current_enforcement_from": 4901
+  },
+  "prior_selected_exact_applicability": {
+    "commit": "61e4d95832fafca1df829cfe9aa3e36ec75d39a4",
+    "path": "docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/empty-array-trial/FINAL-VALIDATION-SELECTION.md",
+    "blob": "c8bc3de3a25e592b3cc1e3ba5ef7ea696fa617eb",
+    "explicit_keep_oct6": true,
+    "same_current_readme_blob_and_accepted_base": true,
+    "published_object_inspected_read_only": true
+  },
+  "reused_FinalizeMetadataNow": {
+    "name": "FinalizeMetadataNow",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "-InputRevision",
+      "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "-PublishedBaselineRevision",
+      "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "-FinalizeMetadataNow"
+    ],
+    "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+    "started_utc": "2026-10-07T02:16:41.571615+00:00",
+    "finished_utc": "2026-10-07T02:17:07.060769+00:00",
+    "exit": 0,
+    "wrapper_exit": 0,
+    "state": "passed",
+    "job_before_cleanup": {
+      "total": 544,
+      "active": 0,
+      "terminated": 0
+    },
+    "job_after_cleanup": {
+      "total": 544,
+      "active": 0,
+      "terminated": 0
+    }
+  },
+  "rubric_weights": {
+    "C": 32,
+    "H": 27,
+    "U": 21,
+    "P": 12,
+    "E": 5,
+    "B": 3
+  },
+  "scores": [
+    {
+      "option": "A",
+      "ratings": [
+        10,
+        10,
+        9,
+        10,
+        10,
+        10
+      ],
+      "numerator": 979,
+      "total": 97.9
+    },
+    {
+      "option": "B",
+      "ratings": [
+        9,
+        9,
+        4,
+        10,
+        8,
+        10
+      ],
+      "numerator": 805,
+      "total": 80.5
+    },
+    {
+      "option": "C",
+      "ratings": [
+        10,
+        10,
+        9,
+        10,
+        10,
+        7
+      ],
+      "numerator": 970,
+      "total": 97.0
+    },
+    {
+      "option": "D",
+      "ratings": [
+        7,
+        6,
+        7,
+        7,
+        6,
+        4
+      ],
+      "numerator": 659,
+      "total": 65.9
+    },
+    {
+      "option": "E",
+      "ratings": [
+        7,
+        6,
+        6,
+        6,
+        6,
+        3
+      ],
+      "numerator": 623,
+      "total": 62.3
+    },
+    {
+      "option": "F",
+      "ratings": [
+        3,
+        2,
+        3,
+        2,
+        2,
+        2
+      ],
+      "numerator": 253,
+      "total": 25.3
+    },
+    {
+      "option": "G",
+      "ratings": [
+        1,
+        2,
+        2,
+        2,
+        2,
+        4
+      ],
+      "numerator": 174,
+      "total": 17.4
+    },
+    {
+      "option": "H",
+      "ratings": [
+        9,
+        9,
+        7,
+        9,
+        9,
+        3
+      ],
+      "numerator": 840,
+      "total": 84.0
+    },
+    {
+      "option": "I",
+      "ratings": [
+        4,
+        5,
+        4,
+        3,
+        5,
+        5
+      ],
+      "numerator": 423,
+      "total": 42.3
+    }
+  ],
+  "all_nine_totals_checked_against_report": true,
+  "recommendation": {
+    "option": "A",
+    "total": 97.9,
+    "product_edit": false,
+    "body_correction_required": false,
+    "new_test_required": false
+  },
+  "proposed_reply": "The README's October 6 date was carried in `504cd76`; `5e8ccbb` leaves that blob unchanged.\nBoth checkers return before event-date enforcement when rendered content is unchanged; the shared date already matches TF. [Selected metadata boundary](https://github.com/franklesniak/PSStyleGuide/blob/61e4d95832fafca1df829cfe9aa3e36ec75d39a4/docs/planning/action-items-2026-10-02/results/A06/PS-TF68-carryback/empty-array-trial/FINAL-VALIDATION-SELECTION.md).\nGenerated with Codex",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-observation-five.json",
+      "sha256": "8dd436237c078cc3a84366cfd23df23d7317725df5cd75ab6db2cdc10ae26066",
+      "bytes": 769160
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-terminal.json",
+      "sha256": "51093143ba83d9f3dffcdce44b276346d521b0a718dafd8d7ca82ef6c8ba4a41",
+      "bytes": 773078
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISIONS.md",
+      "sha256": "f58131a8dfd0452ba69310b2dab04f0a0133ff758bea1d19111e2b58fd20d3f6",
+      "bytes": 20567
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+      "sha256": "59cbda866821219f47e27d0619bc3cd5bb510b57d2fd11c055b5e1958515c2d1",
+      "bytes": 5805
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-validation-preparation\\REPORT.md",
+      "sha256": "550b8912173867db5c174333579323fbaffaefb16e97412172b8966286c00653",
+      "bytes": 13343
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION.json",
+      "sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0",
+      "bytes": 16116
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+      "sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4",
+      "bytes": 3949
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-one\\execution-run\\result.json",
+      "sha256": "d7fbc5ae3ab0ac7ba9c33c855a4c2d474879ea2d19bce407426e6fc1bbf7aeea",
+      "bytes": 6045
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\result.json",
+      "sha256": "d72f0c82ae0c0bd92346fce3748ef069f5a5c521aa00a63ce398c88c5093cdb3",
+      "bytes": 12315
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\output\\FinalizeMetadataNow\\log.txt",
+      "sha256": "2915e7f5cfd3a7bea575c60b5cb6e76ed2b0a945ed16446e3b00cc9c45faa1c6",
+      "bytes": 227
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\committed-validation-continuation-one\\execution-run\\output\\FinalizeMetadataNow\\result.json",
+      "sha256": "4bff8d0c6baa8170664bc284f53ed78e7bb8ac083900117ef89e18f62bc53ecb",
+      "bytes": 1048
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\REPORT.md",
+      "sha256": "143c3598fc2bc3688dc6c47a85de25c98328c19f6845b0b25c21480c69221454",
+      "bytes": 8821
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\evidence.json",
+      "sha256": "9d0ddb1dc0ee9fa5ddefdbc6ca1a44678bc3cbfcf95f1b5d7421dfa3f2289349",
+      "bytes": 74406
+    }
+  ],
+  "guards_before": {
+    "HEAD": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index_sha256": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+    "refs_sha256": "cfba9d3a0f12d379f492fbf0411d98590832da37785da27b7207fd1d5c015745",
+    "config_sha256": "ba950a2ef00ba8eabad87ac93ea9a926f7af219b43a8f30548eff1f9ef163096",
+    "clean": true
+  },
+  "guards_after": {
+    "HEAD": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "index_sha256": "6ec8302c48efa7184c71ec9cd920e9dc74f9120a98952ed3b72abb87a227f29f",
+    "refs_sha256": "cfba9d3a0f12d379f492fbf0411d98590832da37785da27b7207fd1d5c015745",
+    "config_sha256": "ba950a2ef00ba8eabad87ac93ea9a926f7af219b43a8f30548eff1f9ef163096",
+    "clean": true
+  },
+  "guards_equal": true,
+  "native_limits": {
+    "terminal_snapshot_UTC": "2026-10-07T02:55:50.839953+00:00",
+    "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
+    "dynamic37562640212": "cancelled02:55:09Z;20-minute maximum;11hooks899s and finalguard passed before reviewprocessingcancelled (root annotation evidence)",
+    "14ordinary_CI": "successful",
+    "Codex6029735383": "clean",
+    "earliest_recovery": "2026-10-07T03:34:29Z",
+    "current_input_channels": "1/3",
+    "old_input_channels": "3/3 exhausted",
+    "deadline": "2026-10-14T20:09:39.767792Z",
+    "round": 2,
+    "A06_transfers": "2/12",
+    "B99": "frozen",
+    "failed_CI_merge": "prohibited",
+    "date_edit_service_remedy": "not supported"
+  },
+  "D07_setup_note": [
+    "Host text encoding and one long static builder failed before output writes.",
+    "A missing guessed guide and subdirectory-relative planning lookup were corrected by actual instructions/full-tree addressing.",
+    "Explicit UTF-8/private-data construction completed; all score totals and report binding were checked.",
+    "No product/runtime/parser/test/probe/native/dependency execution or Git mutation occurred."
+  ],
+  "tests_or_native_calls_performed": false,
+  "product_or_Git_writes": false,
+  "report_sha256": "50d8db43326e044f150c6c45cb924b7d14aa023df8c5c778f3c21ef51bdbe69f"
+}

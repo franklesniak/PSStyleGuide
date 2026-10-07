@@ -1,0 +1,88 @@
+{
+  "main": {
+    "ref": "refs/heads/main",
+    "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+    "object": {
+      "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "type": "commit",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+    }
+  },
+  "candidate_commit": {
+    "sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "node_id": "C_kwDOQkjdhNoAKDVlOGNjYmJlNDU2NzlhYjU4YTIwMmM2NzI1NTRmZmRhNTZhMGE5ZjU",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-07T01:58:29Z"
+    },
+    "committer": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-07T01:58:29Z"
+    },
+    "tree": {
+      "sha": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/821a952c9d4be1395cab3b2af8da7a679987e4a6"
+    },
+    "message": "Avoid redundant validation of empty Markdown arrays",
+    "parents": [
+      {
+        "sha": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/504cd7672ac9604ace765a4f451346f801f09ddd",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/504cd7672ac9604ace765a4f451346f801f09ddd"
+      }
+    ],
+    "verification": {
+      "verified": false,
+      "reason": "unsigned",
+      "signature": null,
+      "payload": null,
+      "verified_at": null
+    }
+  },
+  "test_merge_commit": {
+    "sha": "589ca70df32bdd5f1c3f940b831fa76e39f577ec",
+    "node_id": "C_kwDOQkjdhNoAKDU4OWNhNzBkZjMyYmRkNWYxYzNmOTQwYjgzMWZhNzZlMzlmNTc3ZWM",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/589ca70df32bdd5f1c3f940b831fa76e39f577ec",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/589ca70df32bdd5f1c3f940b831fa76e39f577ec",
+    "author": {
+      "name": "Frank Lesniak",
+      "email": "franklesniak@hotmail.com",
+      "date": "2026-10-07T02:29:03Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-10-07T02:29:03Z"
+    },
+    "tree": {
+      "sha": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/821a952c9d4be1395cab3b2af8da7a679987e4a6"
+    },
+    "message": "Merge 5e8ccbbe45679ab58a202c672554ffda56a0a9f5 into 98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "parents": [
+      {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      },
+      {
+        "sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+      }
+    ],
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqxa5vCRC1aQ7uu5UhlAAA2YEQAB5d/oXt7mmwmFiz7z2EKmHs\nJkmVlT2r6OZ5N3MLAJ7aJlE5mqmD2im2ysXmO6ohj1Ro9YeEh2MR2ynVbS0XtnWt\naUJdl2ZcYS3XuXHTf495jx82jo8kjljrhGh4yRWPNY3ap2C8Klw8TFax5UOsHO7M\n8o9ws5IHnkYY4M+K/SLpSovNV93FqmClnfZiVzEBLOta1gMHJY731+w98NqJticV\n0mor6B9P02AYmHX3t21A2mHrHfDdbLhZRhW5AI8sPI58G1UwOMwOr2jSKxp5xqEG\nOvzetKVWztnDNP5Up0OWB0FlN1jZLfmuvPDuuLtvzncEn0JaKkjvKZN6+6M5TV6m\njysfStvSkOmN1HBJUO6xE0S9w/q/iA4AunzLPFDK5EWdm1q3EUJa5cF6laI5LNt7\nf4amsLNJFWGnI+tVZOwuY+zUs+OSG7dWoef28hxM7QAtLg2/5sYrmlmFAwmFaLlu\n+fQkbE3E+NhZUJQnySRq9sUlnc+mtjrHcvr8TqZt2WaBTVRtzUdXaGgu1D7aquv4\ncq1qp/gydaukd0iR7Ir5WP8XZ3zpXdqF4tr5/BrSCaPQWAjiuPltQEId1C+YMKly\nh40MN3INLjx0UypQZruqoKOs0cfAtqanffwSVpxmivI0IbsXU9IVp0qPkn5cSvE8\nf0AsPQMr5vaoFolPQs8Y\n=qp8U\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree 821a952c9d4be1395cab3b2af8da7a679987e4a6\nparent 98177628b7bc02c646724bfc8aa0fd73fed0cd24\nparent 5e8ccbbe45679ab58a202c672554ffda56a0a9f5\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791340143 -0500\ncommitter GitHub <noreply@github.com> 1791340143 -0500\n\nMerge 5e8ccbbe45679ab58a202c672554ffda56a0a9f5 into 98177628b7bc02c646724bfc8aa0fd73fed0cd24\n",
+      "verified_at": "2026-10-07T02:29:04Z"
+    }
+  },
+  "captured_at": "2026-10-07T02:44:18.395551+00:00"
+}

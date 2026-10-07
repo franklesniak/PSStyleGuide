@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "status": "round2_codex_clean_copilot_and_CI_pending",
+  "status": "round2_R4_selected_native_disposition_pending_CI_hold",
   "released_at": "2026-10-06T18:45:47.224991+00:00",
   "objective": "Apply the ten accepted TF68 shared fixes to PS, preserving finite language/identity exceptions and genuine metadata; then normal validation/review/landing and reverse comparison. Dedicated service activation remains an S1/task/paired acceptance obligation.",
   "repository": "franklesniak/PSStyleGuide",
@@ -89,17 +89,7 @@
   "first_request_at": "2026-10-06T20:09:39.767792+00:00",
   "deadline": "2026-10-14T20:09:39.767792+00:00",
   "pr": 235,
-  "pending_native_operations": [
-    {
-      "kind": "Copilot_review_result",
-      "pr": 235,
-      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
-      "round": 2,
-      "request_event_id": 32653656598,
-      "requested_at": "2026-10-07T02:34:29Z",
-      "workflow_run_id": 37562640212
-    }
-  ],
+  "pending_native_operations": [],
   "local_operation": {
     "kind": "non_force_topic_publication_and_PR_body",
     "status": "completed",
@@ -107,7 +97,7 @@
     "reconciled_at": "2026-10-07T02:32:20.614Z"
   },
   "write_owner": "root for exact application; a06_ps_carryback_writer read-only until separate validation release",
-  "next_action": "Await existing Copilot exact-head request and current CI; retain completed current-head Codex result. Complete conditional read-only peer delta readiness. No merge until all normal gates pass.",
+  "next_action": "Publish selected R4 and completed evidence; reply and resolve R4 with native preimage/readback; update factual PR status. Keep CI hold; no recovery before03:34:29Z.",
   "restrictions": [
     "No Git reset/force/main writes or held A07 changes",
     "No direct writes to protected guides or generated outputs",
@@ -376,7 +366,7 @@
     "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
     "status": "local_product_validation_passed_with_explicit_evidence_reuse"
   },
-  "planning_checkpoint": "4ea9b8a2e66bdbb46941ff5fb026754b08446e1f",
+  "planning_checkpoint": "997d6efabb13fbee58bd35629ab7bbedaf9a9bec",
   "commit": {
     "status": "committed",
     "parent": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
@@ -401,7 +391,7 @@
     "head": "504cd7672ac9604ace765a4f451346f801f09ddd",
     "finished_at": "2026-10-06T19:48:35.353053+00:00"
   },
-  "updated_at": "2026-10-07T02:41:10.003857+00:00",
+  "updated_at": "2026-10-07T03:07:01.690239+00:00",
   "prior_committed_validation_attempts": [
     {
       "status": "failed",
@@ -868,7 +858,7 @@
     },
     {
       "round": 2,
-      "status": "codex_clean_copilot_pending",
+      "status": "R4_selected_native_disposition_pending_CI_cancelled_hold",
       "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
       "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
       "body_sha256": "d3e7ce6d501588f3cf623018e0b4f5b16d582939b7b91719e2463ad0d1f5c7f0",
@@ -878,10 +868,10 @@
       "baseline_sha256": "975ab0b986a272e997082c5c43bced1e8be2ccd34be5b6e8567117cb9e90c0e2",
       "reason": "Validated new product commit and revised material body require current-input reviews; old-input exhausted recovery remains unchanged.",
       "copilot": {
-        "status": "confirmed_pending_result",
+        "status": "completed_one_finding_service_cancelled",
         "channel": "GitHub Reviewers UI",
         "selected_effort": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "request_event_id": 32653656598,
         "request_issued_at": "2026-10-07T02:34:29Z",
@@ -889,7 +879,7 @@
         "confirmation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-copilot-readback.json",
         "workflow_run_id": 37562640212,
         "workflow_started_at": "2026-10-07T02:34:37Z",
-        "workflow_status": "in_progress",
+        "workflow_status": "completed",
         "selected_effort_source": "Authenticated GitHub Reviewers control and new timeline event; completion effort not yet observed",
         "setup_observation": {
           "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-live-jobs-one.json",
@@ -900,7 +890,19 @@
           "started_at": "2026-10-07T02:35:29Z",
           "status": "in_progress",
           "dedicated_service_selection_proved": false
-        }
+        },
+        "observed_effort_source": "Authenticated completed review overview",
+        "review_id": 5437075963,
+        "submitted_at": "2026-10-07T02:51:34Z",
+        "review_body_sha256": "7a8d41282879318423efb5bd8d51c26d1dd420946326d89ee6655e2100cb29e5",
+        "review_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-observation-five.json",
+        "declared_new_findings": 1,
+        "reconciled_new_inline_findings": 1,
+        "body_only_findings": 0,
+        "warning": "Full agentic review did not start before timeout; dynamic workflow terminal outcome remains pending.",
+        "workflow_conclusion": "cancelled",
+        "workflow_terminal_at": "2026-10-07T02:55:09Z",
+        "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json"
       },
       "codex": {
         "status": "clean",
@@ -930,13 +932,39 @@
         "result_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-observation-two.json",
         "attribution": "Authenticated author; new result excluded from complete pre-request baseline; exact reviewed commit; post-trigger time; completed manual summary; unchanged head/base/body and no new unresolved threads."
       },
-      "findings": []
+      "findings": [
+        {
+          "id": "PS235-R4",
+          "comment_id": 4202576730,
+          "review_id": 5437075963,
+          "thread_id": "PRRT_kwDOQkjdhM6pvNci",
+          "path": ".github/workflows/scripts-README.md",
+          "line": 8,
+          "body": "This file is modified in the PR but the metadata `Last Updated` is set to `2026-10-06` while other touched metadata and the PR narrative reference `2026-10-07`. If this date is used by the repository\u2019s metadata/finalization checks, please update it to the actual change date to avoid inconsistent document metadata.",
+          "status": "selected_A_no_source_change_native_disposition_pending",
+          "worker": "a06_conversion_cold_packet",
+          "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata",
+          "existing_related_decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+          "selected_option": "A",
+          "selected_score": 97.9,
+          "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\REPORT.md",
+          "report_sha256": "50d8db43326e044f150c6c45cb924b7d14aa023df8c5c778f3c21ef51bdbe69f",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\evidence.json",
+          "evidence_sha256": "f2f228779a343c1982486dbc68278f3f8640a8eb11c78d2b5e80cebe46144924",
+          "selection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-metadata\\SELECTION.md",
+          "root_verified_at": "2026-10-07T03:07:01.690239+00:00",
+          "root_reference_count": 15,
+          "root_scores_checked": 9,
+          "product_edit": false,
+          "tests_repeated": false
+        }
+      ]
     }
   ],
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-observation-two.json",
-    "sha256": "225dcddaa9c8ca402f413928189eb6c9280c050d7772a377427a5882f7475868",
-    "captured_at": "2026-10-07T02:40:07.855739+00:00"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-terminal.json",
+    "sha256": "51093143ba83d9f3dffcdce44b276346d521b0a718dafd8d7ca82ef6c8ba4a41",
+    "captured_at": "2026-10-07T02:55:50.839953+00:00"
   },
   "CI_observation": {
     "captured_at": "2026-10-06T22:48:43.172089+00:00",
@@ -1800,41 +1828,85 @@
     "last_request_at": "2026-10-07T02:34:29Z",
     "next_attempt_not_before": "2026-10-07T03:34:29+00:00",
     "old_input_history": "review_rounds[0].copilot.service_recovery; exhausted3/3 unchanged",
-    "rule": "Never duplicate pending or ambiguous requests. At most one CI relaunch per PR per hour."
+    "rule": "Never duplicate pending or ambiguous requests. At most one CI relaunch per PR per hour.",
+    "status": "terminal_failure_one_of_three_used_wait_hourly_interval",
+    "terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
+    "next_request_kind": "Supported Balanced UI service recovery; no duplicate pending request and no request solely to replace Lite",
+    "retry_released_now": false
   },
   "current_input_CI": {
     "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
-    "captured_at": "2026-10-07T02:35:29.100077+00:00",
+    "captured_at": "2026-10-07T02:55:50.839953+00:00",
     "successful_runs": [
       37562193726,
+      37562192514,
       37562192513,
       37562191989,
       37562192494,
       37562192569,
       37562192608,
+      37562192501,
       37562189632,
       37562189629,
       37562189589,
-      37562189611
-    ],
-    "active_runs": [
-      37562640212,
-      37562192514,
-      37562192501,
+      37562189611,
       37562189624,
       37562189656
     ],
-    "failed_or_cancelled_runs": [],
-    "acceptance": "pending; no merge until all applicable current CI/reviews and required acceptance gates pass",
+    "active_runs": [],
+    "failed_or_cancelled_runs": [
+      37562640212
+    ],
+    "acceptance": "CI HOLD; current cancelled dynamic workflow prohibits merge",
     "historical_failed_runs": "review_rounds[0] retains two cancelled dynamic runs and exhausted3/3same-input recovery"
   },
   "peer_delta_preparation": {
-    "status": "active_read_only",
+    "status": "root_verified_conditional_readiness",
     "worker": "a06_conversion_cold_packet",
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness",
     "candidate_head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
     "TF_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
     "implementation_released": false,
-    "transfer_incremented": false
+    "transfer_incremented": false,
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\REPORT.md",
+    "report_sha256": "143c3598fc2bc3688dc6c47a85de25c98328c19f6845b0b25c21480c69221454",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-peer-delta-readiness\\evidence.json",
+    "evidence_sha256": "9d0ddb1dc0ee9fa5ddefdbc6ca1a44678bc3cbfcf95f1b5d7421dfa3f2289349",
+    "root_verification": "Read complete report; verified19references, all20raw ten-path PS/TF blobs/modes, exact exception substitutions and one coupled contract pair; exactly3common deltas. Future actual accepted refs/date must be rebound.",
+    "required_common_followup_paths": [
+      "docs/dependency-maintenance.md",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1"
+    ]
+  },
+  "current_hosted_progress": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-ordinary-terminal-hosted-proof.json",
+    "sha256": "58238a4140d6311fd9cfacca5e2b162c3f41f6c8e99e6f87b34e2248544ff423",
+    "verified_terminal_ordinary_runs": 14,
+    "all_CI_passed": false,
+    "dedicated_service_selection_proved": false,
+    "dynamic_terminal_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-service-terminal.json",
+    "dynamic_terminal_sha256": "836ab911f8d08b6142582610510d29625907681803522cdafe245feac75e3a20"
+  },
+  "current_native_gates": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-native-gates-baseline.json",
+    "sha256": "b39d0e8d12163b92c7699ccbcea000f73b361bdb746c6cae527488e21927faa2",
+    "not_merge_authority": true,
+    "copilot_and_current_dynamic_run_pending": true,
+    "bypass": "never"
+  },
+  "round2_independent_quality": {
+    "status": "scoped_evidence_pass_R4_and_dynamic_CI_pending",
+    "worker": "ps_carryback_final_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current",
+    "scope": "New native publication/review/hosted and conditional peer evidence; reuse unchanged final local quality.",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\REPORT.md",
+    "report_sha256": "0f59afbd16690750d2223d7497a61ed6724d2c0f2ff666a0e8cafc0cfc6dfaa8",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\evidence.json",
+    "evidence_sha256": "8e7ca04d3ce1311310ca85a0bda71823b432cb80caa311b2e89ae536a7e4abc5",
+    "root_read_complete": true,
+    "root_consequential_samples": 6,
+    "acceptance_released": false,
+    "current_gate_status": "R4 no-change selected; native reply/resolution pending; current dynamic CI cancelled. No acceptance."
   }
 }

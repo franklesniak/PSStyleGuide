@@ -1,0 +1,1598 @@
+{
+  "status": "READ_ONLY_CONDITIONAL_PEER_DELTA_READY_PS_UNACCEPTED",
+  "captured_start_utc": "2026-10-07T02:43:44.864160+00:00",
+  "captured_end_utc": "2026-10-07T02:43:58.739746+00:00",
+  "source_worktrees": {
+    "PS": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+    "TF": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003"
+  },
+  "identities": {
+    "PS_proposed_H": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "PS_tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+    "PS_parent": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "PS_accepted_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TF_accepted_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "TF_tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+    "TF_worktree_HEAD": "89bf3920fb8008752c7f179e7c69c4c2979750d8"
+  },
+  "native_refs_before": {
+    "utc": "2026-10-07T02:43:44.864172+00:00",
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    },
+    "PR235": {
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "baseRef": "main",
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "headRef": "codex/tf68-compareback",
+      "merged": false,
+      "number": 235,
+      "state": "open"
+    }
+  },
+  "native_refs_after": {
+    "utc": "2026-10-07T02:43:57.002635+00:00",
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/a840f21b03f0dcac0815e2f7f044928667402b42"
+      }
+    },
+    "PR235": {
+      "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "baseRef": "main",
+      "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "headRef": "codex/tf68-compareback",
+      "merged": false,
+      "number": 235,
+      "state": "open"
+    }
+  },
+  "native_refs_equal": true,
+  "local_guards_before": {
+    "PS": {
+      "status": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "index_entries": "ce5ae8f43cbbd0cfcb638162ccafc0c42ef2bc2548d3a249b79e1f8340f8d16f",
+      "all_refs": "cfba9d3a0f12d379f492fbf0411d98590832da37785da27b7207fd1d5c015745",
+      "local_config": "ba950a2ef00ba8eabad87ac93ea9a926f7af219b43a8f30548eff1f9ef163096",
+      "HEAD": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "status_empty": true
+    },
+    "TF": {
+      "status": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "index_entries": "3054e84d1e65f1179870fbaec5ab2ee4a9773192f25588c6714c3588ed10c1d1",
+      "all_refs": "7f1239de171a6269bf5b22cb9e2ba2cf36d43cf25cb707263f871df514fa2a48",
+      "local_config": "4c99a3e65f91abbdbca2443a7681657529c97362995f8fb86bc46f62f56c6cbd",
+      "HEAD": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "status_empty": true
+    }
+  },
+  "local_guards_after": {
+    "PS": {
+      "status": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "index_entries": "ce5ae8f43cbbd0cfcb638162ccafc0c42ef2bc2548d3a249b79e1f8340f8d16f",
+      "all_refs": "cfba9d3a0f12d379f492fbf0411d98590832da37785da27b7207fd1d5c015745",
+      "local_config": "ba950a2ef00ba8eabad87ac93ea9a926f7af219b43a8f30548eff1f9ef163096",
+      "HEAD": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "status_empty": true
+    },
+    "TF": {
+      "status": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "index_entries": "3054e84d1e65f1179870fbaec5ab2ee4a9773192f25588c6714c3588ed10c1d1",
+      "all_refs": "7f1239de171a6269bf5b22cb9e2ba2cf36d43cf25cb707263f871df514fa2a48",
+      "local_config": "4c99a3e65f91abbdbca2443a7681657529c97362995f8fb86bc46f62f56c6cbd",
+      "HEAD": "89bf3920fb8008752c7f179e7c69c4c2979750d8",
+      "status_empty": true
+    }
+  },
+  "local_guards_equal": true,
+  "full_PS_B_to_H_path_union": "M\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\nM\t.github/workflows/Test-AgentInstructions.ps1\nM\t.github/workflows/Test-CiHelpers.test.mjs\nM\t.github/workflows/Test-StyleGuideArtifacts.ps1\nM\t.github/workflows/agent-instructions.yml\nA\t.github/workflows/copilot-code-review.yml\nM\t.github/workflows/package-lock.json\nM\t.github/workflows/package.json\nM\t.github/workflows/scripts-README.md\nM\tdocs/dependency-maintenance.md\n",
+  "PS_parent_to_H_path_union": "M\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\nM\t.github/workflows/Test-AgentInstructions.ps1\nM\tdocs/dependency-maintenance.md\n",
+  "ten_path_mapping": [
+    {
+      "path": ".github/workflows/package.json",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+        "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        "bytes": 936
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+        "bytes": 844
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+        "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+        "bytes": 936
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "670083e767627cfed90a61f788021dba88de1091",
+        "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+        "bytes": 994
+      },
+      "exact_exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 2,
+              "end_line": 2
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2,
+              "end_line": 2
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "https://github.com/franklesniak/TerraformStyleGuide",
+          "ps": "https://github.com/franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 13,
+              "end_line": 13
+            },
+            {
+              "start_line": 23,
+              "end_line": 23
+            },
+            {
+              "start_line": 25,
+              "end_line": 25
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 13,
+              "end_line": 13
+            },
+            {
+              "start_line": 23,
+              "end_line": 23
+            },
+            {
+              "start_line": 25,
+              "end_line": 25
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "\"terraform\"",
+          "ps": "\"powershell\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 16,
+              "end_line": 16
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 16,
+              "end_line": 16
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "\"author\": \"Frank Lesniak, Blake Cherry, and Danny Stutz\"",
+          "ps": "\"author\": \"Frank Lesniak\"",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 20,
+              "end_line": 20
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 20,
+              "end_line": 20
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/package-lock.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+        "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        "bytes": 38820
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/package-lock.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196",
+        "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+        "bytes": 38822
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/package-lock.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+        "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+        "bytes": 38820
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/package-lock.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+        "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+        "bytes": 38834
+      },
+      "exact_exceptions": [
+        {
+          "tf": "\"name\": \"terraformstyleguide\"",
+          "ps": "\"name\": \"psstyleguide\"",
+          "occurrences": 2,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 2,
+              "end_line": 2
+            },
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2,
+              "end_line": 2
+            },
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07",
+        "sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+        "bytes": 10446
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+        "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+        "bytes": 9867
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+        "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+        "bytes": 10446
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "docs/dependency-maintenance.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d15abb9feaa371b7b7e4963382c83ca95ca8ed4d",
+        "sha256": "f5bc839ecc06e0783d1ab59dfbdcd43fb8ee817baacab49c12a6730430c0690c",
+        "bytes": 10453
+      },
+      "exact_exceptions": [
+        {
+          "tf": "current dependency-risk checks in TerraformStyleGuide.",
+          "ps": "current dependency-risk checks in PSStyleGuide.",
+          "occurrences": 1,
+          "need": "Package ownership, registry-project identity or documentation scope must identify its actual repository; shared dependency versions/algorithms are not excepted.",
+          "TF_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 8,
+              "end_line": 8
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": false,
+      "shared_delta_hunks": [
+        "@@ -5,5 +5,5 @@"
+      ],
+      "shared_delta_sha256": "3a6032ce13dbd1b58894223e32ec94e53233507b52ac869131273e6488791186",
+      "shared_delta_text": "--- accepted-TF-with-declared-exceptions\n\n+++ proposed-PS-H\n\n@@ -5,5 +5,5 @@\n\n - **Status:** Active\n - **Owner:** Repository maintainer (@franklesniak)\n-- **Last Updated:** 2026-10-06\n+- **Last Updated:** 2026-10-07\n - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.\n ",
+      "shared_delta_description": "Last Updated line7 Oct6->Oct7; rendered body unchanged.",
+      "PS_H504_raw_unchanged": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+        "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+        "bytes": 299398
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+        "bytes": 229936
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "43e08f56376b1b67b8e797b06649ab04fce12aed",
+        "sha256": "8c1dc0ac0ef119790d08a96496182fdc8bfaafa3b011a4600dafca7e798c8ef8",
+        "bytes": 285244
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+        "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+        "bytes": 285263
+      },
+      "exact_exceptions": [
+        {
+          "tf": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "ps": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "occurrences": 1,
+          "need": "Retain the existing historical provenance fixture path for this repository.",
+          "TF_regions": [
+            {
+              "start_line": 2729,
+              "end_line": 2729
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 2977,
+              "end_line": 2977
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": false,
+      "shared_delta_hunks": [
+        "@@ -34,5 +34,5 @@",
+        "@@ -201,4 +201,252 @@",
+        "@@ -3980,4 +4228,5 @@"
+      ],
+      "shared_delta_sha256": "ad2562532882b15f5840a8526e453bd55027e2684832dc275460df4a4cd046de",
+      "shared_delta_text": null,
+      "shared_delta_description": "Add Assert-MarkdownStringArrayContextSelfTest at lines207-454 and unconditional invocation4230; change script version36 to1.12.20261007.0.",
+      "PS_H504_raw_unchanged": false
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+        "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        "bytes": 13541
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "bytes": 13541
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e6221de4ca0f42b3a3c7230dfe88604d0cb31030",
+        "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+        "bytes": 13541
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "de0936d30fe3489261018b281b264fff9b7330c0",
+        "sha256": "b98c5c019a08e54ff56d98e283b1c4bb2f495d8332eb1edc39ee22aa34998467",
+        "bytes": 13470
+      },
+      "exact_exceptions": [
+        {
+          "tf": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "ps": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name.",
+          "TF_regions": [
+            {
+              "start_line": 23,
+              "end_line": 24
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 23,
+              "end_line": 24
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "| `Test-StyleGuideArtifacts.ps1` | Runs the recovery-example child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "ps": "| `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name.",
+          "TF_regions": [
+            {
+              "start_line": 34,
+              "end_line": 35
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 34,
+              "end_line": 35
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "| `Test-StateRecoveryExamples.mjs` | Checks the published Terraform state-recovery examples. | `node .github/workflows/Test-StateRecoveryExamples.mjs` |\n",
+          "ps": "| `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name.",
+          "TF_regions": [
+            {
+              "start_line": 36,
+              "end_line": 37
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 36,
+              "end_line": 37
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        },
+        {
+          "tf": "The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "ps": "The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n",
+          "occurrences": 1,
+          "need": "Retain actual provenance link, language semantic caller/helper, or required verifier job name.",
+          "TF_regions": [
+            {
+              "start_line": 40,
+              "end_line": 41
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 40,
+              "end_line": 41
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+        "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        "bytes": 36084
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "bytes": 36090
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+        "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+        "bytes": 36084
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+        "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+        "bytes": 36081
+      },
+      "exact_exceptions": [
+        {
+          "tf": "    ScopedId = 'terraform-instructions'\n    ScopedPath = 'terraform.instructions.md'\n    SemanticRole = 'TerraformRecovery'",
+          "ps": "    ScopedId = 'powershell-instructions'\n    ScopedPath = 'powershell.instructions.md'\n    SemanticRole = 'PowerShellExamples'",
+          "occurrences": 1,
+          "need": "Scoped artifact destination and semantic role select the actual repository language. Both semantic branches remain common code; PS must run its blank-line child and TF its state-recovery child.",
+          "TF_regions": [
+            {
+              "start_line": 37,
+              "end_line": 39
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 37,
+              "end_line": 39
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+        "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+        "bytes": 510837
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+        "bytes": 482175
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+        "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+        "bytes": 510470
+      },
+      "exact_exceptions": [],
+      "shared_regions_equal_after_exact_exceptions": false,
+      "shared_delta_hunks": [
+        "@@ -24,5 +24,5 @@",
+        "@@ -3548,5 +3548,5 @@",
+        "@@ -3830,7 +3830,9 @@",
+        "@@ -3884,7 +3886,9 @@",
+        "@@ -3952,7 +3956,9 @@"
+      ],
+      "shared_delta_sha256": "f7af09e4d370ca2adcaaae4e61aaac70dc6ee53aab43047cdfc2185450e485da",
+      "shared_delta_text": "--- accepted-TF-with-declared-exceptions\n\n+++ proposed-PS-H\n\n@@ -24,5 +24,5 @@\n\n # .NOTES\n # Positional parameters are not supported.\n-# Version: 1.20.20261006.0\n+# Version: 1.21.20261007.0\n \n [CmdletBinding(PositionalBinding = $false)]\n@@ -3548,5 +3548,5 @@\n\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.2.20261006.0\n+    # Version: 1.3.20261007.0\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([pscustomobject])]\n@@ -3830,7 +3830,9 @@\n\n                 $null -eq $objRawProseBlock.text -or\n                 $objRawProseBlock.code -isnot [array] -or\n-                @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawProseBlock.code.Count -ne 0 -and\n+                    @($objRawProseBlock.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawProseBlock.links -isnot [array] -or\n-                @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawProseBlock.links.Count -ne 0 -and\n+                    @($objRawProseBlock.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed prose block.'\n             }\n@@ -3884,7 +3886,9 @@\n\n                     $objRawCell.text -isnot [string] -or\n                     $objRawCell.code -isnot [array] -or\n-                    @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                    ($objRawCell.code.Count -ne 0 -and\n+                        @($objRawCell.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                     $objRawCell.links -isnot [array] -or\n-                    @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                    ($objRawCell.links.Count -ne 0 -and\n+                        @($objRawCell.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                     throw 'The locked Markdown parser returned a malformed table cell.'\n                 }\n@@ -3952,7 +3956,9 @@\n\n                 ($null -ne $objRawListItem.text -and $objRawListItem.text -isnot [string]) -or\n                 $objRawListItem.code -isnot [array] -or\n-                @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0 -or\n+                ($objRawListItem.code.Count -ne 0 -and\n+                    @($objRawListItem.code | Where-Object { $_ -isnot [string] }).Count -ne 0) -or\n                 $objRawListItem.links -isnot [array] -or\n-                @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0) {\n+                ($objRawListItem.links.Count -ne 0 -and\n+                    @($objRawListItem.links | Where-Object { $_ -isnot [string] }).Count -ne 0)) {\n                 throw 'The locked Markdown parser returned a malformed top-level list item.'\n             }",
+      "shared_delta_description": "Six parenthesized Count!=0 guards before existing nonstring filters; script/function metadata24-26/3550 changed.",
+      "PS_H504_raw_unchanged": false
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        "bytes": 130003
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "bytes": 123582
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+        "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+        "bytes": 130003
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+        "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+        "bytes": 130059
+      },
+      "exact_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 8,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common.",
+          "TF_regions": [
+            {
+              "start_line": 174,
+              "end_line": 174
+            },
+            {
+              "start_line": 176,
+              "end_line": 176
+            },
+            {
+              "start_line": 178,
+              "end_line": 178
+            },
+            {
+              "start_line": 211,
+              "end_line": 211
+            },
+            {
+              "start_line": 260,
+              "end_line": 260
+            },
+            {
+              "start_line": 419,
+              "end_line": 419
+            },
+            {
+              "start_line": 427,
+              "end_line": 427
+            },
+            {
+              "start_line": 1501,
+              "end_line": 1501
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 174,
+              "end_line": 174
+            },
+            {
+              "start_line": 176,
+              "end_line": 176
+            },
+            {
+              "start_line": 178,
+              "end_line": 178
+            },
+            {
+              "start_line": 211,
+              "end_line": 211
+            },
+            {
+              "start_line": 260,
+              "end_line": 260
+            },
+            {
+              "start_line": 419,
+              "end_line": 419
+            },
+            {
+              "start_line": 427,
+              "end_line": 427
+            },
+            {
+              "start_line": 1501,
+              "end_line": 1501
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/agent-instructions.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+        "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        "bytes": 12865
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/agent-instructions.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+        "bytes": 12837
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/agent-instructions.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+        "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+        "bytes": 12865
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/agent-instructions.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+        "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+        "bytes": 12893
+      },
+      "exact_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 4,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common.",
+          "TF_regions": [
+            {
+              "start_line": 31,
+              "end_line": 31
+            },
+            {
+              "start_line": 49,
+              "end_line": 49
+            },
+            {
+              "start_line": 121,
+              "end_line": 121
+            },
+            {
+              "start_line": 139,
+              "end_line": 139
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 31,
+              "end_line": 31
+            },
+            {
+              "start_line": 49,
+              "end_line": 49
+            },
+            {
+              "start_line": 121,
+              "end_line": 121
+            },
+            {
+              "start_line": 139,
+              "end_line": 139
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "PS_proposed": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "bytes": 44995
+      },
+      "PS_accepted_base": {
+        "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "present": false
+      },
+      "PS_previous_published_H": {
+        "revision": "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bfad820fa092e7ff743e9ea90e782f61336df0d1",
+        "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+        "bytes": 44995
+      },
+      "TF_accepted": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/copilot-code-review.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe",
+        "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+        "bytes": 45016
+      },
+      "exact_exceptions": [
+        {
+          "tf": "franklesniak/TerraformStyleGuide",
+          "ps": "franklesniak/PSStyleGuide",
+          "occurrences": 3,
+          "need": "Exact acquisition/credential origin and fixture repository identity must name the destination; security conditions and algorithms stay common.",
+          "TF_regions": [
+            {
+              "start_line": 83,
+              "end_line": 83
+            },
+            {
+              "start_line": 184,
+              "end_line": 184
+            },
+            {
+              "start_line": 241,
+              "end_line": 241
+            }
+          ],
+          "PS_regions": [
+            {
+              "start_line": 83,
+              "end_line": 83
+            },
+            {
+              "start_line": 184,
+              "end_line": 184
+            },
+            {
+              "start_line": 241,
+              "end_line": 241
+            }
+          ],
+          "decision_class": "D07 finite previously reviewed repository identity / language / provenance / actual required-role mapping",
+          "why_not_one_literal": "The literal selects the actual package owner, trusted acquisition origin, language output/semantic caller, retained provenance file or required native job role; common surrounding implementation is retained."
+        }
+      ],
+      "shared_regions_equal_after_exact_exceptions": true,
+      "shared_delta_hunks": [],
+      "shared_delta_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "shared_delta_text": "",
+      "shared_delta_description": "No additional shared delta.",
+      "PS_H504_raw_unchanged": true
+    }
+  ],
+  "coupled_contract_mapping": [
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+        "bytes": 51809
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+        "bytes": 51830
+      },
+      "raw_equal": false,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "--- TF\n\n+++ PS\n\n@@ -80,3 +80,3 @@\n\n           }\n-          if ($strRepository -cne 'franklesniak/TerraformStyleGuide') {\n+          if ($strRepository -cne 'franklesniak/PSStyleGuide') {\n               throw 'acquire: the triggering repository is not the expected repository'\n@@ -181,3 +181,3 @@\n\n           }\n-          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n               throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'\n@@ -238,3 +238,3 @@\n\n           if ($LASTEXITCODE -ne 0 -or $arrUrls.Count -ne 1 -or\n-              $arrUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n+              $arrUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n               throw 'main: origin identity is invalid'",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "bytes": 31176
+      },
+      "raw_equal": true,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "bytes": 6095
+      },
+      "raw_equal": true,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/NpmTools.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/NpmTools.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+        "bytes": 7656
+      },
+      "raw_equal": true,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+        "bytes": 91
+      },
+      "raw_equal": true,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "",
+      "new_edit_required": false
+    },
+    {
+      "path": "package.json",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+        "bytes": 816
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+        "bytes": 837
+      },
+      "raw_equal": false,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "--- TF\n\n+++ PS\n\n@@ -1,6 +1,6 @@\n\n {\n-  \"name\": \"terraformstyleguide-agent-governance\",\n+  \"name\": \"psstyleguide-agent-governance\",\n   \"version\": \"1.0.0\",\n   \"private\": true,\n-  \"description\": \"Locked agent-governance validation for TerraformStyleGuide.\",\n+  \"description\": \"Locked agent-governance validation for PSStyleGuide.\",\n   \"license\": \"MIT\",\n@@ -19,3 +19,3 @@\n\n     \"type\": \"git\",\n-    \"url\": \"git+https://github.com/franklesniak/TerraformStyleGuide.git\"\n+    \"url\": \"git+https://github.com/franklesniak/PSStyleGuide.git\"\n   },",
+      "new_edit_required": false
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".pre-commit-config.yaml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+        "bytes": 5398
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".pre-commit-config.yaml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+        "bytes": 5405
+      },
+      "raw_equal": false,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "--- TF\n\n+++ PS\n\n@@ -1,2 +1,2 @@\n\n-# Pre-commit configuration for TerraformStyleGuide.\n+# Pre-commit configuration for PSStyleGuide.\n #",
+      "new_edit_required": false
+    },
+    {
+      "path": ".husky/pre-commit",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".husky/pre-commit",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".husky/pre-commit",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "bytes": 3249
+      },
+      "raw_equal": true,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/document-metadata-classification.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        "bytes": 388
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/document-metadata-classification.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        "bytes": 387
+      },
+      "raw_equal": false,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "--- TF\n\n+++ PS\n\n@@ -14,3 +14,3 @@\n\n     \"copilot-instructions.md\",\n-    \"terraform.instructions.md\"\n+    \"powershell.instructions.md\"\n   ]",
+      "new_edit_required": false
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        "bytes": 1517
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        "bytes": 1496
+      },
+      "raw_equal": false,
+      "both_unchanged_from_prior_accepted_binding": true,
+      "exact_existing_difference": "--- TF\n\n+++ PS\n\n@@ -3,3 +3,3 @@\n\n   \"roles\": {\n-    \"artifactVerifier\": \"verify\"\n+    \"artifactVerifier\": \"verify_generated_artifacts\"\n   },\n@@ -33,3 +33,3 @@\n\n         \"name\": \"style-guide-committed-${{ github.run_id }}-${{ github.run_attempt }}\",\n-        \"path\": \"copilot-instructions.md\\nterraform.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n+        \"path\": \"copilot-instructions.md\\npowershell.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n         \"if-no-files-found\": \"error\",",
+      "new_edit_required": false
+    }
+  ],
+  "unchanged_common_function_regions": [
+    {
+      "function": "ConvertFrom-ParserJsonContext",
+      "PS_TF_raw_region_equal": true,
+      "sha256": "70ae28a5048d698580056b0f1493077e1119fb65f705e1b934ca2b36ac870992",
+      "bytes": 11281
+    },
+    {
+      "function": "Copy-MarkdownParseReuseContext",
+      "PS_TF_raw_region_equal": true,
+      "sha256": "2ae7863ec1ed17015e0e87003c4175be078f3ad2afe9868abaa122a39cbb7f40",
+      "bytes": 5834
+    },
+    {
+      "function": "Invoke-MarkdownParserProcess",
+      "PS_TF_raw_region_equal": true,
+      "sha256": "15c3c25a3eff543d3dd00d320337735029a003a2528a220990b61796d1014511",
+      "bytes": 8799
+    },
+    {
+      "function": "Get-MarkdownParseReuseSlot",
+      "PS_TF_raw_region_equal": true,
+      "sha256": "4207f3e5108a8698b688c3bfb4fb1641917573dd0bc5560abc7811ec94320030",
+      "bytes": 989
+    },
+    {
+      "function": "ConvertTo-MetadataComparisonText",
+      "PS_TF_raw_region_equal": true,
+      "sha256": "b4ece0b72f5c95e8a9499789c28775dd3d64dee26fb3a1d2cb8763b8715cad55",
+      "bytes": 2690
+    }
+  ],
+  "language_outputs": [
+    {
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "bytes": 148759
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+        "bytes": 152868
+      },
+      "PS_unchanged_from_accepted_B": true,
+      "exception_region": "whole normative language guide / generated derivative",
+      "class": "D07 normative guides and language filenames",
+      "new_edit_required": false,
+      "boundary": "Selected PowerShell blank-line versus Terraform state-recovery semantic child; common artifact dispatcher remains identical outside its three-line descriptor."
+    },
+    {
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "powershell.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+        "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+        "bytes": 148831
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "terraform.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+        "bytes": 153067
+      },
+      "PS_unchanged_from_accepted_B": true,
+      "exception_region": "whole normative language guide / generated derivative",
+      "class": "D07 normative guides and language filenames",
+      "new_edit_required": false,
+      "boundary": "Selected PowerShell blank-line versus Terraform state-recovery semantic child; common artifact dispatcher remains identical outside its three-line descriptor."
+    },
+    {
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "556538c7664327652bc42875b63a5bf6bc16783f",
+        "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+        "bytes": 148852
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+        "bytes": 152962
+      },
+      "PS_unchanged_from_accepted_B": true,
+      "exception_region": "whole normative language guide / generated derivative",
+      "class": "D07 normative guides and language filenames",
+      "new_edit_required": false,
+      "boundary": "Selected PowerShell blank-line versus Terraform state-recovery semantic child; common artifact dispatcher remains identical outside its three-line descriptor."
+    },
+    {
+      "PS": {
+        "revision": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+        "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+        "bytes": 257290
+      },
+      "TF": {
+        "revision": "a840f21b03f0dcac0815e2f7f044928667402b42",
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+        "bytes": 222292
+      },
+      "PS_unchanged_from_accepted_B": true,
+      "exception_region": "whole normative language guide / generated derivative",
+      "class": "D07 normative guides and language filenames",
+      "new_edit_required": false,
+      "boundary": "Selected PowerShell blank-line versus Terraform state-recovery semantic child; common artifact dispatcher remains identical outside its three-line descriptor."
+    }
+  ],
+  "required_common_followup_paths": [
+    "docs/dependency-maintenance.md",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "new_material_findings": [],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "46b6ca0ffe14fa637199a259f855bbc3393df62cd605594e5e3b164b78dd132f",
+      "bytes": 10771
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\RESULT.md",
+      "sha256": "a6c865ec6dda2e292932186026d19ef2e10226f3b115d89869a5914ac5069782",
+      "bytes": 107637
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A06.md",
+      "sha256": "332e538613bd227564932a2ec10889f797959495f7580c343324b85509c1f1e7",
+      "bytes": 4632
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\postlanding-sequence\\REPORT.md",
+      "sha256": "df83feb5c496ab1b37343ace28119be8f73f66a9b542e62ceea00997be86e7b2",
+      "bytes": 8654
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-peer-readiness\\REPORT.md",
+      "sha256": "d9915bfcac120f76bb4184431f3d253f9b378acb64e286e17ac16bfbc72e5eef",
+      "bytes": 6444
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round7-peer-readiness\\evidence.json",
+      "sha256": "e5fe76b2c285124d32f5eef581e90c52dccb2ff1ac76f01d4c479ca02f82117e",
+      "bytes": 65442
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\REPORT.md",
+      "sha256": "53805dffb1fa3c4ea389df8abcab57ff60298f5028905ba8b53f9c95a9b4c43f",
+      "bytes": 13793
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\preparation\\evidence.json",
+      "sha256": "88151812a524665d94f0b5da06068c5a0ffc476dcd405b4f8428f0b6aa083a28",
+      "bytes": 41504
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\REPORT.md",
+      "sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+      "bytes": 23934
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
+      "sha256": "4b62332550246304186353badb936f4364db9e662a84ebd74a0e960f72eabf45",
+      "bytes": 3684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINAL-QUALIFICATION-RESULT.json",
+      "sha256": "1ec3f88b5ab8ef71ef58340ea4da7bdca2e39a90fe1e038771650157530c73a0",
+      "bytes": 9335
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FOCUS-RESULT.json",
+      "sha256": "c3dd11dfcaca1117fe2ac8abcb544df911c80cbd6b8926dc2b5255e8580451f3",
+      "bytes": 5841
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-BENEFIT-RESULT.json",
+      "sha256": "d874366410f30a4c8cbf1beacc76cd25a97056880ba27480586bfca4c8f56fac",
+      "bytes": 8000
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-NET-RESULT.json",
+      "sha256": "f5a257e8a4a205ce0e5094c91c887125d554d4759de2ccce7f0edea8ddfb1d16",
+      "bytes": 3576
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+      "sha256": "59cbda866821219f47e27d0619bc3cd5bb510b57d2fd11c055b5e1958515c2d1",
+      "bytes": 5805
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION.json",
+      "sha256": "265a124aaabf0154024d949844f246d55f64104b587018ccd6d0b4857cf856e0",
+      "bytes": 16116
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+      "sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4",
+      "bytes": 3949
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\net-suite-result-review\\REPORT.md",
+      "sha256": "0e74f8d98359d050bba020342ff7be172039081a62ddd23fe2acff23a6cc8f78",
+      "bytes": 4704
+    }
+  ],
+  "scope_limits": [
+    "PS H5e8 is proposed and unaccepted. Actual accepted landed refs/date/raw blobs/modes must be rebound before any TF use.",
+    "Exact prior exceptions are transformation receipts solely to prove surrounding common regions; raw named-commit blobs/modes remain separately recorded.",
+    "PS-focused and performance evidence does not certify a future TF candidate, stable benchmark, hosted savings or dedicated-service activation.",
+    "No tests, dependency inspection/execution, containers, installation, parser imports, Git writes/fetch, native mutations, source/planning/state edits or B99 work performed."
+  ],
+  "unchanged_policy_state": {
+    "PS_round": 2,
+    "PS_deadline": "2026-10-14T20:09:39.767792Z",
+    "old_input_recovery_cap": "3/3 consumed; unchanged",
+    "A06_transfers": "2/12; unchanged",
+    "related_transfers_A03_A21_A07": [
+      4,
+      6,
+      6
+    ],
+    "TF_dedicated_service": "open acceptance obligation",
+    "B99": "frozen"
+  },
+  "execution_authorized": false,
+  "report_sha256": "143c3598fc2bc3688dc6c47a85de25c98328c19f6845b0b25c21480c69221454"
+}
