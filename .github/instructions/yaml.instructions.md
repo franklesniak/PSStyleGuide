@@ -137,7 +137,7 @@ Select the immutable ID for the intended role. Use `github.sha` when the job val
 
 Keep least privilege, bounded acquisition, non-forcing fetches and exact post-acquisition commit verification. If the expected object cannot be acquired, stop with a failure. Do not substitute the current value of a mutable ref. For a checkout action, supply the immutable ID as its `ref` and verify the resulting `HEAD` before use.
 
-**Compliant immutable-source example:** This Linux Bash step assumes a least-privilege job, a fresh isolated Git repository and an already verified fixed `origin`. Its destination ref does not exist. The step deadline bounds acquisition; depth1 bounds history. Existing persistent refs remain subject to the no-force and unexpected-transition rules below.
+**Compliant immutable-source example:** This Linux Bash step assumes a least-privilege job, a fresh isolated Git repository and an already verified fixed `origin`. Its destination ref does not exist. The step deadline bounds acquisition; depth 1 bounds history. Existing persistent refs remain subject to the no-force and unexpected-transition rules below.
 
 ```yaml
 - name: Acquire the immutable event commit

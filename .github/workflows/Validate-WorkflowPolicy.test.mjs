@@ -306,6 +306,8 @@ test('immutable event acquisition survives a moved ref and refuses an unavailabl
   });
   const git = (cwd, parameters, expectedStatus = 0) => {
     const result = spawnSync('git', [
+      // Exercise the complete fixture without permitting implicit bare discovery.
+      '-c', 'safe.bareRepository=explicit',
       '-c', `core.hooksPath=${path.join(temporary, 'no-hooks')}`,
       '-c', 'commit.gpgsign=false', '-c', 'core.autocrlf=false',
       '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
@@ -329,7 +331,7 @@ test('immutable event acquisition survives a moved ref and refuses an unavailabl
   const expectedRevision = git(writer, ['rev-parse', '--verify', 'HEAD^{commit}']).trim();
   assert.match(expectedRevision, /^[0-9a-f]{40}$/);
   git(writer, ['push', 'origin', 'HEAD:refs/heads/event']);
-  assert.equal(git(origin, ['rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), expectedRevision);
+  assert.equal(git(temporary, [`--git-dir=${origin}`, 'rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), expectedRevision);
 
   fs.writeFileSync(path.join(writer, 'event.txt'), 'event B\n');
   git(writer, ['add', 'event.txt']);
@@ -337,7 +339,7 @@ test('immutable event acquisition survives a moved ref and refuses an unavailabl
   const movedRevision = git(writer, ['rev-parse', '--verify', 'HEAD^{commit}']).trim();
   assert.notEqual(movedRevision, expectedRevision);
   git(writer, ['push', 'origin', 'HEAD:refs/heads/event']);
-  assert.equal(git(origin, ['rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), movedRevision);
+  assert.equal(git(temporary, [`--git-dir=${origin}`, 'rev-parse', '--verify', 'refs/heads/event^{commit}']).trim(), movedRevision);
 
   const target = 'refs/remotes/event/target';
   const freshDestination = name => {
