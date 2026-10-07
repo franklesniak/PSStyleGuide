@@ -1,0 +1,18 @@
+{
+  "state": "ROOT_METADATA_ONLY_CHANGE_VERIFIED",
+  "utc": "2026-10-07T01:15:53.056081+00:00",
+  "source_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+  "path": "docs/dependency-maintenance.md",
+  "before": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+  "after": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+  "exact_one_byte_replacement": true,
+  "two_final_scripts_unchanged": true,
+  "README_Oct6_preserved": true,
+  "raw_index_unchanged": true,
+  "exact_three_unstaged_paths": true,
+  "worker_all78_guard_reused": true,
+  "worker_report_sha256": "d606b33c4380505da321c09eecdced94ec55869e39b8656c43057db790df47f6",
+  "worker_evidence_sha256": "2a353cc850f6f0334b3f95d45736bd6121146bd0acb005f546daf5c16217b420",
+  "old_ABBA_whole_PR_binding": "invalidated; immutable fixed-case historical evidence only",
+  "net_packet_not_yet_prepared": true
+}

@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "state": "AUTHORIZED_METADATA_ONLY_SOURCE_FINALIZED_UNEXECUTED",
+  "started_utc": "2026-10-07T01:14:38.744822+00:00",
+  "finished_utc": "2026-10-07T01:14:40.929271+00:00",
+  "source_root": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+  "authorized_path": "docs/dependency-maintenance.md",
+  "changed_bytes": 1,
+  "before": {
+    "path": "docs/dependency-maintenance.md",
+    "mode": "100644",
+    "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+    "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+    "bytes": 10446
+  },
+  "after": {
+    "path": "docs/dependency-maintenance.md",
+    "mode": "100644",
+    "blob": "6d53053fdeb4bc7876d6a8b17e12cde9d22d512b",
+    "sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+    "bytes": 10446,
+    "working_tree_blob": "ef0c89a5bdd6deb2369e68354c28dd5c2649ff07"
+  },
+  "source_count": 78,
+  "unchanged_bystanders": 77,
+  "source_only": true,
+  "execution_authorized": false,
+  "old_abba_whole_pr_binding_invalidated": true,
+  "immutable_fixed_case_result_scope": "historical only; no rerun or extension",
+  "recovery": "Exact reverse replacement of unique Last Updated 2026-10-07 line with 2026-10-06 recovers original raw bytes and SHA256. Patch is forward HEAD-to-finalization and may be reversed only for this owned date delta.",
+  "selection": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\FINAL-VALIDATION-SELECTION.md",
+    "sha256": "59cbda866821219f47e27d0619bc3cd5bb510b57d2fd11c055b5e1958515c2d1"
+  },
+  "guard_reference": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\manifest.prepared.json",
+    "sha256": "6739626eb687092f9ab452789f9b479d09d3886cae04446d47dbaa6d2c229720"
+  },
+  "files": {
+    "original.md": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+    "result.md": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+    "recovery.patch": "407696ed7d6251a047d0d18649d67630cff3193be193d4778435ed464572bc1c",
+    "source-before.json": "cbdd32ade825619489150442abfbc82042d84ac6623db15282804b02532c9190",
+    "source-after.json": "b8fd6537e5e015fef768617e03056274d91690ff31763884c2a0b03035983ba6",
+    "REPORT.md": "d606b33c4380505da321c09eecdced94ec55869e39b8656c43057db790df47f6"
+  },
+  "frozen_script_hashes": {
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+    ".github/workflows/Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+  },
+  "scripts_readme_date": "2026-10-06",
+  "git_identity_unchanged": true,
+  "expected_unstaged": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    "docs/dependency-maintenance.md"
+  ]
+}

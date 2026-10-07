@@ -1,0 +1,21 @@
+{
+  "analyzer_path": "/work/empty-array-glj70b0g/analyzer/PSScriptAnalyzer.psd1",
+  "analyzer": "1.24.0",
+  "pwsh": "7.6.3",
+  "rows": [
+    {
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "parser_basis": "exact final bytes / current ParseFile on this platform",
+      "name": "Test-AgentInstructions.ps1"
+    },
+    {
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "parser_basis": "exact final bytes / current ParseFile on this platform",
+      "name": "Test-AgentInstructions.SelfTest.ps1"
+    }
+  ]
+}

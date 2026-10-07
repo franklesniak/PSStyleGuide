@@ -1,0 +1,163 @@
+{
+  "state": "ROOT_FINAL_BYTE_FOCUSED_AND_QUALITY_PASS",
+  "verified_utc": "2026-10-07T00:40:49.841906+00:00",
+  "results": {
+    "windows-focus": {
+      "state": "passed",
+      "whole_seconds": 86.26499999999942,
+      "output_bytes": 418656,
+      "source_and_git_unchanged": true,
+      "cleanup_passed": true,
+      "cases": 109,
+      "real_parser_calls": 109,
+      "decoder_calls": 109,
+      "null_refusals": 30,
+      "complete_raw_and_typed_parity_with_proven_cases": true,
+      "helper_restoration": true
+    },
+    "windows-quality": {
+      "state": "passed",
+      "whole_seconds": 91.60899999999674,
+      "output_bytes": 13271,
+      "source_and_git_unchanged": true,
+      "cleanup_passed": true,
+      "parser_errors": 0,
+      "analyzer_warning_errors": 0,
+      "final_file_hashes": {
+        "Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+        "Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+      }
+    },
+    "linux-focus": {
+      "state": "passed",
+      "whole_seconds": 63.26499999999942,
+      "output_bytes": 421651,
+      "source_and_git_unchanged": true,
+      "cleanup_passed": true,
+      "cases": 109,
+      "real_parser_calls": 109,
+      "decoder_calls": 109,
+      "null_refusals": 30,
+      "complete_raw_and_typed_parity_with_proven_cases": true,
+      "helper_restoration": true
+    },
+    "linux-quality": {
+      "state": "passed",
+      "whole_seconds": 34.35899999999674,
+      "output_bytes": 15450,
+      "source_and_git_unchanged": true,
+      "cleanup_passed": true,
+      "parser_errors": 0,
+      "analyzer_warning_errors": 0,
+      "final_file_hashes": {
+        "Test-AgentInstructions.SelfTest.ps1": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+        "Test-AgentInstructions.ps1": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c"
+      }
+    }
+  },
+  "cross_platform_complete_raw_type_value_refusal_equality": true,
+  "current_source_and_runtime_guard_pass": true,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\manifest.root-authorized.json",
+      "sha256": "27463d3e733383250ab7722bca8ebf1fc3af426ce0d446971312459b854de8ed",
+      "bytes": 505161
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\proven-cases.json",
+      "sha256": "8d536b7ca9210e142f08910317a8fb95f8ef767b9de4f1e957a90c732f83cef9",
+      "bytes": 262259
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-focus-final-byte-one\\output\\result.json",
+      "sha256": "5a09953f185891fe5ba0203e1525bce46a1fe3d9ff9ae0a4dd9824b6a97f1497",
+      "bytes": 3690
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-focus-final-byte-one\\output\\source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-focus-final-byte-one\\output\\source-after.json",
+      "sha256": "319875ab6bbf05c6212b0165831fedae82d3abd750c2cf76adbf58a7cb15a452",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-focus-final-byte-one\\output\\candidate\\focus.json",
+      "sha256": "62afdf0dfb34c38ef62f6ea25e021274c939224a238aee742e722e1c110090fc",
+      "bytes": 127970
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-quality-final-byte-one\\output\\result.json",
+      "sha256": "03d2cef638e299afdf89de1fd814a9e50ed39fdb522b1231fa2f9799d6d9d135",
+      "bytes": 3967
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-quality-final-byte-one\\output\\source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-quality-final-byte-one\\output\\source-after.json",
+      "sha256": "319875ab6bbf05c6212b0165831fedae82d3abd750c2cf76adbf58a7cb15a452",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\windows-quality-final-byte-one\\output\\quality.json",
+      "sha256": "2bd099670415515c972462032aacca3f0b5d95b98542bca458847325d2c953db",
+      "bytes": 805
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-focus-final-byte-one\\output\\result.json",
+      "sha256": "0f445547f63ee834b4e05b106fc55068a2ec670e6c811b4250f5d9b727fe3174",
+      "bytes": 7150
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-focus-final-byte-one\\status.json",
+      "sha256": "30eddbb8f181c1dcccf04799b85d5b37c2ed17c4e7ad2efb95296139dbfce737",
+      "bytes": 1442
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-focus-final-byte-one\\output\\host-source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-focus-final-byte-one\\output\\host-source-after.json",
+      "sha256": "319875ab6bbf05c6212b0165831fedae82d3abd750c2cf76adbf58a7cb15a452",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-focus-final-byte-one\\output\\candidate\\focus.json",
+      "sha256": "292e156f917707ed1c3af302b040293fb55b3f5930212e20f8bae40d5d694f81",
+      "bytes": 127970
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-quality-final-byte-one\\output\\result.json",
+      "sha256": "19b2473a0fef2f1b43493b7c338077761f5392daf7bc652a3588b496466b47a6",
+      "bytes": 7209
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-quality-final-byte-one\\status.json",
+      "sha256": "28faff4b9e2d5f77b6bf9657d78163cc641823267207a392733b376c7279f5d8",
+      "bytes": 1449
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-quality-final-byte-one\\output\\host-source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-quality-final-byte-one\\output\\host-source-after.json",
+      "sha256": "319875ab6bbf05c6212b0165831fedae82d3abd750c2cf76adbf58a7cb15a452",
+      "bytes": 928
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\qualification\\runs\\linux-quality-final-byte-one\\output\\quality.json",
+      "sha256": "6fb708d44d9f2d8a4e84854bbac8ccd52b948dc36272f93aefefdeec2f169fda",
+      "bytes": 695
+    }
+  ],
+  "scope": "Exact final109-case SelfTest integration plus fresh final two-file ParseFile/PSSA. No speed benefit, full-suite, CI/review, commit or acceptance claim."
+}

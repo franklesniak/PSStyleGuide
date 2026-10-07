@@ -1,0 +1,21 @@
+{
+  "rows": [
+    {
+      "parser_errors": [],
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "diagnostics": [],
+      "parser_basis": "exact final bytes / current ParseFile on this platform",
+      "name": "Test-AgentInstructions.ps1"
+    },
+    {
+      "parser_errors": [],
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "diagnostics": [],
+      "parser_basis": "exact final bytes / current ParseFile on this platform",
+      "name": "Test-AgentInstructions.SelfTest.ps1"
+    }
+  ],
+  "pwsh": "7.6.5",
+  "analyzer": "1.24.0",
+  "analyzer_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\windows-focused\\powershell-modules\\PSScriptAnalyzer\\1.24.0\\PSScriptAnalyzer.psd1"
+}

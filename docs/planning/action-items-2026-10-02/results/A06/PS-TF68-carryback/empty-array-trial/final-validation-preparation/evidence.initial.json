@@ -1,0 +1,310 @@
+{
+  "state": "READ_ONLY_PREPARATION_PLAN_NOT_EXECUTION_PACKET",
+  "written_utc": "2026-10-07T01:05:40.104811+00:00",
+  "report": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-validation-preparation\\REPORT.md",
+    "sha256": "7152671b4e79fc5cc247e1f952762a18d1d6d459eaa3b25fd04123d717f37ad4",
+    "bytes": 11664
+  },
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\REPORT.md",
+      "sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+      "bytes": 23934
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
+      "sha256": "4b62332550246304186353badb936f4364db9e662a84ebd74a0e960f72eabf45",
+      "bytes": 3684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-BENEFIT-RESULT.json",
+      "sha256": "d874366410f30a4c8cbf1beacc76cd25a97056880ba27480586bfca4c8f56fac",
+      "bytes": 8000
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINAL-QUALIFICATION-RESULT.json",
+      "sha256": "1ec3f88b5ab8ef71ef58340ea4da7bdca2e39a90fe1e038771650157530c73a0",
+      "bytes": 9335
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FOCUS-RESULT.json",
+      "sha256": "c3dd11dfcaca1117fe2ac8abcb544df911c80cbd6b8926dc2b5255e8580451f3",
+      "bytes": 5841
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-FINALIZATION-VERIFICATION.json",
+      "sha256": "89795ba8c9ae999ae64593c696079cc2b687f2a90d18d95f5d851c34c2f2378e",
+      "bytes": 1048
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\evidence.json",
+      "sha256": "af9840cba2ebf7e2d9e13e79637cf4f43c357133fdfa17f3e72b3898949a7631",
+      "bytes": 7869
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\FINAL-VALIDATION.json",
+      "sha256": "00575480d058ef329108bda2b0755c7411c8bf159d69dd7fb945026ecef93195",
+      "bytes": 8497
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\LOCAL-VALIDATION.json",
+      "sha256": "70031b725cbccaf9ca1e8a10dbdd88fb78c5f2843c40d8274d41c324fdec13dc",
+      "bytes": 3357
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "0723c9519d5f8f4b07af22fbb5b1a454b67cd321e3beb4159bacefb7a254dabe",
+      "bytes": 1883
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\manifest.authorized.json",
+      "sha256": "d8bec40be133de42ce5c9242968750463b7c6f6496ee5724e1a7925e44a08d11",
+      "bytes": 4660
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-aggregate\\inside.py",
+      "sha256": "3e50268e746826b78c4ec30e117c4f5d2ad031a15d9ae1032ce123dfd936c643",
+      "bytes": 18205
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\linux-final-validation\\inside.py",
+      "sha256": "fab36fc8daf64a1c57580c571705e0f681d8c2388707b9d7fb4692f7e5c71516",
+      "bytes": 18929
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\manifest.authorized.json",
+      "sha256": "9c4eeb1fc01bd8d7592fe07f2acb4d1a9a4997df2ea168647cdee89acc9e2e16",
+      "bytes": 5374
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\committed-validation-v2\\execution-run\\result.json",
+      "sha256": "a731bd47f62dbfdd4617388e991dbe6ac97e97975df825bee2beb2c9af5869d2",
+      "bytes": 9905
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299",
+      "bytes": 5582
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISIONS.md",
+      "sha256": "f58131a8dfd0452ba69310b2dab04f0a0133ff758bea1d19111e2b58fd20d3f6",
+      "bytes": 20567
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A21\\RESULT.md",
+      "sha256": "85128c02167b9c7f6db82d35b27335745c833fdf94f640423d21ccee86c8c7fb",
+      "bytes": 56040
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "bytes": 299398
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\.github\\workflows\\scripts-README.md",
+      "sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "bytes": 13541
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide\\docs\\dependency-maintenance.md",
+      "sha256": "2a6f3caa6079d1d4fc88f8398608f7b580b33c8cce362bdbd1b53269b57f44c0",
+      "bytes": 10446
+    }
+  ],
+  "unchanged_seven_Node_inputs": [
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "unchanged_from_H504": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "unchanged_from_H504": true
+    }
+  ],
+  "old_endpoint_command_references": [
+    {
+      "name": "AcceptedMaintenance",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "504cd7672ac9604ace765a4f451346f801f09ddd"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    },
+    {
+      "name": "AcceptedContent",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    },
+    {
+      "name": "FinalizeMetadataNow",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-FinalizeMetadataNow"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    },
+    {
+      "name": "MetadataClassificationOnly",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-MetadataClassificationOnly"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    },
+    {
+      "name": "ProposedPolicy",
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "504cd7672ac9604ace765a4f451346f801f09ddd",
+        "-PublishedBaselineRevision",
+        "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "-ProposedPolicy"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    },
+    {
+      "name": "CurrentAudit",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "bounds_seconds": 600,
+      "old_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+      "reuse": "Command/transport reference only; final actual H/date/native authority unresolved"
+    }
+  ],
+  "prospective_net_pair": {
+    "order": [
+      "final-candidate-B",
+      "original-checker-SelfTest-A"
+    ],
+    "commands_each": [
+      "/opt/psstyleguide-runtime/venv/bin/python",
+      "-m",
+      "pre_commit",
+      "run",
+      "--all-files"
+    ],
+    "aggregate_seconds_each": 3000,
+    "whole_fixture_seconds_each": 3300,
+    "whole_shared_seconds": 6600,
+    "minimum_reduction_percent_proposed": 5,
+    "minimum_reduction_seconds_proposed": 0.5,
+    "requires_root_interference_judgment": true,
+    "resampling": false,
+    "additional_A_pass_role": "current same-command net-cost control, not duplicate final-B acceptance"
+  },
+  "metadata_precondition": {
+    "paths": [
+      ".github/workflows/scripts-README.md",
+      "docs/dependency-maintenance.md"
+    ],
+    "field": "Last Updated",
+    "observed_value": "2026-10-06",
+    "actual_finalization_date_example": "2026-10-07",
+    "requires_root_scope_and_changed_measurement_input_reconciliation": true,
+    "native_or_candidate_failure_reproduced": false
+  },
+  "payload_executed": false,
+  "product_edited": false,
+  "execution_authorized": false,
+  "future_packet_publication_ref_identity": "pending root; no future execution packet frozen"
+}

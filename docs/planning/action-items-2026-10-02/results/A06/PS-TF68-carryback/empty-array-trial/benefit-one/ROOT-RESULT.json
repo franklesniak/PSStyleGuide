@@ -1,0 +1,134 @@
+{
+  "state": "ROOT_SCOPED_ABBA_BENEFIT_PASS_NET_SUITE_PENDING",
+  "utc": "2026-10-07T00:57:06.279740+00:00",
+  "session_id": 41852,
+  "session_terminal_exit": 0,
+  "times_seconds": {
+    "A1": 8.967582003000189,
+    "B1": 7.751853873000073,
+    "B2": 7.5912383150002825,
+    "A2": 8.6206153359999
+  },
+  "matched_reductions_seconds": [
+    1.215728130000116,
+    1.0293770209996183
+  ],
+  "median_reduction_seconds": 1.122552575499867,
+  "median_reduction_percent": 12.764839441626206,
+  "counts_each": {
+    "generic": 4,
+    "parser-call": 52,
+    "structural": 44,
+    "reuse": 8
+  },
+  "native_exits_each": 52,
+  "all_native_exits_zero": true,
+  "total_events": 644,
+  "raw_stdout_nonmarker_stderr_equal": true,
+  "same_inputs_clock_revisions_argv_cwd": true,
+  "four_distinct_serial_fresh_children": true,
+  "whole_host_seconds": 80.51599999998871,
+  "output_bytes": 1009988,
+  "cleanup": "All four children empty; parent reaped only two owned already-exited Git children with exact zero statuses; terminal empty and container absent.",
+  "case": {
+    "Role": "D94.1 one fresh current actual author-finalization ABBA case",
+    "Baseline": "90dd742ee3d765807f7b0c0d12bc5ae90057a4d3",
+    "Candidate": "16963713368cfd7b5e3ab5cc286053b04a1f8e57",
+    "Clock": "2026-10-07T00:53:55.5806262+00:00",
+    "ExpectedDate": "2026-10-07",
+    "ExpectedExit": 0,
+    "ExpectedMessage": "Author finalization UTC date checked: 2026-10-07; B=90dd742ee3d765807f7b0c0d12bc5ae90057a4d3 H=16963713368cfd7b5e3ab5cc286053b04a1f8e57",
+    "PriorEphemeralIdentityReplayed": false
+  },
+  "host_and_fixture_unchanged": true,
+  "consistency_judgment": "Both pairs independently exceed the numerical thresholds. Gains1.216s/1.029s differ by0.186s; observed within-A0.347s and within-B0.161s are smaller than either gain. No wide contradictory pair or task-owned concurrent test was observed. This supports one local case only; unmeasured external interference cannot be excluded as a general claim.",
+  "scope": "Retain frozen candidate provisionally for normal final-byte validation and net full-suite cost assessment; no commit, new review, CI remedy or broad benchmark acceptance.",
+  "auto_repeat": false,
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\manifest.root-authorized.json",
+      "sha256": "27970d06833a0e35bd0d44f37be9f8600b4e1b67e1d4e481a592792c6bbc1ca6",
+      "bytes": 487710
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\status.json",
+      "sha256": "bb7faebfbe43b4d6c47ca5e715f645831023e5cc3be57f741a657877596d0e71",
+      "bytes": 1701
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\result.json",
+      "sha256": "efef0e2396786d99101965d3ba060e308dce849e82f8d0609aaf14d2b8249f1e",
+      "bytes": 14546
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\abba-judgment.json",
+      "sha256": "20bb8bc8236145daea18feb08009c1a9fe6c73f95f27b6342cc7ec8770071e98",
+      "bytes": 2849
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\host-source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\host-source-after.json",
+      "sha256": "e9b5965a93ac928d2eb6441ea6f5202ee70151c33934c3dd2748476041b067ed",
+      "bytes": 176
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\before.json",
+      "sha256": "6af9a49d4a3f0df6af89ae9658a6a560f30560abe587128f54507e7b73c26afc",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\current-author-ABBA-after.json",
+      "sha256": "590248308a832de6ab2b922018a33fa52a57e5abac5a080def92a02400810215",
+      "bytes": 164
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\case.json",
+      "sha256": "4ba333b071d9cefbdffdde9abeb2ed2ffc24c23995ca07d4c88805dcd8913ca4",
+      "bytes": 498
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\A1-child.json",
+      "sha256": "b6a2109ce5c60bd1858ceb0031b8230401358dbf0e1718841a7285dc1bba5567",
+      "bytes": 19913
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\A1.spec.json",
+      "sha256": "fbf618ed6019e3890c45455960fa7a635ac006152be316510c4ee74e9ac2779c",
+      "bytes": 8487
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\B1-child.json",
+      "sha256": "16824235727ebbe49a50881681bef0b0029dc8bb1aa9f84968bb4a9a91252481",
+      "bytes": 19917
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\B1.spec.json",
+      "sha256": "990d67daf7c8ba3dcfe10af13b2a78ad9bccc99bd366ea04ace195f4b3deb153",
+      "bytes": 8487
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\B2-child.json",
+      "sha256": "0df5610bf7f1fc3c034deee90f3b3b63ab42eb582773ad718a95df637c0d8a6c",
+      "bytes": 19920
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\B2.spec.json",
+      "sha256": "7098f59f504ac2a8cf8bad3b2d099c8c2b12bb3f87a0ccb2c4d09fbc7cdac8a1",
+      "bytes": 8487
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\A2-child.json",
+      "sha256": "69c199f7863156e8a8d1e6234ca30f8c36b13dd17721112b3d487ac1bb57bde0",
+      "bytes": 19919
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\A2.spec.json",
+      "sha256": "81057b78c70c42d3a1051539b7dd52bec15b4d0ae9820e8b6eb99e1157a905e0",
+      "bytes": 8487
+    }
+  ]
+}

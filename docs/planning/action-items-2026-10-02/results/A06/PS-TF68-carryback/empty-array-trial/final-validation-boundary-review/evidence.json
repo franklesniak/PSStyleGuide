@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "state": "SCOPED_RETENTION_DEFENSIBLE_EXPLICIT_INPUT_AND_SEQUENCE_RECONCILIATION_REQUIRED",
+  "utc": "2026-10-07T01:11:40.772924+00:00",
+  "decision_not_execution_release": true,
+  "judgment": {
+    "old_whole_PR_candidate_binding_invalidated_by_metadata_update": true,
+    "historical_ABBA_fixed_dataset_and_exact_script_claim_preserved": true,
+    "automatic_no_change_required_from_metadata_alone": false,
+    "new_updated_dataset_net_control_and_final_gates_required": true,
+    "A_old_SelfTest_B_final_109_case_SelfTest_required_for_net_cost": true,
+    "actual_committed_endpoint_sequence_requires_explicit_root_clarification": true
+  },
+  "source_boundary": {
+    "measured_original_archive_sha256": "8814c60f8f279a8a08b8f41797ee55b5188551a1c5b168c047de114fe2067226",
+    "measured_original_head": "504cd7672ac9604ace765a4f451346f801f09ddd",
+    "host_candidate_freeze_is_separate_from_original_target_fixture": true,
+    "final_validator": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+    "final_SelfTest": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8"
+  },
+  "metadata_static_findings": {
+    "accepted_HEAD_file": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "scripts_README_B_to_H": "only Last Updated Oct5 to Oct6; unchanged rendered-content early return",
+    "dependency_maintenance_B_to_H": "Last Updated plus new KaTeX paragraph; actual-date finalization applies to rendered change",
+    "no_candidate_refusal_executed": true,
+    "peer_metadata_convergence_not_waived": true
+  },
+  "limitations": [
+    "No tests, payload imports, native/Git operations, source/planning/state changes",
+    "Corrected preparation read after initial known error; current corrected hash is bound",
+    "No future aggregate result, execution release, commit authority, CI remedy or acceptance",
+    "Planning updates after completed measurements do not alter historical run identities"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-validation-preparation\\REPORT.md",
+      "sha256": "550b8912173867db5c174333579323fbaffaefb16e97412172b8966286c00653",
+      "bytes": 13343
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-validation-preparation\\evidence.json",
+      "sha256": "0a57b2b79f3a9b65fd6143669b8dbcea7d2e4be25fc82105d16595b3b383b967",
+      "bytes": 18088
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\REPORT.md",
+      "sha256": "3fef5c3b7d10df8e228d5121f682b743e45dae01ed5f3c109c49fe4a3ccce4e9",
+      "bytes": 23934
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\current-author-diagnostic\\interpretation\\ROOT-DECISION.json",
+      "sha256": "4b62332550246304186353badb936f4364db9e662a84ebd74a0e960f72eabf45",
+      "bytes": 3684
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\ROOT-BENEFIT-RESULT.json",
+      "sha256": "d874366410f30a4c8cbf1beacc76cd25a97056880ba27480586bfca4c8f56fac",
+      "bytes": 8000
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-byte-benefit-review\\REPORT.md",
+      "sha256": "832864b2145cea45a7cc44312ea21e8c75530eb22a34845abd7894111fa8c606",
+      "bytes": 4401
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\final-byte-benefit-review\\evidence.json",
+      "sha256": "b8291ac93399bba08f9d3bd24a8d98a261b250fb1c869b1f98c2e43403b342e6",
+      "bytes": 34958
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\manifest.root-authorized.json",
+      "sha256": "27970d06833a0e35bd0d44f37be9f8600b4e1b67e1d4e481a592792c6bbc1ca6",
+      "bytes": 487710
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\inside.py",
+      "sha256": "5fabc34b60382eb83f556969ace75ece2ffe511936e4a404247b967c9840b927",
+      "bytes": 17363
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\author-one-case.ps1",
+      "sha256": "2512c8d6933e1c93b478ad6187b0c4e6fc0b911b077f443008c9098e08b9154c",
+      "bytes": 38751
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\bindings.py",
+      "sha256": "ba38ea7e2e77a2d641d0493edb676a229068a5031429f46ba68f8508066a7413",
+      "bytes": 5961
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\static-input-binding.json",
+      "sha256": "75efb06a2614b38fa4c414a6a946f144f948f7d0d8551f10f12ab0488f1c969e",
+      "bytes": 4932
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\variant-catalog.json",
+      "sha256": "bbadda91a0948d675cb64a75ea0252a074d8dd9b26ca9d9331368f1e0877acd8",
+      "bytes": 483
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\case.json",
+      "sha256": "4ba333b071d9cefbdffdde9abeb2ed2ffc24c23995ca07d4c88805dcd8913ca4",
+      "bytes": 498
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\before.json",
+      "sha256": "6af9a49d4a3f0df6af89ae9658a6a560f30560abe587128f54507e7b73c26afc",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\benefit-one\\runs\\ps235-empty-array-benefit-abba-one\\output\\host-source-before.json",
+      "sha256": "e571a1b3609eca152b4f5101abc7d575885ed9e66bb39048de4b8f0050aa3401",
+      "bytes": 850
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\finalization-one\\candidate\\.github\\workflows\\Test-AgentInstructions.ps1",
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "bytes": 510837
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISIONS.md",
+      "sha256": "f58131a8dfd0452ba69310b2dab04f0a0133ff758bea1d19111e2b58fd20d3f6",
+      "bytes": 20567
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\scripts-README.md",
+      "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "bytes": 13541
+    },
+    {
+      "path": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\docs\\dependency-maintenance.md",
+      "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+      "bytes": 9867
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\qualification\\baseline.tar",
+      "sha256": "8814c60f8f279a8a08b8f41797ee55b5188551a1c5b168c047de114fe2067226",
+      "bytes": 3768320
+    }
+  ]
+}

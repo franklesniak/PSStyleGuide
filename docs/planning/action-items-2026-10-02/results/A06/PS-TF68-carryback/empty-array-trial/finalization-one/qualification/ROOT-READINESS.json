@@ -1,0 +1,36 @@
+{
+  "state": "ROOT_FINAL_PACKET_READY_NO_PAYLOAD_EXECUTED",
+  "utc": "2026-10-07T00:38:01.174667+00:00",
+  "prepared_manifest_sha256": "6739626eb687092f9ab452789f9b479d09d3886cae04446d47dbaa6d2c229720",
+  "references_verified": 10,
+  "private_python_compiled": {
+    "bindings.py": "f309b64298482907d9ae62052ea665dd34e5d95bf50257e126a0ea573fac56f7",
+    "compare.py": "d5bbeb8d51a6802a2fe75e2135c82ec3cf147edfd769348a680016d063897daf",
+    "inside.py": "028ccbc9a3c3426482e8edbcc156c3a5a7aa785300aba3e1c927e7fd1d7803d4",
+    "launch.py": "510e2bd1509a7970e0bf1e0d419dec612c4df0025c829d8adc9971930bb5e52d",
+    "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+    "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+    "windows.py": "e4460196da97b821375af1f9c8ffd4813125580a48dd2192fbe4ff105e423273"
+  },
+  "private_powershell_parse": [
+    {
+      "errors": [],
+      "name": "focus.ps1"
+    },
+    {
+      "errors": [],
+      "name": "quality.ps1"
+    }
+  ],
+  "archive_members": {
+    "candidate_archive": 78,
+    "dependency_archive": 1914,
+    "analyzer_archive": 51
+  },
+  "historical_case_rows_verified_each_platform": 109,
+  "historical_blobs_verified": 125,
+  "host_unchanged": true,
+  "new_full_ref_digest": "ae902f4f42fecd65743d635ce35925e9b0540f98210267a5c2484b4489f0b170",
+  "only_known_planning_refs_reconciled": true,
+  "scope": "Private packet readiness only. Final product ParseFile/PSSA and focus tests remain unexecuted."
+}

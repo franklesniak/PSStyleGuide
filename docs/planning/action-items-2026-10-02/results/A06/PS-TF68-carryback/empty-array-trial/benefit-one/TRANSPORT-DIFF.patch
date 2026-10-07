@@ -1,0 +1,623 @@
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\common.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\common.py
+@@ -1,6 +1,7 @@
+ """Small shared identity helpers. No operation runs on import."""
+ import time
+-IMPORT_DEADLINE=time.monotonic()+520
++IMPORT_STARTED=time.monotonic()
++IMPORT_DEADLINE=IMPORT_STARTED+580
+ import hashlib,json,os,pathlib,subprocess
+ if not __debug__:raise RuntimeError('Safety checks require ordinary, non-optimized Python.')
+ IMAGE='sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4'
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\inside.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\inside.py
+@@ -7,8 +7,10 @@
+ inputs=pathlib.Path('/input');output=pathlib.Path('/output')
+ record={'state':'preparing','started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'commands':[],'cleanup_receipts':[]}
+ save(output/'result.json',record)
+-overall_deadline=time.monotonic()+510;active_direct=[];primary=None;m={}
+-def date_guard():assert datetime.datetime.now(datetime.timezone.utc).date().isoformat()==m['finalization_utc_date'],'Actual UTC date changed; reconcile finalization without a clock override.'
++overall_deadline=time.monotonic()+min(570,json.loads((inputs/'manifest.json').read_bytes())['remaining_execution_seconds']-10);active_direct=[];primary=None;m={}
++import common
++common.IMPORT_DEADLINE=overall_deadline
++def date_guard():assert datetime.datetime.now(datetime.timezone.utc).date().isoformat()==m['release_utc_date'],'Actual UTC date changed; reconcile finalization without a clock override.'
+ def unpack(name,rows):
+     expected={row['path']:row for row in rows};seen=set()
+     with tarfile.open(inputs/name,'r:') as archive:
+@@ -40,8 +42,8 @@
+         save(output/(name+'-drift-identity.json'),identity())
+         raise
+ def output_guard():
+-    total=sum(p.stat().st_size for p in output.iterdir() if p.is_file())
+-    assert total<=m['maximum_output_bytes'],'Total output bound exceeded'
++    total=sum(p.stat().st_size for p in output.iterdir() if p.is_file())+(inputs/'source-before.json').stat().st_size
++    assert total+262144<=m['maximum_output_bytes'],'Total output bound exceeded'
+ 
+ def settle(name,protected=()):
+     try:receipt=own.cleanup_owned(set(protected),min(overall_deadline,time.monotonic()+2))
+@@ -130,14 +132,14 @@
+     record['subreaper']=own.enable_subreaper();record['setup_anchor']=own.anchor()
+     for name,digest in json.loads((inputs/'payload-hashes.json').read_bytes()).items():assert sha((inputs/name).read_bytes())==digest
+     m=json.loads((inputs/'manifest.json').read_bytes());original=json.loads((inputs/'source-before.json').read_bytes())
+-    assert m['execution_authorized'] is True and m['policy_role']=='current-author-finalization-diagnostic-only'
++    assert m['execution_authorized'] is True and m['policy_role']=='D94.1-one-current-author-ABBA-benefit-only'
+     workspace=pathlib.Path(tempfile.mkdtemp(prefix='validation-'+m['run_id']+'-',dir='/work'));repo=workspace/'repository';repo.mkdir()
+     for name in ['home','tmp','npm-cache']:(workspace/name).mkdir()
+     # Do not inherit credentials, host agent flags, hook skips or arbitrary Git configuration.
+     os.environ.clear();os.environ.update(PATH=RUNTIME_PATH,HOME=str(workspace/'home'),USER='root',LOGNAME='root',LANG='C.UTF-8',LC_ALL='C.UTF-8',TZ='UTC',TMPDIR=str(workspace/'tmp'),TEMP=str(workspace/'tmp'),TMP=str(workspace/'tmp'),PRE_COMMIT_HOME='/opt/psstyleguide-runtime/pre-commit-cache',GOTOOLCHAIN='local',GIT_CONFIG_GLOBAL='/dev/null',GIT_CONFIG_NOSYSTEM='1',GIT_TERMINAL_PROMPT='0',PYTHONNOUSERSITE='1',PIP_CONFIG_FILE='/dev/null',PIP_DISABLE_PIP_VERSION_CHECK='1',NPM_CONFIG_UPDATE_NOTIFIER='false',npm_config_cache=str(workspace/'npm-cache'))
+     record.update(role=m['policy_role'],accepted_base=m['accepted_base'],candidate_tree=m['candidate_tree'],workspace=str(workspace))
+     save(output/'result.json',record)
+-    assert (m['whole_timeout_seconds'],m['child_timeout_seconds'],m['driver_timeout_seconds'])==(600,120,480)
++    assert (m['whole_timeout_seconds'],m['child_timeout_seconds'],m['driver_timeout_seconds'])==(600,120,520)
+     date_guard()
+     git(repo,'init','--quiet');git(repo,'config','core.autocrlf','false');git(repo,'config','core.filemode','true')
+     git(repo,'bundle','verify',str(inputs/'history.bundle'))
+@@ -152,7 +154,7 @@
+     # Exact current committed H checkout. No candidate staging or historical replacement.
+     assert value(repo,'rev-parse','HEAD^{tree}')==m['candidate_tree']
+     assert not set(row['path'] for row in original['files']) & set(row['path'] for row in original['dependencies'])
+-    unpack('candidate.tar',original['files']);unpack('dependencies.tar',original['dependencies'])
++    unpack('original.tar',original['files']);unpack('dependencies.tar',original['dependencies'])
+     assert index_rows(repo)==[{key:row[key] for key in ['path','mode','blob']} for row in original['files']]
+     git(repo,'diff','--check')
+     # This runtime profile only qualifies these unchanged Python/hook definitions.
+@@ -184,7 +186,8 @@
+     save(output/'before.json',before);save(output/'runtime.json',{'versions':versions,'path':RUNTIME_PATH,'pyflakes':'absent in qualified image','network':'none','role':m['policy_role']})
+     record['setup_cleanup']=settle('setup')
+     output_guard()
+-    run('current-author-pair',['pwsh','-NoLogo','-NoProfile','-NonInteractive','-File','/input/pair-driver.ps1','-RepositoryRootPath',str(repo),'-OutputDirectory',str(output)],m['driver_timeout_seconds'],before)
++    save(output/'envelope.json',{'deadline_monotonic':overall_deadline,'order':['A1','B1','B2','A2'],'child_seconds':120})
++    run('current-author-ABBA',['pwsh','-NoLogo','-NoProfile','-NonInteractive','-File','/input/pair-driver.ps1','-RepositoryRootPath',str(repo),'-OutputDirectory',str(output)],m['driver_timeout_seconds'],before)
+     date_guard();record['state']='passed'
+ except BaseException as error:
+     primary=error;record.update(state='failed',failure_type=type(error).__name__,failure=str(error))
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\launch.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\launch.py
+@@ -1,155 +1,97 @@
+-"""One separately root-approved offline PS candidate validation; no action is authorized by preparation."""
+-import argparse,datetime,hashlib,io,json,os,pathlib,queue,re,shutil,subprocess,tarfile,threading,time
+-from common import IMPORT_DEADLINE,IMAGE,dependency_catalog,entries,git,index_rows,save,sha,value,worktree_catalog
+-parser=argparse.ArgumentParser();parser.add_argument('--execute-root-approved',action='store_true');parser.add_argument('--manifest',type=pathlib.Path,required=True);parser.add_argument('--approved-manifest-sha256',required=True)
+-args=parser.parse_args()
+-assert args.execute_root_approved,'No execution release supplied.'
+-raw=args.manifest.read_bytes();assert sha(raw)==args.approved_manifest_sha256
+-m=json.loads(raw);assert m['schema']==1 and m['execution_authorized'] is True and m['authorizing_coordinator']=='root' and m['replaces_current_run'] is False
+-assert m['policy_role']=='current-author-finalization-diagnostic-only'
+-assert m['prepared'] is True,'Root has not qualified the packet'
+-evidence=pathlib.Path(m['root_readiness_evidence']);assert sha(evidence.read_bytes())==m['root_readiness_evidence_sha256']
+-assert m['root_confirmed_current_accepted_base'] is True and m['root_confirmed_candidate_policy_and_dependency_compatibility'] is True
+-assert re.fullmatch('[a-z0-9][a-z0-9-]{0,63}',m['run_id'])
+-for key in ['accepted_base','source_head','candidate_tree']:assert re.fullmatch('[0-9a-f]{40}',m[key])
+-assert m['image']==IMAGE
+-assert (m['whole_timeout_seconds'],m['child_timeout_seconds'],m['driver_timeout_seconds'],m['event_limit'])==(600,120,480,2000)
+-host_deadline=IMPORT_DEADLINE
+-assert set(m['changed_paths'])=={'.github/workflows/Test-StyleGuideArtifacts.ps1', '.github/workflows/Test-CiHelpers.test.mjs', '.github/workflows/agent-instructions.yml', '.github/workflows/copilot-code-review.yml', '.github/workflows/package.json', '.github/workflows/scripts-README.md', 'docs/dependency-maintenance.md', '.github/workflows/package-lock.json', '.github/workflows/Test-AgentInstructions.ps1', '.github/workflows/Test-AgentInstructions.SelfTest.ps1'}
+-assert m['maximum_output_bytes']==2097152 and m['maximum_stream_bytes']==2097152
+-assert m['finalization_utc_date']==datetime.datetime.now(datetime.timezone.utc).date().isoformat()
+-assert re.fullmatch(r'https://github\.com/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+\.git',m['origin_url'])
+-here=pathlib.Path(__file__).resolve().parent;source=pathlib.Path(m['source_repository']).resolve();dep_root=pathlib.Path(m['dependency_root']).resolve()
+-dep_file=pathlib.Path(m['dependency_catalog']).resolve();assert sha(dep_file.read_bytes())==m['dependency_catalog_sha256'];approved=json.loads(dep_file.read_bytes())
+-assert len(approved)==m['dependency_count'] and m['dependency_count']>0
+-assert not any(os.environ.get(x) for x in ['HUSKY','SKIP','CI','GITHUB_ACTIONS','GIT_INDEX_FILE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])
+-assert not any(key.startswith('GIT_CONFIG_') or key in ['GIT_DIR','GIT_WORK_TREE','GIT_COMMON_DIR'] for key in os.environ)
+-assert source!=here and source not in here.parents and dep_root not in here.parents
+-def source_guard():
+-    assert value(source,'rev-parse','HEAD')==m['source_head']
+-    assert value(source,'rev-parse','--abbrev-ref','HEAD')==m['source_branch']
+-    assert not git(source,'diff','--name-only'),'Unstaged source change'
+-    assert not git(source,'diff','--cached','--name-only'),'Staged source change'
+-    assert value(source,'rev-parse','HEAD^{tree}')==m['candidate_tree']
+-    assert value(source,'rev-parse','refs/remotes/origin/main')==m['accepted_base']
+-    assert value(source,'remote','get-url','origin')==m['origin_url']
+-    assert value(source,'rev-parse','--is-shallow-repository')=='false'
+-    config=git(source,'config','--local','--list','-z').decode('utf-8')
+-    assert not re.search(r'(?im)(?:^|\x00)(?:extensions\.partialclone|remote\.[^\x00\n]+\.promisor)\n',config),'Partial clone is not an approved immutable source.'
+-    assert not git(source,'for-each-ref','--format=%(refname)','refs/replace/')
+-    for suffix in ['info/grafts','objects/info/alternates']:
+-        p=pathlib.Path(value(source,'rev-parse','--git-path',suffix));p=p if p.is_absolute() else source/p;assert not p.exists(),suffix
+-    git(source,'merge-base','--is-ancestor',m['accepted_base'],m['source_head'])
+-    baseline=entries(source,m['source_tree']);candidate=entries(source,m['candidate_tree'])
+-    assert index_rows(source)==candidate,'Staged candidate index drift'
+-    catalog=here/'source-catalog.json';assert sha(catalog.read_bytes())==m['source_catalog_sha256']
+-    rows=json.loads(catalog.read_bytes());assert len(rows)==m['source_count']==78
+-    assert [{key:row[key] for key in ['path','mode','blob']} for row in rows]==candidate
+-    old={row['path']:(row['mode'],row['blob']) for row in baseline};new={row['path']:(row['mode'],row['blob']) for row in candidate}
+-    assert {path for path in old.keys()|new.keys() if old.get(path)!=new.get(path)}==set(m['changed_paths']),'Accepted-base/candidate changed-path union drift'
+-    assert not git(source,'ls-files','--others','--exclude-standard')
+-    files=worktree_catalog(source,rows);deps=dependency_catalog(dep_root,approved)
+-    metadata={}
+-    for suffix in ['HEAD','index','config','config.worktree']:
+-        p=pathlib.Path(value(source,'rev-parse','--git-path',suffix));p=p if p.is_absolute() else source/p
+-        metadata[suffix]=sha(p.read_bytes()) if p.exists() else None
+-    assert time.monotonic()<host_deadline,'Host input preparation deadline exceeded'
+-    assert sha(git(source,'ls-files','--stage','-z'))==m['expected_index_stage_z_sha256']
+-    assert sha(git(source,'show-ref'))==m['expected_refs_sha256']
+-    assert metadata==m['expected_git_metadata_sha256'],'Physical Git metadata differs from preparation'
+-    return {'head':m['source_head'],'origin_main':m['accepted_base'],'tree':m['candidate_tree'],'index_sha256':sha(git(source,'ls-files','--stage','-z')),'refs_sha256':sha(git(source,'show-ref')),'git_metadata_sha256':metadata,'files':files,'dependencies':deps}
+-for name,digest in m['prepared_files'].items():
+-    assert pathlib.PurePath(name).name==name and sha((here/name).read_bytes())==digest,name
+-before=source_guard()
+-image=json.loads(subprocess.check_output(['docker','image','inspect',IMAGE],timeout=10))[0];assert image['Id']==IMAGE and image['Os']=='linux' and image['Architecture']=='amd64'
++"""Root-only single ABBA transport; false preparation release flags prohibit execution."""
++import argparse,datetime,json,os,pathlib,queue,shutil,subprocess,sys,threading,time
++from common import IMAGE,IMPORT_DEADLINE,IMPORT_STARTED,save,sha
++from bindings import host_guard,ordinary,output_guard,release
++parser=argparse.ArgumentParser();parser.add_argument('--execute-root-approved',action='store_true');parser.add_argument('--manifest',type=pathlib.Path,required=True);parser.add_argument('--approved-manifest-sha256',required=True);args=parser.parse_args()
++here=pathlib.Path(__file__).resolve().parent;m,label=release(here,args)
++assert os.path.normcase(str(pathlib.Path(sys.executable).resolve()))==os.path.normcase(str(pathlib.Path(m['windows_runtimes']['python']['path']).resolve())),'Qualified orchestration Python required'
++assert m['image']==IMAGE and m['host_git_guard']['refs_sha256']=='ae902f4f42fecd65743d635ce35925e9b0540f98210267a5c2484b4489f0b170'
++assert m['run_id']=='ps235-empty-array-benefit-abba-one'
++start=IMPORT_STARTED;whole_end=IMPORT_DEADLINE+20;work_end=whole_end-20
++before=host_guard(m,work_end)
++image=json.loads(subprocess.check_output(['docker','image','inspect',IMAGE],timeout=min(10,max(.01,work_end-time.monotonic()))))[0]
++assert image['Id']==IMAGE and image['Os']=='linux' and image['Architecture']=='amd64'
+ run=here/'runs'/m['run_id'];run.mkdir(parents=True,exist_ok=False);inputs=run/'inputs';outputs=run/'output';inputs.mkdir();outputs.mkdir()
+-container_name='ps235-current-author-'+m['run_id'];label=sha(raw);primary=None
+-record={'state':'preparing','manifest_sha256':sha(raw),'started_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'run_id':m['run_id'],'image':IMAGE,'role':m['policy_role']};save(run/'status.json',record);save(inputs/'manifest.json',m);save(inputs/'source-before.json',before)
++container_name='ps235-empty-array-benefit-'+m['run_id'];primary=None;process=None;record={'state':'preparing','manifest_sha256':label,'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'order':m['order'],'image':IMAGE,'role':m['policy_role']}
++def bound():
++    # Immutable payload/archive/manifest copies are inputs; every generated identity,
++    # log and terminal receipt shares the same 2MiB output envelope.
++    generated=[p for p in run.rglob('*') if p.is_file() and (inputs not in p.parents or p.name=='source-before.json')]
++    total=sum(p.stat().st_size for p in generated);assert total+262144<=m['maximum_output_bytes'],('Whole output reserve exceeded',total)
++    return total
++save(run/'status.json',record);save(outputs/'host-source-before.json',before)
+ try:
+-    # Only output files are written; no ref, index, config or worktree operation targets source.
+-    bundle=inputs/'history.bundle';git(source,'bundle','create',str(bundle),'HEAD','refs/remotes/origin/main')
+-    with bundle.open('rb') as stream:
+-        while line:=stream.readline():
+-            if line==b'\n':break
+-            assert not line.startswith(b'-'),'Prerequisite bundle is not complete history.'
+-    git(source,'bundle','verify',str(bundle))
+-    def archive(path,rows,root):
+-        with tarfile.open(path,'w') as tar:
+-            for row in rows:
+-                data=(root/row['path']).read_bytes();assert sha(data)==row['sha256']
+-                entry=tarfile.TarInfo(row['path']);entry.size=len(data);entry.mode=0o644;entry.mtime=0;tar.addfile(entry,io.BytesIO(data))
+-    archive(inputs/'candidate.tar',before['files'],source);archive(inputs/'dependencies.tar',before['dependencies'],dep_root)
+-    for name in ['common.py', 'inside.py', 'ownership.py', 'settlement.py', 'control.ps1', 'timing.ps1', 'current-SelfTest.ps1', 'load-functions.ps1', 'author-one-case.ps1', 'pair-driver.ps1', 'observers.ps1', 'observer-catalog.json', 'profile-catalog.json', 'run-child.py', 'validate-pair.py']:shutil.copyfile(here/name,inputs/name)
+-    save(inputs/'payload-hashes.json',{name:sha((inputs/name).read_bytes()) for name in ['common.py', 'inside.py', 'ownership.py', 'settlement.py', 'control.ps1', 'timing.ps1', 'current-SelfTest.ps1', 'load-functions.ps1', 'author-one-case.ps1', 'pair-driver.ps1', 'observers.ps1', 'observer-catalog.json', 'profile-catalog.json', 'run-child.py', 'validate-pair.py', 'history.bundle', 'candidate.tar', 'dependencies.tar', 'manifest.json', 'source-before.json']})
+-    assert source_guard()==before
+-    assert time.monotonic()<host_deadline-10,'Insufficient owned-container execution budget'
+-    container_name='ps235-current-author-'+m['run_id'];label=sha(raw)
++    for name,row in [('history.bundle',m['history_bundle']),('original.tar',m['original_archive']),('dependencies.tar',m['dependency_archive'])]:
++        assert sha(ordinary(row['path']).read_bytes())==row['sha256'];shutil.copyfile(row['path'],inputs/name)
++    runtime=['common.py','inside.py','ownership.py','settlement.py','control.ps1','candidate.ps1','current-SelfTest.ps1','candidate-SelfTest.ps1','load-functions.ps1','author-one-case.ps1','pair-driver.ps1','observers.ps1','observer-catalog.json','variant-catalog.json','run-child.py','validate-abba.py']
++    for name in runtime:shutil.copyfile(here/name,inputs/name)
++    remaining=work_end-time.monotonic();assert remaining>30,'Insufficient bounded setup/cleanup budget'
++    execution_manifest={**m,'remaining_execution_seconds':remaining};save(inputs/'manifest.json',execution_manifest)
++    save(inputs/'source-before.json',{'head':m['source_head'],'origin_main':m['accepted_base'],'tree':m['head_tree'],'files':m['original_rows'],'dependencies':m['dependency_rows'],'host_current_identity_reference':'../output/host-source-before.json'})
++    save(inputs/'payload-hashes.json',{name:sha((inputs/name).read_bytes()) for name in runtime+['history.bundle','original.tar','dependencies.tar','manifest.json','source-before.json']})
++    assert host_guard(m,work_end)==before;bound()
+     command=['docker','run','--rm','--pull','never','--name',container_name,'--label','psstyleguide.validation-manifest='+label,'--network','none','--mount',f'type=bind,source={inputs},target=/input,readonly','--mount',f'type=bind,source={outputs},target=/output','--entrypoint','python',IMAGE,'/input/inside.py']
+     record.update(state='running',command=command);save(run/'status.json',record)
+-    try:
+-        with (run/'container.log').open('xb') as log:
+-            p=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+-            chunks=queue.Queue(maxsize=8)
+-            def drain():
+-                try:
+-                    while True:
+-                        data=p.stdout.read(65536)
+-                        chunks.put(data)
+-                        if not data:return
+-                except BaseException as error:chunks.put(error)
+-            reader=threading.Thread(target=drain,daemon=True);reader.start();deadline=host_deadline;total=0
++    with (run/'container.log').open('xb') as log:
++        process=subprocess.Popen(command,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
++        chunks=queue.Queue(maxsize=8)
++        def drain():
+             try:
+                 while True:
+-                    if time.monotonic()>deadline:raise subprocess.TimeoutExpired(command,600)
+-                    try:data=chunks.get(timeout=.1)
+-                    except queue.Empty:continue
+-                    if isinstance(data,BaseException):raise data
+-                    if not data:break
+-                    total+=len(data);assert total<=m['maximum_stream_bytes'],'Container log bound exceeded'
+-                    log.write(data);log.flush()
+-                    assert sum(f.stat().st_size for f in outputs.iterdir() if f.is_file())<=m['maximum_output_bytes'],'Output bound exceeded'
+-                p.wait(timeout=max(.01,deadline-time.monotonic()))
+-            finally:
+-                if p.poll() is None:
+-                    p.terminate()
+-                    try:p.wait(timeout=5)
+-                    except subprocess.TimeoutExpired:p.kill();p.wait(timeout=5)
+-                p.stdout.close()
+-            record['container_log_bytes']=total
+-    except (subprocess.TimeoutExpired,KeyboardInterrupt):
+-        # Never address a container by a broad name pattern or stop another run.
+-        inspected=subprocess.run(['docker','container','inspect',container_name],capture_output=True,timeout=10)
++                    data=process.stdout.read(65536);chunks.put(data)
++                    if not data:return
++            except BaseException as error:chunks.put(error)
++        reader=threading.Thread(target=drain,daemon=True);reader.start();total=0
++        while True:
++            assert time.monotonic()<work_end,'Whole run deadline/cleanup reserve reached'
++            try:data=chunks.get(timeout=.1)
++            except queue.Empty:bound();continue
++            if isinstance(data,BaseException):raise data
++            if not data:break
++            total+=len(data);assert total<=m['maximum_stream_bytes'];log.write(data);log.flush();bound()
++        process.wait(timeout=max(.01,work_end-time.monotonic()));record['container_exit']=process.returncode
++    result=json.loads((outputs/'result.json').read_bytes());assert process.returncode==0 and result['state']=='passed',result
++    judgment=json.loads((outputs/'abba-judgment.json').read_bytes());record['benefit_disposition']=judgment['disposition']
++    record['state']='collected';record['scope']='Not product acceptance; numerical benefit provisional until root consistency/interference and later full-suite net-cost gates.'
++except BaseException as error:
++    primary=error;record.update(state='failed',failure_type=type(error).__name__,failure=str(error),benefit_disposition='NO CHANGE')
++finally:
++    # Stop/remove only exact label+image-owned container, preserve primary failure,
++    # and never call eventual emptiness successful when forced cleanup was required.
++    try:
++        inspected=subprocess.run(['docker','container','inspect',container_name],capture_output=True,timeout=max(.01,min(5,whole_end-time.monotonic())))
+         if inspected.returncode==0:
+-            current=json.loads(inspected.stdout)[0]
+-            assert current['Config']['Labels'].get('psstyleguide.validation-manifest')==label and current['Image']==IMAGE
+-            stopped=subprocess.run(['docker','stop','--time','5',current['Id']],capture_output=True,timeout=10)
+-            record['bounded_stop']={'container_id':current['Id'],'exit':stopped.returncode}
+-        raise
+-    record['container_exit']=p.returncode
+-    result=json.loads((outputs/'result.json').read_bytes());assert p.returncode==0 and result['state']=='passed',result
+-    after=source_guard();save(outputs/'host-source-after.json',{'identity_sha256':sha((json.dumps(after,sort_keys=True,separators=(',',':'))).encode()),'equal_before':after==before,'complete_identity_reference':'../inputs/source-before.json'});assert after==before
+-    record.update(state='passed',source_after_equal=True)
+-except BaseException as error:
+-    primary=error
+-    record.update(state='failed',failure_type=type(error).__name__,failure=str(error))
++            current=json.loads(inspected.stdout)[0];assert current['Config']['Labels'].get('psstyleguide.validation-manifest')==label and current['Image']==IMAGE
++            record['required_container_removal']=True
++            removed=subprocess.run(['docker','rm','--force',current['Id']],capture_output=True,timeout=max(.01,min(5,whole_end-time.monotonic())))
++            record['owned_container_removal']={'id':current['Id'],'exit':removed.returncode};assert removed.returncode==0
++            if primary is None:primary=AssertionError('Unexpected remaining owned container required removal')
++        absent=subprocess.run(['docker','container','inspect',container_name],capture_output=True,timeout=max(.01,min(5,whole_end-time.monotonic())))
++        assert absent.returncode!=0 and b'No such container' in absent.stderr,'Container absence unconfirmed';record['container_absent']=True
++    except BaseException as error:
++        record['container_cleanup_failure']=str(error)
++        if primary is None:primary=error
+     try:
+-        after=source_guard();save(outputs/'host-source-after.json',{'identity_sha256':sha((json.dumps(after,sort_keys=True,separators=(',',':'))).encode()),'equal_before':after==before,'complete_identity_reference':'../inputs/source-before.json'});record['source_after_equal']=after==before
+-    except BaseException as guard_error:record['source_guard_error']=str(guard_error)
+-    raise
+-finally:
++        if process is not None:
++            if process.poll() is None:
++                process.terminate()
++                try:process.wait(timeout=max(.01,min(2,whole_end-time.monotonic())))
++                except subprocess.TimeoutExpired:process.kill();process.wait(timeout=max(.01,min(2,whole_end-time.monotonic())))
++                if primary is None:primary=AssertionError('Direct transport termination required')
++            record['container_exit']=process.returncode
++            if process.stdout is not None:process.stdout.close()
++    except BaseException as error:
++        record['transport_cleanup_failure']=str(error)
++        if primary is None:primary=error
+     try:
+-        inspected=subprocess.run(['docker','container','inspect',container_name],capture_output=True,timeout=10)
+-        if inspected.returncode==0:
+-            current=json.loads(inspected.stdout)[0]
+-            assert current['Config']['Labels'].get('psstyleguide.validation-manifest')==label and current['Image']==IMAGE
+-            removed=subprocess.run(['docker','rm','--force',current['Id']],capture_output=True,timeout=10)
+-            record['final_owned_container_cleanup']={'id':current['Id'],'exit':removed.returncode};assert removed.returncode==0
+-        absent=subprocess.run(['docker','container','inspect',container_name],capture_output=True,timeout=10)
+-        assert absent.returncode!=0 and b'No such container' in absent.stderr,'Container absence unconfirmed'
+-        record['container_absent']=True
+-    except BaseException as cleanup_error:
+-        record['container_cleanup_failure']=str(cleanup_error)
+-        if primary is None:primary=cleanup_error;record.update(state='failed',failure=str(cleanup_error))
+-    record['finished_at']=datetime.datetime.now(datetime.timezone.utc).isoformat();save(run/'status.json',record)
+-
++        after=host_guard(m,whole_end);save(outputs/'host-source-after.json',{'identity_sha256':sha(json.dumps(after,sort_keys=True,separators=(',',':')).encode()),'equal_before':after==before,'complete_identity_reference':'host-source-before.json'});assert after==before;record['source_after_equal']=True
++    except BaseException as error:
++        record['host_terminal_guard_failure']=str(error)
++        if primary is None:primary=error
++    try:bound();assert time.monotonic()<whole_end,'Whole 600s envelope exceeded'
++    except BaseException as error:
++        record['terminal_bound_failure']=str(error)
++        if primary is None:primary=error
++    if primary is not None:record.update(state='failed',failure_type=type(primary).__name__,failure=str(primary),benefit_disposition='NO CHANGE')
++    record['finished_utc']=datetime.datetime.now(datetime.timezone.utc).isoformat();record['whole_host_seconds']=time.monotonic()-start;save(run/'status.json',record)
+ if primary is not None:raise primary
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\run-child.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\run-child.py
+@@ -6,13 +6,13 @@
+ p=argparse.ArgumentParser();p.add_argument('--spec',type=pathlib.Path,required=True);a=p.parse_args()
+ s=json.loads(a.spec.read_bytes());out=a.spec.parent;m=json.loads(pathlib.Path('/input/manifest.json').read_bytes())
+ assert m['execution_authorized'] is True and m['prepared'] is True
+-assert s['variant'] in ['control','profile'] and s['timeout_seconds']==120
++assert s['variant'] in ['A1','B1','B2','A2'] and s['timeout_seconds']==120
+ assert len(s['command'])==6 and s['command'][1:5]==['-NoLogo','-NoProfile','-NonInteractive','-Command']
+ assert pathlib.Path(s['command'][0]).is_absolute() and pathlib.Path(s['cwd']).is_absolute()
+ assert sum(len(arg.encode('utf-8'))+1 for arg in s['command'])<=8192,'Selected argv exceeds unchanged identity receipt bound'
+ record={'state':'running','variant':s['variant'],'command':s['command'],'cwd':s['cwd'],'started_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(),'timeout_seconds':120,'combined_stream_limit_bytes':2097152,'event_limit':2000,'subreaper':own.enable_subreaper(),'anchor':own.anchor()}
+ result=out/(s['variant']+'-child.json');assert not result.exists()
+-child=None;identity=None;selector=None;files={};streams={};buffers={'stdout':bytearray(),'stderr':bytearray()};start=time.monotonic();failure=None;end=start+120;finished=None
++child=None;identity=None;selector=None;files={};streams={};buffers={'stdout':bytearray(),'stderr':bytearray()};start=time.monotonic();failure=None;end=min(start+120,json.loads((out/'envelope.json').read_bytes())['deadline_monotonic']-5);finished=None
+ save(result,record)
+ try:
+     child=subprocess.Popen(s['command'],cwd=s['cwd'],env=os.environ,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
+@@ -29,9 +29,9 @@
+             data=os.read(key.fileobj.fileno(),65536)
+             if not data:selector.unregister(key.fileobj);continue
+             assert sum(map(len,buffers.values()))+len(data)<=2097152,'Selected child combined stream bound'
+-            assert sum(p.stat().st_size for p in out.iterdir() if p.is_file())+len(data)<=2097152-262144,'Whole packet output reserve exceeded'
++            assert sum(p.stat().st_size for p in out.iterdir() if p.is_file())+pathlib.Path('/input/source-before.json').stat().st_size+len(data)<=2097152-262144,'Whole packet output reserve exceeded'
+             buffers[key.data].extend(data);files[key.data].write(data);files[key.data].flush()
+-            assert buffers['stderr'].count(b'PS235OBS|')+buffers['stderr'].count(b'PS235DIAG|')<=2000,'Event bound'
++            assert sum(path.read_bytes().count(b'PS235OBS|') for path in out.glob('*-stderr.txt'))<=2000,'Shared four-child event bound'
+         if finished is not None and not ready and time.monotonic()-finished>=.1:break
+     record['exit']=child.wait(timeout=max(.01,end-time.monotonic()))
+     record['whole_child_seconds']=time.monotonic()-start
+@@ -53,7 +53,7 @@
+         if selector is not None:selector.close()
+         for stream in streams.values():stream.close()
+         for stream in files.values():stream.close()
+-        receipt=own.cleanup_owned({child.pid} if child is not None else set(),time.monotonic()+2)
++        receipt=own.cleanup_owned({child.pid} if child is not None else set(),min(end+3,time.monotonic()+2))
+         record['cleanup']=receipt
+         require_successful_exited_children(receipt)
+         receipt['judgment']='successful_exited_children_only'
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\author-one-case.ps1
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\author-one-case.ps1
+@@ -268,8 +268,8 @@
+             ''' ' + $(if ($RequireLocal) { '-RequireLocal ' } else { '' }) +
+             '-Action { & $checker ' + $strCommandArguments +
+             ' } } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 } finally { try { if($global:PS235ObserverBreakpoints.Count){Remove-PSBreakpoint -Breakpoint $global:PS235ObserverBreakpoints -ErrorAction Stop} } catch { $global:PS235ObserverFailure=$true; try { [Console]::Error.WriteLine("PS235OBS|observer-cleanup-failed") } catch {} } }'
+-        $strCommand = '$global:PS235TimingCall=0L; $global:PS235TimingFailure=$false; $global:PS235ObserverFailure=$false; . /input/observers.ps1; ' + $strCommand + '; if($global:PS235TimingFailure -or $global:PS235ObserverFailure){exit 97}'
+-        if($script:PairVariant -cnotin @('control','profile')){throw 'Unexpected selected child'}
++        $strCommand = '$global:PS235ObserverFailure=$false; . /input/observers.ps1; ' + $strCommand + '; if($global:PS235ObserverFailure){exit 97}'
++        if($script:PairVariant -cnotin @('A1','B1','B2','A2')){throw 'Unexpected selected child'}
+         $strPairSpec=Join-Path $script:PairOutput ($script:PairVariant+'.spec.json')
+         if(Test-Path -LiteralPath $strPairSpec){throw 'Selected child must execute only once'}
+         $arrPairOriginal=[IO.File]::ReadAllBytes($Checker)
+@@ -278,8 +278,8 @@
+         try {
+             # The actual dispatcher has already selected B. Change only this private
+             # live checker after checkout; both immutable B/H objects stay identical.
+-            $strSelectedPath=if($script:PairVariant -ceq 'control'){'/input/control.ps1'}else{$script:PairProfile}
+-            $strSelectedHash=if($script:PairVariant -ceq 'control'){$script:PairCatalog.OriginalSha256}else{$script:PairCatalog.ProfileSha256}
++            $strSelectedPath=if($script:PairVariant.StartsWith('A',[StringComparison]::Ordinal)){'/input/control.ps1'}else{'/input/candidate.ps1'}
++            $strSelectedHash=if($script:PairVariant.StartsWith('A',[StringComparison]::Ordinal)){$script:PairCatalog.OriginalSha256}else{$script:PairCatalog.CandidateSha256}
+             [IO.File]::WriteAllBytes($Checker,[IO.File]::ReadAllBytes($strSelectedPath))
+             if((Get-FileHash -LiteralPath $Checker -Algorithm SHA256).Hash.ToLowerInvariant() -cne $strSelectedHash){throw 'Selected checker identity drift'}
+             [ordered]@{variant=$script:PairVariant;command=@($strHostPath,'-NoLogo','-NoProfile','-NonInteractive','-Command',$strCommand);cwd=(Get-Location).Path;timeout_seconds=120;checker_sha256=(Get-FileHash -LiteralPath $Checker -Algorithm SHA256).Hash.ToLowerInvariant();arguments=$Argument;clock=$Clock.ToString('o');require_local=$RequireLocal}|ConvertTo-Json -Depth 6|Set-Content -LiteralPath $strPairSpec -Encoding utf8NoBOM
+@@ -524,12 +524,12 @@
+         }
+         [IO.File]::WriteAllText($strRunbookPath, $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+         $strCurrentCandidate = & $scriptblockCommit
+-        $script:PairCase=[ordered]@{Role='current PS235 first actual author-finalization case';Baseline=$strBaseline;Candidate=$strCurrentCandidate;Clock=$objFixtureUtcNow.ToString('o');ExpectedDate=$strCurrentDate;ExpectedExit=0;ExpectedMessage="Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate";PriorEphemeralIdentityReplayed=$false}
++        $script:PairCase=[ordered]@{Role='D94.1 one fresh current actual author-finalization ABBA case';Baseline=$strBaseline;Candidate=$strCurrentCandidate;Clock=$objFixtureUtcNow.ToString('o');ExpectedDate=$strCurrentDate;ExpectedExit=0;ExpectedMessage="Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate";PriorEphemeralIdentityReplayed=$false}
+         $script:PairCase|ConvertTo-Json -Depth 5|Set-Content (Join-Path $script:PairOutput 'case.json') -Encoding utf8NoBOM
+-        $script:PairVariant='control'
+-        & $scriptblockCheck $strCurrentCandidate $true $false $true "Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate"
+-        $script:PairVariant='profile'
+-        & $scriptblockCheck $strCurrentCandidate $true $false $true "Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate"
++        foreach ($strABBAChild in @('A1','B1','B2','A2')) {
++            $script:PairVariant=$strABBAChild
++            & $scriptblockCheck $strCurrentCandidate $true $false $true "Author finalization UTC date checked: $strCurrentDate; B=$strBaseline H=$strCurrentCandidate"
++        }
+         return
+     } finally {
+         foreach ($strCleanupPath in @($strFixtureRoot, $strEmptyHooks)) {
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\pair-driver.ps1
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\pair-driver.ps1
+@@ -1,9 +1,8 @@
+ param([Parameter(Mandatory)][string]$RepositoryRootPath,[Parameter(Mandatory)][string]$OutputDirectory)
+ $ErrorActionPreference='Stop'
+ $script:PairOutput=$OutputDirectory
+-$script:PairProfile='/input/timing.ps1'
+ $script:PairChildRunner='/input/run-child.py'
+-$script:PairCatalog=Get-Content /input/profile-catalog.json -Raw|ConvertFrom-Json
++$script:PairCatalog=Get-Content /input/variant-catalog.json -Raw|ConvertFrom-Json
+ Push-Location $RepositoryRootPath
+ try {
+     . /input/load-functions.ps1 -SourceRoot $RepositoryRootPath
+@@ -11,7 +10,7 @@
+     $beforeBreakpoints=@(Get-PSBreakpoint).Count
+     Assert-AuthorFinalizationGitFixture -RepositoryRootPath $RepositoryRootPath
+     if(@(Get-PSBreakpoint).Count -ne $beforeBreakpoints){throw 'Actual parent clock cleanup drift'}
+-    & python /input/validate-pair.py $OutputDirectory
+-    if($LASTEXITCODE -ne 0){throw 'Current control/timing pair evidence differs'}
+-    'Current author diagnostic pair completed; one-case evidence only.'
++    & python /input/validate-abba.py $OutputDirectory
++    if($LASTEXITCODE -ne 0){throw 'Current ABBA evidence differs'}
++    'Current author ABBA collection completed; merit remains subject to declared gates.'
+ } finally { Pop-Location }
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\observer-catalog.json
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\observer-catalog.json
+@@ -1,12 +1,12 @@
+ [
+   {
+-    "variant": "control",
++    "variant": "A",
+     "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+     "lines": [
+       {
+         "kind": "parser-call",
+         "line": 3151,
+-        "anchor": "    $listAttemptEvidence = "
++        "anchor": "    $listAttemptEvidence = [Collections.Generic.List[string]]::new()"
+       },
+       {
+         "kind": "structural",
+@@ -26,27 +26,27 @@
+     ]
+   },
+   {
+-    "variant": "profile",
+-    "sha256": "a8a270de1df84aca2216f45c07e981315b5f45b78a6930fcdf95636f7d27b5a9",
++    "variant": "B",
++    "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+     "lines": [
+       {
+         "kind": "parser-call",
+-        "line": 3159,
+-        "anchor": "    $listAttemptEvidence = "
++        "line": 3151,
++        "anchor": "    $listAttemptEvidence = [Collections.Generic.List[string]]::new()"
+       },
+       {
+         "kind": "structural",
+-        "line": 335,
++        "line": 327,
+         "anchor": "        if ($UseNativeStructuralConversion) {"
+       },
+       {
+         "kind": "reuse",
+-        "line": 3789,
++        "line": 3775,
+         "anchor": "                if ($null -ne $objCopy) { return $objCopy.Context }"
+       },
+       {
+         "kind": "native-exit",
+-        "line": 3318,
++        "line": 3310,
+         "anchor": "        if ($intExitCode -ne 0) {"
+       }
+     ]
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\finalization-one\qualification\bindings.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\bindings.py
+@@ -61,20 +61,23 @@
+ def packet_guard(here,m):
+     for name,digest in m['packet_files'].items():
+         assert pathlib.PurePath(name).name==name and sha(ordinary(pathlib.Path(here)/name).read_bytes())==digest,name
+-    assert len(m['candidate_rows'])==78 and len(m['dependency_rows'])==1914
++    assert len(m['candidate_rows'])==78 and len(m['original_rows'])==78 and len(m['dependency_rows'])==1914
++    assert len(m['runtime_rows'])==54 and len(m['windows_runtimes'])==9
+     assert m['maximum_output_bytes']==2097152 and m['event_limit']==2000
+-    assert m['focus_total_seconds']==600 and m['focus_child_seconds']==300 and m['quality_total_seconds']==180
+-    for archive_key in ['candidate_archive','dependency_archive','analyzer_archive']:
+-        row=m[archive_key];assert sha(ordinary(row['path']).read_bytes())==row['sha256'],archive_key
++    assert (m['whole_timeout_seconds'],m['child_timeout_seconds'],m['driver_timeout_seconds'])==(600,120,520)
++    for key in ['original_archive','dependency_archive','history_bundle']:
++        row=m[key];data=ordinary(row['path']).read_bytes();assert sha(data)==row['sha256'] and len(data)==row['bytes'],key
++
+ 
+ def release(here,args):
+     raw=pathlib.Path(args.manifest).read_bytes();assert sha(raw)==args.approved_manifest_sha256
+     m=json.loads(raw)
+     assert args.execute_root_approved and m['execution_authorized'] is True and m['prepared'] is True
+-    assert m['authorizing_coordinator']=='root' and m['policy_role']=='empty-array-focused-correctness-only'
+-    assert args.mode in ['focus','quality'] and m['qualification_role']=='D94.1-final-byte-candidate-only'
++    assert m['authorizing_coordinator']=='root' and m['policy_role']=='D94.1-one-current-author-ABBA-benefit-only'
++    assert m['release_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release date'
+     assert not any(os.environ.get(k) for k in ['SKIP','CI','GITHUB_ACTIONS','GIT_INDEX_FILE','GIT_DIR','GIT_WORK_TREE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])
+-    assert m['release_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release date'
+     assert not any(k.startswith('GIT_CONFIG_') or k in ['GIT_COMMON_DIR','HUSKY'] for k in os.environ)
++    assert m['execution_count']==1 and m['auto_repeat'] is False and m['order']==['A1','B1','B2','A2']
++    assert m['benefit_gate']=={'both_matched_pairs_faster':True,'minimum_median_reduction_percent':5.0,'minimum_median_reduction_seconds':0.5,'root_interference_and_pair_consistency_required':True,'later_net_full_suite_cost_required':True,'absent_or_inconclusive':'NO CHANGE','resampling':False}
+     packet_guard(here,m)
+     return m,sha(raw)
+--- C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\current-author-diagnostic\validate-pair.py
++++ C:\Users\flesniak\AppData\Local\Temp\PSStyleGuide-A06-PS-carryback-20261006\round1-recovery-exhaustion\empty-array-trial\benefit-one\validate-abba.py
+@@ -1,68 +1,50 @@
+-"""Judge this pair's raw receipts. No subprocesses, imports of candidate or replay."""
+-import collections,json,pathlib,re,sys
++"""Finite ABBA raw-receipt judgment. No subprocess or candidate import."""
++import collections,json,math,pathlib,re,statistics,sys
+ from common import save,sha
+ from settlement import require_successful_exited_children
+-out=pathlib.Path(sys.argv[1]);case=json.loads((out/'case.json').read_bytes());catalog=json.loads(pathlib.Path('/input/profile-catalog.json').read_bytes())
++out=pathlib.Path(sys.argv[1]);case=json.loads((out/'case.json').read_bytes());catalog=json.loads(pathlib.Path('/input/variant-catalog.json').read_bytes())
++order=['A1','B1','B2','A2'];records={v:json.loads((out/(v+'-child.json')).read_bytes()) for v in order};specs={v:json.loads((out/(v+'.spec.json')).read_bytes()) for v in order}
+ assert case['PriorEphemeralIdentityReplayed'] is False and case['ExpectedExit']==0
+-records={v:json.loads((out/(v+'-child.json')).read_bytes()) for v in ['control','profile']}
+-specs={v:json.loads((out/(v+'.spec.json')).read_bytes()) for v in records}
+-for k in ['cwd','arguments','clock','require_local','timeout_seconds']:assert specs['control'][k]==specs['profile'][k],k
+-assert specs['control']['clock']==case['Clock'] and specs['control']['timeout_seconds']==120
+-assert specs['control']['checker_sha256']==catalog['OriginalSha256'] and specs['profile']['checker_sha256']==catalog['ProfileSha256']
+-assert specs['control']['command']==specs['profile']['command'],'Same argv including wrapper required'
+-parsed={};events=[]
+-for variant,r in records.items():
+-    assert r['state']=='completed' and r['exit']==0 and not any(k.endswith('failure') for k in r)
+-    require_successful_exited_children(r['cleanup'])
+-    assert r['cleanup']['judgment']=='successful_exited_children_only'
+-    rawstdout=(out/(variant+'-stdout.txt')).read_bytes();rawstderr=(out/(variant+'-stderr.txt')).read_bytes()
+-    assert sha(rawstdout)==r['stream_hashes']['stdout'] and sha(rawstderr)==r['stream_hashes']['stderr']
+-    assert case['ExpectedMessage'] in rawstdout.decode('utf-8'),'Exact current success oracle absent'
+-    counts=collections.Counter();exits=[];frequencies=[];nonmarkers=[];timings=[]
+-    for line in rawstderr.decode('utf-8').splitlines(keepends=True):
++assert re.fullmatch('[0-9a-f]{40}',case['Baseline']) and re.fullmatch('[0-9a-f]{40}',case['Candidate']) and case['Baseline']!=case['Candidate']
++assert case['Clock'].startswith(case['ExpectedDate']+'T') and catalog['SelfTestExecuted'] is False
++for v,s in specs.items():
++    assert s['variant']==v and s['timeout_seconds']==120
++    for key in ['cwd','arguments','clock','require_local','timeout_seconds','command']:assert s[key]==specs['A1'][key],(v,key)
++    assert s['clock']==case['Clock'] and s['checker_sha256']==catalog['OriginalSha256' if v.startswith('A') else 'CandidateSha256']
++    assert s['arguments']==['-InputRevision',case['Candidate'],'-PublishedBaselineRevision',case['Baseline'],'-FinalizeMetadataNow']
++parsed={};event_total=0;last_finished=None
++for v,r in records.items():
++    assert r['variant']==v and r['state']=='completed' and r['exit']==0 and not any(k.endswith('failure') for k in r)
++    require_successful_exited_children(r['cleanup']);assert r['cleanup']['judgment']=='successful_exited_children_only'
++    assert r['identity']['pid']==r['pid'] and isinstance(r['identity']['start_ticks'],int)
++    if last_finished is not None:assert r['started_utc']>=last_finished,'Selected children overlap/out of declared order'
++    last_finished=r['finished_utc']
++    elapsed=r['whole_child_seconds'];assert type(elapsed) in [int,float] and math.isfinite(elapsed) and 0<elapsed<=120
++    stdout=(out/(v+'-stdout.txt')).read_bytes();stderr=(out/(v+'-stderr.txt')).read_bytes()
++    assert sha(stdout)==r['stream_hashes']['stdout'] and sha(stderr)==r['stream_hashes']['stderr']
++    assert case['ExpectedMessage'] in stdout.decode('utf-8'),'Exact current success oracle absent'
++    counts=collections.Counter();exits=[];frequencies=[];other=[]
++    for line in stderr.decode('utf-8',errors='strict').splitlines(keepends=True):
+         text=line.rstrip('\r\n')
++        assert not text.startswith('PS235DIAG|'),'Phase/timing profile prohibited'
+         if text.startswith('PS235OBS|'):
+-            parts=text.split('|');kind=parts[1]
+-            if kind in ['parser-call','structural','generic','reuse']:
+-                assert len(parts)==2;counts[kind]+=1
+-            elif kind=='native-exit':assert len(parts)==3 and re.fullmatch(r'-?\d+',parts[2]);exits.append(int(parts[2]))
+-            elif kind=='frequency':assert len(parts)==3 and parts[2].isdigit();frequencies.append(int(parts[2]))
+-            else:raise AssertionError('Unknown/failed observer event')
+-        elif text.startswith('PS235DIAG|'):
+-            assert variant=='profile';parts=text.split('|');assert len(parts)==7
+-            assert all(re.fullmatch(r'-?\d+',parts[i]) for i in [1,4,5,6])
+-            timings.append(dict(call=int(parts[1]),phase=parts[2],edge=parts[3],tick=int(parts[4]),bytes=int(parts[5]),lines=int(parts[6])))
+-        else:nonmarkers.append(line)
++            fields=text.split('|');kind=fields[1];event_total+=1
++            if kind in ['parser-call','structural','generic','reuse']:assert len(fields)==2;counts[kind]+=1
++            elif kind=='native-exit':assert len(fields)==3 and re.fullmatch(r'-?\d+',fields[2]);exits.append(int(fields[2]))
++            elif kind=='frequency':assert len(fields)==3 and fields[2].isdigit();frequencies.append(int(fields[2]))
++            else:raise AssertionError('Unknown/failed observer marker')
++        else:other.append(line)
+     assert len(frequencies)==1 and frequencies[0]>0
+-    assert counts['parser-call']>0 and counts['structural']>0
+-    assert len(exits)==counts['parser-call'] and all(x==0 for x in exits),'Native exit consumers changed/failed'
+-    assert sum(counts.values())+len(exits)+len(frequencies)+len(timings)<=2000
+-    parsed[variant]=dict(counts=dict(counts),native_exits=exits,frequency=frequencies[0],nonmarker_stderr=''.join(nonmarkers),timings=timings,whole_child_seconds=r['whole_child_seconds'])
+-assert (out/'control-stdout.txt').read_bytes()==(out/'profile-stdout.txt').read_bytes()
+-for key in ['counts','native_exits','frequency','nonmarker_stderr']:assert parsed['control'][key]==parsed['profile'][key],key
+-allowed={'caller','native-parser','conversion-cold-inclusive','schema-envelope','schema-ranges','schema-prose','schema-tables','schema-blocks','schema-lists','schema-headings','schema-level-two','construction','snapshot-hit-copy','snapshot-store-copy'}
+-active={};spans=[];last=-1
+-for e in parsed['profile']['timings']:
+-    assert e['phase'] in allowed and e['edge'] in ['begin','end'] and e['call']>0 and e['tick']>=last
+-    last=e['tick'];key=(e['call'],e['phase'])
+-    if e['edge']=='begin':assert key not in active;active[key]=e
+-    else:
+-        assert key in active;begin=active.pop(key);assert e['tick']>=begin['tick']
+-        spans.append(dict(call=e['call'],phase=e['phase'],start=begin['tick'],end=e['tick'],seconds=(e['tick']-begin['tick'])/parsed['profile']['frequency'],input_bytes=begin['bytes'] if e['phase']=='caller' else None,input_lines=begin['lines'] if e['phase']=='caller' else None))
+-if active:
+-    save(out/'incomplete-spans.json',dict(state='failed_incomplete_spans',unclosed=list(active.values()),completed_spans=spans,imputation=False))
+-    raise AssertionError('Partial timing intervals preserved; no inferred split allowed')
+-callers={s['call']:s for s in spans if s['phase']=='caller'}
+-assert len(callers)==parsed['profile']['counts']['parser-call'] and len(callers)>0
+-for call,parent in callers.items():
+-    children=sorted([s for s in spans if s['call']==call and s['phase']!='caller'],key=lambda s:s['start'])
+-    assert all(parent['start']<=s['start']<=s['end']<=parent['end'] for s in children)
+-    assert all(a['end']<=b['start'] for a,b in zip(children,children[1:])), 'Overlapping sibling phases; no double count'
+-    parent['remainder_seconds']=parent['seconds']-sum(s['seconds'] for s in children)
+-    assert parent['remainder_seconds']>=0
+-ordered=sorted(callers.values(),key=lambda s:s['start']);assert all(a['end']<=b['start'] for a,b in zip(ordered,ordered[1:]))
+-totals={phase:dict(calls=sum(s['phase']==phase for s in spans),seconds=sum(s['seconds'] for s in spans if s['phase']==phase)) for phase in sorted(allowed)}
+-assert totals['conversion-cold-inclusive']['calls']==parsed['profile']['counts']['structural']
+-assert totals['snapshot-hit-copy']['calls']>=parsed['profile']['counts'].get('reuse',0)
+-caller_seconds=totals['caller']['seconds'];assert caller_seconds<=records['profile']['whole_child_seconds']
+-save(out/'pair-judgment.json',dict(state='passed_one_current_case',case=case,counts=parsed['profile']['counts'],native_exits=parsed['profile']['native_exits'],control_whole_child_seconds=records['control']['whole_child_seconds'],timing_whole_child_seconds=records['profile']['whole_child_seconds'],phase_totals=totals,caller_remainder_seconds=sum(s['remainder_seconds'] for s in callers.values()),timing_child_outside_caller_seconds=records['profile']['whole_child_seconds']-caller_seconds,spans=spans,stdout_equal=True,nonmarker_stderr_equal=True,same_argv_cwd_clock_revisions=True,scope='Timing-only diagnostic with shared debugger observer overhead; no performance target or product acceptance.',old_59_51_8_expected=False))
++    assert counts['parser-call']>0 and counts['structural']>0 and len(exits)==counts['parser-call'] and all(x==0 for x in exits)
++    parsed[v]={'counts':dict(counts),'native_exits':exits,'frequency':frequencies[0],'nonmarker_stderr':''.join(other),'whole_child_seconds':elapsed,'stdout_sha256':sha(stdout)}
++    assert stdout==(out/'A1-stdout.txt').read_bytes()
++    for key in ['counts','native_exits','frequency','nonmarker_stderr']:assert parsed[v][key]==parsed['A1'][key],(v,key)
++assert event_total<=2000 and len({(r['pid'],r['identity']['start_ticks']) for r in records.values()})==4
++pairs=[{'original':'A1','candidate':'B1'},{'original':'A2','candidate':'B2'}]
++for row in pairs:
++    a=parsed[row['original']]['whole_child_seconds'];b=parsed[row['candidate']]['whole_child_seconds']
++    row.update(original_seconds=a,candidate_seconds=b,reduction_seconds=a-b,reduction_percent=100*(a-b)/a,candidate_faster=b<a)
++a=statistics.median(parsed[v]['whole_child_seconds'] for v in ['A1','A2']);b=statistics.median(parsed[v]['whole_child_seconds'] for v in ['B1','B2']);gain=a-b;percent=100*gain/a
++numeric=all(p['candidate_faster'] for p in pairs) and gain>=.5 and percent>=5
++spreads={family:abs(parsed[family+'1']['whole_child_seconds']-parsed[family+'2']['whole_child_seconds']) for family in ['A','B']}
++save(out/'abba-judgment.json',{'state':'completed_one_ABBA_case','scope':'Whole fresh-child cold bootstrap/compilation included; no full-suite/net-added-SelfTest-cost or hosted-service remedy claim.','order':order,'same_argv_cwd_clock_revisions':True,'stdout_equal':True,'nonmarker_stderr_equal':True,'counts':parsed['A1']['counts'],'native_exits':parsed['A1']['native_exits'],'total_events':event_total,'times_seconds':{v:parsed[v]['whole_child_seconds'] for v in order},'matched_pairs':pairs,'median_original_seconds':a,'median_candidate_seconds':b,'median_reduction_seconds':gain,'median_reduction_percent':percent,'within_variant_spread_seconds':spreads,'matched_gain_spread_seconds':abs(pairs[0]['reduction_seconds']-pairs[1]['reduction_seconds']),'numeric_gate_met':numeric,'disposition':'PROVISIONAL NUMERICAL BENEFIT ONLY' if numeric else 'NO CHANGE','root_interference_and_pair_consistency_judgment':'pending; wide/inconsistent/interfered/unknown means NO CHANGE regardless of numerical gate','later_full_suite_net_cost_gate':'pending; author-case does not measure added permanent tests','resampling_authorized':False,'historical_counts_used_as_expected':False,'case':case})

@@ -1,0 +1,371 @@
+--- qualified-continuation/bindings.py
++++ final-byte/bindings.py
+@@ -61,20 +61,18 @@
+ def packet_guard(here,m):
+     for name,digest in m['packet_files'].items():
+         assert pathlib.PurePath(name).name==name and sha(ordinary(pathlib.Path(here)/name).read_bytes())==digest,name
+-    assert len(m['baseline_rows'])==len(m['candidate_rows'])==78 and len(m['dependency_rows'])==1914
++    assert len(m['candidate_rows'])==78 and len(m['dependency_rows'])==1914
+     assert m['maximum_output_bytes']==2097152 and m['event_limit']==2000
+     assert m['focus_total_seconds']==600 and m['focus_child_seconds']==300 and m['quality_total_seconds']==180
+-    for archive_key in ['baseline_archive','candidate_archive','dependency_archive','analyzer_archive']:
++    for archive_key in ['candidate_archive','dependency_archive','analyzer_archive']:
+         row=m[archive_key];assert sha(ordinary(row['path']).read_bytes())==row['sha256'],archive_key
+-    receipt=json.loads((pathlib.Path(here)/'ROOT-SYNTAX-RESULT.json').read_bytes())
+-    assert receipt['pwsh']=='7.6.5' and len(receipt['rows'])==2 and all(not r['errors'] for r in receipt['rows'])
+-    assert {r['file']:r['sha256'] for r in receipt['rows']}=={pathlib.Path(r['path']).name:r['sha256'] for r in m['candidate_rows'] if r['path'] in m['two_paths']}
++
+ def release(here,args):
+     raw=pathlib.Path(args.manifest).read_bytes();assert sha(raw)==args.approved_manifest_sha256
+     m=json.loads(raw)
+     assert args.execute_root_approved and m['execution_authorized'] is True and m['prepared'] is True
+     assert m['authorizing_coordinator']=='root' and m['policy_role']=='empty-array-focused-correctness-only'
+-    assert args.mode=='focus' and m['continuation_role']=='D07-private-recorder-repair-focus-only'
++    assert args.mode in ['focus','quality'] and m['qualification_role']=='D94.1-final-byte-candidate-only'
+     assert not any(os.environ.get(k) for k in ['SKIP','CI','GITHUB_ACTIONS','GIT_INDEX_FILE','GIT_DIR','GIT_WORK_TREE','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES'])
+     assert m['release_utc_date']==time.strftime('%Y-%m-%d',time.gmtime()),'Stale root release date'
+     assert not any(k.startswith('GIT_CONFIG_') or k in ['GIT_COMMON_DIR','HUSKY'] for k in os.environ)
+--- qualified-continuation/compare.py
++++ final-byte/compare.py
+@@ -6,7 +6,9 @@
+     'many strings':'["","one","\\u00e9\\ud83d\\ude03","2026-10-06T23:00:00Z"]',
+     'missing':'','null field':'null','scalar string':'"text"','scalar number':'1',
+     'scalar Boolean':'true','object field':'{}','nested array':'[["text"]]',
+-    'object element':'[{}]','bad first':'[1,"text"]','bad last':'["text",false]'
++    'object element':'[{}]','bad first':'[1,"text"]','bad last':'["text",false]',
++    'null element':'[null]','null first string':'[null,"text"]','null last string':'["text",null]',
++    'null first number':'[null,1]','null last number':'[1,null]'
+ }
+ FAMILIES=['proseBlocks','tableRows','topLevelListItems']
+ FIELDS=['code','links']
+@@ -63,73 +65,57 @@
+         expected_message=("The property '"+tag['field']+"' cannot be found on this object. Verify that the property exists.") if tag['name']=='missing' else FAILURES[tag['family']]
+         assert event['failure'] is not None and event['failure']['message']==expected_message and event['emitted']==0
+ 
++def key(event):
++    tag=event['case']
++    if tag=={'name':'natural-plain','mutate':False}:return ('natural-plain',)
++    return (tag['family'],tag['field'],tag['json'])
++
+ def compare(root):
+-    root=pathlib.Path(root)
+-    records=[json.loads((root/v/'focus.json').read_bytes()) for v in ['baseline','candidate']]
+-    for variant,r in zip(['baseline','candidate'],records):
+-        assert r['state']=='passed' and r['variant']==variant and r['failure'] is None
+-        assert not r['restoration_failures'] and not r['observation_failures']
+-        helpers={'Get-MarkdownParseContext','Invoke-MarkdownParserProcess','ConvertFrom-ParserJsonContext','Copy-MarkdownParseReuseContext','Get-NodeApplicationContext','Get-MarkdownParseReuseSlot','Clear-MarkdownParseReuseSlot'}
+-        assert len(r['helper_receipts'])==4 and [x['check'] for x in r['helper_receipts']]==[x['name'] for x in r['checks']]
+-        assert all(set(x['helpers'])==helpers and x['before'] is True and x['after'] is True for x in r['helper_receipts'])
+-        assert r['terminal_definitions_restored'] is True
+-        assert [x['name'] for x in r['checks']]==['Assert-MarkdownStringArrayContextSelfTest','Assert-MarkdownParseReuseSelfTest','Assert-ParserJsonConversionSelfTest','private-null']
+-        assert all(x['state']=='passed' for x in r['checks'][:3]) and r['checks'][3]=={'name':'private-null','state':'collected','cases':30}
+-        assert len(r['events'])+len(r['converter_events'])<=1000
+-        assert len(r['converter_events'])==78
+-        assert len({(x['input'],x['maximum_bytes'],x['native']) for x in r['converter_events']})==78
+-        for seq,event in enumerate(r['converter_events'],1):
+-            assert type(event['sequence']) is int and event['sequence']==seq
+-            assert type(event['native']) is bool and type(event['maximum_bytes']) is int
+-            assert type(event['emitted']) is int and (event['failure'] is None or event['emitted']==0)
+-            for field in ['input','typed_ledger']:
+-                digest=event[field];data=(root/'data'/(digest+'.utf8')).read_bytes()
+-                assert hashlib.sha256(data).hexdigest()==digest and len(data)<=65536
+-                data.decode('utf-8',errors='strict')
+-            nodes=json.loads((root/'data'/(event['typed_ledger']+'.utf8')).read_bytes())
+-            assert nodes[0]['path']==[] and nodes[0]['kind']=='array' and nodes[0]['type']=='System.Object[]' and nodes[0]['count']==event['emitted']
+-        for seq,event in enumerate(r['events'],1):
+-            assert type(event['sequence']) is int and event['sequence']==seq
+-            assert type(event['emitted']) is int and event['emitted']>=0 and (event['failure'] is None or event['emitted']==0)
+-            for field in ['input','parser_output','decoder_input','typed_output']:
+-                digest=event[field]
+-                if digest is None:continue
+-                assert len(digest)==64 and all(c in '0123456789abcdef' for c in digest)
+-                data=(root/'data'/(digest+'.utf8')).read_bytes()
+-                assert hashlib.sha256(data).hexdigest()==digest and len(data)<=65536
+-                data.decode('utf-8',errors='strict')
+-            typed=json.loads((root/'data'/(event['typed_output']+'.utf8')).read_bytes())
+-            assert typed['kind']=='array' and typed['type']=='System.Object[]' and len(typed['items'])==event['emitted']
+-        finite=[x for x in r['events'] if x['check']=='Assert-MarkdownStringArrayContextSelfTest']
+-        assert len(finite)==79 and finite[0]['case']=={'name':'natural-plain','mutate':False}
+-        finite_expected={(f,k,n,fragment) for f in FAMILIES for k in FIELDS for n,fragment in CASES.items()}
+-        assert {(x['case']['family'],x['case']['field'],x['case']['name'],x['case']['json']) for x in finite[1:]}==finite_expected
+-        for event in finite:case_proof(root,event)
+-        null=[x for x in r['events'] if x['check']=='private-null']
+-        expected={(family,field,fragment) for family in ['proseBlocks','tableRows','topLevelListItems'] for field in ['code','links'] for fragment in ['[null]','[null,"text"]','["text",null]','[null,1]','[1,null]']}
+-        actual={(x['case']['family'],x['case']['field'],x['case']['json']) for x in null}
+-        assert len(null)==30 and actual==expected
+-        assert all(x['parser_calls']==1 and x['decoder_calls']==1 and x['decoder_input'] is not None for x in null)
+-        for event in null:case_proof(root,event)
+-    assert records[0]['parser_calls']==records[1]['parser_calls'] and records[0]['decoder_calls']==records[1]['decoder_calls']
+-    # Hashes address exact, inspectable UTF-8 data. Equality is established only
+-    # after both blobs have independently been decoded and verified above.
+-    assert len(records[0]['events'])==len(records[1]['events'])
+-    for left,right in zip(records[0]['events'],records[1]['events']):
+-        assert strict_equal({k:v for k,v in left.items() if k not in ['typed_output','decoder_input','parser_output']},{k:v for k,v in right.items() if k not in ['typed_output','decoder_input','parser_output']}),'Case identity/count/refusal/input receipts differ'
+-        for field in ['typed_output','decoder_input','parser_output']:
+-            assert (left[field] is None)==(right[field] is None)
+-            if left[field] is None:continue
+-            a=json.loads((root/'data'/(left[field]+'.utf8')).read_bytes())
+-            b=json.loads((root/'data'/(right[field]+'.utf8')).read_bytes())
+-            assert strict_equal(a,b),'Decoded complete contexts/types/values/raw JSON differ'
+-    for left,right in zip(records[0]['converter_events'],records[1]['converter_events']):
+-        assert strict_equal({k:v for k,v in left.items() if k!='typed_ledger'},{k:v for k,v in right.items() if k!='typed_ledger'}),'Converter identity/refusal/raw-input receipts differ'
+-        a=json.loads((root/'data'/(left['typed_ledger']+'.utf8')).read_bytes())
+-        b=json.loads((root/'data'/(right['typed_ledger']+'.utf8')).read_bytes())
+-        assert strict_equal(a,b),'Complete converter value/type/property-order ledger differs'
+-    assert sum(len(r['events'])+len(r['converter_events']) for r in records)<=2000
+-    return {'state':'passed_differential','variants':['baseline','candidate'],'events_each':len(records[0]['events']),
+-            'converter_calls_each':78,'finite_cases_each':79,'null_cases_each':30,'parser_calls_each':records[0]['parser_calls'],
+-            'decoder_calls_each':records[0]['decoder_calls'],'raw_data_independently_verified':True,
+-            'limit':'Focus correctness only; no runtime gain, full-suite, policy or CI acceptance.'}
++    # Previous case data supplies a proven expectation only, never a stitched status.
++    root=pathlib.Path(root);here=pathlib.Path(__file__).resolve().parent
++    current=json.loads((root/'candidate/focus.json').read_bytes())
++    assert current['state']=='passed' and current['variant']=='candidate' and current['failure'] is None
++    assert not current['restoration_failures'] and not current['observation_failures']
++    assert current['terminal_definitions_restored'] is True
++    assert current['checks']==[{'name':'Assert-MarkdownStringArrayContextSelfTest','state':'passed'}]
++    assert current['converter_events']==[]
++    helpers={'Get-MarkdownParseContext','Invoke-MarkdownParserProcess','ConvertFrom-ParserJsonContext','Copy-MarkdownParseReuseContext','Get-NodeApplicationContext','Get-MarkdownParseReuseSlot','Clear-MarkdownParseReuseSlot'}
++    assert len(current['helper_receipts'])==1
++    h=current['helper_receipts'][0]
++    assert h['check']=='Assert-MarkdownStringArrayContextSelfTest' and h['before'] is True and h['after'] is True
++    assert len(h['helpers'])==7 and set(h['helpers'])==helpers
++    platform={'7.6.5':'windows','7.6.3':'linux'}[current['pwsh']]
++    prior=json.loads((here/'proven-cases.json').read_bytes())[platform]
++    assert len(prior['events'])==109
++    known={key(e):e for e in prior['events']};assert len(known)==109
++    events=current['events'];assert len(events)==109
++    expected=[{'name':'natural-plain','mutate':False}]+[{'family':f,'field':k,'name':n,'json':fragment} for f in FAMILIES for k in FIELDS for n,fragment in CASES.items()]
++    assert strict_equal([e['case'] for e in events],expected),'Final109 exact case identities/order differ'
++    assert type(current['parser_calls']) is int and current['parser_calls']==109
++    assert type(current['decoder_calls']) is int and current['decoder_calls']==109
++    def blob(digest,old=False):
++        assert len(digest)==64 and all(c in '0123456789abcdef' for c in digest)
++        data=((here/('proof-'+digest+'.utf8')) if old else (root/'data'/(digest+'.utf8'))).read_bytes()
++        assert hashlib.sha256(data).hexdigest()==digest and len(data)<=65536
++        data.decode('utf-8',errors='strict');return data
++    for seq,event in enumerate(events,1):
++        assert type(event['sequence']) is int and event['sequence']==seq
++        assert event['check']=='Assert-MarkdownStringArrayContextSelfTest'
++        assert type(event['emitted']) is int and event['emitted']>=0
++        assert event['failure'] is None or event['emitted']==0
++        for field in ['input','parser_output','decoder_input','typed_output']:blob(event[field])
++        typed=json.loads(blob(event['typed_output']))
++        assert typed['kind']=='array' and typed['type']=='System.Object[]' and len(typed['items'])==event['emitted']
++        case_proof(root,event)
++        previous=known[key(event)]
++        excluded={'sequence','check','case','input','parser_output','decoder_input','typed_output'}
++        assert strict_equal({k:v for k,v in event.items() if k not in excluded},{k:v for k,v in previous.items() if k not in excluded}),'Native/count/input-shape/refusal receipts differ from proven case'
++        assert blob(event['input'])==blob(previous['input'],True),'Actual Markdown input differs'
++        for field in ['parser_output','decoder_input','typed_output']:
++            assert strict_equal(json.loads(blob(event[field])),json.loads(blob(previous[field],True))),'Complete decoded raw/context/value/type data differs from proven case'
++    assert sum(e['parser_calls'] for e in events)==current['parser_calls']
++    assert sum(e['decoder_calls'] for e in events)==current['decoder_calls']
++    return {'state':'passed_final_case_receipts','platform':platform,'variant':'candidate','exact_cases':109,
++            'real_parser_calls':109,'structural_decoder_calls':109,'previous_case_data_compared':109,
++            'previous_source_receipt_sha256':prior['source_receipt_sha256'],
++            'scope':'Final permanent SelfTest integration only; no stitched old status, baseline/reuse/converter/private-null replay, runtime gain or broad acceptance.'}
+--- qualified-continuation/windows.py
++++ final-byte/windows.py
+@@ -18,7 +18,7 @@
+  except BaseException as error:r.update(exit=125,failure=str(error))
+  r['finished_utc']=now();save(spec['worker_result'],r)
+  raise SystemExit(r['exit'] if 0<=r['exit']<=255 else 1)
+-p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus'],required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus','quality'],required=True);a=p.parse_args()
+ m,label=release(HERE,a)
+ assert os.name=='nt' and sys.version_info[:3]==(3,12,10)
+ assert Path(sys.executable).resolve()==Path(m['windows_runtimes']['python']['path']).resolve()
+@@ -51,7 +51,7 @@
+  def close(self):checked(K.CloseHandle(self.handle));self.handle=None
+ 
+ started=LAUNCH_START;deadline=started+(m['focus_total_seconds'] if a.mode=='focus' else m['quality_total_seconds'])
+-run=HERE/'runs'/('windows-'+a.mode+'-continuation-one');run.mkdir(parents=True,exist_ok=False)
++run=HERE/'runs'/('windows-'+a.mode+'-final-byte-one');run.mkdir(parents=True,exist_ok=False)
+ out=run/'output';out.mkdir();tmp=run/'tmp';tmp.mkdir();home=run/'home';home.mkdir()
+ record={'state':'preparing','platform':'Windows','mode':a.mode,'started_utc':now(),'manifest_sha256':label,'stages':[],'primary_failure':None,'cleanup_failures':[]}
+ save(out/'result.json',record)
+@@ -115,7 +115,7 @@
+ before=None
+ try:
+  before=host_guard(m,deadline);save(out/'source-before.json',before)
+- for variant in (['baseline','candidate'] if a.mode=='focus' else ['candidate']):
++ for variant in ['candidate']:
+   fixture=run/variant;fixture.mkdir();rows=m[variant+'_rows']
+   unpack(m[variant+'_archive']['path'],fixture,rows);unpack(m['dependency_archive']['path'],fixture,m['dependency_rows'])
+   fixture_guard(fixture,rows,m['dependency_rows'])
+--- qualified-continuation/inside.py
++++ final-byte/inside.py
+@@ -103,7 +103,7 @@
+     if mode=='quality':
+         analyzer=work/'analyzer';analyzer.mkdir();unpack('analyzer.tar',analyzer,m['analyzer_rows'])
+         os.environ['PSModulePath']=str(analyzer)+':/opt/microsoft/powershell/7/Modules'
+-    for variant in (['baseline','candidate'] if mode=='focus' else ['candidate']):
++    for variant in ['candidate']:
+         fixture=work/variant;fixture.mkdir();rows=m[variant+'_rows']
+         unpack(variant+'.tar',fixture,rows);unpack('dependencies.tar',fixture,m['dependency_rows'])
+         fixture_guard(fixture,rows,m['dependency_rows'])
+--- qualified-continuation/launch.py
++++ final-byte/launch.py
+@@ -4,7 +4,7 @@
+ from bindings import host_guard,output_guard,packet_guard,release,save,sha
+ HERE=pathlib.Path(__file__).resolve().parent
+ START=time.monotonic()
+-p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus'],required=True);a=p.parse_args()
++p=argparse.ArgumentParser();p.add_argument('--execute-root-approved',action='store_true');p.add_argument('--manifest',required=True);p.add_argument('--approved-manifest-sha256',required=True);p.add_argument('--mode',choices=['focus','quality'],required=True);a=p.parse_args()
+ m,label=release(HERE,a)
+ assert os.name=='nt' and sys.version_info[:3]==(3,12,10)
+ assert pathlib.Path(sys.executable).resolve()==pathlib.Path(m['windows_runtimes']['python']['path']).resolve()
+@@ -12,9 +12,9 @@
+ assert m['image']==IMAGE
+ now=lambda:datetime.datetime.now(datetime.timezone.utc).isoformat()
+ deadline=START+(m['focus_total_seconds'] if a.mode=='focus' else m['quality_total_seconds'])
+-run=HERE/'runs'/('linux-'+a.mode+'-continuation-one');run.mkdir(parents=True,exist_ok=False)
++run=HERE/'runs'/('linux-'+a.mode+'-final-byte-one');run.mkdir(parents=True,exist_ok=False)
+ inputs=run/'inputs';out=run/'output';inputs.mkdir();out.mkdir()
+-name='ps235-empty-array-'+a.mode+'-continuation-one'
++name='ps235-empty-array-'+a.mode+'-final-byte-one'
+ record={'state':'preparing','mode':a.mode,'manifest_sha256':label,'started_utc':now(),'primary_failure':None,'cleanup_failures':[],'container_absent':False}
+ primary=None;before=None;process=None;stream=None;reader=None;launched=False;owned_id=None
+ save(run/'status.json',record)
+@@ -45,14 +45,15 @@
+     assert inspect() is None,'Exact new container name already exists; refuse release'
+     # Read-only mounts contain only new private byte copies; never mount a product/dependency root.
+     save(inputs/'manifest.json',m);(inputs/'mode.txt').write_text(a.mode+'\n',encoding='utf-8')
+-    names=['inside.py','bindings.py','compare.py','ownership.py','settlement.py','focus.ps1','quality.ps1','candidate-test.ps1','ROOT-SYNTAX-RESULT.json']
++    names=['inside.py','bindings.py','compare.py','ownership.py','settlement.py','focus.ps1','quality.ps1','candidate-test.ps1']
++    names += ['proven-cases.json'] + m['proof_blob_files']
+     for filename in names:shutil.copyfile(HERE/filename,inputs/filename)
+-    for key,filename in [('baseline_archive','baseline.tar'),('candidate_archive','candidate.tar'),('dependency_archive','dependencies.tar')]:
++    for key,filename in [('candidate_archive','candidate.tar'),('dependency_archive','dependencies.tar')]:
+         shutil.copyfile(m[key]['path'],inputs/filename);assert sha((inputs/filename).read_bytes())==m[key]['sha256']
+     if a.mode=='quality':
+         shutil.copyfile(m['analyzer_archive']['path'],inputs/'analyzer.tar');assert sha((inputs/'analyzer.tar').read_bytes())==m['analyzer_archive']['sha256']
+         names.append('analyzer.tar')
+-    names+=['baseline.tar','candidate.tar','dependencies.tar','manifest.json','mode.txt']
++    names+=['candidate.tar','dependencies.tar','manifest.json','mode.txt']
+     save(inputs/'payload-hashes.json',{filename:sha((inputs/filename).read_bytes()) for filename in names})
+     assert host_guard(m,deadline-15)==before
+     assert time.monotonic()<deadline-30,'Insufficient execution and exact-owned cleanup envelope'
+@@ -81,7 +82,7 @@
+         record['container_exit']=process.wait(timeout=max(.01,deadline-15-time.monotonic()))
+     result=json.loads((out/'result.json').read_bytes())
+     assert record['container_exit']==0 and result['state']=='passed',result
+-    if a.mode=='focus':assert json.loads((out/'differential.json').read_bytes())['state']=='passed_differential'
++    if a.mode=='focus':assert json.loads((out/'differential.json').read_bytes())['state']=='passed_final_case_receipts'
+     record['state']='passed'
+ except BaseException as error:
+     primary=error;record.update(state='failed',primary_failure=str(error),failure_type=type(error).__name__)
+--- qualified-continuation/focus.ps1
++++ final-byte/focus.ps1
+@@ -227,7 +227,7 @@
+ 
+ try {
+     Save-Record
+-    foreach ($strCheck in @('Assert-MarkdownStringArrayContextSelfTest', 'Assert-MarkdownParseReuseSelfTest', 'Assert-ParserJsonConversionSelfTest')) {
++    foreach ($strCheck in @('Assert-MarkdownStringArrayContextSelfTest')) {
+         $hashtableObservation.Check = $strCheck
+         foreach ($strName in $hashtableObserverDefinitions.Keys) {
+             if (-not [object]::ReferenceEquals((Get-Item -LiteralPath ('Function:' + $strName)).ScriptBlock, $hashtableObserverDefinitions[$strName])) {
+@@ -243,73 +243,6 @@
+         $listHelperReceipts.Add(@{ check = $strCheck; before = $true; after = $true; helpers = [string[]]@($hashtableObserverDefinitions.Keys) })
+         $listChecks.Add(@{ name = $strCheck; state = 'passed' }); Save-Record
+     }
+-    foreach ($strName in $hashtableObserverDefinitions.Keys) {
+-        if (-not [object]::ReferenceEquals((Get-Item -LiteralPath ('Function:' + $strName)).ScriptBlock, $hashtableObserverDefinitions[$strName])) {
+-            throw ('Observer helper changed before null differential: ' + $strName)
+-        }
+-    }
+-    # Thirty private null cases; no newly asserted null-admission rule.
+-    $hashtableObservation.Check = 'private-null'
+-    $hashtableNullFixture = @{ Family = ''; Field = ''; Json = ''; Processes = 0 }
+-    $scriptBlockObservedParser = ${function:Invoke-MarkdownParserProcess}
+-    function Invoke-PrivateNullCase {
+-        param()
+-        function Invoke-MarkdownParserProcess {
+-            param($StartInfo, $Content)
+-            $objActualResult = & $scriptBlockObservedParser -StartInfo $StartInfo -Content $Content
+-            $hashtableNullFixture.Processes++
+-            $hashtableRaw = $objActualResult.Output | ConvertFrom-Json -AsHashtable
+-            $hashtableRecord = if ($hashtableNullFixture.Family -ceq 'tableRows') { $hashtableRaw.tableRows[0].cells[0] } else {
+-                $hashtableRaw[$hashtableNullFixture.Family][0]
+-            }
+-            $objValue = & $scriptBlockQualificationDecoder -Content ('{"value":' + $hashtableNullFixture.Json + '}') -MaximumBytes 4096
+-            $hashtableRecord[$hashtableNullFixture.Field] = $objValue.value
+-            $objActualResult.Output = $hashtableRaw | ConvertTo-Json -Depth 20 -Compress
+-            return $objActualResult
+-        }
+-        $strMarkdown = @('# Title', '', 'Text `code` [link](https://example.invalid).', '',
+-            '- Item `code` [link](https://example.invalid)', '',
+-            '| Field | Value |', '| --- | --- |', '| Cell | `code` [link](https://example.invalid) |') -join "`n"
+-        $intBefore = $hashtableNullFixture.Processes
+-        $intBeforeEvents = $listEvents.Count
+-        $objNullFailure = $null
+-        $intLineCount = @([regex]::Split($strMarkdown, '\r\n|\r|\n')).Count
+-        try { $null = Get-MarkdownParseContext -Content $strMarkdown -LineCount $intLineCount } catch { $objNullFailure = $_ }
+-        if ($hashtableNullFixture.Processes -ne $intBefore + 1 -or $listEvents.Count -ne $intBeforeEvents + 1) {
+-            throw 'Null differential lost its one real parser call or context receipt.'
+-        }
+-        $objEvent = $listEvents[$listEvents.Count - 1]
+-        if ($objEvent.parser_calls -ne 1 -or $objEvent.decoder_calls -ne 1 -or $null -eq $objEvent.decoder_input) {
+-            throw 'Null differential lacks real parser/structural decoder evidence.'
+-        }
+-        if ($null -ne $objNullFailure) {
+-            $strExpected = switch ($hashtableNullFixture.Family) {
+-                'proseBlocks' { 'The locked Markdown parser returned a malformed prose block.' }
+-                'tableRows' { 'The locked Markdown parser returned a malformed table cell.' }
+-                'topLevelListItems' { 'The locked Markdown parser returned a malformed top-level list item.' }
+-            }
+-            if ($objNullFailure.Exception.Message -cne $strExpected -or $objEvent.emitted -ne 0) {
+-                throw 'Null differential collected an unrelated failure or partial output.'
+-            }
+-        } elseif ($objEvent.emitted -ne 1) { throw 'Null differential success lost its context.' }
+-    }
+-    foreach ($strFamily in @('proseBlocks', 'tableRows', 'topLevelListItems')) {
+-        $hashtableNullFixture.Family = $strFamily
+-        foreach ($strField in @('code', 'links')) {
+-            $hashtableNullFixture.Field = $strField
+-            foreach ($strJson in @('[null]', '[null,"text"]', '["text",null]', '[null,1]', '[1,null]')) {
+-                $hashtableNullFixture.Json = $strJson
+-                Invoke-PrivateNullCase
+-            }
+-        }
+-    }
+-    foreach ($strName in $hashtableObserverDefinitions.Keys) {
+-        if (-not [object]::ReferenceEquals((Get-Item -LiteralPath ('Function:' + $strName)).ScriptBlock, $hashtableObserverDefinitions[$strName])) {
+-            throw ('Null differential leaked a helper definition: ' + $strName)
+-        }
+-    }
+-    $listHelperReceipts.Add(@{ check = 'private-null'; before = $true; after = $true; helpers = [string[]]@($hashtableObserverDefinitions.Keys) })
+-    $listChecks.Add(@{ name = 'private-null'; state = 'collected'; cases = 30 })
+     if ($listObservationFailures.Count) { throw 'Observation failed; collected cases cannot be accepted.' }
+     $strState = 'passed'
+ } catch {
+@@ -335,4 +268,4 @@
+ }
+ if ($null -ne $objPrimaryFailure) { throw $objPrimaryFailure }
+ if ($listRestorationFailures.Count) { throw 'Helper restoration or terminal receipt failed.' }
+-Write-Output 'Focused correctness and thirty null cases completed; differential comparison remains required.'
++Write-Output 'Final109-case candidate SelfTest completed; proven-case receipt comparison remains required.'
+--- qualified-continuation/quality.ps1
++++ final-byte/quality.ps1
+@@ -13,16 +13,9 @@
+     $strPath = Join-Path $SourceRoot ('.github/workflows/' + $strName)
+     $strHash = (Get-FileHash -LiteralPath $strPath -Algorithm SHA256).Hash.ToLowerInvariant()
+     $arrErrors = @()
+-    $strParseBasis = 'current Linux ParseFile'
+-    if ($IsWindows) {
+-        # Root already ran exactly these archived bytes under the pinned Windows runtime.
+-        $objReceipt = Get-Content -Raw -LiteralPath (Join-Path $PacketRoot 'ROOT-SYNTAX-RESULT.json') | ConvertFrom-Json
+-        $strParseBasis = 'ROOT-SYNTAX-RESULT.json: exact archived bytes; no repeated Windows ParseFile'
+-        # The host launcher verifies the immutable receipt/hash/runtime binding before this child.
+-    } else {
+-        $arrTokens = $null
+-        $null = [Management.Automation.Language.Parser]::ParseFile($strPath, [ref]$arrTokens, [ref]$arrErrors)
+-    }
++    $strParseBasis = 'exact final bytes / current ParseFile on this platform'
++    $arrTokens = $null
++    $null = [Management.Automation.Language.Parser]::ParseFile($strPath, [ref]$arrTokens, [ref]$arrErrors)
+     $arrDiagnostics = @(Invoke-ScriptAnalyzer -Path $strPath -Severity Warning,Error)
+     $listRows.Add(@{ name = $strName; sha256 = $strHash; parser_basis = $strParseBasis
+             parser_errors = @($arrErrors | ForEach-Object { $_.Message })

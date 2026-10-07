@@ -1,0 +1,41 @@
+{
+  "state": "ROOT_ABBA_PREPARATION_PASS_NO_PAYLOAD",
+  "utc": "2026-10-07T00:52:44.549712+00:00",
+  "prepared_manifest_sha256": "30f142d0c7be5981357722f5fbb3c79bfbc1526819b66b1a8437208da92e8f75",
+  "compiled_private_python": {
+    "bindings.py": "ba38ea7e2e77a2d641d0493edb676a229068a5031429f46ba68f8508066a7413",
+    "common.py": "0bd76089b1acf5c8216a1535ad4c6cfc6749aa862965c285ec98a2ebb5157708",
+    "inside.py": "5fabc34b60382eb83f556969ace75ece2ffe511936e4a404247b967c9840b927",
+    "launch.py": "8018b5e0ab4363a28a988c7ba2baa31c8d3376b39a4eac5c622fb56d5d0dd792",
+    "ownership.py": "798be0f4f89c883856715ea0b44e6b3f183caab64ac60c3828b232ee4ee0fcad",
+    "run-child.py": "83145941dd6bb49cddf8bf9921497e4d92b3f08f5a24312bbe6ff53d227ed70b",
+    "settlement.py": "2005ec2b9c7541673f7dfbd837f9bccd6a99ca513ac2d85c556a33ab0db0452b",
+    "validate-abba.py": "85b2087c582a495bda445e5f724552eeda1e9071bc51d33326bf8024e8f02ac7"
+  },
+  "changed_private_powershell_parse": [
+    {
+      "name": "author-one-case.ps1",
+      "errors": []
+    },
+    {
+      "name": "pair-driver.ps1",
+      "errors": []
+    }
+  ],
+  "four_plain_source_files_exact": true,
+  "observer_anchors_verified": 8,
+  "unchanged_qualified_infrastructure_reused": true,
+  "previous_archive_member_proof_reused_by_exact_hash": true,
+  "current_host_guard_pass": true,
+  "benefit_gate": {
+    "both_matched_pairs_faster": true,
+    "minimum_median_reduction_percent": 5.0,
+    "minimum_median_reduction_seconds": 0.5,
+    "root_interference_and_pair_consistency_required": true,
+    "later_net_full_suite_cost_required": true,
+    "absent_or_inconclusive": "NO CHANGE",
+    "resampling": false
+  },
+  "source_and_fixture_boundary": "Final host two-script candidate bound; same original H fixture B/H data and original SelfTest loader; only checker differs.",
+  "scope": "One-shot ABBA readiness only; performance and product acceptance remain unproved."
+}
