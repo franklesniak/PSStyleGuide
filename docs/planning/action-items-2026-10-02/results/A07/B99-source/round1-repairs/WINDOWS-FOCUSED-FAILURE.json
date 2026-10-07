@@ -1,0 +1,18 @@
+{
+  "at": "2026-10-07T10:05:46.799781+00:00",
+  "status": "failed_fixture_construction",
+  "windows_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f1\\result.json",
+  "windows_result_sha256": "b8197e9acff63e8a62ddd2ee312c3a191cc025d863a3b57de0a5f559981338bf",
+  "finished_utc": "2026-10-07T09:59:05.491333+00:00",
+  "quality": "passed",
+  "affected_helpers": "failed_native_1",
+  "cause": "Substring replacement in a harmless positive fixture also changed the compiled-suffix directory negation. The validator correctly rejected the damaged fixture.",
+  "correction": "Replace only the complete anchored ignore-rule line; production behavior and selected P1/P2 decisions unchanged.",
+  "later_stages": "not_executed",
+  "all_jobs_settled": true,
+  "final_guard_failure": null,
+  "linux_hold": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\HELD-BEFORE-EXECUTION.json",
+  "linux_hold_sha256": "7e5fda4daaf244a8e4aa31b9a7a7c11b8c19660a78f12926e630091e576dff1c",
+  "linux_candidate_execution_started": false,
+  "author_scope": "SelfTest fixture correction only; static validation and new immutable handoff; no stage/commit/native action"
+}

@@ -1,0 +1,55 @@
+{
+  "status": "ROOT_SELECTED_AFTER_CONFIRMED_REPRODUCTION",
+  "at": "2026-10-07T09:34:51.682500+00:00",
+  "input_head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "input_tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "selected": {
+    "P1": "C96.8",
+    "P2": "D97.2"
+  },
+  "options_rubrics_scores_displayed_before_release": true,
+  "proposal_sha256": {
+    "P1-hook-behavior.md": "f207301d41661bebb41d7c76314488c2a013d3ed8ce34b990101d7a929dc7fe7",
+    "P2-ignore-case-parity.md": "7f841d7a5659b6d49be311841ac1fdaebdcbbfa7b0ce4014829f7b42a8432cab"
+  },
+  "score_samples": [
+    "P1C",
+    "P1D",
+    "P2D",
+    "P2C"
+  ],
+  "reproduction": {
+    "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-reproduction-one\\run\\result.json",
+    "sha256": "4cc8828893260e4176dbee43cdb82bfabde50ce389733266527f45c3b8600f6c",
+    "native_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-reproduction-one\\run\\output\\native\\result.json",
+    "native_sha256": "243a3863d20a8dca24d91b16223f3d37179314618072ead9cb806cfce22424c9",
+    "functions": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-reproduction-one\\run\\output\\functions.json",
+    "functions_sha256": "366ae9dd2fd4640bf4d50a24576f576743880e1370ce76a28e68b1baa27739ef",
+    "session": 20653,
+    "exit": 0,
+    "canonical_and_mutations_accepted": 10,
+    "native_git_rows": 60,
+    "real_windows_symlink": true,
+    "all_owned_jobs_empty": true,
+    "output_bytes": 233266
+  },
+  "release": {
+    "writer": "ps_carryback_final_quality",
+    "paths": [
+      ".gitignore",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "source_edits": true,
+    "static_syntax_only": true,
+    "runtime_tests": false,
+    "stage_commit_push": false
+  },
+  "linux_probe": {
+    "worker": "tf_ps235_candidate_quality",
+    "scope": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-reproduction",
+    "released": true,
+    "meaning": "Old-H/proposed ignore data only; not final changed-source acceptance"
+  },
+  "next": "Complete source repair and bounded test proposal; inspect final diff; validate changed inputs before normal publication and round2."
+}

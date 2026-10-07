@@ -1,0 +1,85 @@
+{
+  "status": "LOCAL_BEHAVIOR_AND_AGGREGATE_ACCEPTED",
+  "at": "2026-10-07T10:34:00.303469+00:00",
+  "candidate_tree": "5767b0d8aca73f90cf745dcf294114148503f40d",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "session": 96291,
+  "aggregate": {
+    "state": "passed",
+    "exit": 0,
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
+    "full_selftest": "Actual ordinary agent-instruction-contract invokes -SelfTest -RequireStagedInputMatch; full accepted SelfTest retained. No separate replay.",
+    "source_guards_equal": true,
+    "owned_cleanup_empty": true,
+    "container_absent": true
+  },
+  "prior_evidence": "Both current-input analyzer and focused platform results independently verified; prior fixture/monitor failures preserved. Aggregate separately enforces complete source guards.",
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\staged-preflight-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md.log",
+      "sha256": "b880e225119d5012d65e03ddadea2913a393a9e5361db063d20c5c95f8b63851"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-nested.log",
+      "sha256": "9e64d0dbfe56224c5cae5aac087b9407e636accc0cef3337ee0b8a843a4b02e9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-nested-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\aggregate-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-focused-acceptance.json",
+      "sha256": "cdae9614f75b0c6340e84450a79540dbf7f79dbf3d4c6e2e828d95f6b22cc587"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\REPORT.md",
+      "sha256": "4f1f8b0e6e61e6c01a04afac37a5e66c28cef1ef2a6b6969d22cc016b61cd261"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\evidence.json",
+      "sha256": "cd2b72515410bdb0867cbb20cd9b3e92653655d6dc4c601d1f3beb1d1641a1b5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\status.json",
+      "sha256": "ca4db63e8c1ce8ee7d79fd5d365e49ed206956faada3cbd21b4299861a3c7a58"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\result.json",
+      "sha256": "52d48ff3c60b29f64e0d5d129bd5b120519f202913f8472c5bcbe3bcc806fcb9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\runtime-config-equivalence.json",
+      "sha256": "ddc2e42d5fde026ef7e341c4ce357d017e9c9c1b217157a129dc34522bfc3c62"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\host-source-after.json",
+      "sha256": "966dbd080b9e19e3716f741a921aa486cefc62bfac89723fda4a0fc4ce407b28"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-release\\manifest.root-authorized.json",
+      "sha256": "676b1e4b07a6db51aef96c490ed9cddfef49f5aae1d48d072ebe03fd962a92d6"
+    }
+  ],
+  "limitations": "Local acceptance only. Normal commit, five actual B/H modes, current two-root audit, independent final PR quality, remote reviews, hosted CI, normal merge and paired comparison remain."
+}

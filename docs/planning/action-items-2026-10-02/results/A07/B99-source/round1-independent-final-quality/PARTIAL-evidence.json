@@ -1,0 +1,266 @@
+{
+  "status": "partial-committed-source-and-aggregate-pass-endpoint-audit-pending",
+  "created_utc": "2026-10-07T10:38:50.946067+00:00",
+  "head": "a7f6dcae7b9db4e83a63c36eb224b9625cb32032",
+  "tree": "5767b0d8aca73f90cf745dcf294114148503f40d",
+  "parent": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "committed_modes_verified": {
+    ".claude/commands/review-loop.md": "100644",
+    ".codex/config.toml": "100644",
+    ".gitattributes": "100644",
+    ".github/copilot-instructions.md": "100644",
+    ".github/dependabot.yml": "100644",
+    ".github/document-metadata-classification.json": "100644",
+    ".github/instructions/docs.instructions.md": "100644",
+    ".github/instructions/yaml.instructions.md": "100644",
+    ".github/workflows/.markdownlint.jsonc": "100644",
+    ".github/workflows/Check-NpmAudit.mjs": "100644",
+    ".github/workflows/Check-NpmAudit.test.mjs": "100644",
+    ".github/workflows/Classify-InstructionMaintenance.mjs": "100644",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs": "100644",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1": "100644",
+    ".github/workflows/Get-SupplyFreezeDigest.mjs": "100644",
+    ".github/workflows/Get-SupplyFreezeDigest.test.mjs": "100644",
+    ".github/workflows/Initialize-CiToolchain.ps1": "100644",
+    ".github/workflows/Invoke-LockedPythonHook.ps1": "100644",
+    ".github/workflows/Invoke-MarkdownLint.ps1": "100644",
+    ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md": "100644",
+    ".github/workflows/NpmTools.mjs": "100644",
+    ".github/workflows/NpmTools.test.mjs": "100644",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "100644",
+    ".github/workflows/Test-AgentInstructions.ps1": "100644",
+    ".github/workflows/Test-BlankLineExamples.ps1": "100644",
+    ".github/workflows/Test-CheckoutCredentials.ps1": "100644",
+    ".github/workflows/Test-CiHelpers.test.mjs": "100644",
+    ".github/workflows/Test-ExactGitPathSet.ps1": "100644",
+    ".github/workflows/Test-LocalValidation.test.mjs": "100644",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1": "100644",
+    ".github/workflows/Test-StyleGuideGenerator.ps1": "100644",
+    ".github/workflows/Validate-WorkflowPolicy.mjs": "100644",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs": "100644",
+    ".github/workflows/agent-instructions.yml": "100644",
+    ".github/workflows/build.yml": "100644",
+    ".github/workflows/ci-toolchain.json": "100644",
+    ".github/workflows/copilot-code-review.yml": "100644",
+    ".github/workflows/copilot-setup-steps.yml": "100644",
+    ".github/workflows/devcontainer-ci.yml": "100644",
+    ".github/workflows/historical-supply-profile.json": "100644",
+    ".github/workflows/install-husky.mjs": "100644",
+    ".github/workflows/lint-markdown.mjs": "100644",
+    ".github/workflows/lint-markdown.test.mjs": "100644",
+    ".github/workflows/lint-nested-markdown.js": "100644",
+    ".github/workflows/lint-staged-markdown.mjs": "100644",
+    ".github/workflows/markdownlint.yml": "100644",
+    ".github/workflows/npm-risk-exceptions.json": "100644",
+    ".github/workflows/package-lock.json": "100644",
+    ".github/workflows/package.json": "100644",
+    ".github/workflows/scripts-README.md": "100644",
+    ".github/workflows/workflow-policy-cases.json": "100644",
+    ".github/workflows/workflow-policy-contract.json": "100644",
+    ".gitignore": "100644",
+    ".husky/pre-commit": "100644",
+    ".pre-commit-config.yaml": "100644",
+    ".vscode/settings.json": "100644",
+    "ACKNOWLEDGMENTS.md": "100644",
+    "AGENTS.md": "100644",
+    "CLAUDE.md": "100644",
+    "CONTRIBUTING.md": "100644",
+    "LICENSE": "100644",
+    "README.md": "100644",
+    "STYLE_GUIDE.md": "100644",
+    "STYLE_GUIDE_CHAT.md": "100644",
+    "STYLE_GUIDE_FULL.md": "100644",
+    "STYLE_GUIDE_RATIONALE.md": "100644",
+    "copilot-instructions.md": "100644",
+    "docs/ISSUE_EVALUATION_PROMPT.md": "100644",
+    "docs/P1-SUPPLY-FREEZE-v1.md": "100644",
+    "docs/decisions/0001-accept-in-repository-trust-root.md": "100644",
+    "docs/decisions/0002-accept-unverifiable-baseline-provenance.md": "100644",
+    "docs/dependency-maintenance.md": "100644",
+    "package-lock.json": "100644",
+    "package.json": "100644",
+    "powershell.instructions.md": "100644",
+    "requirements-dev.txt": "100644",
+    "samples/test-nested-markdown-linting.md": "100644",
+    "samples/test-recursive-nested-markdown.md": "100644"
+  },
+  "final_worktree_status": "",
+  "payload_hashes_verified": true,
+  "material_findings": [],
+  "body_scope": "draft only; placeholders block publication",
+  "pending": [
+    "actual endpoint modes",
+    "current audit",
+    "final publication body",
+    "native lifecycle",
+    "paired propagation"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-independent-final-quality\\PARTIAL-REPORT.md",
+      "sha256": "00fdb9f59a7e07df84102a32fcfd3c980bf0f56246af8a5ff54b08838b76a7e1",
+      "bytes": 3939
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-independent-final-quality\\PARTIAL-INSPECTION.json",
+      "sha256": "0e35be1b6597ab4fd89373c47cf17cbe82055c7f3b208ef4cdee8193d6b98456",
+      "bytes": 18421
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\ROUND1-LOCAL-VALIDATION.json",
+      "sha256": "2378952b824b373122f57a6aaf3fe2bbbcb6fcb59bc7597a7d39775d482aeb22",
+      "bytes": 5399
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\ROUND1-NORMAL-COMMIT.json",
+      "sha256": "54c6850ebddd20a70f615dca8cd10c25cfea221c80ed253661dd2ba666a2bb12",
+      "bytes": 776
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\normal-round1-repair-commit.log",
+      "sha256": "5d990c6e7558adb1cf7bc9a1286ff3419ffb548c77319babbadbe955c95258ef",
+      "bytes": 152
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\PR-BODY-ROUND2-DRAFT.md",
+      "sha256": "a4e1f47bdb7199c29216932276135a6fee80b542421871c0f06efe09d0428db8",
+      "bytes": 3266
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\REPORT.md",
+      "sha256": "4f1f8b0e6e61e6c01a04afac37a5e66c28cef1ef2a6b6969d22cc016b61cd261",
+      "bytes": 7643
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\evidence.json",
+      "sha256": "cd2b72515410bdb0867cbb20cd9b3e92653655d6dc4c601d1f3beb1d1641a1b5",
+      "bytes": 25041
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\inputs\\payload-hashes.json",
+      "sha256": "e0e6a8a468f89ae7113b0bd96e0154d3eb2e5c36a854a5038c3b77939985a13f",
+      "bytes": 971
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\inputs\\inside.py",
+      "sha256": "ddc787d5d08b3cb7c4f8d2eea1ad07b865c57c055d5a0eeeaef3d49936b1bcad",
+      "bytes": 18966
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\inputs\\source-before.json",
+      "sha256": "966dbd080b9e19e3716f741a921aa486cefc62bfac89723fda4a0fc4ce407b28",
+      "bytes": 401646
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\status.json",
+      "sha256": "ca4db63e8c1ce8ee7d79fd5d365e49ed206956faada3cbd21b4299861a3c7a58",
+      "bytes": 1350
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-release\\manifest.root-authorized.json",
+      "sha256": "676b1e4b07a6db51aef96c490ed9cddfef49f5aae1d48d072ebe03fd962a92d6",
+      "bytes": 441956
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\aggregate-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\aggregate-cleanup.json",
+      "sha256": "928e9fd2c0df3270dab29cad740f584b828267004aad2494c798f8773026945c",
+      "bytes": 93114
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\aggregate.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "bytes": 880
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\before.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\fixture-adaptation.json",
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "bytes": 328
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\host-source-after.json",
+      "sha256": "966dbd080b9e19e3716f741a921aa486cefc62bfac89723fda4a0fc4ce407b28",
+      "bytes": 401646
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-nested-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-nested-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md-nested.log",
+      "sha256": "9e64d0dbfe56224c5cae5aac087b9407e636accc0cef3337ee0b8a843a4b02e9",
+      "bytes": 813
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\lint-md.log",
+      "sha256": "b880e225119d5012d65e03ddadea2913a393a9e5361db063d20c5c95f8b63851",
+      "bytes": 219
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\result.json",
+      "sha256": "52d48ff3c60b29f64e0d5d129bd5b120519f202913f8472c5bcbe3bcc806fcb9",
+      "bytes": 240641
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\runtime-config-equivalence.json",
+      "sha256": "ddc2e42d5fde026ef7e341c4ce357d017e9c9c1b217157a129dc34522bfc3c62",
+      "bytes": 270
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\runtime.json",
+      "sha256": "fea652349eaeaaf6027b72cc7ba70435ed2a7d0a766b7fc3f6b1a6b30898ee11",
+      "bytes": 465
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\setup-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\staged-preflight-after.json",
+      "sha256": "b6cf12b434910905f68c2b08e35f52c9d8844c164dfce1039b3dbe911587e5f9",
+      "bytes": 413153
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\staged-preflight-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\staged-preflight.log",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "bytes": 194
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-preparation\\runs\\b99-round1-repaired\\output\\terminal-cleanup.json",
+      "sha256": "0abc0c03e4584357354b90a3fee6d2259d1aaaa2e903ed4c14bcfa4d65c63a93",
+      "bytes": 233
+    }
+  ]
+}

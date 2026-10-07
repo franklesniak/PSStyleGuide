@@ -1,0 +1,21 @@
+{
+  "created_at": "2026-10-07T10:12:21.280036+00:00",
+  "status": "WINDOWS_PRIVATE_MONITOR_CORRECTED_SAME_SOURCE",
+  "prior_failed_result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f2\\result.json",
+  "prior_failed_result_sha256": "d7fe2de9340e1af1625c8a5149f6d5f0c13049a6b7db709286bff4cd8be2d368",
+  "cause": "Two-step is_file/stat output scan raced Git removing a private temporary file; helper native result absent, so interrupted validation remains incomplete.",
+  "fix": "Reuse the already-qualified output_guard AST unchanged: one lstat per entry, ignore FileNotFoundError only, preserve other errors and original stream/total caps.",
+  "ownership": "All prior Jobs empty and final guards passed; no still-running Windows child.",
+  "test_scope": "Same helpers, ignore and real-main tests in new run; current Windows analyzer results reused.",
+  "source_archive_sha256": "798a2c4de69b7b9a0de7e4b9dd7308d0b4de924c1f3b4fb24ce3c36ccccea88a",
+  "limits": {
+    "maximum_stream_bytes": 4194304,
+    "maximum_output_bytes": 39367243,
+    "overall_seconds": 1800,
+    "per_stage_seconds": 180
+  },
+  "qualified_output_guard_sha256": "a782542cbcc61a0b7819253e6e10fffd01932c4316cb5921e94dbd116a10a425",
+  "manifest_sha256": "7e2e64edb335341893d73ae796bb9002395f8da82e7173ee8a964ccd25a05b61",
+  "runner_sha256": "5a974088b673ab94f4a1760113976b537e911e090e532ef9a91e24ab35884c6f",
+  "new_run": "C:/Users/flesniak/AppData/Local/Temp/ps-b99-r1f3"
+}

@@ -1,0 +1,509 @@
+{
+  "status": "PASS_GENUINE_PS_SERVICE_SELECTION_AT_H_ONLY",
+  "observed_utc": "2026-10-07T09:13:13.945415+00:00",
+  "head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "tree": "b573c4f43493f2c59e483961a65326c6c4bf5fa4",
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "run_id": 37597256211,
+  "job_id": 112712811228,
+  "event": "dynamic",
+  "path": "dynamic/agents/copilot-pull-request-reviewer",
+  "actor": "Copilot",
+  "status_native": "completed",
+  "conclusion_native": "success",
+  "job_completed_at": "2026-10-07T09:05:18Z",
+  "dedicated_file": ".github/workflows/copilot-code-review.yml",
+  "dedicated_raw_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+  "comparison_method": "Raw saved source equals Git blob at H. Decode literal YAML run indentation; remove timestamp and ANSI display framing from native logs; compare each complete run body as an exact contiguous sequence. Preserve source/log bytes and record hashes. GitHub-added shell wrapper remains outside the compared body. No source normalization used for raw source identity.",
+  "steps": [
+    {
+      "name": "Acquire triggering revision without an action",
+      "step_number": 12,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:45Z",
+      "completed_at": "2026-10-07T08:57:47Z",
+      "member": "copilot-pull-request-reviewer/12_Acquire triggering revision without an action.txt",
+      "member_sha256": "fc2cd19bccb41e7d6372a2bed9e2a130b4c8068ad477bea27442eba0539f3acb",
+      "run_body_sha256": "aac82e15924f8d3267b813ee7ed5a4672f6363d01ee97ccb85f6ae14d96d519f",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Verify checkout credential cleanup",
+      "step_number": 17,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:48Z",
+      "completed_at": "2026-10-07T08:57:48Z",
+      "member": "copilot-pull-request-reviewer/17_Verify checkout credential cleanup.txt",
+      "member_sha256": "e47f8507137bbfae226d2301de89437c3efc964a4e66ab786f851d6dcf534c6a",
+      "run_body_sha256": "ca11d4d6336ba4e4896ebfec47e1eb8c142458ab4823e61cfdbf68b0d86d3c18",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Acquire published main reference",
+      "step_number": 22,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:49Z",
+      "completed_at": "2026-10-07T08:57:51Z",
+      "member": "copilot-pull-request-reviewer/22_Acquire published main reference.txt",
+      "member_sha256": "022dd74fdd77eea4b904327f3ebd69e9c2e50817b4f3f2d125afe3ac66639902",
+      "run_body_sha256": "7f8c8396ed4bd3153bbfcd0f0b1c7bc5c71659cba06577fee68206c62307f7dc",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Reject alternate npm install inputs",
+      "step_number": 27,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:52Z",
+      "completed_at": "2026-10-07T08:57:52Z",
+      "member": "copilot-pull-request-reviewer/27_Reject alternate npm install inputs.txt",
+      "member_sha256": "2d19269b496786678b9fffa012e2437a3092d427a36059865d528cccf02d6255",
+      "run_body_sha256": "ff61aea07dcf4e0da300891b930a0c08f31318c5417e0e750b00913304a0da8b",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Detect locked validation-tool layout",
+      "step_number": 32,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:52Z",
+      "completed_at": "2026-10-07T08:57:53Z",
+      "member": "copilot-pull-request-reviewer/32_Detect locked validation-tool layout.txt",
+      "member_sha256": "c34a383cdf7947e2ac02b16cd8a6f5f3adf04db8e0e642ef594fe5117e31c62f",
+      "run_body_sha256": "4d842aaccdde44059c410ccea70ec9c4131f658b83d6e2192b41dca4ddf72662",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Verify acquired immutable setup inputs",
+      "step_number": 37,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:54Z",
+      "completed_at": "2026-10-07T08:57:54Z",
+      "member": "copilot-pull-request-reviewer/37_Verify acquired immutable setup inputs.txt",
+      "member_sha256": "409a532431543a26860c46fc5c517e05e1cb86e922eef5ce575e4906f470c149",
+      "run_body_sha256": "1ce41462bd0087c0d0845ff756df8f92291ed4d8e48c597f71e9edb0d9ec716b",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Set up verified official Node.js runtime",
+      "step_number": 42,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:55Z",
+      "completed_at": "2026-10-07T08:57:58Z",
+      "member": "copilot-pull-request-reviewer/42_Set up verified official Node.js runtime.txt",
+      "member_sha256": "27e4709f4d165f83ef318e9f1f71f37c48a7243d5cd3c3b8a27249f4edeb87d8",
+      "run_body_sha256": "80460c7695a6e2f66ccc59b0975b8ba33d9098fa546b8b0168ca2912b80a192f",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Verify selected Node.js runtime",
+      "step_number": 47,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:57:59Z",
+      "completed_at": "2026-10-07T08:57:59Z",
+      "member": "copilot-pull-request-reviewer/47_Verify selected Node.js runtime.txt",
+      "member_sha256": "48f75bbf6512e73ece2830db8c8f340a65dc326a2cb3418c38674c808c1ae324",
+      "run_body_sha256": "825b66eb8b7de9d502f7f4a1f0d6192307d3e52084dca4ecd440638466fbb19e",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Install locked Node.js validation tools",
+      "step_number": 52,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:00Z",
+      "completed_at": "2026-10-07T08:58:01Z",
+      "member": "copilot-pull-request-reviewer/52_Install locked Node.js validation tools.txt",
+      "member_sha256": "c910e404d190be059075643474890c00714b3c72f267a3d41a88ab782b0815a6",
+      "run_body_sha256": "f7d1b778ef1d20a16c7d0f46ee573a34a681457eba04884f446f930dd0b14be4",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Verify locked dependency trees and immutable manifests",
+      "step_number": 57,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:02Z",
+      "completed_at": "2026-10-07T08:58:02Z",
+      "member": "copilot-pull-request-reviewer/57_Verify locked dependency trees and immutable manifests.txt",
+      "member_sha256": "cfdff78b6824e8109ddb3f5354abdf6cd1e36613190459fda2b9e9d3c41b221f",
+      "run_body_sha256": "5de093f99d4241e6295056c54f6c88be4d3a8666456d0fba470c400346b3ac6a",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Set up isolated Python 3.12",
+      "step_number": 62,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:03Z",
+      "completed_at": "2026-10-07T08:58:05Z",
+      "member": "copilot-pull-request-reviewer/62_Set up isolated Python 3.12.txt",
+      "member_sha256": "b50f359fd6e8f74e1034a20dd0b3d995ed365b28c01ebae43d015013b2c0ea7c",
+      "run_body_sha256": "00db15828966d28daf5caad350c895122150df1021fdfc0d325bf7d78847dc31",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Install locked Python validation tools",
+      "step_number": 67,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:06Z",
+      "completed_at": "2026-10-07T08:58:09Z",
+      "member": "copilot-pull-request-reviewer/67_Install locked Python validation tools.txt",
+      "member_sha256": "c22334b06b69d3e7b09f851cee9cd4be129b99d3377cbf720250f802ddea3456",
+      "run_body_sha256": "95a0fd9ab6131730bb97505e5d6f5b0b597aba3080b5b03b95613e85c266d23e",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Activate repository hooks",
+      "step_number": 72,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:10Z",
+      "completed_at": "2026-10-07T08:58:10Z",
+      "member": "copilot-pull-request-reviewer/72_Activate repository hooks.txt",
+      "member_sha256": "95a3eb73f8c7e0e313653ca4f72240d59ac7abf397dd9d7fb5db0c405881770a",
+      "run_body_sha256": "9de230493101a7f3b0dc3dcacf94f15b5bf6a54095e5b4a4b5cc4762c5faf1ad",
+      "exact_body_in_rendered_log": true
+    },
+    {
+      "name": "Verify final immutable setup inputs",
+      "step_number": 77,
+      "conclusion": "success",
+      "started_at": "2026-10-07T08:58:11Z",
+      "completed_at": "2026-10-07T08:58:11Z",
+      "member": "copilot-pull-request-reviewer/77_Verify final immutable setup inputs.txt",
+      "member_sha256": "7f8e1412ff1e6dad34e9834ebc4bea9300d58eada152d277aa912ddcae867320",
+      "run_body_sha256": "1ce41462bd0087c0d0845ff756df8f92291ed4d8e48c597f71e9edb0d9ec716b",
+      "exact_body_in_rendered_log": true
+    }
+  ],
+  "immutable_guard_scope": [
+    "package.json",
+    "package-lock.json",
+    ".github/workflows/package.json",
+    ".github/workflows/package-lock.json",
+    ".github/workflows/ci-toolchain.json",
+    "requirements-dev.txt",
+    ".github/workflows/Invoke-LockedPythonHook.ps1",
+    ".pre-commit-config.yaml",
+    ".github/workflows/install-husky.mjs",
+    ".husky/pre-commit",
+    ".github/workflows/lint-staged-markdown.mjs"
+  ],
+  "limitations": [
+    "Setup readiness and genuine selection only; not full validation or PR acceptance.",
+    "Silent immutable guard success is established by terminal native step conclusion, not a printed success sentence.",
+    "Only exact H/source/environment observed; later changed candidate requires explicit affected-input re-evaluation.",
+    "Original Codex material findings remain outside this service-only disposition.",
+    "No inference about observed Balanced effort from run identity/model; current review attribution remains root-owned."
+  ],
+  "additional_material_service_findings": [],
+  "references": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/service-terminal-run.json",
+      "sha256": "941c9eecfeb3f7b7cc649b245e192be6b5b38dc543e97131b386cb704b95017d",
+      "bytes": 13391
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/service-terminal-jobs.json",
+      "sha256": "1000c9593074a959846425e1fb5f6c13df60dfd404af9b7b48448f21f8cde2da",
+      "bytes": 17934
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/service-37597256211-logs.zip",
+      "sha256": "e51ad7e6841138733435586dec7f7044e755b95423c4a24010a8554d15239ba1",
+      "bytes": 143159
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/service-body-comparison.json",
+      "sha256": "820ce94192e22cec26f5115671b5e9d67c37ad45cef0e75f69b80e25d6d17601",
+      "bytes": 7295
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/dedicated-source-at-H.yml",
+      "sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "bytes": 44995
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-B99-source-20261006/independent-quality/native-final/initial-head.json",
+      "sha256": "cac5f3fe05627de94a763c9e57d7237c5d423dbc4be4203f86d7b793e8b862de",
+      "bytes": 1207
+    }
+  ],
+  "archive_entries": [
+    {
+      "name": "0_copilot-pull-request-reviewer.txt",
+      "bytes": 268774,
+      "sha256": "4ebddbd9cd96c99cbd7a834b31a1894b2c894142ac923e50c147e4c4c007b96a"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/system.txt",
+      "bytes": 611,
+      "sha256": "f2e5172fde9e3d46bd7241adf0e26fc45d6b5e5d32826e0420d6a834eb303f9d"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/1_Set up job.txt",
+      "bytes": 1936,
+      "sha256": "a9f06a62efb76201049f13551999d520af4634d59e6cacadace355627387fb90"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/2_Initialize.txt",
+      "bytes": 566,
+      "sha256": "d228b825990dedeba7c8cb39e48dc30e4e2085188ed3470e8e7440d805f44f9d"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/6_Pre-cache Playwright MCP server in the background (Linux).txt",
+      "bytes": 1193,
+      "sha256": "1cdb178f712b3f214a36c4e645c3f53b22591d996bc9ffc2a19edcf546397efb"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/8_Prepare Copilot (Linux).txt",
+      "bytes": 3343,
+      "sha256": "dd53a9e0c3938d1a1501e042b423f4f2b51acb6676ee43513d99b05f4b7acf7b"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/10_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1165,
+      "sha256": "88630d2efb525c72d2986278b0ede1f13bffa12e6797e2d25bddfce705e95886"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/12_Acquire triggering revision without an action.txt",
+      "bytes": 9155,
+      "sha256": "fc2cd19bccb41e7d6372a2bed9e2a130b4c8068ad477bea27442eba0539f3acb"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/13_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 2303,
+      "sha256": "a3842e315d2730d87a39aa6d9e2930337b42f52b348e720394e0a598b53c135c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/15_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1132,
+      "sha256": "ffae41cdaf57df51b4a61a39b0703cfd8076602a3e42502d28026e225573b6ce"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/17_Verify checkout credential cleanup.txt",
+      "bytes": 5639,
+      "sha256": "e47f8507137bbfae226d2301de89437c3efc964a4e66ab786f851d6dcf534c6a"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/18_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 2248,
+      "sha256": "57a3186f55ec5fa841dab84c67244084a96c327b49a80d0b0697ffd6c581e462"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/20_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1126,
+      "sha256": "4fa86bcf1cbbda6784216fc3044b68591c05a3b093fdb18fbacf1bc638f3d0b1"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/22_Acquire published main reference.txt",
+      "bytes": 5933,
+      "sha256": "022dd74fdd77eea4b904327f3ebd69e9c2e50817b4f3f2d125afe3ac66639902"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/23_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 2238,
+      "sha256": "ce85756a4c37df2029973b5e0c1ee270ccb162ca0f01392a3ce06f1d857cbadd"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/25_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1135,
+      "sha256": "189e164305222a1a5f060cabee8a7946b4308f8af138b2924edc3d81570e024a"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/27_Reject alternate npm install inputs.txt",
+      "bytes": 2318,
+      "sha256": "2d19269b496786678b9fffa012e2437a3092d427a36059865d528cccf02d6255"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/28_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3314,
+      "sha256": "913a1cf35a95f353c9d469306fc64a6c1bfeeefb0e3efec17f46f534bbc615d5"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/30_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1138,
+      "sha256": "f0fd5f1a970a33b9600da8b71ece2f91b836a01b037d33d63b26a0b5f55f10bb"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/32_Detect locked validation-tool layout.txt",
+      "bytes": 10070,
+      "sha256": "c34a383cdf7947e2ac02b16cd8a6f5f3adf04db8e0e642ef594fe5117e31c62f"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/33_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3357,
+      "sha256": "becf2710b83f5758307316d4d1cb03b27945c420e54db37740f67c6bdf080629"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/35_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1144,
+      "sha256": "a33aada03677bf74a8ce5a671b49fd4d458474cfdda35478af01e8967e0f9e3c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/37_Verify acquired immutable setup inputs.txt",
+      "bytes": 2460,
+      "sha256": "409a532431543a26860c46fc5c517e05e1cb86e922eef5ce575e4906f470c149"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/38_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3323,
+      "sha256": "d4385aff4a27eaf6b9fd556944c66bede1bd154e79097fb9218b10ab27bf08f2"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/40_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1150,
+      "sha256": "3d7e54ddce5e7bac64b12dc528a5d55e6ea80de4f252e116cac9058f9743783c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/42_Set up verified official Node.js runtime.txt",
+      "bytes": 9435,
+      "sha256": "27e4709f4d165f83ef318e9f1f71f37c48a7243d5cd3c3b8a27249f4edeb87d8"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/43_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 2278,
+      "sha256": "ea20b10a6e45d6ebd727455e2a14140a55d4a200052e929c925cc2e670ac60b3"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/45_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1123,
+      "sha256": "0acc097424171f6b1fb156192f2df5d1949653de1586d4048a11e53f79cd0b4e"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/47_Verify selected Node.js runtime.txt",
+      "bytes": 4419,
+      "sha256": "48f75bbf6512e73ece2830db8c8f340a65dc326a2cb3418c38674c808c1ae324"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/48_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3450,
+      "sha256": "9f581f25271d142424800572d061d57241a250fc343087f520040368b98db7b5"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/50_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1295,
+      "sha256": "11cc9ed593b09b0c776cb72b368cfbf6cf005b7050b9b1c2bafdc10f01358723"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/52_Install locked Node.js validation tools.txt",
+      "bytes": 4748,
+      "sha256": "c910e404d190be059075643474890c00714b3c72f267a3d41a88ab782b0815a6"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/53_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3841,
+      "sha256": "2021efc987f8e38b9cfaa94324addc8d2c69e2f5fb996012e9472b94cc3053dd"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/55_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1340,
+      "sha256": "c511d8ded43f5b7e30020a80019c2aeb13a947e97c55d1462a9c602901dd8c9b"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/57_Verify locked dependency trees and immutable manifests.txt",
+      "bytes": 16836,
+      "sha256": "cfdff78b6824e8109ddb3f5354abdf6cd1e36613190459fda2b9e9d3c41b221f"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/58_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 10061,
+      "sha256": "e12233577919493761a67890fff647e60714e5af4c2f11b41b9b86e2fc3c08f8"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/60_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1259,
+      "sha256": "166cff19a2d84013f1fbbce0b94aff3e153e15090fe14ddddb11011f58fbf59c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/62_Set up isolated Python 3.12.txt",
+      "bytes": 6888,
+      "sha256": "b50f359fd6e8f74e1034a20dd0b3d995ed365b28c01ebae43d015013b2c0ea7c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/63_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3643,
+      "sha256": "64a4d683a4a2130c80055f70df9f39b41e93a0b7c30bb68cc562ed2317c9ec02"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/65_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1497,
+      "sha256": "00d2f56d2403da06366672c14b8502e1fd6ab3f29151090b4199f33f00a1ca48"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/67_Install locked Python validation tools.txt",
+      "bytes": 9898,
+      "sha256": "c22334b06b69d3e7b09f851cee9cd4be129b99d3377cbf720250f802ddea3456"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/68_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 9317,
+      "sha256": "0a4966cb7e82b7a0cad973a657ea0afbadb1d578e01585caa1506bf31d56da71"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/70_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1458,
+      "sha256": "99ac38fca508b2c9fe0bebc1fdf4e9b550202aee254639e0c893dd59d4c7cea2"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/72_Activate repository hooks.txt",
+      "bytes": 3880,
+      "sha256": "95a3eb73f8c7e0e313653ca4f72240d59ac7abf397dd9d7fb5db0c405881770a"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/73_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3776,
+      "sha256": "7af1b9d93053d1f02f3e336a2d99c93741c2bddb93247cc26348802f30b0754b"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/75_Starting User Configured Setup Step (Linux).txt",
+      "bytes": 1488,
+      "sha256": "e5349b4ba76223a99d4105098ba5a844b260b01c766e6d8a98413485936bf3e4"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/77_Verify final immutable setup inputs.txt",
+      "bytes": 2813,
+      "sha256": "7f8e1412ff1e6dad34e9834ebc4bea9300d58eada152d277aa912ddcae867320"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/78_Finished User Configured Setup Step (Linux).txt",
+      "bytes": 3667,
+      "sha256": "455491bf17acb1d14ead9d10a60421e90677e2b91773bb0785871c7f1b9ccf26"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/80_Download Autofind (Linux).txt",
+      "bytes": 2357,
+      "sha256": "411c6077534742003557604225f258a9ac7d80cd325c59cfa270af2fbf3fa900"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/82_Generate agent firewall CA (Linux).txt",
+      "bytes": 2708,
+      "sha256": "3b8695406a243c4be6a300a714e86c34403111d21ce4fd932c859c2726e0531e"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/83_Start MCP Servers (Linux).txt",
+      "bytes": 6498,
+      "sha256": "d3f2a4bd3b0e210747380d61d577baa7bdfd6538b6f69195a35d01c69145cce7"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/85_Setup Agent (Linux).txt",
+      "bytes": 1423,
+      "sha256": "bcb6b445156c04894ff5ad2eedb8bd7d7ab572a3853a25790e120daa57fb8e7c"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/87_Download git-proxy (Linux).txt",
+      "bytes": 3596,
+      "sha256": "b60bb24cbec1154528a9394467ff01ec474e33849fa625206d76fdb717e8a2d6"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/89_Processing Request (Linux).txt",
+      "bytes": 73672,
+      "sha256": "1708cdda00d145b5a78c32a0e93fe30608afb88793551cb1576b1ab1a1a662cd"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/91_Clean Up (Linux).txt",
+      "bytes": 2430,
+      "sha256": "81ac7af64266c1e8d8a2e956cc553248e486efb9f971765dbad6fe4ae9f105fe"
+    },
+    {
+      "name": "copilot-pull-request-reviewer/94_Complete job.txt",
+      "bytes": 453,
+      "sha256": "fb2acaeaaf6dc96a847e2b6504439839ddeded77dcc4239203cbacec6a3a6d57"
+    }
+  ]
+}

@@ -1,0 +1,2108 @@
+{
+  "export": {
+    "sha256": "96b1e729ceea312ed0b109379fdb0ef6b44a74d2a1571f4bce216611f0b37f41",
+    "entries": 2556,
+    "all_member_bytes_modes_types_links_verified": true,
+    "symlinks": [
+      {
+        "path": "final-ignore/git/link.PYC",
+        "mode": 511,
+        "size": 0,
+        "kind": "symlink",
+        "linkname": "target-dir"
+      }
+    ]
+  },
+  "source_and_dependencies": {
+    "source": {
+      "count": 78,
+      "linux_archive_and_windows_fixture_equal": true
+    },
+    "dependencies": {
+      "count": 1914,
+      "linux_archive_and_windows_fixture_equal": true
+    }
+  },
+  "final-ignore_linux_commands": {
+    "count": 21,
+    "all_raw_streams_hash_size_verified": true,
+    "native_exits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      1,
+      1,
+      0,
+      1
+    ]
+  },
+  "main-refusal_linux_commands": {
+    "count": 1,
+    "all_raw_streams_hash_size_verified": true,
+    "native_exits": [
+      1
+    ]
+  },
+  "linux_quality": {
+    "pwsh": "7.6.3",
+    "analyzer_path": "/analyzer/PSScriptAnalyzer.psd1",
+    "rows": [
+      {
+        "sha256": "30bce361adf84e0df843452a63bb3d1d41486fa213ccfd6edd3d77d345b95604",
+        "parser_errors": [],
+        "name": "Test-AgentInstructions.ps1",
+        "parser_basis": "exact final bytes / current ParseFile on this platform",
+        "diagnostics": []
+      },
+      {
+        "sha256": "f2ecc2966d7c3e5b5e278d042eed24ede18ac514951b2607c96fa5575e2a51bb",
+        "parser_errors": [],
+        "name": "Test-AgentInstructions.SelfTest.ps1",
+        "parser_basis": "exact final bytes / current ParseFile on this platform",
+        "diagnostics": []
+      }
+    ],
+    "analyzer": "1.24.0"
+  },
+  "helpers": {
+    "linux_reads": 66,
+    "windows_reads": 66,
+    "yaml_rows_equal": [
+      {
+        "name": "canonical",
+        "failures": []
+      },
+      {
+        "name": "manual-check-json",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-json (extra stages)"
+        ]
+      },
+      {
+        "name": "manual-check-yaml",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-yaml (extra stages)"
+        ]
+      },
+      {
+        "name": "manual-actionlint",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: actionlint (extra stages)"
+        ]
+      },
+      {
+        "name": "manual-workflow-policy-contract",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: workflow-policy-contract (extra stages)"
+        ]
+      },
+      {
+        "name": "json-types",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-json (changed types)"
+        ]
+      },
+      {
+        "name": "actionlint-files",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: actionlint (changed files)"
+        ]
+      },
+      {
+        "name": "json-no-filenames",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-json (extra pass_filenames)"
+        ]
+      },
+      {
+        "name": "json-help-args",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-json (extra args)"
+        ]
+      },
+      {
+        "name": "json-extra-entry",
+        "failures": [
+          "Pre-commit hook must retain its reviewed behavior: check-json (changed entry)"
+        ]
+      }
+    ],
+    "ignore_20_rows_equal": [
+      {
+        "variant": "final",
+        "path": "module.pyc",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 1
+      },
+      {
+        "variant": "final",
+        "path": "module.PYC",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 2
+      },
+      {
+        "variant": "final",
+        "path": "module.pYo",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 3
+      },
+      {
+        "variant": "final",
+        "path": "module.PyD",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 4
+      },
+      {
+        "variant": "final",
+        "path": "nested/module.PYC",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 5
+      },
+      {
+        "variant": "final",
+        "path": "__pycache__/entry",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 6
+      },
+      {
+        "variant": "final",
+        "path": "__PYCACHE__/entry",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 7
+      },
+      {
+        "variant": "final",
+        "path": "__PyCaChE__/entry",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 8
+      },
+      {
+        "variant": "final",
+        "path": "nested/__PyCaChE__/entry",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 9
+      },
+      {
+        "variant": "final",
+        "path": "safe.py",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 10
+      },
+      {
+        "variant": "final",
+        "path": "standalone/__pycache__",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 11
+      },
+      {
+        "variant": "final",
+        "path": "module.pyc.txt",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 12
+      },
+      {
+        "variant": "final",
+        "path": "__pycache__-source/entry",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 13
+      },
+      {
+        "variant": "final",
+        "path": "bundle.PYC/readme.txt",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 14
+      },
+      {
+        "variant": "final",
+        "path": "CLAUDE.local.md",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 15
+      },
+      {
+        "variant": "final",
+        "path": "nested/CLAUDE.local.md",
+        "exit": 0,
+        "ignored": true,
+        "symlink": false,
+        "directory": false,
+        "command_index": 16
+      },
+      {
+        "variant": "final",
+        "path": "CLAUDE.md",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 17
+      },
+      {
+        "variant": "final",
+        "path": "nested/CLAUDE.md",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": false,
+        "command_index": 18
+      },
+      {
+        "variant": "final",
+        "path": "link.PYC",
+        "exit": 0,
+        "ignored": true,
+        "symlink": true,
+        "directory": true,
+        "command_index": 19
+      },
+      {
+        "variant": "final",
+        "path": "bundle.PYC",
+        "exit": 1,
+        "ignored": false,
+        "symlink": false,
+        "directory": true,
+        "command_index": 20
+      }
+    ],
+    "linux_read_rows": [
+      {
+        "root": "/work/b99-focus/payload/fixture",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "c4f3f9bda3e9c9977b488756f322383895e755bb",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/agent-instructions.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/scripts-README.md worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/Invoke-LockedPythonHook.ps1 worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "package.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/package.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "requirements-dev.txt worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-setup-steps.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".husky/pre-commit worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/package-lock.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": ".gitignore worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/install-husky.mjs worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/lint-staged-markdown.mjs worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".pre-commit-config.yaml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path '/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71/requirements-dev.txt' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path '/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71/.github/workflows/Invoke-LockedPythonHook.ps1' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path '/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71/.gitignore' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "f86e381ffa482a5efd2fdbf787c15b4894627f6b",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": "Git revision input is not one regular 100644 blob: f86e381ffa482a5efd2fdbf787c15b4894627f6b:.gitignore",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-setup-steps.yml must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "cf1d412bcfdefb5917b094740ac3bf5a1510aa4c",
+        "indexCanonical": false,
+        "revisionSize": 65536,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": ".gitignore must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "989931f8f70e89244072c91051fecdcadb0dab2e",
+        "indexCanonical": false,
+        "revisionSize": 65537,
+        "failure": "989931f8f70e89244072c91051fecdcadb0dab2e:.gitignore must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path '/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71/.github/workflows/copilot-code-review.yml' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": true,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Staged optional setup input is absent from the Git index.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "8c6a0f3d72cd582fbbad4e6b6d2be6f6856da3dd",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": true,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "c4f3f9bda3e9c9977b488756f322383895e755bb",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Repository input is unsafe:\n- .github/workflows/copilot-code-review.yml must have exactly one Git index entry.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Repository input is unsafe:\n- .github/workflows/copilot-code-review.yml must have exactly one Git index entry.\n- .github/workflows/copilot-code-review.yml must be a regular worktree file.\n- .github/workflows/copilot-code-review.yml must have a regular Unix file type.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml must contain valid UTF-8 without a BOM.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Git revision input is not one regular 100644 blob: :.github/workflows/copilot-code-review.yml",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "/work/b99-focus/payload/tmp/agent-setup-a800b61c6e63432ca29229dcb9666c71",
+        "revision": "2ec9221609a114d46f44e878d9ab9880b51b095e",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": "Git revision input is not one regular 100644 blob: 2ec9221609a114d46f44e878d9ab9880b51b095e:.github/workflows/copilot-code-review.yml",
+        "absentOptional": false,
+        "returnedCanonical": false
+      }
+    ],
+    "windows_read_rows": [
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\source",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "ada40fd85d9ac07240564a359413eda9da401804",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".pre-commit-config.yaml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/scripts-README.md worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-setup-steps.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/lint-staged-markdown.mjs worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/install-husky.mjs worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/agent-instructions.yml worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/Invoke-LockedPythonHook.ps1 worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "package.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/package-lock.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": ".gitignore worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "requirements-dev.txt worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".husky/pre-commit worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/package.json worktree content must match its staged Git index blob.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3\\requirements-dev.txt' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3\\.github\\workflows\\Invoke-LockedPythonHook.ps1' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3\\.gitignore' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "4333ef8c53db339c943f897e4eeabbab018aa07a",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": "Git revision input is not one regular 100644 blob: 4333ef8c53db339c943f897e4eeabbab018aa07a:.gitignore",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-setup-steps.yml must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "cbe54d0a412f88213a4919eeedb34a2f6a92152e",
+        "indexCanonical": false,
+        "revisionSize": 65536,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": false,
+        "revisionSize": null,
+        "failure": ".gitignore must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "762653a2c213d3a493d0a3c0675a5cf3712e4cdf",
+        "indexCanonical": false,
+        "revisionSize": 65537,
+        "failure": "762653a2c213d3a493d0a3c0675a5cf3712e4cdf:.gitignore must not exceed 65536 bytes.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Cannot find path 'C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3\\.github\\workflows\\copilot-code-review.yml' because it does not exist.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": null,
+        "absentOptional": true,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Staged optional setup input is absent from the Git index.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "cf6a702979284b779a5fb48f7902af3904931e3c",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": true,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "ada40fd85d9ac07240564a359413eda9da401804",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": null,
+        "absentOptional": false,
+        "returnedCanonical": true
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Repository input is unsafe:\n- .github/workflows/copilot-code-review.yml must have exactly one Git index entry.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Repository input is unsafe:\n- .github/workflows/copilot-code-review.yml must have exactly one Git index entry.\n- .github/workflows/copilot-code-review.yml must be a regular worktree file.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": ".github/workflows/copilot-code-review.yml must contain valid UTF-8 without a BOM.",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "",
+        "indexCanonical": true,
+        "revisionSize": null,
+        "failure": "Git revision input is not one regular 100644 blob: :.github/workflows/copilot-code-review.yml",
+        "absentOptional": false,
+        "returnedCanonical": false
+      },
+      {
+        "root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\temp\\agent-setup-37eed6a8c2e24e5397cb24a1e5ded5d3",
+        "revision": "2ec9221609a114d46f44e878d9ab9880b51b095e",
+        "indexCanonical": true,
+        "revisionSize": 421,
+        "failure": "Git revision input is not one regular 100644 blob: 2ec9221609a114d46f44e878d9ab9880b51b095e:.github/workflows/copilot-code-review.yml",
+        "absentOptional": false,
+        "returnedCanonical": false
+      }
+    ]
+  },
+  "linux_raw_index_head_status_reconciled": true,
+  "linux": {
+    "stage_count": 17,
+    "all_native_wrapper_exit_zero": true,
+    "nested_expected_refusal_native_exit": 1,
+    "strict_settlement_receipts": 18,
+    "host_elapsed_seconds": 161.5014504000137,
+    "inner_elapsed_seconds": 149.135204267,
+    "retained_native_bytes": 23985619,
+    "mounted_output_bytes": 9197923,
+    "guard_equal": true,
+    "container_absent": true
+  },
+  "windows": {
+    "state": "passed",
+    "stages": 10,
+    "all_native_wrapper_exit_zero": true,
+    "all_jobs_empty_no_terminations": true,
+    "all_stage_log_hashes_verified": true,
+    "final_guard_failure": null,
+    "raw_stream_commands_verified": 22,
+    "source_after_and_dependency_catalog_equal": true
+  },
+  "Test-AgentInstructions.ps1_function_text_delta": {
+    "added": [
+      "Get-AgentPreCommitBehaviorFailure"
+    ],
+    "removed": [],
+    "changed": [
+      "Get-AgentSetupContractFailure"
+    ],
+    "unchanged_count": 74
+  },
+  "Test-AgentInstructions.SelfTest.ps1_function_text_delta": {
+    "added": [],
+    "removed": [],
+    "changed": [
+      "Assert-AgentSetupSelfTest"
+    ],
+    "unchanged_count": 18
+  },
+  "source_comparison": [
+    {
+      "path": ".claude/commands/review-loop.md",
+      "old_sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+      "final_sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".codex/config.toml",
+      "old_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      "final_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".gitattributes",
+      "old_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "final_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "old_sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      "final_sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "old_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      "final_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "old_sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      "final_sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "old_sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+      "final_sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "old_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "final_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/.markdownlint.jsonc",
+      "old_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      "final_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "old_sha256": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+      "final_sha256": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "old_sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "final_sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "old_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "final_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "old_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "final_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "old_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "final_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "old_sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+      "final_sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "old_sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+      "final_sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "old_sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      "final_sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "old_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      "final_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "old_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      "final_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "old_sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      "final_sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "old_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "final_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "old_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "final_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "old_sha256": "395492f21890b4ad16b05aaf43d996224534fa753ad204f1a4d10691774196ad",
+      "final_sha256": "f2ecc2966d7c3e5b5e278d042eed24ede18ac514951b2607c96fa5575e2a51bb",
+      "changed": true,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "old_sha256": "fc5ff6d8554e2edb11c3ebf0059b2e4488c53d494671493ab9fcf7edc2658b3a",
+      "final_sha256": "30bce361adf84e0df843452a63bb3d1d41486fa213ccfd6edd3d77d345b95604",
+      "changed": true,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "old_sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      "final_sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "old_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "final_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "old_sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "final_sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "old_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "final_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "old_sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "final_sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "old_sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "final_sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "old_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "final_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "old_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "final_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "old_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "final_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "old_sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "final_sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "old_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "final_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "old_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "final_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "old_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "final_sha256": "9f7ebf318a3be35c4f9c925d632a34557c889de0139f6ea4430f23a29285d1e6",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "old_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "final_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "old_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      "final_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/historical-supply-profile.json",
+      "old_sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+      "final_sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "old_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      "final_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "old_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "final_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "old_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "final_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "old_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      "final_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "old_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      "final_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "old_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+      "final_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "old_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      "final_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "old_sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "final_sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "old_sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "final_sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "old_sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "final_sha256": "1f572a37adf3a85c48801ff56a6ffe007ec2445df073972e2b9b50ebf1d35511",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "old_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "final_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "old_sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "final_sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".gitignore",
+      "old_sha256": "0534b9caa821bc62e58f8f8ad0990fdc873a2f7229e86461f929d8bd73b2bda2",
+      "final_sha256": "f5f9c67764ed6713e8b0f2f2d9b0e11250c0c58a70f6773ae38e8f268e28af65",
+      "changed": true,
+      "mode": "100644"
+    },
+    {
+      "path": ".husky/pre-commit",
+      "old_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "final_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "old_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "final_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "old_sha256": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+      "final_sha256": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "old_sha256": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+      "final_sha256": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "AGENTS.md",
+      "old_sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "final_sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "CLAUDE.md",
+      "old_sha256": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+      "final_sha256": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "old_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+      "final_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "LICENSE",
+      "old_sha256": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+      "final_sha256": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "README.md",
+      "old_sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+      "final_sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "old_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "final_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "old_sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "final_sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "old_sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "final_sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "old_sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+      "final_sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "copilot-instructions.md",
+      "old_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "final_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "old_sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "final_sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "old_sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "final_sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "old_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+      "final_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "old_sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+      "final_sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "old_sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+      "final_sha256": "4754a02d4060abb338b062de8b8fbed5d5c03c508bba12d36cc86c6cdd436ddd",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "package-lock.json",
+      "old_sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "final_sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "package.json",
+      "old_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "final_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "powershell.instructions.md",
+      "old_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "final_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "old_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "final_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "samples/test-nested-markdown-linting.md",
+      "old_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "final_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54",
+      "changed": false,
+      "mode": "100644"
+    },
+    {
+      "path": "samples/test-recursive-nested-markdown.md",
+      "old_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+      "final_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c",
+      "changed": false,
+      "mode": "100644"
+    }
+  ]
+}

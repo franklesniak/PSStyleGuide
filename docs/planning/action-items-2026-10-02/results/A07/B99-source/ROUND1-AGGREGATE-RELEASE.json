@@ -1,0 +1,33 @@
+{
+  "status": "ONE_ORDINARY_AGGREGATE_RELEASED",
+  "at": "2026-10-07T10:22:51.395958+00:00",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-aggregate-release\\manifest.root-authorized.json",
+  "sha256": "676b1e4b07a6db51aef96c490ed9cddfef49f5aae1d48d072ebe03fd962a92d6",
+  "run_id": "b99-round1-repaired",
+  "candidate_tree": "5767b0d8aca73f90cf745dcf294114148503f40d",
+  "expected_hooks": 11,
+  "auto_repeat": false,
+  "native_refs": {
+    "PSStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/58a1345896da1a1e8794078e588e88e58a78e2eb"
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "33ec8a03f12006d6e7a05d45014a4ae6b9306eb3",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/33ec8a03f12006d6e7a05d45014a4ae6b9306eb3"
+      }
+    }
+  },
+  "focused_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-focused-acceptance.json"
+}

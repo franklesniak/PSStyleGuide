@@ -1,0 +1,44 @@
+{
+  "status": "ROUND1_REPAIRED_FOCUSED_INPUT_ACCEPTED",
+  "at": "2026-10-07T10:22:37.504820+00:00",
+  "candidate_tree": "5767b0d8aca73f90cf745dcf294114148503f40d",
+  "source_archive_sha256": "798a2c4de69b7b9a0de7e4b9dd7308d0b4de924c1f3b4fb24ce3c36ccccea88a",
+  "both_platforms_accepted": true,
+  "independent_reviewer": "tf_ps235_candidate_quality",
+  "independent_scope": "Full three-file raw diff, test relevance, security/pair implications and exported evidence integrity; no material finding. Aggregate/committed/native gates remain.",
+  "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\REPORT.md",
+  "report_sha256": "4f1f8b0e6e61e6c01a04afac37a5e66c28cef1ef2a6b6969d22cc016b61cd261",
+  "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\evidence.json",
+  "evidence_sha256": "cd2b72515410bdb0867cbb20cd9b3e92653655d6dc4c601d1f3beb1d1641a1b5",
+  "root_read_full_report": true,
+  "root_sampled_references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\host-result.json",
+      "bytes": 63935,
+      "sha256": "f5d3b89b8dfa3227f73823a30843d5ddaab6237e6154994fa3f4322024e57d9d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\result.json",
+      "bytes": 79492,
+      "sha256": "b35c87b870b4e3244f7d2c7651b6da66fc919a7fd2b3215e16d2d4239becf4cf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\native-payload.tar.gz",
+      "bytes": 8444156,
+      "sha256": "96b1e729ceea312ed0b109379fdb0ef6b44a74d2a1571f4bce216611f0b37f41"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexFinal\\log.txt",
+      "bytes": 6665,
+      "sha256": "cd06d307f14e22f6c1a34fd8ad6d24d6c0a014298fb4a5c96473bf1467d1cc1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\result.json",
+      "bytes": 13056,
+      "sha256": "ffbc0d5a2dbb277baf52ff1aa01ea724692fc922882b1f28a6428de4215913a3"
+    }
+  ],
+  "old_failed_runs_preserved": true,
+  "unchanged_evidence_reused_only_at_original_scope": true,
+  "author_stopped": true
+}

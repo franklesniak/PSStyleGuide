@@ -1,0 +1,492 @@
+{
+  "status": "finite-frozen-repair-focused-and-source-pass",
+  "created_utc": "2026-10-07T10:21:20.030393+00:00",
+  "original_published_head": "64df5d77043b3e3d019b7d4d704635bd97598293",
+  "final_candidate_identity": "frozen source archive; no new commit claimed",
+  "findings": [],
+  "report_sha256": "4f1f8b0e6e61e6c01a04afac37a5e66c28cef1ef2a6b6969d22cc016b61cd261",
+  "remaining_gates": [
+    "full aggregate",
+    "actual commit/input binding",
+    "endpoint/current audit",
+    "native CI/reviews and current-input service requirements",
+    "paired propagation/landing"
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\REPORT.md",
+      "bytes": 7643,
+      "sha256": "4f1f8b0e6e61e6c01a04afac37a5e66c28cef1ef2a6b6969d22cc016b61cd261"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\inspection.json",
+      "bytes": 80699,
+      "sha256": "191f05194b1643c3f47bb026b6b1c2a204befd6c1a30529b949d13e716c9a7e6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\HELD-BEFORE-EXECUTION.json",
+      "bytes": 800,
+      "sha256": "7e5fda4daaf244a8e4aa31b9a7a7c11b8c19660a78f12926e630091e576dff1c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\ownership-release.json",
+      "bytes": 17892,
+      "sha256": "e98f0f0d8ea1d142d827431b1885f8b2ece237ee55295b7ec551102e2f5b9006"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\adapter-source-binding.json",
+      "bytes": 278,
+      "sha256": "7c500555563a08c3c108dec0affdbca1e0b078b1254a58d71c485a9ae6da3385"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\launch-qualification.py",
+      "bytes": 6344,
+      "sha256": "bf3636ee54bd77a62088676646e86dbfb22d2eb57552c4e0fe5baec87d24124c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\inputs\\inside-qualification.py",
+      "bytes": 13058,
+      "sha256": "a2844819fc5231c5aaf57e760c3b1e2cdb42b25463a5a694d27d9bb3fa19a01b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\host-result.json",
+      "bytes": 63935,
+      "sha256": "f5d3b89b8dfa3227f73823a30843d5ddaab6237e6154994fa3f4322024e57d9d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\result.json",
+      "bytes": 79492,
+      "sha256": "b35c87b870b4e3244f7d2c7651b6da66fc919a7fd2b3215e16d2d4239becf4cf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\native-export.json",
+      "bytes": 589082,
+      "sha256": "86cba7df761863c44b3ee4ef86a4a4c4f87724762154a354d08b56b6b1885c62"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\native-payload.tar.gz",
+      "bytes": 8444156,
+      "sha256": "96b1e729ceea312ed0b109379fdb0ef6b44a74d2a1571f4bce216611f0b37f41"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-qualification-v2\\manifest.authorized.json",
+      "bytes": 459911,
+      "sha256": "f1c4b32b959dc05761f327940a99b12136e2331e02713534ab36740c43d217a5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-qualification-v2\\source.tar",
+      "bytes": 3840000,
+      "sha256": "798a2c4de69b7b9a0de7e4b9dd7308d0b4de924c1f3b4fb24ce3c36ccccea88a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\dependencies.tar",
+      "bytes": 20316160,
+      "sha256": "c09f273178c5d18b1da93878f6c7badf2fca9f7deaca503dff395da1d1badd8b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\focused-inputs\\linux-runtime-binding-v2.json",
+      "bytes": 2184,
+      "sha256": "400d349b787325f02e876f2fe5f7766f161ccb5377097bc670eed5702471ec0b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\result.json",
+      "bytes": 13056,
+      "sha256": "ffbc0d5a2dbb277baf52ff1aa01ea724692fc922882b1f28a6428de4215913a3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\source-before.json",
+      "bytes": 348,
+      "sha256": "909bf98ed5f126452efbfa414fcb647530bf1b5e1b67c317e8eebb4ab3bc8f55"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\affected-helpers.json",
+      "bytes": 26010,
+      "sha256": "0bf21d0502852e67972ae00d149a9e01e44cff131c4f7b05107252b1c0121e5a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\final-ignore\\result.json",
+      "bytes": 4142,
+      "sha256": "102d33a7a8f337c7b64d6ccc0e1903f6a3a11d0e68532991feb910011f1081c5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\final-ignore\\commands.json",
+      "bytes": 24494,
+      "sha256": "09469968bc15f7dcf88bd868b83bec2909c4b396df5634179cbcee0f1ec8fe69"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\main-refusal\\commands.json",
+      "bytes": 1133,
+      "sha256": "edcdda576da28201c2a65b0af2f3d4c1efcaf64c0145360cdd7e1a4947517613"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\main-refusal\\verdict.json",
+      "bytes": 255,
+      "sha256": "be498bb48ee2b6b94d837d1957bdad2719d875a52ebe60da25734ccc87e977f2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f1\\output\\quality.json",
+      "bytes": 805,
+      "sha256": "d44308a25e4a1140f2d00247757a3fa55d76e4ab2e045e6fe4eadb71affb0071"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f2\\output\\quality.json",
+      "bytes": 533,
+      "sha256": "ea420b0f04ce13f22f6d6dbf3a825581da0cfd8d002af505ab21139c543ec347"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\diff-.gitignore.txt",
+      "bytes": 506,
+      "sha256": "96383b6ec00e21049ae6b2e154f0aaaf98744ac12b0648d526ea7b7f590c2ea4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\diff-Test-AgentInstructions.ps1.txt",
+      "bytes": 14955,
+      "sha256": "9ddc810b031f4ba56d11192d7e3404186b05a1cbe3fe11f7c0f3aced7c57b79e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\diff-Test-AgentInstructions.SelfTest.ps1.txt",
+      "bytes": 16259,
+      "sha256": "68ee04de5dcc5d257346823bb47f22713acc2e379ebabd121a9227469c9db4a7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-source\\round1-repairs\\P1-hook-behavior.md",
+      "bytes": 14380,
+      "sha256": "1cd41c52b2d7cf1e1e7225a1cb3d5e4aa0e9a734e04dc62e229c4c3493702597"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-source\\round1-repairs\\P2-ignore-case-parity.md",
+      "bytes": 12832,
+      "sha256": "40717b427e8e36c7ef42a88688b5650791e1c07917f4b885300f3230bbb3c1d4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\B99-source\\round1-repairs\\selection.json",
+      "bytes": 2419,
+      "sha256": "d542c130478efac51245fd77454c20f940a8e60dfce386fba5955794ec29c6ea"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\AffectedHelpers\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CanonicalAfter\\log.txt",
+      "bytes": 194,
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CanonicalBefore\\log.txt",
+      "bytes": 194,
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CommitPrivateData\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\FinalIgnore\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\HeadAfter\\log.txt",
+      "bytes": 41,
+      "sha256": "283ee88268f57c53441141dc7342bf5dfbd95344871abf3e0fd3c64d3587cd21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\HeadBefore\\log.txt",
+      "bytes": 41,
+      "sha256": "283ee88268f57c53441141dc7342bf5dfbd95344871abf3e0fd3c64d3587cd21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexAfter\\log.txt",
+      "bytes": 6665,
+      "sha256": "cd06d307f14e22f6c1a34fd8ad6d24d6c0a014298fb4a5c96473bf1467d1cc1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexBefore\\log.txt",
+      "bytes": 6665,
+      "sha256": "cd06d307f14e22f6c1a34fd8ad6d24d6c0a014298fb4a5c96473bf1467d1cc1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexFinal\\log.txt",
+      "bytes": 6665,
+      "sha256": "cd06d307f14e22f6c1a34fd8ad6d24d6c0a014298fb4a5c96473bf1467d1cc1e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexManualCase\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexPrivateFixture\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\InitPrivateFixture\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\ManualRefusal\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\Quality\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\RestoreCanonicalIndex\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\StatusAfter\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\AffectedHelpers\\transport.json",
+      "bytes": 3789,
+      "sha256": "6295aa77379f905f829902adc052ef0109729e87f06a60691510dc339b20f1bf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CanonicalAfter\\transport.json",
+      "bytes": 3615,
+      "sha256": "12d8ea56f30731274021901e4768250a829c6d098361066f080231a7907570f8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CanonicalBefore\\transport.json",
+      "bytes": 3617,
+      "sha256": "1fc92e03dfc653c4a874d0c7b39dc5e2988ed9514261b5edfe85fa4d174a16b7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\CommitPrivateData\\transport.json",
+      "bytes": 3966,
+      "sha256": "cb6b39a3bf0db45ce234711fd038270a7b576bb21cef9e33afa9787e44e48841"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\FinalIgnore\\transport.json",
+      "bytes": 3851,
+      "sha256": "b39971dbb3f18410e69c5ebae7471afea891c64902a39162cb884cd896074855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\HeadAfter\\transport.json",
+      "bytes": 3825,
+      "sha256": "c644f1224c5f4144785804b7bac6b88522a0f4e17f9559c2691f50bfbc303b54"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\HeadBefore\\transport.json",
+      "bytes": 3779,
+      "sha256": "dac244255b70089f1f9a76f4138cfbc611b99c51aec45480c7dc91a040a7ddde"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexAfter\\transport.json",
+      "bytes": 3836,
+      "sha256": "13e5d6d146fb42fecbdc54f8c3818edd7810056d45b9954800c430f8593fcb74"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexBefore\\transport.json",
+      "bytes": 3808,
+      "sha256": "54d9ccab465ec1b1362b2e55ef9e9267746b768500ff6709599e07f07546cd3b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexFinal\\transport.json",
+      "bytes": 3848,
+      "sha256": "112525ebf7bbc9174cf9a4169283b082e48526f129527a5a17ad93104346cc2c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexManualCase\\transport.json",
+      "bytes": 3862,
+      "sha256": "c7fb52ec292af29b3d6a29dc6badd619786705ad5a92a1f696a0bdcc06545ddc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\IndexPrivateFixture\\transport.json",
+      "bytes": 3774,
+      "sha256": "d219812fbbd3c649cb5d147757c4c18633ea5880682c84139520acee446df48d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\InitPrivateFixture\\transport.json",
+      "bytes": 3974,
+      "sha256": "71fa366dba44cc700730e883a782e9ac7fb723b43f22a9abe9a3f47acabb2fce"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\ManualRefusal\\transport.json",
+      "bytes": 3652,
+      "sha256": "182cafcfe061b9448a283ec208aa2a992532f927a0848bd0b6c5142de329902b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\Quality\\transport.json",
+      "bytes": 3815,
+      "sha256": "5504f806b3d25fbf5ae2ffff84b25c5e9f87ad87b4c66f349f1d4ac02a36359c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\RestoreCanonicalIndex\\transport.json",
+      "bytes": 3876,
+      "sha256": "a643f61db74e605c92adab422001fbb837205b0ceae1229f5272a589f78db30c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-linux-qualification\\run-v2\\output\\StatusAfter\\transport.json",
+      "bytes": 3841,
+      "sha256": "4ad3226e4dd7f33824ade7c32fbb98d6e2425633342e486bef19443b1f211bf0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\AffectedHelpers\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\CommitPrivateFixture\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\FinalIgnore\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexManualCase\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexPrivateFixture\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\InitPrivateFixture\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalAfter\\log.txt",
+      "bytes": 196,
+      "sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalBefore\\log.txt",
+      "bytes": 196,
+      "sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainManualRefusal\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\RestoreCanonicalIndex\\log.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\AffectedHelpers\\native-result.json",
+      "bytes": 764,
+      "sha256": "83dfb5eed1d3b30f17ba9614030a088cce69081b07b1c97e850f0381c5ab044a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\CommitPrivateFixture\\native-result.json",
+      "bytes": 716,
+      "sha256": "e79a3b72d72e74e8cef54239626a65eff075bb6f7de2781127cc10ad0a7dfc51"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\FinalIgnore\\native-result.json",
+      "bytes": 764,
+      "sha256": "71a10c6468ed48b8a99546548929cdcab73e2f5f23072bed61aad196344cbaf6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexManualCase\\native-result.json",
+      "bytes": 650,
+      "sha256": "7dc250fae80980dd4301ae131f77c2218d7b3601be50f3ff7ce04234049fe900"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexPrivateFixture\\native-result.json",
+      "bytes": 622,
+      "sha256": "380ce109f147bdab28a3badc4dc0b49f9cfb56ac281d76dde6a1f02cf89ca5e7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\InitPrivateFixture\\native-result.json",
+      "bytes": 657,
+      "sha256": "5f2d8ef0113f63098a51fab017098ddab63e607973c50d5f4b172995b9ebd00a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalAfter\\native-result.json",
+      "bytes": 479,
+      "sha256": "bbc1fdef52a87e0412068cf2a67f34124f0ebb493ee6a3b34b8cff1d37f5bb1f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalBefore\\native-result.json",
+      "bytes": 479,
+      "sha256": "8511b98f75487e99cc29b4ae36fef8ba84ec829b9e4cc85364b9a9c13d37df30"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainManualRefusal\\native-result.json",
+      "bytes": 732,
+      "sha256": "1a1743750483d843c03f43d6be494ed35a7beee4216a2133c9adbff800bcb984"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\RestoreCanonicalIndex\\native-result.json",
+      "bytes": 650,
+      "sha256": "8327f67b26517ffce2031829bd15ca0a25a4f59cef91bb3a561a616abfd6adff"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\AffectedHelpers\\result.json",
+      "bytes": 1233,
+      "sha256": "dd1bf3186195254a29c459ce52f54394ed076f97703e4ba8e5a6b230e4083497"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\CommitPrivateFixture\\result.json",
+      "bytes": 1184,
+      "sha256": "635f016c62f9c354bdd3836c0134cb03fad7bbd0e038683d82a9cfce4d9cd221"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\final-ignore\\result.json",
+      "bytes": 4142,
+      "sha256": "102d33a7a8f337c7b64d6ccc0e1903f6a3a11d0e68532991feb910011f1081c5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\FinalIgnore\\result.json",
+      "bytes": 1225,
+      "sha256": "81d4ad4d4a0d57cf1091e34eefd6f4239b22372a7d215dc2b5be38a47756585d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexManualCase\\result.json",
+      "bytes": 1113,
+      "sha256": "eb18c544fb0ccc3ad3222c7120a1c77da819b0c4026f39f71ccd634d786f5c06"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\IndexPrivateFixture\\result.json",
+      "bytes": 1089,
+      "sha256": "26aa19ff15a47d45b12fb65fd6f2f6a6e30a21d04d1d7b4daec5fb4069862ee6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\InitPrivateFixture\\result.json",
+      "bytes": 1123,
+      "sha256": "ca885a43cac5444194dbe3d481686afe213766bdc164f72ab946dc9b8df409e1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalAfter\\result.json",
+      "bytes": 950,
+      "sha256": "b698a00d6ed0698bb41698c348f4ee70ec88a4aaeafa85b0d3f9c30d78ea7968"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainCanonicalBefore\\result.json",
+      "bytes": 951,
+      "sha256": "b545bcf41bfc37ccc3211c9783eed552f6066b786555e98d09aaddeb3750f355"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\MainManualRefusal\\result.json",
+      "bytes": 1201,
+      "sha256": "9509a6812ce1719449562fc47f5ae2fba07d4ba177ccb565cd6f18f7eaf15007"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\ps-b99-r1f3\\output\\RestoreCanonicalIndex\\result.json",
+      "bytes": 1118,
+      "sha256": "29310a3490cfa62ed5500b120709833868d87bd62c058de5df2c99d87ad1ccf9"
+    }
+  ]
+}

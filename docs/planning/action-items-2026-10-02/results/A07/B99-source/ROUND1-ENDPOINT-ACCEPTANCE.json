@@ -1,0 +1,32 @@
+{
+  "status": "ACTUAL_ENDPOINTS_AND_CURRENT_AUDIT_ACCEPTED",
+  "at": "2026-10-07T10:44:17.015158+00:00",
+  "session": 97058,
+  "base": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+  "head": "a7f6dcae7b9db4e83a63c36eb224b9625cb32032",
+  "tree": "5767b0d8aca73f90cf745dcf294114148503f40d",
+  "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-B99-source-20261006\\round1-endpoint-preparation\\bound-one\\execution-run\\result.json",
+  "result_sha256": "aac7d5f5ddf34c354a9fb82b2b77034cba340860aef7cc3675f0f3d7fd4d7188",
+  "five_modes_passed": true,
+  "nine_stages_native_and_wrapper_zero": true,
+  "three_native_main_reads_equal_base": true,
+  "all_guards_equal": true,
+  "owned_jobs_empty_no_termination": true,
+  "owned_temp_absent": true,
+  "audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "58a1345896da1a1e8794078e588e88e58a78e2eb",
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
+  },
+  "scope": "Current committed B/H endpoints and audit only; final independent body/evidence acceptance and native lifecycle remain."
+}
