@@ -1,0 +1,33 @@
+{
+  "captured_at": "2026-10-07T04:06:18.186844+00:00",
+  "run_id": 37569703258,
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "body_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+  "conclusion": "success",
+  "updated_at": "2026-10-07T04:04:43Z",
+  "jobs": [
+    {
+      "id": 112625317061,
+      "name": "Classify maintenance and validate ordinary instructions",
+      "conclusion": "success"
+    },
+    {
+      "id": 112625318401,
+      "name": "Test proposed instruction and workflow behavior",
+      "conclusion": "skipped"
+    }
+  ],
+  "actual_classification_lines": [
+    "Classify maintenance and validate ordinary instructions\tClassify exact PR input and validate ordinary content\t2026-10-07T04:04:41.6581728Z Metadata classification data validated: B=98177628b7bc02c646724bfc8aa0fd73fed0cd24 H=5e8ccbbe45679ab58a202c672554ffda56a0a9f5. This is not first-install, owner or merge authority.",
+    "Classify maintenance and validate ordinary instructions\tClassify exact PR input and validate ordinary content\t2026-10-07T04:04:41.7103573Z MAINTENANCE_REQUIRED: candidate tests, scoped owner authority and fresh independent review are required before merge. This is not ordinary policy admission."
+  ],
+  "limit": "Automatic factual-body maintenance classification succeeded; not a manual CI retry, ordinary policy admission, source test rerun or new review round.",
+  "evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-body-terminal.json": "61fe616fcdbeaaf31e6319e81d1ebb534585f00d8899ff09c9957ac8faaa32fa",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37569703258\\attempt-1\\run.json": "b54a286c4413e0034203b0ae96e68e713d6f9955fb2bbe1e23f4022ae6c675a1",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37569703258\\attempt-1\\jobs.json": "fdaa80a36f22aa48e35c9aa8a5078f07f7f1706aaa0a786a102965e8d884fd68",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37569703258\\attempt-1\\log.txt": "c13935c6a885fc0b69c44753633331e615312b5c8dcb234f1bb743d4256c7ad2",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37569703258\\attempt-1\\summary.json": "ae2c7a1c617fbabcd33ad5bcaf8df71da0456b2d2e14a04bad1f5c1e9a2eaa57"
+  }
+}

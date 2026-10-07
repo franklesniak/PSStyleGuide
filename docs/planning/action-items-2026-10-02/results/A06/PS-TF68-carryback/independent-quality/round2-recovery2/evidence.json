@@ -1,0 +1,1142 @@
+{
+  "status": "PASS_CURRENT_INPUT_RECOVERY_AND_FINAL_QUALITY_SUPPLEMENT",
+  "reviewed_utc": "2026-10-07T04:02:07.290788+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "native_result_observation": "2026-10-07T03:56:02.476437+00:00",
+  "native_gates_observation": "2026-10-07T03:56:42.902964+00:00",
+  "material_findings": [],
+  "source_quality_reused": true,
+  "tests_run": false,
+  "network_or_native_requests": false,
+  "descendants": false,
+  "route": {
+    "requested": "gpt-6-astra/high",
+    "effective_metadata": "Not independently exposed; central routing note retained; no claim of effective model verification"
+  },
+  "raw_git": {
+    "optional_locks": false,
+    "replacements": false,
+    "commit": "tree 821a952c9d4be1395cab3b2af8da7a679987e4a6\nparent 504cd7672ac9604ace765a4f451346f801f09ddd\nauthor Frank Lesniak <franklesniak@hotmail.com> 1791338309 -0500\ncommitter Frank Lesniak <franklesniak@hotmail.com> 1791338309 -0500\n\nAvoid redundant validation of empty Markdown arrays\n",
+    "scope": "M\t.github/workflows/Test-AgentInstructions.SelfTest.ps1\nM\t.github/workflows/Test-AgentInstructions.ps1\nM\t.github/workflows/Test-CiHelpers.test.mjs\nM\t.github/workflows/Test-StyleGuideArtifacts.ps1\nM\t.github/workflows/agent-instructions.yml\nA\t.github/workflows/copilot-code-review.yml\nM\t.github/workflows/package-lock.json\nM\t.github/workflows/package.json\nM\t.github/workflows/scripts-README.md\nM\tdocs/dependency-maintenance.md\n",
+    "native_scope_equal": true
+  },
+  "baseline_comparison": {
+    "captured_at": "2026-10-07T03:34:57.923211+00:00",
+    "new_ids": {
+      "events": [
+        32656445338,
+        32656467427
+      ],
+      "reviews": [
+        5437443500
+      ],
+      "comments": [],
+      "review_comments": [],
+      "workflow_runs": [
+        37567459621
+      ],
+      "check_runs": [
+        112618337044
+      ]
+    },
+    "requested_reviewers_baseline": [
+      {
+        "users": [],
+        "teams": []
+      }
+    ],
+    "requested_reviewers_terminal": [
+      {
+        "users": [],
+        "teams": []
+      }
+    ],
+    "all_four_threads_resolved": true,
+    "threads": [
+      {
+        "id": "PRRT_kwDOQkjdhM6ppYLF",
+        "isResolved": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false,
+            "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMDo0Nzo1NlrO-ltMWA=="
+          },
+          "nodes": [
+            {
+              "databaseId": 4200122706
+            },
+            {
+              "databaseId": 4200287320
+            }
+          ]
+        },
+        "all_comment_ids": [
+          4200122706,
+          4200287320
+        ],
+        "complete_comment_pages": [
+          {
+            "pageInfo": {
+              "hasNextPage": false,
+              "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMDo0Nzo1NlrO-ltMWA=="
+            },
+            "nodes": [
+              {
+                "databaseId": 4200122706
+              },
+              {
+                "databaseId": 4200287320
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PRRT_kwDOQkjdhM6prmeI",
+        "isResolved": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false,
+            "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMjo0Njo1M1rO-miJ6Q=="
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048162
+            },
+            {
+              "databaseId": 4201155049
+            }
+          ]
+        },
+        "all_comment_ids": [
+          4201048162,
+          4201155049
+        ],
+        "complete_comment_pages": [
+          {
+            "pageInfo": {
+              "hasNextPage": false,
+              "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMjo0Njo1M1rO-miJ6Q=="
+            },
+            "nodes": [
+              {
+                "databaseId": 4201048162
+              },
+              {
+                "databaseId": 4201155049
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PRRT_kwDOQkjdhM6prmei",
+        "isResolved": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false,
+            "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMjo0Njo1OFrO-miL7Q=="
+          },
+          "nodes": [
+            {
+              "databaseId": 4201048196
+            },
+            {
+              "databaseId": 4201155565
+            }
+          ]
+        },
+        "all_comment_ids": [
+          4201048196,
+          4201155565
+        ],
+        "complete_comment_pages": [
+          {
+            "pageInfo": {
+              "hasNextPage": false,
+              "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wNlQyMjo0Njo1OFrO-miL7Q=="
+            },
+            "nodes": [
+              {
+                "databaseId": 4201048196
+              },
+              {
+                "databaseId": 4201155565
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "PRRT_kwDOQkjdhM6pvNci",
+        "isResolved": true,
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false,
+            "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wN1QwMzowOTowNlrO-n_EBA=="
+          },
+          "nodes": [
+            {
+              "databaseId": 4202576730
+            },
+            {
+              "databaseId": 4202677252
+            }
+          ]
+        },
+        "all_comment_ids": [
+          4202576730,
+          4202677252
+        ],
+        "complete_comment_pages": [
+          {
+            "pageInfo": {
+              "hasNextPage": false,
+              "endCursor": "Y3Vyc29yOnYyOpK0MjAyNi0xMC0wN1QwMzowOTowNlrO-n_EBA=="
+            },
+            "nodes": [
+              {
+                "databaseId": 4202576730
+              },
+              {
+                "databaseId": 4202677252
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "copilot": {
+    "id": 5437443500,
+    "actor_id": 175728472,
+    "commit": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "submitted_at": "2026-10-07T03:55:06Z",
+    "state": "COMMENTED",
+    "observed_effort": "Balanced",
+    "body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### 🔵 Needs a closer look\n\nIt adds a large security-sensitive setup workflow and a dependency override crossing a declared semver range, and the author's own description records unresolved acceptance gates (a cancelled CI run flagged as a merge blocker, unproven dedicated-setup selection, and a required reverse comparison) that need human judgment.\n\n**Review effort:** Balanced  \n**Findings:** None\n\n<details>\n<summary><strong>Resolved since last review (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This file is modified in the PR but the metadata `Last Updated` is set to `2026-10-06` while other…](#discussion_r4202576730)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+    "body_sha256": "cd67b2cc6b652f3465d0cca50fa515152fea66d1eeeb9ee68516fda398c81a8d",
+    "new_agentic_start_warning": false,
+    "body_concerns": [
+      {
+        "concern": "Large security-sensitive setup workflow",
+        "disposition": "Previously selected C95.9 design corrected by C98.5 finite optional-input security scope; unchanged final local/security/hosted qualification reused. No concrete new unsafe path or failed control identified."
+      },
+      {
+        "concern": "Dependency override crosses parent semver range",
+        "disposition": "Already explicit exact-parent micromark-extension-math@3.1.0 / KaTeX0.18.2 range exception with installation/import/lint compatibility and removal condition, covered by reused local two-root audit and affected caller tests. Generated lock exclusion is retained; review alone does not certify dependencies."
+      },
+      {
+        "concern": "Cancelled CI flagged as merge blocker",
+        "disposition": "Correct historical body statement. Same-H authorized recovery now succeeded; previous run37562640212/check112603164453 remains cancelled in complete collections. Current service outcome superseded by successful37567459621/check112618337044, without deletion or relabeling."
+      },
+      {
+        "concern": "Unproved dedicated setup selection",
+        "disposition": "Still unproved: successful service executed coding-only full validation. Selected B93.5 places actual dedicated-service proof after all-green normal source landing, before S1/affected-task/paired completion."
+      },
+      {
+        "concern": "Required reverse comparison",
+        "disposition": "Still mandatory using actual landed commits; conditional three-path peer readiness is not delivery or paired acceptance."
+      }
+    ]
+  },
+  "codex": {
+    "id": 6029735383,
+    "actor_id": 199175422,
+    "created_at": "2026-10-07T02:38:43Z",
+    "body_sha256": "b6345614d0008401655dd2f0b9fc1225a1fd649e8e14c386d65e98fb4956f6ac",
+    "baseline_body_unchanged": true,
+    "previous_causal_binding_reused": true
+  },
+  "ci": {
+    "ordinary_success": 15,
+    "all_run_census": {
+      "success": 16,
+      "cancelled": 1
+    },
+    "all_check_census": {
+      "success": 26,
+      "skipped": 5,
+      "cancelled": 1
+    },
+    "pending_runs": [],
+    "pending_checks": [],
+    "failed_checks": [],
+    "retained_cancelled_check": 112603164453,
+    "successful_recovery_check": 112618337044,
+    "current_service_context": "copilot-pull-request-reviewer",
+    "supersession": "Same exact head, same service/name/app15368, new authenticated authorized recovery after terminal failure; no historical result modified.",
+    "run_rows": [
+      {
+        "id": 37567459621,
+        "name": "Running Copilot Code Review",
+        "event": "dynamic",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T03:35:32Z",
+        "updated_at": "2026-10-07T03:55:07Z"
+      },
+      {
+        "id": 37565487714,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T03:10:11Z",
+        "updated_at": "2026-10-07T03:10:28Z"
+      },
+      {
+        "id": 37562640212,
+        "name": "Running Copilot Code Review",
+        "event": "dynamic",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "created_at": "2026-10-07T02:34:37Z",
+        "updated_at": "2026-10-07T02:55:09Z"
+      },
+      {
+        "id": 37562193726,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:06Z",
+        "updated_at": "2026-10-07T02:29:28Z"
+      },
+      {
+        "id": 37562192514,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:41:17Z"
+      },
+      {
+        "id": 37562192513,
+        "name": "Markdown Lint",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:29:23Z"
+      },
+      {
+        "id": 37562191989,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:29:22Z"
+      },
+      {
+        "id": 37562192494,
+        "name": "Copilot code review preparation",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:29:37Z"
+      },
+      {
+        "id": 37562192569,
+        "name": "Dev container boundary",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:29:12Z"
+      },
+      {
+        "id": 37562192608,
+        "name": "Build Style Guide Artifacts",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:30:36Z"
+      },
+      {
+        "id": 37562192501,
+        "name": "Agent instruction validation",
+        "event": "pull_request",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:05Z",
+        "updated_at": "2026-10-07T02:47:52Z"
+      },
+      {
+        "id": 37562189632,
+        "name": "Dev container boundary",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:29:09Z"
+      },
+      {
+        "id": 37562189629,
+        "name": "Copilot code review preparation",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:29:25Z"
+      },
+      {
+        "id": 37562189589,
+        "name": "Markdown Lint",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:29:32Z"
+      },
+      {
+        "id": 37562189611,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:30:25Z"
+      },
+      {
+        "id": 37562189624,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:43:16Z"
+      },
+      {
+        "id": 37562189656,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-07T02:29:03Z",
+        "updated_at": "2026-10-07T02:48:03Z"
+      }
+    ],
+    "check_rows": [
+      {
+        "id": 112618337044,
+        "name": "copilot-pull-request-reviewer",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:35:37Z",
+        "completed_at": "2026-10-07T03:55:06Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37567459621/job/112618337044",
+        "app_id": 15368
+      },
+      {
+        "id": 112612110714,
+        "name": "Test proposed instruction and workflow behavior",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-07T03:10:12Z",
+        "completed_at": "2026-10-07T03:10:11Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37565487714/job/112612110714",
+        "app_id": 15368
+      },
+      {
+        "id": 112612109772,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:10:14Z",
+        "completed_at": "2026-10-07T03:10:28Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37565487714/job/112612109772",
+        "app_id": 15368
+      },
+      {
+        "id": 112603164453,
+        "name": "copilot-pull-request-reviewer",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "started_at": "2026-10-07T02:34:42Z",
+        "completed_at": "2026-10-07T02:55:09Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562640212/job/112603164453",
+        "app_id": 15368
+      },
+      {
+        "id": 112602092863,
+        "name": "publish_committed_artifacts",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:30:29Z",
+        "completed_at": "2026-10-07T02:30:35Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192608/job/112602092863",
+        "app_id": 15368
+      },
+      {
+        "id": 112602045037,
+        "name": "publish_committed_artifacts",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:30:19Z",
+        "completed_at": "2026-10-07T02:30:25Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189611/job/112602045037",
+        "app_id": 15368
+      },
+      {
+        "id": 112602028665,
+        "name": "verify_generated_artifacts",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:30:15Z",
+        "completed_at": "2026-10-07T02:30:27Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192608/job/112602028665",
+        "app_id": 15368
+      },
+      {
+        "id": 112601985392,
+        "name": "verify_generated_artifacts",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:30:05Z",
+        "completed_at": "2026-10-07T02:30:16Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189611/job/112601985392",
+        "app_id": 15368
+      },
+      {
+        "id": 112601754433,
+        "name": "Test proposed instruction and workflow behavior",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:29:07Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562193726/job/112601754433",
+        "app_id": 15368
+      },
+      {
+        "id": 112601753201,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:09Z",
+        "completed_at": "2026-10-07T02:29:27Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562193726/job/112601753201",
+        "app_id": 15368
+      },
+      {
+        "id": 112601748635,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-07T02:29:06Z",
+        "completed_at": "2026-10-07T02:29:05Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192501/job/112601748635",
+        "app_id": 15368
+      },
+      {
+        "id": 112601748582,
+        "name": "generator_linux_7",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:08Z",
+        "completed_at": "2026-10-07T02:29:44Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192608/job/112601748582",
+        "app_id": 15368
+      },
+      {
+        "id": 112601748559,
+        "name": "generator_windows_7",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:10Z",
+        "completed_at": "2026-10-07T02:30:13Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192608/job/112601748559",
+        "app_id": 15368
+      },
+      {
+        "id": 112601748498,
+        "name": "Validate the devcontainer exclusion",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:08Z",
+        "completed_at": "2026-10-07T02:29:11Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192569/job/112601748498",
+        "app_id": 15368
+      },
+      {
+        "id": 112601748354,
+        "name": "generator_windows_51",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:08Z",
+        "completed_at": "2026-10-07T02:30:00Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192608/job/112601748354",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747990,
+        "name": "Test proposed instruction and workflow behavior",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-07T02:29:06Z",
+        "completed_at": "2026-10-07T02:29:05Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562191989/job/112601747990",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747791,
+        "name": "Install locked repository validation tools",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:41:16Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192514/job/112601747791",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747720,
+        "name": "policy",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:29:23Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192513/job/112601747720",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747498,
+        "name": "Test proposed instruction and workflow behavior",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:08Z",
+        "completed_at": "2026-10-07T02:47:52Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192501/job/112601747498",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747487,
+        "name": "markdownlint",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:29:23Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192513/job/112601747487",
+        "app_id": 15368
+      },
+      {
+        "id": 112601747464,
+        "name": "Prepare locked code review tools and hooks",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:29:37Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562192494/job/112601747464",
+        "app_id": 15368
+      },
+      {
+        "id": 112601746865,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:29:21Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562191989/job/112601746865",
+        "app_id": 15368
+      },
+      {
+        "id": 112601739608,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "skipped",
+        "started_at": "2026-10-07T02:29:04Z",
+        "completed_at": "2026-10-07T02:29:03Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189656/job/112601739608",
+        "app_id": 15368
+      },
+      {
+        "id": 112601739094,
+        "name": "generator_linux_7",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:05Z",
+        "completed_at": "2026-10-07T02:29:53Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189611/job/112601739094",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738963,
+        "name": "Validate the devcontainer exclusion",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:05Z",
+        "completed_at": "2026-10-07T02:29:08Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189632/job/112601738963",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738771,
+        "name": "generator_windows_7",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:06Z",
+        "completed_at": "2026-10-07T02:30:03Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189611/job/112601738771",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738600,
+        "name": "Install locked repository validation tools",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:05Z",
+        "completed_at": "2026-10-07T02:43:15Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189624/job/112601738600",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738543,
+        "name": "generator_windows_51",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:06Z",
+        "completed_at": "2026-10-07T02:29:59Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189611/job/112601738543",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738462,
+        "name": "Prepare locked code review tools and hooks",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:05Z",
+        "completed_at": "2026-10-07T02:29:24Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189629/job/112601738462",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738370,
+        "name": "policy",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:06Z",
+        "completed_at": "2026-10-07T02:29:31Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189589/job/112601738370",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738332,
+        "name": "Test proposed instruction and workflow behavior",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:07Z",
+        "completed_at": "2026-10-07T02:48:03Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189656/job/112601738332",
+        "app_id": 15368
+      },
+      {
+        "id": 112601738184,
+        "name": "markdownlint",
+        "head_sha": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-07T02:29:05Z",
+        "completed_at": "2026-10-07T02:29:26Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37562189589/job/112601738184",
+        "app_id": 15368
+      }
+    ]
+  },
+  "raw_service": {
+    "job": 112618337044,
+    "status": "completed",
+    "conclusion": "success",
+    "steps": [
+      {
+        "name": "Run complete repository validation",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:36:21Z",
+        "completed_at": "2026-10-07T03:48:12Z"
+      },
+      {
+        "name": "Verify final immutable setup inputs",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:48:13Z",
+        "completed_at": "2026-10-07T03:48:13Z"
+      },
+      {
+        "name": "Processing Request (Linux)",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:48:17Z",
+        "completed_at": "2026-10-07T03:55:02Z"
+      },
+      {
+        "name": "Clean Up (Linux)",
+        "conclusion": "success",
+        "started_at": "2026-10-07T03:55:02Z",
+        "completed_at": "2026-10-07T03:55:02Z"
+      }
+    ],
+    "full_validation_seconds": 711,
+    "actual_hook_pass_lines": [
+      {
+        "line": 2111,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:41.7918236Z check json...............................................................Passed"
+      },
+      {
+        "line": 2112,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:42.6806111Z check yaml...............................................................Passed"
+      },
+      {
+        "line": 2113,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:43.9531478Z fix end of files.........................................................Passed"
+      },
+      {
+        "line": 2114,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:45.2240711Z trim trailing whitespace.................................................Passed"
+      },
+      {
+        "line": 2115,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:46.1442717Z yamllint.................................................................Passed"
+      },
+      {
+        "line": 2116,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:47.8286130Z Lint GitHub Actions workflow files.......................................Passed"
+      },
+      {
+        "line": 2117,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:48.7999835Z Validate Dependabot Config (v2)..........................................Passed"
+      },
+      {
+        "line": 2118,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:49.7978954Z Validate GitHub Workflows................................................Passed"
+      },
+      {
+        "line": 2119,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:49.8294304Z staged Markdown..........................................................Passed"
+      },
+      {
+        "line": 2120,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:50.5400502Z workflow policy contract.................................................Passed"
+      },
+      {
+        "line": 2121,
+        "text": "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:48:12.5382912Z agent instruction contract and mutation tests............................Passed"
+      }
+    ],
+    "final_guard_success_line": 2276,
+    "result_reported_line": 3383,
+    "annotations": [],
+    "log_sha256": "ca02a6464bddaf76ab7f29f84a53a010f7c7fd0ba91877296b077e27142a06ac",
+    "log_bytes": 513453,
+    "nonfatal_service_warnings": {
+      "default_model_settings_lines": [
+        3292,
+        3303,
+        3380,
+        3381
+      ],
+      "content_exclusion_404_and_proceed_without_exclusions_lines": [
+        3308,
+        3313
+      ],
+      "assessment": "Recorded service limitations; terminal processing and result posting succeeded. No agentic-start-timeout warning in current submitted review and no new concrete finding."
+    },
+    "reviewer_plan_no_new_concrete_issues_lines": [
+      3372,
+      3375
+    ],
+    "dedicated_service_selection_proved": false
+  },
+  "native_gates": {
+    "pr": {
+      "state": "OPEN",
+      "isDraft": false,
+      "headRefOid": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "baseRefOid": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "mergeable": "MERGEABLE",
+      "mergeStateStatus": "CLEAN",
+      "reviewDecision": null,
+      "viewerCanUpdate": true
+    },
+    "merge_commit_allowed": true,
+    "main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "rules": [
+      [
+        {
+          "type": "deletion",
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/PSStyleGuide",
+          "ruleset_id": 24419725
+        },
+        {
+          "type": "non_fast_forward",
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/PSStyleGuide",
+          "ruleset_id": 24419725
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": false,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge",
+              "squash",
+              "rebase"
+            ]
+          },
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/PSStyleGuide",
+          "ruleset_id": 24419725
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "policy",
+                "integration_id": 15368
+              },
+              {
+                "context": "markdownlint",
+                "integration_id": 15368
+              },
+              {
+                "context": "verify_generated_artifacts",
+                "integration_id": 15368
+              }
+            ]
+          },
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/PSStyleGuide",
+          "ruleset_id": 24419725
+        }
+      ]
+    ],
+    "ruleset_id": 24419725,
+    "enforcement": "active",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "files": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json",
+      ".github/workflows/scripts-README.md",
+      "docs/dependency-maintenance.md"
+    ]
+  },
+  "factual_body_update": {
+    "appropriate": true,
+    "new_round_required_for_factual_status_only": false,
+    "conditions": "Retain the inspected text and all gates; authenticate native body readback and reconcile automatically triggered CI before merge. No publication performed by reviewer.",
+    "proposed_body_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+    "prior_body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+    "exact_proposed_text_reviewed": true,
+    "problem_validation_unchanged": true,
+    "remaining_acceptance_unchanged": true,
+    "verdict": "PASS factual status-only proposed text; no new material scope/new round"
+  },
+  "constraints": {
+    "round": "2/80",
+    "current_input_service_attempts": "2/3",
+    "old_input_service_attempts": "3/3 exhausted",
+    "deadline": "2026-10-14T20:09:39.767792Z",
+    "transfers_A06_A03_A21_A07": [
+      2,
+      4,
+      6,
+      6
+    ],
+    "transfer_cap": 12,
+    "manual_relaunch_at_most_hourly": true,
+    "no_merge_with_current_failing_ci": true,
+    "B99": "Frozen until genuine PS acceptance"
+  },
+  "limitations": [
+    "Snapshot only; root owns immediate premerge fresh native binding and actual normal merge.",
+    "No blanket merge approval; no dedicated-service, landed or paired acceptance.",
+    "Unchanged completed local/source/ordinary quality reused, not rerun or expanded.",
+    "Single observed hosted success proves no stable performance guarantee.",
+    "Generated lock review exclusion and provider warnings retained."
+  ],
+  "references": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two-baseline.json",
+      "sha256": "0a6e2e0c6e7b86dc3f02b7e05bc4b1b8b543e0d54d1b7c7ef799eaf8c4c0923c",
+      "bytes": 810678
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json",
+      "sha256": "958ab5f4458230cc59f6becebc79ecb40c726228337b06e4d211bb00783565af",
+      "bytes": 2029
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-terminal.json",
+      "sha256": "a853d0f6f2c08df9bdc83d7090fc5190ac6a11882a28dbd57bd0966d61df10c4",
+      "bytes": 845842
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-native-gates.json",
+      "sha256": "79cae5d92d182b948c6b8f6d6b72eaed2b69fac78ee06ab16228dc66aef34b9c",
+      "bytes": 208828
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\run.json",
+      "sha256": "f5e47a64f64405ecb8d3d59a89221bb5ebbeb885cb02696c352973878cb9bbe2",
+      "bytes": 14931
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\jobs.json",
+      "sha256": "9654ee87c989332d3876fcd10bc5ae87e0a174e5800407cbed6fc1576abef4c7",
+      "bytes": 29645
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+      "bytes": 3
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\summary.json",
+      "sha256": "8ad8359f57a7443d46c59998696f0cd562947763827868d5f6cf155aa5ac34e3",
+      "bytes": 12163
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\log.txt",
+      "sha256": "ca02a6464bddaf76ab7f29f84a53a010f7c7fd0ba91877296b077e27142a06ac",
+      "bytes": 513453
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\REPORT.md",
+      "sha256": "0f59afbd16690750d2223d7497a61ed6724d2c0f2ff666a0e8cafc0cfc6dfaa8",
+      "bytes": 4926
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-current\\evidence.json",
+      "sha256": "8e7ca04d3ce1311310ca85a0bda71823b432cb80caa311b2e89ae536a7e4abc5",
+      "bytes": 15794
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-R4-disposition\\REPORT.md",
+      "sha256": "d0038ed5ebd772ed0d901d6f1f08848201ba29dee0176f1b42cf6202b52e228b",
+      "bytes": 4284
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-R4-disposition\\evidence.json",
+      "sha256": "60ec6ceb5f7e65698af1480ad48cd0498d50bb202fa2953b4ea16b619fe29a5e",
+      "bytes": 6242
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\FINAL-REPORT.md",
+      "sha256": "d9d329b5a0094f2bf0964255e79d991cbd41be2b404c1f5444910f0ca04d34a4",
+      "bytes": 3949
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round1-recovery-exhaustion\\empty-array-trial\\actual-head-quality\\final-evidence.json",
+      "sha256": "7ca2e74f7fadcc1796966cf139369e6e257e125fae4b78dc8f660349b96a41e9",
+      "bytes": 19132
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A06.md",
+      "sha256": "332e538613bd227564932a2ec10889f797959495f7580c343324b85509c1f1e7",
+      "bytes": 4632
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "60ccfa68bfeefc68fdaea8efd19debe45d152c3b8153092948a396b25794617c",
+      "bytes": 16434
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round5-activation\\REPORT.md",
+      "sha256": "5f96ba08f2af0dd997396cbe24e315a3b6d70a41b078314d6550c5c85ca02def",
+      "bytes": 16997
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round7\\final-quality\\REPORT.md",
+      "sha256": "bbfa35e6cd91fd2c8b0ca6bbddf7ecae7f6e329dab56cf8b81a5dbd5711ea78a",
+      "bytes": 6211
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-security-scope.md",
+      "sha256": "8f04e055b9403ed3d11427b2f8ae00462f0430c9f46db61ff801cbe58034d28b",
+      "bytes": 11343
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-design-closure.md",
+      "sha256": "eb69f4cbd325ca434bc64904b3d3dacd411aabb9827e43006fa99e81c744ea7b",
+      "bytes": 4948
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-R4-proposed-body.txt",
+      "sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+      "bytes": 11149
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-proposed-body.txt",
+      "sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+      "bytes": 11941
+    }
+  ],
+  "report_sha256": "339d58aa639966c76457e32c9d2328f0880386514f66334d80db7a49a77fe9c8"
+}

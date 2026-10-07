@@ -1,0 +1,29 @@
+{
+  "status": "body_update_confirmed",
+  "intent_at": "2026-10-07T04:04:25.069443+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "expected_body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "proposed_body_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+  "reason": "Factual successful current-input recovery and existing acceptance disposition; source/problem/validation/remaining scope unchanged.",
+  "transport": "gh api PATCH fallback; current connector catalog has no PR-body update capability",
+  "independent_quality": {
+    "status": "PASS_CURRENT_INPUT_RECOVERY_AND_FINAL_QUALITY_SUPPLEMENT",
+    "worker": "ps235_recovery2_acceptance",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2",
+    "scope": "New terminal service/review/native evidence and overview duplicate assessment; unchanged source quality reused.",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2\\REPORT.md",
+    "report_sha256": "339d58aa639966c76457e32c9d2328f0880386514f66334d80db7a49a77fe9c8",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\independent-quality\\round2-recovery2\\evidence.json",
+    "evidence_sha256": "668f8b948ee6574cdf73e91fbd83ca5c2aa0c92b68a173199778d48cb2d44c11",
+    "root_read_complete": true,
+    "root_consequential_reference_samples": 5,
+    "body_proposal_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44",
+    "new_material_findings": 0,
+    "acceptance_released": false,
+    "remaining": "Factual body readback/automatic CI; immediate native premerge check; later dedicated/landed/paired gates remain."
+  },
+  "update_exit": 0,
+  "completed_at": "2026-10-07T04:04:27.558871+00:00",
+  "body_sha256": "ae847d8066de0cee95b958f6309f9e1328c0b0d1b4aca3b0734ad8fde7bd8d44"
+}

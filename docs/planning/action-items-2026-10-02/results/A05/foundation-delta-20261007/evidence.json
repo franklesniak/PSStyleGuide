@@ -1,0 +1,2178 @@
+{
+  "recorded_at": "2026-10-07T03:45:57.317816+00:00",
+  "scope": "bounded read-only A05 foundation delta; no runtime tests/native requests/product writes",
+  "sources": [
+    {
+      "label": "PS-accepted",
+      "repository": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+      "accepted_supplied_by_root": true,
+      "baseline_label": "PS-accepted",
+      "baseline_ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "bounded_workflow_delta_paths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/build.yml",
+        ".github/workflows/scripts-README.md",
+        ".github/workflows/workflow-policy-cases.json"
+      ]
+    },
+    {
+      "label": "TF-accepted",
+      "repository": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "tree": "e71b81232ba0f197acf5f126e4b14f1e90ee7da2",
+      "accepted_supplied_by_root": true,
+      "baseline_label": "TF-accepted",
+      "baseline_ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "bounded_workflow_delta_paths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/agent-instructions.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/copilot-code-review.yml",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/scripts-README.md",
+        ".github/workflows/workflow-policy-cases.json"
+      ]
+    },
+    {
+      "label": "PS235-prospective",
+      "repository": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+      "accepted_supplied_by_root": false,
+      "baseline_label": "A06-staged-prospective",
+      "baseline_ref": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+      "bounded_workflow_delta_paths": [
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/agent-instructions.yml",
+        ".github/workflows/copilot-code-review.yml",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/scripts-README.md"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "bytes": 54645,
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "baseline": {
+        "path": ".github/instructions/yaml.instructions.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+        "bytes": 54645,
+        "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+      "bytes": 90995,
+      "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "baseline": {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "bytes": 86655,
+        "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "bytes": 123582,
+      "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "baseline": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+        "bytes": 98544,
+        "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "baseline": {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "bytes": 253910,
+        "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "bytes": 36090,
+      "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "bytes": 32648,
+        "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "absent": true
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+      "bytes": 12837,
+      "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      "baseline": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "bytes": 12837,
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "bytes": 25715,
+      "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "baseline": {
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "bytes": 1517,
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "baseline": {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 5398,
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "924d12c833d07def47d05137b532e622db622fa4",
+      "bytes": 54645,
+      "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "baseline": {
+        "path": ".github/instructions/yaml.instructions.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "924d12c833d07def47d05137b532e622db622fa4",
+        "bytes": 54645,
+        "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "ef2e3d08b54212da215790a8a61f4b259b5c81c8",
+      "bytes": 91158,
+      "sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "baseline": {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "bytes": 95329,
+        "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019",
+      "bytes": 130059,
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "baseline": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "bytes": 100007,
+        "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "baseline": {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "bytes": 253918,
+        "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e",
+      "bytes": 36081,
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "bytes": 31949,
+        "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "absent": true
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd",
+      "bytes": 12893,
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "baseline": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "bytes": 12865,
+        "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c7865981e4755df08eecdeed59af21cb2d09ac90",
+      "bytes": 25744,
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "baseline": {
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "bytes": 4348,
+        "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "bytes": 1496,
+      "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "bytes": 5405,
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "baseline": {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "bytes": 5405,
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "bytes": 54645,
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "baseline": {
+        "path": ".github/instructions/yaml.instructions.md",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+        "bytes": 54645,
+        "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "bytes": 6095,
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "baseline": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "166d137206aff8f503911be9a569efbd204e023b",
+        "bytes": 26191,
+        "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+      "bytes": 90995,
+      "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "baseline": {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+        "bytes": 90995,
+        "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0eb1362df2fad5f6c3a04054c8a575d0981cbf39",
+      "bytes": 130003,
+      "sha256": "fd51ccf06a37963191a07a9aef1629846acba32c8eaa60599b90a2594bfa3780",
+      "baseline": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "bytes": 123582,
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "baseline": {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0dfff820ae8a7243a163d8e81924ba3788884753",
+      "bytes": 36084,
+      "sha256": "70f949e59d41797cbf906d61e670f434fab867a28c251351ac3162d96ac61390",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "bytes": 36090,
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "baseline": {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7e9c97c06d3c4c937538e634ffe8cf08ea3e4435",
+        "bytes": 27089,
+        "sha256": "fbfa8555cd9596073abb78200af00eba9df38e60f336c0bf500342401ca17584"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "bytes": 31176,
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "baseline": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+        "bytes": 17625,
+        "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "8a14b8c284dc6b136836840e8641f497ba8d15d6",
+      "bytes": 12865,
+      "sha256": "708d90cf7e41c6001adb59d11df15ca4c477db835c810d2ed0896206b711bec3",
+      "baseline": {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "bytes": 12837,
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+      },
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "bytes": 25715,
+      "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "baseline": {
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+        "bytes": 25715,
+        "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+        "bytes": 26216,
+        "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "bytes": 1517,
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+      "baseline": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "baseline": {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 5398,
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "changed_from_prior": false
+    }
+  ],
+  "callers": [
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/agent-instructions.yml",
+      "line": 210,
+      "invocation": "& node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs",
+      "next_line": "if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }",
+      "native_exit_line": 211
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/agent-instructions.yml",
+      "line": 211,
+      "invocation": "& node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs",
+      "next_line": "if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }",
+      "native_exit_line": 212
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/agent-instructions.yml",
+      "line": 211,
+      "invocation": "& node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs",
+      "next_line": "if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }",
+      "native_exit_line": 212
+    }
+  ],
+  "approved_patches": [
+    {
+      "source": "PS-accepted",
+      "patch": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A05\\proposed-PS.patch",
+      "patch_sha256": "3646374828a8cd128645a734d2d1a347ab3495efb49f270898d9c556cde820e7",
+      "preimage_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "preview_bytes": 57926,
+      "preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+      "strict_in_memory_application": true,
+      "metadata_finalization_required": true
+    },
+    {
+      "source": "TF-accepted",
+      "patch": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A05\\proposed-TF.patch",
+      "patch_sha256": "2d4c357ff5cf6694365b27130e79de97758439f5a6aae903b823baff35e605c2",
+      "preimage_sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "preview_bytes": 57926,
+      "preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+      "strict_in_memory_application": true,
+      "metadata_finalization_required": true
+    },
+    {
+      "source": "PS235-prospective",
+      "patch": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A05\\proposed-PS.patch",
+      "patch_sha256": "3646374828a8cd128645a734d2d1a347ab3495efb49f270898d9c556cde820e7",
+      "preimage_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "preview_bytes": 57926,
+      "preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+      "strict_in_memory_application": true,
+      "metadata_finalization_required": true
+    }
+  ],
+  "retained_runtime_hash_verification": [
+    {
+      "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+      "matches_saved": true,
+      "evidence_set": "PSStyleGuide-A05-design-20261002",
+      "file": "probe-results.json",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\probe-results.json",
+      "rechecked_sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+      "not_rerun": true
+    },
+    {
+      "sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+      "matches_saved": true,
+      "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+      "file": "linux-local-git-probe.mjs",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-post231-readiness-20261004\\linux-local-git-probe.mjs",
+      "rechecked_sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+      "not_rerun": true
+    },
+    {
+      "sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+      "matches_saved": true,
+      "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+      "file": "linux-probe-results.json",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-post231-readiness-20261004\\linux-probe-results.json",
+      "rechecked_sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+      "not_rerun": true
+    },
+    {
+      "sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+      "matches_saved": true,
+      "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+      "file": "linux-execution.json",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-post231-readiness-20261004\\linux-execution.json",
+      "rechecked_sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+      "not_rerun": true
+    }
+  ],
+  "retained_proofs": {
+    "readiness_record_sha256": "a26b2bdae826dfba7df2fe4be6632c1f36e0e04c2d538f0b1baa6bbdfb49e7c9",
+    "windows": {
+      "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+      "environment": {
+        "git": "git version 2.55.0.windows.5",
+        "host": "win32",
+        "transport": "local file URI; no network/service behavior proof",
+        "perProcessTimeoutSeconds": 15
+      },
+      "eventCommit": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "movedBranchCommit": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+      "allCommandsWithinAssertions": true,
+      "fetchFlagEquality": true,
+      "notRerun": true
+    },
+    "linux": {
+      "native_exit": 0,
+      "elapsed_seconds": 0.984,
+      "image": "sha256:4484fb945681e4ac67180b5e7df85a1ade48168ba3d38f8d60d78ec3ecb497a3",
+      "script_sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+      "result_sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+      "execution_record_sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+      "platform": "linux",
+      "node": "v24.18.1",
+      "git": "git version 2.43.0",
+      "uid": 65534,
+      "native_command_count": 37,
+      "per_child_timeout_ms": 15000,
+      "event_commit": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+      "moved_branch_commit": "e4107a36ce420331cef794f137fd47df0ecf262a",
+      "results": [
+        {
+          "case": "immutable",
+          "actualRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "matchesEvent": true,
+          "value": "event A",
+          "exactComparisonNativeExit": 0,
+          "shallowCommitCount": 1
+        },
+        {
+          "case": "mutable",
+          "actualRevision": "e4107a36ce420331cef794f137fd47df0ecf262a",
+          "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "matchesEvent": false,
+          "value": "later B",
+          "exactComparisonNativeExit": 1,
+          "shallowCommitCount": 1
+        }
+      ],
+      "missing_object_native_exit": 128,
+      "missing_object_leaves_no_target": true,
+      "fixture_removed": true,
+      "scope": "Local file-URI Git semantics only; no hosted transport, network-deadline or final product claim."
+    },
+    "probe_not_rerun": true,
+    "original_preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+    "existing_file_hash_checks": [
+      {
+        "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-design-20261002",
+        "file": "probe-results.json"
+      },
+      {
+        "sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-local-git-probe.mjs"
+      },
+      {
+        "sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-probe-results.json"
+      },
+      {
+        "sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-execution.json"
+      }
+    ]
+  },
+  "decision": "I99/D08 retained; no new owner choice",
+  "state": "active; held pending serialized foundation acceptance; CI hold persists",
+  "budgets": {
+    "transfers": 0,
+    "transfer_cap": 8,
+    "review_rounds": 0,
+    "review_cap": 80,
+    "clock": "unstarted"
+  },
+  "native_acceptance": "Root-supplied; current main refs not independently authenticated by this worker",
+  "additional_integration_identities": [
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "bytes": 482175,
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+      "baseline_blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "bytes": 229936,
+      "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+      "baseline_blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "bytes": 844,
+      "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+      "baseline_blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "changed_from_prior": false
+    },
+    {
+      "source": "PS-accepted",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "bytes": 38822,
+      "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+      "baseline_blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "changed_from_prior": false
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "67e0c1ce95ff6b99c76f1959b5c284e208b450dd",
+      "bytes": 510470,
+      "sha256": "e2a7767f70ffc3d38e9225d7ed6a723d9329135e3b104b3cec9654122ae7d35c",
+      "baseline_blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "07886736b000aeff5d5d431ed31098bcdc4add48",
+      "bytes": 285263,
+      "sha256": "dd2aaf7f23e77f00cf264ba1b4b130d34006cec9958f94e24570f2982231415e",
+      "baseline_blob": "7275b050ca3067706d646412a7f751138073e5bb",
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "670083e767627cfed90a61f788021dba88de1091",
+      "bytes": 994,
+      "sha256": "87e0ca58fb56402808252679f7d8f8721484ddc575a814af077d7b0d23950649",
+      "baseline_blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+      "changed_from_prior": true
+    },
+    {
+      "source": "TF-accepted",
+      "ref": "a840f21b03f0dcac0815e2f7f044928667402b42",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "12a755075c87c7ab65a4c8055975c81116c4000c",
+      "bytes": 38834,
+      "sha256": "4923c138c8d03f9de63d0396d910060d4ba6d51a02ee884929051a57834ed176",
+      "baseline_blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6607c5e4eecc4d9dd23a6123011176da7a4455b7",
+      "bytes": 510837,
+      "sha256": "658fa71b68fc47657bbc3147e31a8c805cdf0a34c0653e765bc14ec9971f144c",
+      "baseline_blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "38754eff438fbad9d64f58470a575bb42c4c845a",
+      "bytes": 299398,
+      "sha256": "f2fbcb89dd737ee4be61dfd26b60297745859189e4e0153b477018f831280ce8",
+      "baseline_blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7a4dc1f439a4850db835b3bd4b04e38cde85e0e0",
+      "bytes": 936,
+      "sha256": "43ecc5b2abc16aaf722d3d390fbec52c91601ba19a568df49ca50ccb14d23eb9",
+      "baseline_blob": "b09ca859508430050dc0b023b3dba62e50748680",
+      "changed_from_prior": true
+    },
+    {
+      "source": "PS235-prospective",
+      "ref": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "bd358653a6366f9108d6f748ab1f4b02525f9c12",
+      "bytes": 38820,
+      "sha256": "89c036ba66edb71c24dac7153b48e0d748bbb5db7d87989f3aa9b7e9b2b17631",
+      "baseline_blob": "27cc70ba810dfb3f410014542142154f86509196",
+      "changed_from_prior": true
+    }
+  ],
+  "metadata_interface_excerpts": [
+    {
+      "source": "PS-accepted",
+      "line": 13,
+      "text": "# .PARAMETER FinalizeMetadataNow"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 34,
+      "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 3846,
+      "text": "function Get-OperativeMarkdownContext {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 4318,
+      "text": "function Get-PublishedEndpointLastUpdatedFailure {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 4424,
+      "text": "                -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false)"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 4436,
+      "text": "                -RequireExpectedUtcDateForRenderedChange $false)"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 6477,
+      "text": "function Get-PublishedEndpointMetadataFailure {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 6500,
+      "text": "    # .PARAMETER RequireExpectedUtcDateForRenderedChange"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 6541,
+      "text": "        [bool] $RequireExpectedUtcDateForRenderedChange = $true"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 6583,
+      "text": "        if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 6710,
+      "text": "    if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 7618,
+      "text": "if ($RequireStagedInputMatch -and ($MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 7627,
+      "text": "if ($ProposedPolicy -and ($SelfTest -or $MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 7636,
+      "text": "if ($FinalizeMetadataNow -and ($SelfTest -or $MetadataClassificationOnly -or"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 7638,
+      "text": "    throw 'FinalizeMetadataNow requires exact B/H endpoints and cannot run with other modes.'"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 8068,
+      "text": "    if ($FinalizeMetadataNow) {"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 8100,
+      "text": "            RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 8211,
+      "text": "                -RequireExpectedUtcDateForRenderedChange `"
+    },
+    {
+      "source": "PS-accepted",
+      "line": 8228,
+      "text": "if ($FinalizeMetadataNow) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 13,
+      "text": "# .PARAMETER FinalizeMetadataNow"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 34,
+      "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 246,
+      "text": "    # .PARAMETER UseNativeStructuralConversion"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 271,
+      "text": "        [Parameter()][switch] $UseNativeStructuralConversion"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 327,
+      "text": "        if ($UseNativeStructuralConversion) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3322,
+      "text": "function Get-MarkdownParseReuseSlot {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3334,
+      "text": "    # Get-MarkdownParseReuseSlot -Budget $objBudget"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3353,
+      "text": "function Clear-MarkdownParseReuseSlot {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3365,
+      "text": "    # Clear-MarkdownParseReuseSlot -Slot $objSlot"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3777,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $ReuseSlot"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 3782,
+      "text": "                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4077,
+      "text": "        try { Clear-MarkdownParseReuseSlot -Slot $ReuseSlot } catch { Write-Verbose 'Reuse cleanup failed after validation failure.' }"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4281,
+      "text": "function Get-OperativeMarkdownContext {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4753,
+      "text": "function Get-PublishedEndpointLastUpdatedFailure {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4777,
+      "text": "    # .PARAMETER CurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4780,
+      "text": "    # .PARAMETER ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4808,
+      "text": "        [Parameter()][AllowNull()][object] $CurrentParseReuse,"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4809,
+      "text": "        [Parameter()][AllowNull()][object] $ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4812,
+      "text": "    $boolOwnParseReuse = $null -eq $CurrentParseReuse -and $null -eq $ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4816,
+      "text": "            $CurrentParseReuse = Get-MarkdownParseReuseSlot"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4817,
+      "text": "            $ParentParseReuse = Get-MarkdownParseReuseSlot -Budget $CurrentParseReuse.Budget"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4820,
+      "text": "            -Content $CurrentContent -RequiresVersion $false -ReuseSlot $CurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4842,
+      "text": "                -Content $BaseContent -RequiresVersion $false -ReuseSlot $ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4875,
+      "text": "                    -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4876,
+      "text": "                    -CurrentParseReuse $ParentParseReuse)"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4888,
+      "text": "                    -RequireExpectedUtcDateForRenderedChange $false `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4889,
+      "text": "                    -CurrentParseReuse $CurrentParseReuse `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4890,
+      "text": "                    -ParentParseReuse $(if ($null -ne $objVersionParentContent) { $ParentParseReuse } else { $null }))"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4914,
+      "text": "            foreach ($objSlot in @($CurrentParseReuse, $ParentParseReuse)) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 4915,
+      "text": "                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 6954,
+      "text": "function Get-PublishedEndpointMetadataFailure {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 6977,
+      "text": "    # .PARAMETER RequireExpectedUtcDateForRenderedChange"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 6980,
+      "text": "    # .PARAMETER CurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 6983,
+      "text": "    # .PARAMETER ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7024,
+      "text": "        [bool] $RequireExpectedUtcDateForRenderedChange = $true,"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7026,
+      "text": "        [Parameter()][AllowNull()][object] $CurrentParseReuse,"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7027,
+      "text": "        [Parameter()][AllowNull()][object] $ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7030,
+      "text": "    $objCurrentMetadata = Get-DocumentMetadataContext -Content $CurrentContent -ReuseSlot $CurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7069,
+      "text": "        if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7091,
+      "text": "    $objParentMetadata = Get-DocumentMetadataContext -Content $ParentContent -ReuseSlot $ParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 7196,
+      "text": "    if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8103,
+      "text": "if ($RequireStagedInputMatch -and ($MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8112,
+      "text": "if ($ProposedPolicy -and ($SelfTest -or $MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8121,
+      "text": "if ($FinalizeMetadataNow -and ($SelfTest -or $MetadataClassificationOnly -or"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8123,
+      "text": "    throw 'FinalizeMetadataNow requires exact B/H endpoints and cannot run with other modes.'"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8523,
+      "text": "        $objCurrentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8524,
+      "text": "        $listDocumentParseSlots.Add($objCurrentParseReuse)"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8525,
+      "text": "        $objParentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8526,
+      "text": "        $listDocumentParseSlots.Add($objParentParseReuse)"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8561,
+      "text": "        if ($FinalizeMetadataNow) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8570,
+      "text": "                -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path] -ReuseSlot $objCurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8574,
+      "text": "            $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent -ReuseSlot $objParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8583,
+      "text": "                    Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8588,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $objCurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8589,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8592,
+      "text": "                CurrentParseReuse = $objCurrentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8593,
+      "text": "                ParentParseReuse = $objParentParseReuse"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8602,
+      "text": "                RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8716,
+      "text": "                        -RequireExpectedUtcDateForRenderedChange `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8718,
+      "text": "                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8719,
+      "text": "                        -ParentParseReuse $objDocumentContext.ParentParseReuse))"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8728,
+      "text": "                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8729,
+      "text": "                        -ParentParseReuse $objDocumentContext.ParentParseReuse))"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8735,
+      "text": "            foreach ($objSlot in @($objDocumentContext.CurrentParseReuse, $objDocumentContext.ParentParseReuse)) {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8736,
+      "text": "                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8747,
+      "text": "        try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "TF-accepted",
+      "line": 8758,
+      "text": "if ($FinalizeMetadataNow) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 13,
+      "text": "# .PARAMETER FinalizeMetadataNow"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 34,
+      "text": "    [Parameter()][switch] $FinalizeMetadataNow,"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 246,
+      "text": "    # .PARAMETER UseNativeStructuralConversion"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 271,
+      "text": "        [Parameter()][switch] $UseNativeStructuralConversion"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 327,
+      "text": "        if ($UseNativeStructuralConversion) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3322,
+      "text": "function Get-MarkdownParseReuseSlot {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3334,
+      "text": "    # Get-MarkdownParseReuseSlot -Budget $objBudget"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3353,
+      "text": "function Clear-MarkdownParseReuseSlot {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3365,
+      "text": "    # Clear-MarkdownParseReuseSlot -Slot $objSlot"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3777,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $ReuseSlot"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 3782,
+      "text": "                -Content $strParserOutput -MaximumBytes 16777216 -UseNativeStructuralConversion"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4083,
+      "text": "        try { Clear-MarkdownParseReuseSlot -Slot $ReuseSlot } catch { Write-Verbose 'Reuse cleanup failed after validation failure.' }"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4287,
+      "text": "function Get-OperativeMarkdownContext {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4759,
+      "text": "function Get-PublishedEndpointLastUpdatedFailure {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4783,
+      "text": "    # .PARAMETER CurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4786,
+      "text": "    # .PARAMETER ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4814,
+      "text": "        [Parameter()][AllowNull()][object] $CurrentParseReuse,"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4815,
+      "text": "        [Parameter()][AllowNull()][object] $ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4818,
+      "text": "    $boolOwnParseReuse = $null -eq $CurrentParseReuse -and $null -eq $ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4822,
+      "text": "            $CurrentParseReuse = Get-MarkdownParseReuseSlot"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4823,
+      "text": "            $ParentParseReuse = Get-MarkdownParseReuseSlot -Budget $CurrentParseReuse.Budget"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4826,
+      "text": "            -Content $CurrentContent -RequiresVersion $false -ReuseSlot $CurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4848,
+      "text": "                -Content $BaseContent -RequiresVersion $false -ReuseSlot $ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4881,
+      "text": "                    -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4882,
+      "text": "                    -CurrentParseReuse $ParentParseReuse)"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4894,
+      "text": "                    -RequireExpectedUtcDateForRenderedChange $false `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4895,
+      "text": "                    -CurrentParseReuse $CurrentParseReuse `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4896,
+      "text": "                    -ParentParseReuse $(if ($null -ne $objVersionParentContent) { $ParentParseReuse } else { $null }))"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4920,
+      "text": "            foreach ($objSlot in @($CurrentParseReuse, $ParentParseReuse)) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 4921,
+      "text": "                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 6960,
+      "text": "function Get-PublishedEndpointMetadataFailure {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 6983,
+      "text": "    # .PARAMETER RequireExpectedUtcDateForRenderedChange"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 6986,
+      "text": "    # .PARAMETER CurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 6989,
+      "text": "    # .PARAMETER ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7030,
+      "text": "        [bool] $RequireExpectedUtcDateForRenderedChange = $true,"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7032,
+      "text": "        [Parameter()][AllowNull()][object] $CurrentParseReuse,"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7033,
+      "text": "        [Parameter()][AllowNull()][object] $ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7036,
+      "text": "    $objCurrentMetadata = Get-DocumentMetadataContext -Content $CurrentContent -ReuseSlot $CurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7075,
+      "text": "        if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7097,
+      "text": "    $objParentMetadata = Get-DocumentMetadataContext -Content $ParentContent -ReuseSlot $ParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 7202,
+      "text": "    if ($RequireExpectedUtcDateForRenderedChange) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8109,
+      "text": "if ($RequireStagedInputMatch -and ($MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8118,
+      "text": "if ($ProposedPolicy -and ($SelfTest -or $MetadataClassificationOnly -or $FinalizeMetadataNow -or"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8127,
+      "text": "if ($FinalizeMetadataNow -and ($SelfTest -or $MetadataClassificationOnly -or"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8129,
+      "text": "    throw 'FinalizeMetadataNow requires exact B/H endpoints and cannot run with other modes.'"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8529,
+      "text": "        $objCurrentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8530,
+      "text": "        $listDocumentParseSlots.Add($objCurrentParseReuse)"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8531,
+      "text": "        $objParentParseReuse = Get-MarkdownParseReuseSlot -Budget $objDocumentParseBudget"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8532,
+      "text": "        $listDocumentParseSlots.Add($objParentParseReuse)"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8567,
+      "text": "        if ($FinalizeMetadataNow) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8576,
+      "text": "                -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path] -ReuseSlot $objCurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8580,
+      "text": "            $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent -ReuseSlot $objParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8589,
+      "text": "                    Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8594,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $objCurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8595,
+      "text": "            Clear-MarkdownParseReuseSlot -Slot $objParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8598,
+      "text": "                CurrentParseReuse = $objCurrentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8599,
+      "text": "                ParentParseReuse = $objParentParseReuse"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8608,
+      "text": "                RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8722,
+      "text": "                        -RequireExpectedUtcDateForRenderedChange `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8724,
+      "text": "                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8725,
+      "text": "                        -ParentParseReuse $objDocumentContext.ParentParseReuse))"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8734,
+      "text": "                        -CurrentParseReuse $objDocumentContext.CurrentParseReuse `"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8735,
+      "text": "                        -ParentParseReuse $objDocumentContext.ParentParseReuse))"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8741,
+      "text": "            foreach ($objSlot in @($objDocumentContext.CurrentParseReuse, $objDocumentContext.ParentParseReuse)) {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8742,
+      "text": "                try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8753,
+      "text": "        try { Clear-MarkdownParseReuseSlot -Slot $objSlot } catch {"
+    },
+    {
+      "source": "PS235-prospective",
+      "line": 8764,
+      "text": "if ($FinalizeMetadataNow) {"
+    }
+  ],
+  "bounded_changed_test_oracle_scan": [
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 1770,
+          "text": "            [pscustomobject]@{ Name = 'later body Version prose'; Content = $strHeaded + \"`n## Procedure`n`n**Version:** 2.0.0`n\"; Version = $false },"
+        },
+        {
+          "line": 1772,
+          "text": "            [pscustomobject]@{ Name = 'later body field examples'; Content = $strHeaded + \"`n## Body examples`n`n$strFields\"; Version = $false },"
+        }
+      ]
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 1445,
+          "text": "  test(`Copilot separate real-Git event ancestry and main authority: ${mode}`, { skip: !linux }, t => {"
+        }
+      ]
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 2645,
+          "text": "            [pscustomobject]@{ Name = 'later body Version prose'; Content = $strHeaded + \"`n## Procedure`n`n**Version:** 2.0.0`n\"; Version = $false },"
+        },
+        {
+          "line": 2647,
+          "text": "            [pscustomobject]@{ Name = 'later body field examples'; Content = $strHeaded + \"`n## Body examples`n`n$strFields\"; Version = $false },"
+        }
+      ]
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 1477,
+          "text": "  test(`Copilot separate real-Git event ancestry and main authority: ${mode}`, { skip: !linux }, t => {"
+        }
+      ]
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 2893,
+          "text": "            [pscustomobject]@{ Name = 'later body Version prose'; Content = $strHeaded + \"`n## Procedure`n`n**Version:** 2.0.0`n\"; Version = $false },"
+        },
+        {
+          "line": 2895,
+          "text": "            [pscustomobject]@{ Name = 'later body field examples'; Content = $strHeaded + \"`n## Body examples`n`n$strFields\"; Version = $false },"
+        }
+      ]
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "selected_oracle_marker_hits": [
+        {
+          "line": 1477,
+          "text": "  test(`Copilot separate real-Git event ancestry and main authority: ${mode}`, { skip: !linux }, t => {"
+        }
+      ]
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "selected_oracle_marker_hits": []
+    },
+    {
+      "source": "PS235-prospective",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "selected_oracle_marker_hits": []
+    }
+  ],
+  "selected_moved_ref_oracle_present": false,
+  "root_ref_readback": {
+    "source": "direct parent message during this task",
+    "PS_main": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TF_main": "a840f21b03f0dcac0815e2f7f044928667402b42",
+    "PS235_worktree": "clean at 5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+    "acceptance_change": false
+  },
+  "oracle_inspection": {
+    "policy_harness": "Actual test builds candidate policy commits and accepted-policy isolation; no branch movement/two fresh acquisition destinations/unavailable-object control.",
+    "CiHelpers_real_Git_ancestry": "Actual test keeps separate main/topic ancestry, acquires event plus current main without shallow history; no event-ref move/depth1/refmap/two-destination-content/missing-object oracle.",
+    "generator_fixture": "Final filesystem identity, native exit/admission and cleanup guarantees; no Git event ref movement.",
+    "marker_search_limit": "Broad case-insensitive markers include unrelated later-body metadata and event-ancestry test labels; those hits were read and classified, not equated with the selected oracle.",
+    "equivalent_moved_ref_oracle_found": false
+  },
+  "remaining_final_validation": [
+    "Genuinely accepted serialized foundations and changed-identity refresh",
+    "Final guide metadata against accepted parents and actual authoring UTC date",
+    "Portable fixture in existing policy harness",
+    "Final candidate Windows and Linux fixture behavior",
+    "Front-matter YAML parsing; instruction validation; outer/nested Markdown checks",
+    "PS175 two complete clean full pre-commit passes",
+    "Normal PS review, independent final quality, merge and landed acceptance",
+    "TF counterpart under D08 and reverse raw-byte/mode comparison"
+  ],
+  "new_owner_choice_required": false,
+  "report_sha256": "f1fe3c5744d83dce5d9368d5488313b694276569184627f5afd6ef36e5e68ab4"
+}

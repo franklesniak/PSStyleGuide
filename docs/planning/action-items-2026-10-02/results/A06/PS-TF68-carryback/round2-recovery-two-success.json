@@ -1,0 +1,127 @@
+{
+  "status": "SUCCESS_CURRENT_INPUT_RECOVERY_REVIEW_OVERVIEW_ASSESSMENT_PENDING",
+  "captured_at": "2026-10-07T03:56:02.476437+00:00",
+  "head": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5",
+  "base": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "tree": "821a952c9d4be1395cab3b2af8da7a679987e4a6",
+  "body_sha256": "aa7fb9790e35253462cbfc93f1bbc118510618c8b413cccf0c2ebf2e4dc84045",
+  "round": 2,
+  "deadline": "2026-10-14T20:09:39.767792+00:00",
+  "request_event_id": 32656445338,
+  "requested_at": "2026-10-07T03:35:21Z",
+  "review": {
+    "id": 5437443500,
+    "node_id": "PRR_kwDOQkjdhM8AAAABRBjNrA",
+    "user": {
+      "login": "copilot-pull-request-reviewer[bot]",
+      "id": 175728472,
+      "node_id": "BOT_kgDOCnlnWA",
+      "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D",
+      "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+      "followers_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/followers",
+      "following_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/following{/other_user}",
+      "gists_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/subscriptions",
+      "organizations_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/orgs",
+      "repos_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/repos",
+      "events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/copilot-pull-request-reviewer%5Bbot%5D/received_events",
+      "type": "Bot",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### \ud83d\udd35 Needs a closer look\n\nIt adds a large security-sensitive setup workflow and a dependency override crossing a declared semver range, and the author's own description records unresolved acceptance gates (a cancelled CI run flagged as a merge blocker, unproven dedicated-setup selection, and a required reverse comparison) that need human judgment.\n\n**Review effort:** Balanced  \n**Findings:** None\n\n<details>\n<summary><strong>Resolved since last review (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This file is modified in the PR but the metadata `Last Updated` is set to `2026-10-06` while other\u2026](#discussion_r4202576730)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+    "state": "COMMENTED",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/235#pullrequestreview-5437443500",
+    "pull_request_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235",
+    "author_association": "NONE",
+    "_links": {
+      "html": {
+        "href": "https://github.com/franklesniak/PSStyleGuide/pull/235#pullrequestreview-5437443500"
+      },
+      "pull_request": {
+        "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/pulls/235"
+      }
+    },
+    "submitted_at": "2026-10-07T03:55:06Z",
+    "commit_id": "5e8ccbbe45679ab58a202c672554ffda56a0a9f5"
+  },
+  "new_inline_comments": [],
+  "all_four_threads_resolved": true,
+  "observed_effort": "Balanced",
+  "workflow_run_id": 37567459621,
+  "attempt": 1,
+  "workflow_conclusion": "success",
+  "job_id": 112618337044,
+  "job_terminal_at": "2026-10-07T03:55:06Z",
+  "run_updated_at": "2026-10-07T03:55:07Z",
+  "phases": [
+    {
+      "name": "Run complete repository validation",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 77,
+      "started_at": "2026-10-07T03:36:21Z",
+      "completed_at": "2026-10-07T03:48:12Z"
+    },
+    {
+      "name": "Verify final immutable setup inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 82,
+      "started_at": "2026-10-07T03:48:13Z",
+      "completed_at": "2026-10-07T03:48:13Z"
+    },
+    {
+      "name": "Processing Request (Linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "number": 94,
+      "started_at": "2026-10-07T03:48:17Z",
+      "completed_at": "2026-10-07T03:55:02Z"
+    }
+  ],
+  "successful_hook_lines": [
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:41.7918236Z check json...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:42.6806111Z check yaml...............................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:43.9531478Z fix end of files.........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:45.2240711Z trim trailing whitespace.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:46.1442717Z yamllint.................................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:47.8286130Z Lint GitHub Actions workflow files.......................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:48.7999835Z Validate Dependabot Config (v2)..........................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:49.7978954Z Validate GitHub Workflows................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:49.8294304Z staged Markdown..........................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:36:50.5400502Z workflow policy contract.................................................Passed",
+    "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-07T03:48:12.5382912Z agent instruction contract and mutation tests............................Passed"
+  ],
+  "aggregate_seconds": 711.0,
+  "channel_attempts_used": 2,
+  "channel_attempt_limit": 3,
+  "old_input_history": "H504 remains3/3 exhausted",
+  "historical_same_input_cancelled_run": 37562640212,
+  "supersession": "A new explicitly authorized same-input Copilot request produced a later successful run. The earlier cancelled run/check remains stored; no deletion, waiver or relabeling.",
+  "ordinary_check_rollup": {
+    "pass": 23,
+    "conditional_skips": 3,
+    "failed": 0,
+    "pending": 0,
+    "dynamic_context_limit": "CLI rollup omits dynamic runs. Complete REST run/job evidence separately proves the current recovery success."
+  },
+  "dedicated_service_selection_proved": false,
+  "acceptance": "Fresh independent supplement, factual body disposition, and immediate native premerge checks remain. No merge or paired completion claimed.",
+  "evidence": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two-baseline.json": "0a6e2e0c6e7b86dc3f02b7e05bc4b1b8b543e0d54d1b7c7ef799eaf8c4c0923c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-Copilot-recovery-two.json": "958ab5f4458230cc59f6becebc79ecb40c726228337b06e4d211bb00783565af",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-terminal.json": "a853d0f6f2c08df9bdc83d7090fc5190ac6a11882a28dbd57bd0966d61df10c4",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-native-gates.json": "79cae5d92d182b948c6b8f6d6b72eaed2b69fac78ee06ab16228dc66aef34b9c",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\round2-recovery-two-pr-checks.json": "52e8d7da33bb1eda4c05bf6d3a20c63e8327d64583365b17fb5846a93dfba5e2",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\run.json": "f5e47a64f64405ecb8d3d59a89221bb5ebbeb885cb02696c352973878cb9bbe2",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\jobs.json": "9654ee87c989332d3876fcd10bc5ae87e0a174e5800407cbed6fc1576abef4c7",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\log.txt": "ca02a6464bddaf76ab7f29f84a53a010f7c7fd0ba91877296b077e27142a06ac",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\summary.json": "8ad8359f57a7443d46c59998696f0cd562947763827868d5f6cf155aa5ac34e3",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-PS-carryback-20261006\\hosted-5e8ccbb\\37567459621\\attempt-1\\annotations.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+  }
+}
