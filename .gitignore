@@ -17,3 +17,7 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+# Local compiled Python artifacts must remain untracked.
+__pycache__/
+*.py[cod]
