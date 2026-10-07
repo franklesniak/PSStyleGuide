@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.22.20261007.0
+# Version: 1.23.20261007.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -939,6 +939,259 @@ function Get-AgentPreCommitHookContext {
 }
 
 
+function Get-AgentPreCommitBehaviorFailure {
+    # .SYNOPSIS
+    # Checks complete behavior fields of the eleven reviewed active hooks.
+    #
+    # .DESCRIPTION
+    # Uses trusted literal contracts after the finite envelope is admitted.
+    # Field order and benign display names do not change executable behavior.
+    # Types and stages are duplicate-free sets; commands, arguments and scalar
+    # data retain exact reviewed bytes. This helper does not parse arbitrary YAML.
+    #
+    # .PARAMETER HookBodies
+    # Active bodies returned by a successful Get-AgentPreCommitHookContext call.
+    #
+    # .EXAMPLE
+    # Get-AgentPreCommitBehaviorFailure -HookBodies $objContext.HookBodies
+    #
+    # # Emits hook-specific failures for missing, extra or changed fields.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One diagnostic for each invalid behavior field.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not a public interface.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261007.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][hashtable] $HookBodies)
+
+    # These values are reviewed source constants, never candidate-derived defaults.
+    $hashtableContracts = @{
+        'check-json' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.check_json'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('json')
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            package(-lock)?\.json|'
+                '            \.github/workflows/[^/]+\.json|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'check-yaml' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.check_yaml'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('yaml')
+            files = '        files: ^.*\.ya?ml$'
+        }
+        'end-of-file-fixer' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.end_of_file_fixer'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('text')
+            stages = @('pre-commit', 'pre-push', 'manual')
+            minimum_pre_commit_version = '        minimum_pre_commit_version: "3.2.0"'
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            \.codex/config\.toml|'
+                '            .*\.(md|mdc)|'
+                '            package(-lock)?\.json|'
+                '            \.pre-commit-config\.yaml|'
+                '            \.github/actionlint\.yaml|'
+                '            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'trailing-whitespace' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module pre_commit_hooks.trailing_whitespace_fixer'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('text')
+            stages = @('pre-commit', 'pre-push', 'manual')
+            minimum_pre_commit_version = '        minimum_pre_commit_version: "3.2.0"'
+            args = @(
+                '        args:'
+                '          - --markdown-linebreak-ext=md,mdc'
+            ) -join "`n"
+            files = @(
+                '        files: >-'
+                '          (?x)^('
+                '            \.codex/config\.toml|'
+                '            .*\.(md|mdc)|'
+                '            package(-lock)?\.json|'
+                '            \.pre-commit-config\.yaml|'
+                '            \.github/actionlint\.yaml|'
+                '            \.github/workflows/.*\.(js|mjs|ps1|ya?ml)|'
+                '            \.github/document-metadata-classification\.json'
+                '          )$'
+            ) -join "`n"
+        }
+        'yamllint' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module yamllint'
+            ) -join "`n"
+            language = '        language: system'
+            types = @('file', 'yaml')
+            args = @(
+                '        args:'
+                '          - --config-data'
+                '          - |'
+                '            extends: default'
+                '            rules:'
+                '              line-length:'
+                '                level: warning'
+                '              truthy:'
+                '                check-keys: false'
+            ) -join "`n"
+            files = '        files: ^.*\.ya?ml$'
+        }
+        'actionlint' = @{
+            files = '        files: ^\.github/workflows/.*\.ya?ml$'
+        }
+        'check-dependabot' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module check_jsonschema'
+            ) -join "`n"
+            language = '        language: system'
+            args = @(
+                '        args:'
+                '          - --builtin-schema'
+                '          - vendor.dependabot'
+            ) -join "`n"
+            types = @('yaml')
+            files = '        files: ^\.github/dependabot\.yml$'
+        }
+        'check-github-workflows' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                '          -Module check_jsonschema'
+            ) -join "`n"
+            language = '        language: system'
+            args = @(
+                '        args:'
+                '          - --builtin-schema'
+                '          - vendor.github-workflows'
+            ) -join "`n"
+            types = @('yaml')
+            files = '        files: ^\.github/workflows/.*\.ya?ml$'
+        }
+        'staged-markdown' = @{
+            entry = '        entry: node .github/workflows/lint-staged-markdown.mjs'
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            files = '        files: ^(\.github/workflows/lint-staged-markdown\.mjs|.*\.(md|mdc))$'
+        }
+        'workflow-policy-contract' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive'
+                '          -WorkingDirectory .github/workflows -Command'
+                '          node Validate-WorkflowPolicy.mjs'
+                '          build.yml markdownlint.yml'
+            ) -join "`n"
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            always_run = '        always_run: true'
+        }
+        'agent-instruction-contract' = @{
+            entry = @(
+                '        entry: >-'
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch'
+            ) -join "`n"
+            language = '        language: system'
+            pass_filenames = '        pass_filenames: false'
+            always_run = '        always_run: true'
+        }
+    }
+    foreach ($strId in $hashtableContracts.Keys) {
+        if (-not $HookBodies.ContainsKey($strId)) {
+            Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (missing body)"
+            continue
+        }
+        $hashtableFields = @{}
+        $strField = ''
+        foreach ($strLine in ($HookBodies[$strId] -split "`n")) {
+            $objField = [regex]::Match($strLine, '^        (?<Key>[a-z_]+):')
+            if ($objField.Success) {
+                $strField = $objField.Groups['Key'].Value
+                $hashtableFields[$strField] = $strLine
+            } elseif (-not [string]::IsNullOrEmpty($strField)) {
+                $hashtableFields[$strField] += "`n" + $strLine
+            }
+        }
+        $hashtableExpected = $hashtableContracts[$strId]
+        foreach ($strKey in $hashtableFields.Keys) {
+            # Name grammar is already finite. The instruction guard retains its
+            # separate exact body/name check in Get-AgentSetupContractFailure.
+            if ($strKey -cne 'name' -and -not $hashtableExpected.ContainsKey($strKey)) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (extra $strKey)"
+            }
+        }
+        foreach ($strKey in $hashtableExpected.Keys) {
+            if (-not $hashtableFields.ContainsKey($strKey)) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (missing $strKey)"
+                continue
+            }
+            $boolMatches = $false
+            if ($strKey -cin @('types', 'stages')) {
+                $arrLines = $hashtableFields[$strKey] -split "`n"
+                $setValues = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+                $boolMatches = $arrLines[0] -ceq ('        ' + $strKey + ':')
+                for ($intIndex = 1; $intIndex -lt $arrLines.Count; $intIndex++) {
+                    $objValue = [regex]::Match($arrLines[$intIndex], '^          - (?<Value>[-a-z0-9][a-z0-9.,=_-]*)$')
+                    if (-not $objValue.Success -or -not $setValues.Add($objValue.Groups['Value'].Value)) {
+                        $boolMatches = $false
+                    }
+                }
+                $boolMatches = $boolMatches -and $setValues.SetEquals([string[]]$hashtableExpected[$strKey])
+            } else {
+                $boolMatches = $hashtableFields[$strKey] -ceq $hashtableExpected[$strKey]
+            }
+            if (-not $boolMatches) {
+                Write-Output "Pre-commit hook must retain its reviewed behavior: $strId (changed $strKey)"
+            }
+        }
+    }
+}
+
+
 function Get-TrackedCompiledPythonFailure {
     # .SYNOPSIS
     # Rejects compiled Python names in a complete target Git inventory.
@@ -1007,7 +1260,7 @@ function Get-AgentSetupContractFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.2.20261007.0
+    # Version: 1.3.20261007.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][hashtable] $Content)
@@ -1060,6 +1313,9 @@ function Get-AgentSetupContractFailure {
         'check-github-workflows' = 'check_jsonschema'
     }
     $hashtableHookBodies = $objHookContext.HookBodies
+    if ($null -eq $objHookContext.Failure) {
+        Get-AgentPreCommitBehaviorFailure -HookBodies $hashtableHookBodies
+    }
     foreach ($strId in @($hashtableModules.Keys) + @('staged-markdown', 'agent-instruction-contract')) {
         if ($null -ne $objHookContext.Failure -or -not $hashtableHookBodies.ContainsKey($strId)) {
             Write-Output "Pre-commit requires one hook definition: $strId"
@@ -1118,10 +1374,23 @@ function Get-AgentSetupContractFailure {
         Write-Output 'Pre-commit requires the exact active always-run instruction guard without extra fields or overrides.'
     }
     $strIgnore = ([string]$Content['.gitignore']).Replace("`r`n", "`n")
-    foreach ($strRequiredIgnoreLine in @('__pycache__/', '*.py[cod]')) {
+    $arrCompiledIgnoreRules = @('*.[pP][yY][cCoOdD]', '!*.[pP][yY][cCoOdD]/',
+        '__[pP][yY][cC][aA][cC][hH][eE]__/')
+    foreach ($strRequiredIgnoreLine in $arrCompiledIgnoreRules) {
         if ([regex]::Matches($strIgnore, '(?m)^' + [regex]::Escape($strRequiredIgnoreLine) + '$').Count -ne 1) {
             Write-Output "Git ignore must contain one compiled-artifact rule: $strRequiredIgnoreLine"
         }
+    }
+    # Git uses the last matching rule. Keep this policy suffix after unrelated
+    # rules so no later negation or positive pattern can change its behavior.
+    $arrOperativeIgnoreRules = @($strIgnore -split "`n" | Where-Object {
+            -not [string]::IsNullOrWhiteSpace($_) -and -not $_.StartsWith('#', [StringComparison]::Ordinal)
+        })
+    $arrExpectedIgnoreSuffix = @($arrCompiledIgnoreRules) + @('CLAUDE.local.md')
+    if ($arrOperativeIgnoreRules.Count -lt 4 -or
+        ($arrOperativeIgnoreRules[($arrOperativeIgnoreRules.Count - 4)..($arrOperativeIgnoreRules.Count - 1)] -join "`n") -cne
+        ($arrExpectedIgnoreSuffix -join "`n")) {
+        Write-Output 'Git ignore must end with the reviewed compiled-artifact rules and personal-memory rule.'
     }
     foreach ($strSetupPath in @('.github/workflows/copilot-setup-steps.yml',
             '.github/workflows/copilot-code-review.yml')) {
