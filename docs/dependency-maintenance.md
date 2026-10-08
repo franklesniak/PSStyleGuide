@@ -4,10 +4,10 @@
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-07
+- **Last Updated:** 2026-10-08
 - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
-Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux CI bootstrap verifies its Node archive with `linuxX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:
+Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux/Windows x64 CI bootstrap verifies its preferred Node archive with `preferred.linuxX64Sha256` or `preferred.windowsX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:
 
 ```text
 node .github/workflows/NpmTools.mjs install
@@ -68,3 +68,5 @@ python3.12 -m pre_commit run --all-files
 Keep that virtual environment active when running the Python hooks. The launcher selects its `python3.12` application from `PATH`. The virtual environment supplies pip and keeps installed packages separate from Ubuntu's externally managed system Python.
 
 The hashed [requirements closure](../requirements-dev.txt) supplies the Python hooks. The [launcher](../.github/workflows/Invoke-LockedPythonHook.ps1) selects Python 3.12 and invokes only its listed modules. It uses `-E -P` to ignore Python environment variables and exclude the unsafe current-directory import path; it does not attest installed package bytes or exclude every site-package source. Install the closure into the interpreter that the launcher selects. The remote actionlint hook retains its exact reviewed Git revision and checksummed Go dependencies.
+
+For controlled runner setup, see the [runtime acquisition contract](../.github/workflows/scripts-README.md#reviewed-runtime-acquisition). The optional Linux Node22 compatibility executable is isolated from ordinary package installation, audits, lint and PATH. It is published only after complete setup succeeds. Both Copilot setup workflows separately admit the strict current schema2 declaration and the evidenced one-field historical declaration; malformed present metadata cannot fall back to historical checksums. Their retained pre-declaration and node-only layouts remain separate capabilities.

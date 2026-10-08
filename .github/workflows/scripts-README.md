@@ -5,7 +5,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-10-06
+- **Last Updated:** 2026-10-08
 - **Scope:** Describes repository-owned workflow scripts, supported local entry points, setup, and Markdown lint behavior. It does not define repository-wide documentation policy.
 - **Related:** [Nested Markdown Linting Implementation Summary](MARKDOWN-LINTING-IMPLEMENTATION.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
@@ -21,16 +21,16 @@ This table lists the workflow tools and helpers in this directory. It excludes `
 | `Classify-InstructionMaintenance.mjs` | Classifies whether a change requires instruction maintenance. | Called from the accepted-base checkout by `agent-instructions.yml` with the checkout root and exact base/head revisions. It does not grant maintenance authority. |
 | `Generate-StyleGuideArtifacts.ps1` | Regenerates consumer style-guide artifacts from the normative and rationale sources. | `pwsh -NoLogo -NoProfile -File .github/workflows/Generate-StyleGuideArtifacts.ps1` |
 | `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |
-| `Initialize-CiToolchain.ps1` | Installs the reviewed Linux Node/npm runtime and selected locked dependency trees. | Called by CI with `-WorkflowDependencies` and, for instruction jobs, `-InstructionDependencies`; requires its Linux runner environment. |
+| `Initialize-CiToolchain.ps1` | Acquires the reviewed Linux/Windows x64 preferred Node/npm runtime and selected locked dependency trees. | Called by CI with `-WorkflowDependencies` and, for instruction jobs, `-InstructionDependencies`; requires reviewed PowerShell 7 and its private runner environment. Add `-IncludeRecoveryCompatibility` only on Linux x64 when an exact Node22 executable is needed. |
 | `install-husky.mjs` | Activates the retained Git hook during setup and prepare. | Called by `NpmTools.mjs install` and the workflow package's `prepare` script; no separate routine invocation is needed. |
 | `lint-markdown.mjs` | Runs the bounded outer Markdown API. | `npm run lint:md` |
 | `lint-nested-markdown.js` | Recursively lints `markdown` and `md` fenced content in repository `.md` and `.mdc` files. | `npm run lint:md:nested` |
 | `lint-staged-markdown.mjs` | Selects and lints outer and nested staged `.md` and `.mdc` content without replacing worktree files. | `node .github/workflows/lint-staged-markdown.mjs` |
 | `Invoke-LockedPythonHook.ps1` | Selects Python 3.12 for allowlisted locked hook modules. | Called by the configured pre-commit hooks. |
-| `Invoke-MarkdownLint.ps1` | Runs outer and nested Markdown checks and preserves both native results. | Called by `markdownlint.yml` after runtime setup; requires the reviewed Linux runner runtime. |
+| `Invoke-MarkdownLint.ps1` | Runs outer and nested Markdown checks and preserves both native results. | Called by `markdownlint.yml` after runtime setup; requires successful preferred-runtime setup and its private configuration files. |
 | `NpmTools.mjs` | Installs both locked dependency graphs with isolated npm configuration and activates the retained hook. | `node .github/workflows/NpmTools.mjs install` |
 | `Test-AgentInstructions.ps1` | Validates governed instruction capacity, operative policy, final-state metadata, staged-input matching, and behavioral mutation controls. | `npm run test:agent-instructions` |
-| `Test-CheckoutCredentials.ps1` | Verifies the anonymous checkout's origin and credential policy. | Called by CI and shared helpers after anonymous acquisition; requires the expected origin and credential-free Linux runner context. |
+| `Test-CheckoutCredentials.ps1` | Verifies the anonymous checkout's origin and credential policy. | Called by CI and shared helpers after anonymous acquisition; requires the expected origin and credential-free Linux or supported Windows x64 runner context. |
 | `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |
 | `Test-StyleGuideGenerator.ps1` | Exercises actual generation, golden bytes, publication, and focused composition and identity controls in disposable repositories. | Run directly in Windows PowerShell 5.1 or PowerShell 7. Hosted cells pass `-ExpectedHost WindowsPowerShell51`, `WindowsPowerShell7`, or `LinuxPowerShell7`; Linux requires native ext4 for source and scratch storage. |
 | `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |
@@ -134,3 +134,15 @@ When no issues are found:
 ✓ No issues found in nested Markdown code fences
 ✓ Nested Markdown linting passed
 ```
+
+## Reviewed runtime acquisition
+
+Run `Initialize-CiToolchain.ps1` with an explicit reviewed PowerShell 7 executable and `-NoLogo -NoProfile -NonInteractive`. The syntax floor is 7.3; the selected Windows host is 7.6.5. Windows requires the OS system curl8.5+ in major8 with HTTPS/TLS and the selected options, plus Git for Windows2.39+ in major2 at native Program Files `Git/cmd/git.exe`. No PATH fallback or host installation is used. Actual binaries and the runner must be qualified; version admission alone is not platform acceptance.
+
+Set `RUNNER_TEMP` to an ordinary local directory outside the checkout. Supply distinct existing ordinary `GITHUB_PATH` and `GITHUB_ENV` files. Windows requires reviewed owner/SYSTEM/administrator/OS-servicing write authority in the parent chain. The helper creates a private `styleguide-node` directory; an occupied destination is an error. It does not change parent permissions or execution policy. Run Linux extraction as a non-root account. Linux requires ordinary fixed `/usr/bin/tar` and `/usr/bin/xz` applications. Each archive child receives only a fixed system PATH, C locale and UTC timezone; inherited tar/xz options and native-loader selectors do not reach it.
+
+The schema2 declaration provides preferred Linux/Windows archive digests and the separate exact Linux22.23.3/npm10.9.9 compatibility tuple. Root package engines remain the preferred version source. Every archive must pass its digest, exact-root member validation and the limits of 50,000 entries and 1GiB expanded data before execution. The official in-root npm/npx/corepack links are retained.
+
+Ordinary downloads use connect20, attempt180, retry2 and retry-admission300 seconds, with default curl configuration disabled. Native transient retry selection is retained. The nominal network envelope is483 seconds per archive plus scheduling overhead; it is not a300-second process deadline. Two requested archives have a966-second nominal network envelope before installation. Copilot retains its separate connect20/attempt120/retry3/retry-admission300/all-errors policy and historical schema admission.
+
+Only successful complete setup publishes preferred Node to the runner PATH. With `-IncludeRecoveryCompatibility`, setup also publishes the absolute `STYLEGUIDE_RECOVERY_NODE22` executable. Node22 never enters PATH and never installs ordinary packages. Private npm config files remain under the owned directory for later steps; lint uses the exact preferred Node plus its bundled npm CLI. Setup performs a permission-limited preflight before each requested locked install, preserves both manifests/locks and does not activate hooks implicitly. Acquisition evidence does not replace future recovery-harness or GateA/B acceptance.

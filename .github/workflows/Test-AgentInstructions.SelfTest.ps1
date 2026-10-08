@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.14.20261007.0
+# Version: 1.15.20261008.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -3697,7 +3697,7 @@ function Assert-AgentSetupSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.3.20261007.0
+    # Version: 1.4.20261008.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -4255,47 +4255,74 @@ function Assert-AgentSetupSelfTest {
         & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
             -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m restore-ignore
         if ($LASTEXITCODE -ne 0) { throw 'Ignore fixture restoration revision failed.' }
-        foreach ($strBoundPath in @('.github/workflows/copilot-setup-steps.yml', $strReviewSetupPath, '.gitignore')) {
+        # Expected limits are independent of the production specification.
+        foreach ($hashtableBoundCase in @(
+                @{ Path = '.github/workflows/copilot-setup-steps.yml'; MaximumBytes = 131072 }
+                @{ Path = '.github/workflows/copilot-code-review.yml'; MaximumBytes = 131072 }
+                @{ Path = '.gitignore'; MaximumBytes = 65536 }
+            )) {
+            [string]$strBoundPath = $hashtableBoundCase.Path
+            [int]$intBoundMaximumBytes = $hashtableBoundCase.MaximumBytes
             $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
-            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw "Setup input read bound changed: $strBoundPath" }
+            if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne $intBoundMaximumBytes) {
+                throw "Setup input read bound changed: $strBoundPath"
+            }
             foreach ($intExtra in @(0, 1)) {
-                [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
+                [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath),
+                    ('a' * ($intBoundMaximumBytes + $intExtra)), $objEncoding)
                 $boolRejected = $false
                 try {
-                    $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
-                    if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
+                    $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+                        -Revision '' -StagedInputPaths $setEmpty
+                    if ($hashtableBound[$strBoundPath].Length -ne $intBoundMaximumBytes) {
+                        throw "Setup bound did not preserve bytes: $strBoundPath"
+                    }
                 } catch {
                     if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
-                        -not $_.Exception.Message.Contains($strBoundPath, [StringComparison]::Ordinal)) { throw }
+                        -not $_.Exception.Message.Contains($strBoundPath, [StringComparison]::Ordinal)) {
+                        throw
+                    }
                     $boolRejected = $true
                 }
-                if ($intExtra -eq 1 -and -not $boolRejected) { throw "One-byte oversized setup input was accepted: $strBoundPath" }
-                if ($strBoundPath -ceq '.gitignore') {
-                    & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
-                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture indexing failed.' }
-                    & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
-                        -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m bounded-ignore
-                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture revision failed.' }
-                    $strBoundRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
-                    if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture identity failed.' }
-                    $boolRevisionRejected = $false
-                    try {
-                        $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
-                            -Revision $strBoundRevision -StagedInputPaths $setEmpty
-                        if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Immutable ignore bound did not preserve bytes.' }
-                    } catch {
-                        if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
-                            -not $_.Exception.Message.Contains('.gitignore', [StringComparison]::Ordinal)) { throw }
-                        $boolRevisionRejected = $true
+                if ($intExtra -eq 1 -and -not $boolRejected) {
+                    throw "One-byte oversized setup input was accepted: $strBoundPath"
+                }
+                & git -C $strFixtureRoot -c core.autocrlf=false add -- $strBoundPath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Bounded setup fixture indexing failed: $strBoundPath"
+                }
+                & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+                    -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m bounded-setup
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Bounded setup fixture revision failed: $strBoundPath"
+                }
+                $strBoundRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+                if ($LASTEXITCODE -ne 0) {
+                    throw "Bounded setup fixture identity failed: $strBoundPath"
+                }
+                $boolRevisionRejected = $false
+                try {
+                    $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+                        -Revision $strBoundRevision -StagedInputPaths $setEmpty
+                    if ($hashtableBound[$strBoundPath].Length -ne $intBoundMaximumBytes) {
+                        throw "Immutable setup bound did not preserve bytes: $strBoundPath"
                     }
-                    if ($intExtra -eq 1 -and -not $boolRevisionRejected) { throw 'One-byte oversized immutable ignore input was accepted.' }
+                } catch {
+                    if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed' -or
+                        -not $_.Exception.Message.Contains($strBoundPath, [StringComparison]::Ordinal)) {
+                        throw
+                    }
+                    $boolRevisionRejected = $true
+                }
+                if ($intExtra -eq 1 -and -not $boolRevisionRejected) {
+                    throw "One-byte oversized immutable setup input was accepted: $strBoundPath"
                 }
             }
             [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), $hashtableContent[$strBoundPath], $objEncoding)
-            if ($strBoundPath -ceq '.gitignore') {
-                # The later optional-file revision must inherit canonical required input.
-                & git -C $strFixtureRoot -c core.autocrlf=false add -- .gitignore
-                if ($LASTEXITCODE -ne 0) { throw 'Bounded ignore fixture index restoration failed.' }
+            # Each later fixture revision must inherit the restored input.
+            & git -C $strFixtureRoot -c core.autocrlf=false add -- $strBoundPath
+            if ($LASTEXITCODE -ne 0) {
+                throw "Bounded setup fixture index restoration failed: $strBoundPath"
             }
         }
         $strReviewTarget = Join-Path $strFixtureRoot $strReviewSetupPath
