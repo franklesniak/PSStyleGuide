@@ -3,7 +3,7 @@
 # Verifies that the anonymous checkout retained no credentials.
 #
 # .DESCRIPTION
-# Requires PowerShell 7.3 or later for the retained helper APIs. Callers must omit GIT_DIR, GIT_WORK_TREE and GIT_COMMON_DIR, including empty values. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
+# Requires PowerShell 7.3 or later for the retained helper APIs. Callers must omit GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR, GIT_ASKPASS and SSH_ASKPASS, including empty values. Rejects any effective core.askPass key, including empty, included and worktree configuration. Remove these variables and unset the key in its supplying configuration before retrying. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
 #
 # .EXAMPLE
 # & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
@@ -253,6 +253,12 @@ foreach ($strRepositorySelector in @('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR
     }
 }
 
+foreach ($strAskPassSelector in @('GIT_ASKPASS', 'SSH_ASKPASS')) {
+    if (Test-Path -LiteralPath ('Env:' + $strAskPassSelector)) {
+        throw 'credential-policy: askpass environment variables are not allowed'
+    }
+}
+
 # Do not load user/system Git credentials or hooks during anonymous acquisition.
 if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
     -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
@@ -359,6 +365,11 @@ try {
         $_ -cmatch '^(system|global)\s'
     }).Count -ne 0) {
         throw 'credential-policy: external Git configuration was not excluded'
+    }
+    if (@($arrEffectiveConfig | Where-Object {
+        $_ -match '\A\S+[ \t]+core\.askpass\z'
+    }).Count -ne 0) {
+        throw 'credential-policy: effective core.askPass is not allowed'
     }
     $boolCredentialSuccess = $true
 } finally {

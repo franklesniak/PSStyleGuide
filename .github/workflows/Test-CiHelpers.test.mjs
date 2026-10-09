@@ -3429,6 +3429,9 @@ fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
 // are replaced in the refusal fixtures; the real-Git positives use neither mock.
 const r3GitSelectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR'];
 const r3SelectorDiagnostic = 'credential-policy: repository selector environment variables are not allowed';
+const fq45AskpassNames = ['GIT_ASKPASS', 'SSH_ASKPASS'];
+const fq45AskpassDiagnostic = 'credential-policy: askpass environment variables are not allowed';
+const fq45CoreDiagnostic = 'credential-policy: effective core.askPass is not allowed';
 function r3CredentialFixture(t, nativeGit = false) {
   const f = fixture(t), scripts = path.join(f.work, '.github/workflows');
   fs.mkdirSync(scripts, { recursive: true });
@@ -3465,13 +3468,13 @@ elseif ($args -notcontains '--list') { throw 'R3 unexpected Git dispatch' }
   function run(overrides = {}, target = script, cwd = f.work) {
     const env = { ...process.env, RUNNER_TEMP: f.root, TEST_LOG: f.log,
       GITHUB_PATH: path.join(f.root, 'path'), GITHUB_ENV: path.join(f.root, 'env') };
-    const removed = [...r3GitSelectors, 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+    const removed = [...r3GitSelectors, ...fq45AskpassNames, 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
       'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL'];
     const canonical = name => process.platform === 'win32' ? name.toUpperCase() : name;
     for (const key of Object.keys(env)) if (removed.includes(canonical(key))) delete env[key];
     Object.assign(env, overrides);
     const expected = new Map(Object.entries(overrides).map(([name, value]) => [canonical(name), value]));
-    const checks = [...new Set([...r3GitSelectors, ...Object.keys(overrides)])].map(name => {
+    const checks = [...new Set([...r3GitSelectors, ...fq45AskpassNames, ...Object.keys(overrides)])].map(name => {
       const present = expected.has(canonical(name));
       return `$arrNames = @([Environment]::GetEnvironmentVariables().Keys | Where-Object {
     [string]::Equals([string]$_, ${quote(name)}, ${process.platform === 'win32' ? '[StringComparison]::OrdinalIgnoreCase' : '[StringComparison]::Ordinal'})
@@ -3489,14 +3492,20 @@ ${present ? `if ([Environment]::GetEnvironmentVariable(${quote(name)}) -cne ${qu
   }
   return { ...f, scripts, script, source, run };
 }
-function assertR3SelectorRefusal(f, result) {
+function assertR3EarlyCredentialRefusal(f, result, expectedDiagnostic) {
   assert.notEqual(result.status, 0, result.stdout + result.stderr);
   const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
-  assert.ok(diagnostic.includes(r3SelectorDiagnostic), diagnostic);
+  assert.ok(diagnostic.includes(expectedDiagnostic), diagnostic);
   assert.doesNotMatch(result.stdout, /R3 helper completed/u);
-  assert.deepEqual(f.calls(), [], 'A selector must refuse before even the Git version probe');
+  assert.deepEqual(f.calls(), [], 'An inherited credential selector must refuse before even the Git version probe');
   assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
   assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+}
+function assertR3SelectorRefusal(f, result) {
+  assertR3EarlyCredentialRefusal(f, result, r3SelectorDiagnostic);
+}
+function assertFq45AskpassRefusal(f, result) {
+  assertR3EarlyCredentialRefusal(f, result, fq45AskpassDiagnostic);
 }
 
 test('R3 credential selectors: subsets and present value boundaries', { skip: !linux && process.platform !== 'win32' }, t => {
@@ -3544,19 +3553,24 @@ test('R3 credential selectors: each guard-name removal reaches Git', { skip: !li
   }
 });
 
-test('R3 credential selectors: absent ordinary and linked-worktree real Git positives', { skip: !linux && process.platform !== 'win32' }, t => {
+function r3NativeCredentialRepository(t) {
   const f = r3CredentialFixture(t, true), metadata = path.join(f.work, '.git');
   // Authored ordinary Git metadata: no commits, hooks, network or Git setup command.
   for (const entry of ['objects', 'refs/heads']) fs.mkdirSync(path.join(metadata, entry), { recursive: true });
   fs.writeFileSync(path.join(metadata, 'HEAD'), 'ref: refs/heads/fixture\n');
-  fs.writeFileSync(path.join(metadata, 'config'),
-    '[core]\nrepositoryformatversion = 0\nbare = false\n[remote "origin"]\nurl = https://github.com/franklesniak/PSStyleGuide\n');
+  const baseConfig = '[core]\nrepositoryformatversion = 0\nbare = false\n[remote "origin"]\nurl = https://github.com/franklesniak/PSStyleGuide\n';
+  fs.writeFileSync(path.join(metadata, 'config'), baseConfig);
   const linked = path.join(f.root, 'linked'), admin = path.join(metadata, 'worktrees/linked');
   fs.mkdirSync(linked); fs.mkdirSync(admin, { recursive: true });
   fs.writeFileSync(path.join(admin, 'HEAD'), 'ref: refs/heads/fixture\n');
   fs.writeFileSync(path.join(admin, 'commondir'), '../..\n');
   fs.writeFileSync(path.join(admin, 'gitdir'), path.join(linked, '.git') + '\n');
   fs.writeFileSync(path.join(linked, '.git'), 'gitdir: ' + admin + '\n');
+  return { ...f, metadata, linked, admin, baseConfig };
+}
+
+test('R3 credential selectors: absent ordinary and linked-worktree real Git positives', { skip: !linux && process.platform !== 'win32' }, t => {
+  const f = r3NativeCredentialRepository(t), linked = f.linked;
   for (const cwd of [f.work, linked]) {
     const result = f.run({}, f.script, cwd);
     assert.equal(result.status, 0, result.stdout + result.stderr);
@@ -3565,41 +3579,157 @@ test('R3 credential selectors: absent ordinary and linked-worktree real Git posi
   }
 });
 
-for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) {
-  test(`R3 credential selectors: real helper refuses through ${caller}`, { skip: !linux && process.platform !== 'win32' }, t => {
-    const f = r3CredentialFixture(t), curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
-    let source = read(caller);
-    const helperCall = '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"';
-    assert.equal(source.split(helperCall).length, 2, 'The real credential helper call must remain exactly once');
-    fs.writeFileSync(path.join(f.work, 'package.json'), fs.readFileSync(path.join(directory, '../../package.json')));
-    fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
-    for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
-    fs.writeFileSync(curl, `
-[IO.File]::AppendAllText(${quote(curlLog)}, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
-$global:LASTEXITCODE = 0
-if ($args -contains '--version') {
-    'curl 8.5.0 fixture libcurl/8.5.0'; 'Protocols: https'; 'Features: SSL'; return
-}
-if ($args -contains '--help') {
-    ${['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir', 'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'].map(name => quote('--' + name + ' fixture')).join('; ')}
-    return
-}
-throw 'R3 unexpected acquisition dispatch'
-`);
-    if (caller === 'Initialize-CiToolchain.ps1') {
-      for (const anchor of ["$strCurlPath = Join-Path ([Environment]::SystemDirectory) 'curl.exe'", "$strCurlPath = '/usr/bin/curl'"]) {
-        assert.equal(source.split(anchor).length, 2, 'R3 fixed curl anchor must occur once');
-        source = source.replace(anchor, `$strCurlPath = ${quote(curl)}`);
-      }
+test('FQ45 credential askpass: subsets and present value boundaries', { skip: !linux && process.platform !== 'win32' }, t => {
+  const cases = [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
+    .map(name => [name, 'fq45-private-askpass-value'])));
+  for (const name of fq45AskpassNames) for (const value of ['', '   ', './fq45-relative-askpass']) cases.push({ [name]: value });
+  assert.equal(cases.length, 9);
+  for (const env of cases) {
+    const f = r3CredentialFixture(t), result = f.run(env);
+    assertFq45AskpassRefusal(f, result);
+    for (const value of ['fq45-private-askpass-value', './fq45-relative-askpass']) {
+      assert.equal((result.stdout + result.stderr).includes(value), false, 'Askpass diagnostic must not reveal its value');
     }
-    const target = path.join(f.scripts, caller); fs.writeFileSync(target, source);
-    const result = f.run({ GIT_COMMON_DIR: 'r3-selector-private-value' }, target);
-    assertR3SelectorRefusal(f, result);
-    const curlCalls = fs.existsSync(curlLog) ? fs.readFileSync(curlLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
-    assert.deepEqual(curlCalls, caller === 'Initialize-CiToolchain.ps1' && process.platform === 'win32'
-      ? [['--disable', '--version'], ['--disable', '--help', 'all']] : []);
-    for (const name of ['path', 'env']) assert.equal(fs.readFileSync(path.join(f.root, name), 'utf8'), '');
-  });
+  }
+});
+
+test('FQ45 credential askpass: native platform name casing', { skip: !linux && process.platform !== 'win32' }, t => {
+  for (const name of fq45AskpassNames) {
+    const mixed = name === 'GIT_ASKPASS' ? 'gIt_AsKpAsS' : 'sSh_AsKpAsS';
+    const f = r3CredentialFixture(t), result = f.run({ [mixed]: 'fq45-private-askpass-value' });
+    if (process.platform === 'win32') assertFq45AskpassRefusal(f, result);
+    else {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.match(result.stdout, /R3 helper completed/u);
+      assert.equal(f.calls().length, 4, 'Linux mixed-case names are unrelated to Git askpass environment names');
+    }
+    assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
+  }
+});
+
+test('FQ45 credential askpass: each guard-name removal defeats the refusal oracle', { skip: !linux && process.platform !== 'win32' }, t => {
+  const anchor = "@('GIT_ASKPASS', 'SSH_ASKPASS')";
+  for (const name of fq45AskpassNames) {
+    const f = r3CredentialFixture(t);
+    assert.equal(f.source.split(anchor).length, 2, 'The askpass guard list must occur exactly once');
+    const replacement = `@(${fq45AskpassNames.filter(item => item !== name).map(quote).join(', ')})`;
+    const mutant = f.source.replace(anchor, replacement);
+    assert.equal(mutant.replace(replacement, anchor), f.source, 'The mutant removes only one askpass guard name');
+    fs.writeFileSync(f.script, mutant);
+    const result = f.run({ [name]: 'fq45-private-askpass-value' });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 5 : 4);
+    assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
+    assert.throws(() => assertFq45AskpassRefusal(f, result), assert.AssertionError,
+      'The actual-helper refusal oracle must reject each weakened guard');
+  }
+});
+
+test('FQ45 credential askpass: effective real Git config and guard-removal control', { skip: !linux && process.platform !== 'win32' }, t => {
+  const guard = String.raw`    if (@($arrEffectiveConfig | Where-Object {
+        $_ -match '\A\S+[ \t]+core\.askpass\z'
+    }).Count -ne 0) {
+        throw 'credential-policy: effective core.askPass is not allowed'
+    }
+`;
+  // Similar keys are permitted; the guard matches the effective key, not a prefix.
+  const positive = r3NativeCredentialRepository(t);
+  fs.writeFileSync(path.join(positive.metadata, 'config'), positive.baseConfig + '[core]\naskPassExtra = unused\n[other]\naskPass = unused\n');
+  const positiveResult = positive.run();
+  assert.equal(positiveResult.status, 0, positiveResult.stdout + positiveResult.stderr);
+  assert.match(positiveResult.stdout, /R3 helper completed/u);
+  assert.deepEqual(positive.calls(), [], 'The config positive must resolve qualified real Git');
+  const cases = [];
+  for (const scope of ['local', 'included', 'worktree']) for (const key of ['askPass', 'aSkPaSs']) {
+    for (const value of ['', './fq45-private-unused-program']) cases.push({ scope, key, value });
+  }
+  assert.equal(cases.length, 12);
+  for (const { scope, key, value } of cases) {
+    const f = r3NativeCredentialRepository(t), local = path.join(f.metadata, 'config');
+    const setting = `[core]\n${key} = ${value}\n`;
+    let configured;
+    if (scope === 'local') {
+      configured = local; fs.writeFileSync(local, f.baseConfig + setting);
+    } else if (scope === 'included') {
+      configured = path.join(f.metadata, 'askpass.config'); fs.writeFileSync(configured, setting);
+      fs.writeFileSync(local, f.baseConfig + '[include]\npath = askpass.config\n');
+    } else {
+      configured = path.join(f.admin, 'config.worktree'); fs.writeFileSync(configured, setting);
+      fs.writeFileSync(local, f.baseConfig.replace('repositoryformatversion = 0', 'repositoryformatversion = 1')
+        + '[extensions]\nworktreeConfig = true\n');
+    }
+    const cwd = scope === 'worktree' ? f.linked : f.work;
+    const snapshots = new Map([local, configured].map(file => [file, fs.readFileSync(file)]));
+    const assertRefusal = result => {
+      assert.notEqual(result.status, 0, result.stdout + result.stderr);
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+      assert.ok(diagnostic.includes(fq45CoreDiagnostic), diagnostic);
+      assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+      assert.equal((result.stdout + result.stderr).includes('fq45-private-unused-program'), false);
+      assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false,
+        'The current helper must complete its strict failure cleanup');
+      assert.deepEqual(f.calls(), [], 'The config rejection must use qualified real Git, not the mock');
+      for (const [file, bytes] of snapshots) assert.deepEqual(fs.readFileSync(file), bytes, 'Helper must not mutate supplied config');
+    };
+    assertRefusal(f.run({}, f.script, cwd));
+    assert.equal(f.source.split(guard).length, 2, 'The effective-key guard must occur exactly once');
+    const mutant = f.source.replace(guard, '');
+    assert.equal(mutant.replace('    $boolCredentialSuccess = $true', guard + '    $boolCredentialSuccess = $true'), f.source,
+      'The config mutant removes only the effective-key refusal');
+    const mutantPath = path.join(f.scripts, 'fq45-core-mutant.ps1'); fs.writeFileSync(mutantPath, mutant);
+    const result = f.run({}, mutantPath, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.throws(() => assertRefusal(result), assert.AssertionError,
+      'Removing the actual effective-key guard must false-pass the same negative case');
+  }
+});
+
+for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) {
+  for (const family of ['R3 credential selectors', 'FQ45 credential askpass']) {
+    test(`${family}: real helper refuses through ${caller}`, { skip: !linux && process.platform !== 'win32' }, t => {
+      const cases = family === 'R3 credential selectors' ? [{ GIT_COMMON_DIR: 'r3-selector-private-value' }]
+        : [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
+          .map(name => [name, 'fq45-private-askpass-value'])));
+      for (const env of cases) {
+        const f = r3CredentialFixture(t), curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
+        let source = read(caller);
+        const helperCall = '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"';
+        assert.equal(source.split(helperCall).length, 2, 'The real credential helper call must remain exactly once');
+        fs.writeFileSync(path.join(f.work, 'package.json'), fs.readFileSync(path.join(directory, '../../package.json')));
+        fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+        for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
+        fs.writeFileSync(curl, `
+    [IO.File]::AppendAllText(${quote(curlLog)}, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
+    $global:LASTEXITCODE = 0
+    if ($args -contains '--version') {
+        'curl 8.5.0 fixture libcurl/8.5.0'; 'Protocols: https'; 'Features: SSL'; return
+    }
+    if ($args -contains '--help') {
+        ${['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir', 'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'].map(name => quote('--' + name + ' fixture')).join('; ')}
+        return
+    }
+    throw 'R3 unexpected acquisition dispatch'
+    `);
+        if (caller === 'Initialize-CiToolchain.ps1') {
+          for (const anchor of ["$strCurlPath = Join-Path ([Environment]::SystemDirectory) 'curl.exe'", "$strCurlPath = '/usr/bin/curl'"]) {
+            assert.equal(source.split(anchor).length, 2, 'R3 fixed curl anchor must occur once');
+            source = source.replace(anchor, `$strCurlPath = ${quote(curl)}`);
+          }
+        }
+        const target = path.join(f.scripts, caller); fs.writeFileSync(target, source);
+        const result = f.run(env, target);
+        if (family === 'R3 credential selectors') assertR3SelectorRefusal(f, result);
+        else assertFq45AskpassRefusal(f, result);
+        assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
+        const curlCalls = fs.existsSync(curlLog) ? fs.readFileSync(curlLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
+        assert.deepEqual(curlCalls, caller === 'Initialize-CiToolchain.ps1' && process.platform === 'win32'
+          ? [['--disable', '--version'], ['--disable', '--help', 'all']] : []);
+        for (const name of ['path', 'env']) assert.equal(fs.readFileSync(path.join(f.root, name), 'utf8'), '');
+      }
+    });
+  }
 }
 
 // Windows fixtures must run with TEMP/TMP under the qualified private runner
