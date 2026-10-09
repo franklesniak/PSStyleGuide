@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.23.20261007.0
+# Version: 1.24.20261008.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -483,7 +483,7 @@ function Get-AgentSetupInputSpec {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; there are no parameters.
-    # Version: 1.2.20261007.0
+    # Version: 1.3.20261008.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param()
@@ -492,8 +492,8 @@ function Get-AgentSetupInputSpec {
             ,@('package.json', 16384)
             ,@('.github/workflows/package.json', 16384)
             ,@('.github/workflows/package-lock.json', 131072)
-            ,@('.github/workflows/copilot-setup-steps.yml', 65536)
-            ,@('.github/workflows/copilot-code-review.yml', 65536, $true)
+            ,@('.github/workflows/copilot-setup-steps.yml', 131072)
+            ,@('.github/workflows/copilot-code-review.yml', 131072, $true)
             ,@('.github/workflows/lint-staged-markdown.mjs', 32768)
             ,@('.github/workflows/Invoke-LockedPythonHook.ps1', 32768)
             ,@('.github/workflows/install-husky.mjs', 16384)

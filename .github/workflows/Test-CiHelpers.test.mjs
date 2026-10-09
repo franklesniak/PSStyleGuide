@@ -20,6 +20,31 @@ const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 
+// The bridge keeps its flat producer. Future schema2 is inert fixture input only.
+const copilotReaderPin = digest => ({ schemaVersion: 2,
+  preferred: { linuxX64Sha256: digest,
+    windowsX64Sha256: 'ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765' },
+  recoveryCompatibility: { node: '22.23.3', npm: '10.9.9',
+    linuxX64Sha256: 'df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de' } });
+
+// A timeout, signal or launch error is not a completed product refusal.
+function assertReaderCompleted(result, context) {
+  const details = `${context}: error=${result.error?.stack ?? result.error ?? 'none'}; ` +
+    `signal=${String(result.signal)}; status=${String(result.status)}\n${result.stdout ?? ''}${result.stderr ?? ''}`;
+  assert.equal(result.error, undefined, details);
+  assert.equal(result.signal, null, details);
+  assert.equal(Number.isInteger(result.status), true, details);
+  return result;
+}
+
+// Join only the observed PowerShell continuation margin; keep message tokens exact.
+function assertCopilotDigestDeclaration(stderr, format) {
+  const diagnostic = stderr.replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
+  const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
+  const declaration = `package.json engines.node and .github/workflows/ci-toolchain.json ${field}.`;
+  assert.ok(diagnostic.includes(declaration), stderr);
+}
+
 // Private fixture discovery follows the contributor's required PowerShell7 PATH.
 // Production acquisition keeps its fixed Git application paths unchanged.
 function discoverFixtureGit({ env = process.env, run = spawnSync } = {}) {
@@ -967,8 +992,8 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
     });
   }
 
-  for (const mode of ['', 'download-failure', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
-    test(`${setupWorkflowName}: Copilot runtime failure: ${mode || 'success'}`, { skip: !linux }, t => {
+  for (const format of ['historical-flat', 'schema2']) for (const mode of ['', 'download-failure', 'wrong-digest', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
+    test(`${setupWorkflowName}: Copilot ${format} runtime failure: ${mode || 'success'}`, { skip: !linux }, t => {
       const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
       fs.mkdirSync(workflows, { recursive: true });
       const manifest = JSON.parse(fs.readFileSync(path.resolve(directory, '../../package.json')));
@@ -986,8 +1011,8 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
       const archive = path.join(f.root, 'runtime.tar.xz');
       const packed = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
       assert.equal(packed.status, 0, packed.stderr);
-      fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
-        linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
+      const digest = mode === 'wrong-digest' ? 'b'.repeat(64) : createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+      fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(format === 'schema2' ? copilotReaderPin(digest) : { linuxX64Sha256: digest }));
       const curl = path.join(f.root, 'curl');
       fs.writeFileSync(curl, `#!${process.execPath}
   const fs = require('node:fs'), args = process.argv.slice(2);
@@ -999,6 +1024,7 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
         .find(step => step.name === 'Set up verified official Node.js runtime').run
         .replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl));
       const result = f.run(source, { TOOLCHAIN_LAYOUT: 'modern', TEST_MODE: mode });
+      assertReaderCompleted(result, `${setupWorkflowName}/${format}/${mode || 'success'}`);
       assert.equal(result.status === 0, mode === '', result.stderr);
       const request = f.calls().find(row => row[0] === 'curl');
       assert.equal(request[1], '--disable');
@@ -1010,6 +1036,27 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
         assert.equal(request[request.indexOf(flag) + 1], value);
       }
       if (mode === 'download-failure') assert.match(result.stderr, /download exited 28/);
+      if (mode === 'wrong-digest') {
+        assert.match(result.stderr, /official Node archive does not match the reviewed digest/);
+        assertCopilotDigestDeclaration(result.stderr, format);
+        const declarationPath = '.github/workflows/ci-toolchain.json';
+        const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
+        const diagnosticMutations = [
+          ['wrong-path', result.stderr.replaceAll(declarationPath, '.github/workflows/other-toolchain.json')],
+          ['missing-path', result.stderr.replaceAll(declarationPath, '')],
+          ['wrong-field', result.stderr.replaceAll(field,
+            format === 'schema2' ? 'recoveryCompatibility.linuxX64Sha256' : 'windowsX64Sha256')],
+          ['missing-field', result.stderr.replaceAll(field, '')],
+          ['misordered-field', result.stderr.replaceAll(field, '').replaceAll(declarationPath, `${field} ${declarationPath}`)],
+        ];
+        for (const [mutation, mutated] of diagnosticMutations) {
+          const context = `${setupWorkflowName}/${format}/${mutation}`;
+          assert.notEqual(mutated, result.stderr, `${context}: control must change actual native stderr.`);
+          assert.throws(() => assertCopilotDigestDeclaration(mutated, format),
+            { name: 'AssertionError', code: 'ERR_ASSERTION' }, `${context}: incorrect declaration must be refused.`);
+        }
+        assert.equal(fs.existsSync(path.join(f.root, 'agent-validation-node')), false, 'Digest failure must precede extraction.');
+      }
       if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
       if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
       if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
@@ -1955,5 +2002,94 @@ for (const mode of ['clean', 'worktree', 'index-masked', 'untracked']) {
     if (mode === 'untracked') f.put('requirements-dev.txt');
     const result = f.run('Verify final immutable setup inputs');
     assert.equal(result.status === 0, mode === 'clean', result.stdout + result.stderr);
+  });
+}
+
+// Strict whole declarations must fail at each actual workflow admission site.
+const malformedRuntimeDeclarations = () => {
+  const pin = copilotReaderPin('a'.repeat(64));
+  const changed = edit => { const value = structuredClone(pin); edit(value); return JSON.stringify(value); };
+  const spoof = object => ({ ...object, Count: Object.keys(object).length, Keys: Object.keys(object), PSBase: 'shadow', extra: true });
+  const flat = { linuxX64Sha256: 'a'.repeat(64) };
+  return [JSON.stringify(spoof(pin)), changed(p => p.preferred = spoof(p.preferred)),
+    changed(p => p.recoveryCompatibility = spoof(p.recoveryCompatibility)), JSON.stringify(spoof(flat)),
+    changed(p => Object.assign(p, { count: 3, keys: Object.keys(pin), extra: true })),
+    ...[[], [pin], [flat], [pin, pin], [[pin]]].map(JSON.stringify),
+    'null', '"declaration"', '{}', '{', '{"linuxX64Sha256":"' + 'a'.repeat(64) + '","linuxX64Sha256":"' + 'b'.repeat(64) + '"}',
+    changed(p => p.schemaVersion = 1), changed(p => p.schemaVersion = '2'), changed(p => p.schemaVersion = 99),
+    changed(p => p.linuxX64Sha256 = 'a'.repeat(64)), changed(p => delete p.preferred),
+    changed(p => delete p.preferred.linuxX64Sha256), changed(p => delete p.preferred.windowsX64Sha256),
+    changed(p => p.preferred.linuxX64Sha256 = 'A'.repeat(64)), changed(p => p.preferred.windowsX64Sha256 = []),
+    ...[null, 1, []].flatMap(value => [changed(p => p.preferred = value), changed(p => p.recoveryCompatibility = value)]),
+    ...[null, 1, [], 'A'.repeat(64), 'a'.repeat(63), 'a'.repeat(65)].map(linuxX64Sha256 => JSON.stringify({ linuxX64Sha256 })),
+    changed(p => p.preferred.linuxX64Sha256 = null), changed(p => p.preferred.windowsX64Sha256 = 'b'.repeat(63)),
+    changed(p => p.recoveryCompatibility.linuxX64Sha256 = 'C'.repeat(64)),
+    changed(p => p.recoveryCompatibility.node = '22.x'), changed(p => p.recoveryCompatibility.npm = ['10.9.9']),
+    changed(p => delete p.recoveryCompatibility.linuxX64Sha256), changed(p => p.recoveryCompatibility.url = 'https://example.invalid/'),
+    JSON.stringify(pin).replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2'),
+    JSON.stringify(pin).replace('"node":"22.23.3"', '"node":"22.23.3","n\\u006fde":"22.23.3"')];
+};
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  test(`${workflow}: whole malformed declaration rejects before curl at both sites`, { skip: !linux }, t => {
+    const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+    for (const raw of malformedRuntimeDeclarations()) {
+      const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
+      f.put('.github/workflows/ci-toolchain.json', raw);
+      const curl = path.join(f.root, 'curl');
+      fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${f.root}/curl-marker'\nexit 19\n`, { mode: 0o700 });
+      const admitted = f.run('Detect locked validation-tool layout');
+      assertReaderCompleted(admitted, 'Reader detection malformed input');
+      assert.notEqual(admitted.status, 0, raw);
+      assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
+      const acquired = f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
+        source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl)));
+      assertReaderCompleted(acquired, 'Reader runtime malformed input');
+      assert.notEqual(acquired.status, 0, raw);
+      assert.equal(fs.existsSync(path.join(f.root, 'curl-marker')), false, raw);
+      assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, raw);
+    }
+  });
+}
+
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  for (const kind of ['historical-flat', 'schema2', 'pre-declaration', 'historical', 'historical-full', 'legacy']) {
+    test(`${workflow}: reader bridge capability: ${kind}`, { skip: !linux }, t => {
+      const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+      const f = copilotBodyFixture(t, 'work', job);
+      copilotInputs(f, ['historical-flat', 'schema2'].includes(kind) ? 'declared' : kind === 'historical-full' ? 'historical' : kind);
+      if (kind === 'schema2') f.put('.github/workflows/ci-toolchain.json', JSON.stringify(copilotReaderPin('a'.repeat(64))));
+      if (kind === 'historical-full') for (const name of copilotFullInputs) f.put(name);
+      const result = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${workflow}/${kind}`);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      const output = fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8');
+      assert.match(output, new RegExp(`layout=${kind === 'legacy' ? 'legacy' : 'modern'}`));
+      assert.match(output, new RegExp(`validation=${['historical', 'legacy'].includes(kind) ? 'node-only' : 'full'}`));
+      if (['historical', 'legacy'].includes(kind)) assert.match(result.stdout, /Python and full validation are unavailable/);
+      assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, 'Detection cannot publish a runtime.');
+    });
+  }
+}
+
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  test(`${workflow}: reader bridge declaration exact and oversized byte bounds`, { skip: !linux }, t => {
+    const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+    for (const length of [16384, 16385]) {
+      const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
+      const raw = JSON.stringify({ linuxX64Sha256: 'a'.repeat(64) }).padEnd(length, ' ');
+      assert.equal(Buffer.byteLength(raw), length);
+      f.put('.github/workflows/ci-toolchain.json', raw);
+      const curl = path.join(f.root, 'curl'), marker = path.join(f.root, 'curl-marker');
+      fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${marker}'\nexit 19\n`, { mode: 0o700 });
+      const detected = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${workflow}/bound detection/${length}`);
+      assert.equal(detected.status === 0, length === 16384, detected.stdout + detected.stderr);
+      const acquired = assertReaderCompleted(f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
+        source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl))),
+      `${workflow}/bound runtime/${length}`);
+      assert.notEqual(acquired.status, 0);
+      assert.equal(fs.existsSync(marker), length === 16384, acquired.stdout + acquired.stderr);
+      assert.match(acquired.stderr, length === 16384 ? /download exited 19/ : /bounded regular JSON input required/);
+      assert.equal(fs.existsSync(f.env.GITHUB_PATH), false);
+      if (length === 16385) assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
+    }
   });
 }
