@@ -7,6 +7,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+import { stripVTControlCharacters } from 'node:util';
 import test from 'node:test';
 import { readContract } from './Validate-WorkflowPolicy.mjs';
 
@@ -37,9 +38,9 @@ function assertReaderCompleted(result, context) {
   return result;
 }
 
-// Join only the observed PowerShell continuation margin; keep message tokens exact.
+// Remove terminal styling and join the PowerShell margin; keep message tokens exact.
 function assertCopilotDigestDeclaration(stderr, format) {
-  const diagnostic = stderr.replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
+  const diagnostic = stripVTControlCharacters(stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
   const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
   const declaration = `package.json engines.node and .github/workflows/ci-toolchain.json ${field}.`;
   assert.ok(diagnostic.includes(declaration), stderr);
@@ -1038,22 +1039,25 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
       if (mode === 'download-failure') assert.match(result.stderr, /download exited 28/);
       if (mode === 'wrong-digest') {
         assert.match(result.stderr, /official Node archive does not match the reviewed digest/);
-        assertCopilotDigestDeclaration(result.stderr, format);
         const declarationPath = '.github/workflows/ci-toolchain.json';
         const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
-        const diagnosticMutations = [
-          ['wrong-path', result.stderr.replaceAll(declarationPath, '.github/workflows/other-toolchain.json')],
-          ['missing-path', result.stderr.replaceAll(declarationPath, '')],
-          ['wrong-field', result.stderr.replaceAll(field,
-            format === 'schema2' ? 'recoveryCompatibility.linuxX64Sha256' : 'windowsX64Sha256')],
-          ['missing-field', result.stderr.replaceAll(field, '')],
-          ['misordered-field', result.stderr.replaceAll(field, '').replaceAll(declarationPath, `${field} ${declarationPath}`)],
-        ];
-        for (const [mutation, mutated] of diagnosticMutations) {
-          const context = `${setupWorkflowName}/${format}/${mutation}`;
-          assert.notEqual(mutated, result.stderr, `${context}: control must change actual native stderr.`);
-          assert.throws(() => assertCopilotDigestDeclaration(mutated, format),
-            { name: 'AssertionError', code: 'ERR_ASSERTION' }, `${context}: incorrect declaration must be refused.`);
+        const colored = result.stderr.split('\n').map(line => `\u001b[31m${line}\u001b[0m`).join('\n');
+        for (const diagnosticText of [result.stderr, colored]) {
+          assertCopilotDigestDeclaration(diagnosticText, format);
+          const diagnosticMutations = [
+            ['wrong-path', diagnosticText.replaceAll(declarationPath, '.github/workflows/other-toolchain.json')],
+            ['missing-path', diagnosticText.replaceAll(declarationPath, '')],
+            ['wrong-field', diagnosticText.replaceAll(field,
+              format === 'schema2' ? 'recoveryCompatibility.linuxX64Sha256' : 'windowsX64Sha256')],
+            ['missing-field', diagnosticText.replaceAll(field, '')],
+            ['misordered-field', diagnosticText.replaceAll(field, '').replaceAll(declarationPath, `${field} ${declarationPath}`)],
+          ];
+          for (const [mutation, mutated] of diagnosticMutations) {
+            const context = `${setupWorkflowName}/${format}/${mutation}`;
+            assert.notEqual(mutated, diagnosticText, `${context}: control must change actual native stderr.`);
+            assert.throws(() => assertCopilotDigestDeclaration(mutated, format),
+              { name: 'AssertionError', code: 'ERR_ASSERTION' }, `${context}: incorrect declaration must be refused.`);
+          }
         }
         assert.equal(fs.existsSync(path.join(f.root, 'agent-validation-node')), false, 'Digest failure must precede extraction.');
       }
@@ -1967,6 +1971,52 @@ test('dedicated review setup preserves every preparation guard and omits only th
   assert.match(complete.run, /-m pre_commit run --all-files/u);
   assert.deepEqual(reviewJob.steps, copilotJob.steps.filter(step => step !== complete));
   assert.equal(reviewJob.steps.some(step => step.run.includes('-m pre_commit run --all-files')), false);
+  const readerGroup = run => {
+    const source = run.replaceAll('\r\n', '\n');
+    const starts = [...source.matchAll(/^([ \t]*)function Read-SetupJson \{$/gmu)];
+    const runtimes = [...source.matchAll(/^([ \t]*)function Read-SetupRuntime \{$/gmu)];
+    assert.equal(starts.length, 1, 'Exactly one JSON reader group is required.');
+    assert.equal(runtimes.length, 1, 'Exactly one runtime reader is required.');
+    const [start] = starts, [runtime] = runtimes, indent = start[1];
+    assert.equal(runtime[1], indent);
+    assert.ok(runtime.index > start.index);
+    const end = new RegExp(`^${indent}\\}$`, 'mu').exec(source.slice(runtime.index));
+    assert.ok(end, 'The runtime reader must have one closing group boundary.');
+    const group = source.slice(start.index, runtime.index + end.index + end[0].length);
+    for (const name of ['Read-SetupJson', 'Assert-UniqueJson', 'Assert-SetupShape', 'Read-SetupRuntime']) {
+      assert.equal([...group.matchAll(new RegExp(`^[ \\t]*function ${name} \\{$`, 'gmu'))].length, 1, name);
+    }
+    return group.split('\n').map(line => {
+      if (line === '') return line;
+      assert.ok(line.startsWith(indent), 'Only embedding indentation may be removed.');
+      return line.slice(indent.length);
+    }).join('\n');
+  };
+  const compareReaders = runs => {
+    assert.equal(runs.length, 4);
+    const groups = runs.map(readerGroup);
+    for (const [index, group] of groups.entries()) assert.equal(group, groups[0], `Reader group ${index} differs.`);
+  };
+  const runs = [coding.jobs['copilot-setup-steps'], reviewJob].flatMap(job =>
+    ['Detect locked validation-tool layout', 'Set up verified official Node.js runtime'].map(name => {
+      const steps = job.steps.filter(step => step.name === name);
+      assert.equal(steps.length, 1, name);
+      return steps[0].run;
+    }));
+  compareReaders(runs);
+  const changedReader = run => {
+    const from = '-AsHashtable -Depth 64 -ErrorAction Stop';
+    assert.equal(run.split(from).length, 2, 'Mutation must change one actual JSON reader.');
+    return run.replace(from, '-AsHashtable -Depth 63 -ErrorAction Stop');
+  };
+  assert.throws(() => compareReaders(runs.map((run, index) => index === 0 ? changedReader(run) : run)), { code: 'ERR_ASSERTION' });
+  const pairedDrift = runs.map((run, index) => index % 2 === 0 ? changedReader(run) : run);
+  assert.equal(pairedDrift[0], pairedDrift[2]);
+  assert.equal(pairedDrift[1], pairedDrift[3]);
+  assert.throws(() => compareReaders(pairedDrift), { code: 'ERR_ASSERTION' });
+  for (const replacement of ['', 'function Read-SetupJson {\nfunction Read-SetupJson {']) {
+    assert.throws(() => readerGroup(runs[0].replace('function Read-SetupJson {', replacement)), { code: 'ERR_ASSERTION' });
+  }
 });
 for (const mode of ['declared', 'historical', 'missing-current-input']) {
   test(`dedicated review actual capability selection: ${mode}`, { skip: !linux }, t => {
@@ -2047,6 +2097,41 @@ for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
       assert.notEqual(acquired.status, 0, raw);
       assert.equal(fs.existsSync(path.join(f.root, 'curl-marker')), false, raw);
       assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, raw);
+    }
+  });
+}
+
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  test(`${workflow}: reader bridge rejects terminal newlines in declared tokens`, { skip: !linux }, t => {
+    const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+    for (const format of ['historical-flat', 'schema2']) {
+      const digestFields = format === 'schema2'
+        ? ['preferred.linuxX64Sha256', 'preferred.windowsX64Sha256', 'recoveryCompatibility.linuxX64Sha256']
+        : ['linuxX64Sha256'];
+      for (const field of ['engines.node', 'engines.npm', ...digestFields]) for (const suffix of ['\n', '\r\n']) {
+        const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
+        const declaration = format === 'schema2' ? copilotReaderPin('a'.repeat(64)) : { linuxX64Sha256: 'a'.repeat(64) };
+        const manifest = JSON.parse(fs.readFileSync(path.join(f.work, 'package.json'), 'utf8'));
+        const keys = field.split('.'), leaf = keys.pop();
+        const target = keys.reduce((value, key) => value[key], field.startsWith('engines.') ? manifest : declaration);
+        target[leaf] += suffix;
+        f.put('package.json', JSON.stringify(manifest));
+        f.put('.github/workflows/ci-toolchain.json', JSON.stringify(declaration));
+        const label = `${workflow}/${format}/${field}/${JSON.stringify(suffix)}`;
+        const curl = path.join(f.root, 'curl'), marker = path.join(f.root, 'curl-marker');
+        fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${marker}'\nexit 19\n`, { mode: 0o700 });
+        const detected = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${label}/detection`);
+        assert.notEqual(detected.status, 0, label);
+        assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='), label);
+        const acquired = assertReaderCompleted(f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
+          source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl))), `${label}/runtime`);
+        assert.notEqual(acquired.status, 0, label);
+        const diagnostic = field.startsWith('engines.') ? /invalid declared runtime tuple/ : /invalid runtime digest/;
+        assert.match(detected.stderr, diagnostic, label);
+        assert.match(acquired.stderr, diagnostic, label);
+        assert.equal(fs.existsSync(marker), false, label);
+        assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, label);
+      }
     }
   });
 }
