@@ -1,0 +1,49 @@
+{
+  "state": "passed",
+  "started_at": "2026-10-08T23:17:26.731080+00:00",
+  "command": [
+    "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+    "--test",
+    "--test-name-pattern=^(B1 Windows credential helper:|F4 compatibility documentation)",
+    ".github/workflows/Test-CiHelpers.test.mjs"
+  ],
+  "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide",
+  "platform": "win32",
+  "catalog_sha256": "d2bd44801f4a7c1e3b63d6ee2ed189442434ea664ea1edefad1ba89fef23849f",
+  "private_temp": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\b1-fq21-1008-a1",
+  "qualified_parent_dacl_unchanged": true,
+  "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\integration-repair-native\\fq21-targeted-windows.log",
+  "scope": "Existing14 Windows B1 tests and F4 documentation parameter-ownership test; no other registrations selected.",
+  "native_exit": 0,
+  "finished_at": "2026-10-08T23:17:44.847272+00:00",
+  "candidate_files_unchanged": true,
+  "changed_during_validation": [],
+  "log_identity": {
+    "sha256": "9ff793b7219972383c733ca5b14f29e4d39dd31d8adce802e7cbc9dba4b00c15",
+    "bytes": 1029
+  },
+  "reported_counts": {
+    "tests": [
+      15
+    ],
+    "suites": [
+      0
+    ],
+    "pass": [
+      15
+    ],
+    "fail": [
+      0
+    ],
+    "cancelled": [
+      0
+    ],
+    "skipped": [
+      0
+    ],
+    "todo": [
+      0
+    ]
+  },
+  "scratch_entries": []
+}

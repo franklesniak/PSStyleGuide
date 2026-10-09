@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-08T23:18:00.3266331+00:00",
+  "powershell": "7.6.5",
+  "analyzer": "1.24.0",
+  "results": [
+    {
+      "file": "Test-CheckoutCredentials.ps1",
+      "sha256": "699887e6414275ec3a9d7ec5d17715c0adcb301446676d91bfeff6d06d13e769",
+      "parser_errors": [],
+      "analyzer": []
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "at": "2026-10-08T23:17:54.050211+00:00",
+  "node": "24.18.1",
+  "results": [
+    {
+      "script": "lint-markdown.mjs",
+      "native_exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\integration-repair-native\\fq22-lint-markdown.mjs.log"
+    },
+    {
+      "script": "lint-nested-markdown.js",
+      "native_exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\integration-repair-native\\fq22-lint-nested-markdown.js.log"
+    }
+  ]
+}
