@@ -390,7 +390,309 @@ jobs:
             # shellcheck disable=SC2016
             pwsh -NoLogo -NoProfile -NonInteractive -Command '
               $ErrorActionPreference = "Stop"
-              $null = Get-Content -Raw -LiteralPath .github/workflows/ci-toolchain.json | ConvertFrom-Json -ErrorAction Stop'
+              function Read-SetupJson {
+                  # .SYNOPSIS
+                  # Reads one bounded regular JSON object with strict UTF8 decoding.
+                  #
+                  # .DESCRIPTION
+                  # Checks the literal input item, its size and its reparse status before reading.
+                  # Resolves the checked native FullName through the FileSystem provider and
+                  # requires exact ordinal equality before the static file read. Rejects duplicate
+                  # members recursively and any non-object root. Returns the converted dictionary.
+                  # Failures propagate with their original error records; debug text is fixed.
+                  #
+                  # .PARAMETER Path
+                  # Literal PowerShell path to the JSON input. Internal callers supply fixed paths.
+                  #
+                  # .PARAMETER Limit
+                  # Maximum permitted file length in bytes. Existing callers supply explicit limits.
+                  #
+                  # .EXAMPLE
+                  # Read-SetupJson -Path ".github/workflows/ci-toolchain.json" -Limit 16384
+                  # # Returns the admitted runtime declaration dictionary without other output.
+                  #
+                  # .EXAMPLE
+                  # Read-SetupJson ".github/workflows/ci-toolchain.json" 1
+                  # # Rejects a declaration that exceeds the one-byte limit before decoding it.
+                  #
+                  # .INPUTS
+                  # None. Pipeline input is not accepted.
+                  #
+                  # .OUTPUTS
+                  # System.Collections.IDictionary. One converted object-root dictionary, whose
+                  # concrete type is a hashtable or ordered hashtable supplied by ConvertFrom-Json.
+                  # Errors terminate the call instead of returning an admission result.
+                  #
+                  # .NOTES
+                  # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+                  # Parameters, return shape and positional contract may change without notice.
+                  # This function supports positional parameters
+                  # (internal-caller contract only; subject to change):
+                  #   Position 0: Path
+                  #   Position 1: Limit
+                  # Version: 1.0.20261008.0
+                  [CmdletBinding()]
+                  [OutputType([Collections.IDictionary])]
+                  param (
+                      [Parameter(Position = 0)]
+                      [string]$Path,
+
+                      [Parameter(Position = 1)]
+                      [long]$Limit
+                  )
+
+                  try {
+                      $objInputItem = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+                      if ($objInputItem.PSIsContainer -or ($objInputItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+                          $objInputItem.Length -gt $Limit) {
+                          throw "toolchain: bounded regular JSON input required"
+                      }
+                      [Management.Automation.ProviderInfo]$objPathProvider = $null
+                      [Management.Automation.PSDriveInfo]$objPathDrive = $null
+                      $strResolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                          $objInputItem.FullName, [ref]$objPathProvider, [ref]$objPathDrive)
+                      if ($null -eq $objPathProvider -or $objPathProvider.Name -cne "FileSystem" -or
+                          -not [StringComparer]::Ordinal.Equals($strResolvedPath, $objInputItem.FullName)) {
+                          throw "toolchain: bounded regular JSON input required"
+                      }
+                      $strJsonText = [IO.File]::ReadAllText($strResolvedPath, [Text.UTF8Encoding]::new($false, $true))
+                      $objJsonDocument = [Text.Json.JsonDocument]::Parse($strJsonText)
+                      function Assert-UniqueJson {
+                          # .SYNOPSIS
+                          # Rejects duplicate JSON object member names recursively.
+                          #
+                          # .DESCRIPTION
+                          # Visits object members and array elements in the parsed document.
+                          # Compares each object member name with ordinal case-sensitive equality.
+                          # Scalars need no traversal. Duplicate members and traversal errors throw;
+                          # this function emits no success output and does not dispose the document.
+                          #
+                          # .PARAMETER Element
+                          # Live System.Text.Json.JsonElement from the document owned by the reader.
+                          # ValueKind may vary while the CLR type remains JsonElement.
+                          #
+                          # .EXAMPLE
+                          # $objExampleDocument = [Text.Json.JsonDocument]::Parse("{""member"":1}")
+                          # try {
+                          #     Assert-UniqueJson -Element $objExampleDocument.RootElement
+                          # } finally {
+                          #     [void]($objExampleDocument.Dispose())
+                          # }
+                          # # Emits no success output for the object with one member.
+                          #
+                          # .EXAMPLE
+                          # $objExampleDocument = [Text.Json.JsonDocument]::Parse("{""member"":1,""member"":2}")
+                          # try {
+                          #     Assert-UniqueJson $objExampleDocument.RootElement
+                          # } finally {
+                          #     [void]($objExampleDocument.Dispose())
+                          # }
+                          # # Throws the duplicate-member diagnostic and still disposes the example.
+                          #
+                          # .INPUTS
+                          # None. Pipeline input is not accepted.
+                          #
+                          # .OUTPUTS
+                          # None. System.Void indicates no success output; failures throw.
+                          #
+                          # .NOTES
+                          # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+                          # Parameters, return shape and positional contract may change without notice.
+                          # This function supports positional parameters
+                          # (internal-caller contract only; subject to change):
+                          #   Position 0: Element
+                          # Version: 1.0.20261008.0
+                          [CmdletBinding()]
+                          [OutputType([void])]
+                          param (
+                              [Parameter(Position = 0)]
+                              [Text.Json.JsonElement]$Element
+                          )
+
+                          try {
+                              if ($Element.ValueKind -eq [Text.Json.JsonValueKind]::Object) {
+                                  $objMemberNameSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+                                  foreach ($objJsonProperty in $Element.EnumerateObject()) {
+                                      if (-not $objMemberNameSet.Add($objJsonProperty.Name)) {
+                                          throw "toolchain: duplicate JSON member"
+                                      }
+                                      Assert-UniqueJson $objJsonProperty.Value
+                                  }
+                              } elseif ($Element.ValueKind -eq [Text.Json.JsonValueKind]::Array) {
+                                  foreach ($objArrayElement in $Element.EnumerateArray()) {
+                                      Assert-UniqueJson $objArrayElement
+                                  }
+                              }
+                          } catch {
+                              Write-Debug -Message "toolchain: JSON member validation failed"
+                              throw
+                          }
+                      }
+                      try {
+                          if ($objJsonDocument.RootElement.ValueKind -ne [Text.Json.JsonValueKind]::Object) {
+                              throw "toolchain: JSON input must be an object"
+                          }
+                          Assert-UniqueJson $objJsonDocument.RootElement
+                      } finally {
+                          [void]($objJsonDocument.Dispose())
+                      }
+                      return ConvertFrom-Json -InputObject $strJsonText -AsHashtable -Depth 64 -ErrorAction Stop
+                  } catch {
+                      Write-Debug -Message "toolchain: JSON reader failed"
+                      throw
+                  }
+              }
+
+
+              function Assert-SetupShape {
+                  # .SYNOPSIS
+                  # Requires an exact runtime declaration object shape.
+                  #
+                  # .DESCRIPTION
+                  # Accepts deliberately polymorphic input so null, scalar and array values reach
+                  # the existing shape diagnostic. Requires an IDictionary, its exact psbase key
+                  # count and case-sensitive expected keys. Does not convert the input dictionary.
+                  # Shape failures and unexpected errors throw with no success output.
+                  #
+                  # .PARAMETER Object
+                  # Object to inspect, including malformed non-dictionary input that must be refused.
+                  #
+                  # .PARAMETER Keys
+                  # Exact case-sensitive member names required by the internal caller.
+                  #
+                  # .EXAMPLE
+                  # Assert-SetupShape -Object @{ linuxX64Sha256 = "example" } -Keys @("linuxX64Sha256")
+                  # # Emits no success output when the dictionary has exactly the expected key.
+                  #
+                  # .EXAMPLE
+                  # Assert-SetupShape $null @("linuxX64Sha256")
+                  # # Throws the existing field-shape diagnostic for the malformed object.
+                  #
+                  # .INPUTS
+                  # None. Pipeline input is not accepted.
+                  #
+                  # .OUTPUTS
+                  # None. System.Void indicates no success output; failures throw.
+                  #
+                  # .NOTES
+                  # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+                  # Parameters, return shape and positional contract may change without notice.
+                  # This function supports positional parameters
+                  # (internal-caller contract only; subject to change):
+                  #   Position 0: Object
+                  #   Position 1: Keys
+                  # Version: 1.0.20261008.0
+                  [CmdletBinding()]
+                  [OutputType([void])]
+                  param (
+                      [Parameter(Position = 0)]
+                      [object]$Object,
+
+                      [Parameter(Position = 1)]
+                      [string[]]$Keys
+                  )
+
+                  try {
+                      if ($Object -isnot [Collections.IDictionary] -or $Object.psbase.Count -ne $Keys.Count -or
+                          @($Object.psbase.Keys | Where-Object {
+                              $_ -cnotin $Keys
+                          }).Count) {
+                          throw "toolchain: invalid runtime declaration fields"
+                      }
+                  } catch {
+                      Write-Debug -Message "toolchain: runtime field validation failed"
+                      throw
+                  }
+              }
+
+
+              function Read-SetupRuntime {
+                  # .SYNOPSIS
+                  # Reads the admitted preferred Linux Node runtime tuple and digest.
+                  #
+                  # .DESCRIPTION
+                  # Reads the bounded declaration and package objects with the strict JSON reader.
+                  # Validates the declared runtime tuple, exact schema2 or historical shape, all
+                  # required digests and the fixed recovery tuple. A present malformed schema never
+                  # selects the historical branch. Returns the preferred digest in uppercase with
+                  # its declared source field. Failures propagate; debug messages reveal no input.
+                  #
+                  # .EXAMPLE
+                  # $hashtableRuntimeResult = Read-SetupRuntime
+                  # # Version is the exact package Node version; Digest is its uppercase Linux SHA256.
+                  # # Field names the admitted schema2 or exact historical digest source.
+                  #
+                  # .EXAMPLE
+                  # (Read-SetupRuntime).Field
+                  # # Returns preferred.linuxX64Sha256 for schema2, or linuxX64Sha256 for history.
+                  # # A malformed present declaration throws instead of selecting a fallback.
+                  #
+                  # .INPUTS
+                  # None. Pipeline input is not accepted.
+                  #
+                  # .OUTPUTS
+                  # System.Collections.Hashtable. One hashtable containing Version, Digest and Field.
+                  # Version is the exact declared stable Node24 tuple;
+                  # Digest is the selected uppercase SHA256 string; Field is its exact source name.
+                  # Errors terminate the call without returning a runtime result.
+                  #
+                  # .NOTES
+                  # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+                  # Parameters, return shape and positional contract may change without notice.
+                  # No declared parameters or positional arguments; internal-caller contract only.
+                  # Version: 1.0.20261008.0
+                  [CmdletBinding()]
+                  [OutputType([hashtable])]
+                  param ()
+
+                  try {
+                      $objRuntimeDeclaration = Read-SetupJson .github/workflows/ci-toolchain.json 16384
+                      $objPackage = Read-SetupJson package.json 1048576
+                      if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "\A24\.[0-9]+\.[0-9]+\z" -or
+                          $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "\A[0-9]+\.[0-9]+\.[0-9]+\z") {
+                          throw "toolchain: invalid declared runtime tuple"
+                      }
+                      if ($objRuntimeDeclaration -is [Collections.IDictionary] -and $objRuntimeDeclaration.Contains("schemaVersion")) {
+                          Assert-SetupShape $objRuntimeDeclaration @("schemaVersion", "preferred", "recoveryCompatibility")
+                          Assert-SetupShape $objRuntimeDeclaration.preferred @("linuxX64Sha256", "windowsX64Sha256")
+                          Assert-SetupShape $objRuntimeDeclaration.recoveryCompatibility @("node", "npm", "linuxX64Sha256")
+                          if ($objRuntimeDeclaration.schemaVersion -isnot [long] -or $objRuntimeDeclaration.schemaVersion -ne 2 -or
+                              $objRuntimeDeclaration.recoveryCompatibility.node -isnot [string] -or
+                              $objRuntimeDeclaration.recoveryCompatibility.node -cne "22.23.3" -or
+                              $objRuntimeDeclaration.recoveryCompatibility.npm -isnot [string] -or
+                              $objRuntimeDeclaration.recoveryCompatibility.npm -cne "10.9.9") {
+                              throw "toolchain: invalid runtime schema or compatibility tuple"
+                          }
+                          $arrRuntimeDigest = @(
+                              $objRuntimeDeclaration.preferred.linuxX64Sha256,
+                              $objRuntimeDeclaration.preferred.windowsX64Sha256,
+                              $objRuntimeDeclaration.recoveryCompatibility.linuxX64Sha256
+                          )
+                          $strRuntimeDigest = $objRuntimeDeclaration.preferred.linuxX64Sha256
+                          $strRuntimeDigestField = "preferred.linuxX64Sha256"
+                      } else {
+                          # This is the exact evidenced historical format, not schema-error fallback.
+                          Assert-SetupShape $objRuntimeDeclaration @("linuxX64Sha256")
+                          $arrRuntimeDigest = @($objRuntimeDeclaration.linuxX64Sha256)
+                          $strRuntimeDigest = $objRuntimeDeclaration.linuxX64Sha256
+                          $strRuntimeDigestField = "linuxX64Sha256"
+                      }
+                      foreach ($objDigestValue in $arrRuntimeDigest) {
+                          if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "\A[a-f0-9]{64}\z") {
+                              throw "toolchain: invalid runtime digest"
+                          }
+                      }
+                      return @{
+                          Version = $objPackage.engines.node
+                          Digest = $strRuntimeDigest.ToUpperInvariant()
+                          Field = $strRuntimeDigestField
+                      }
+                  } catch {
+                      Write-Debug -Message "toolchain: runtime declaration validation failed"
+                      throw
+                  }
+              }
+              $null = Read-SetupRuntime'
           fi
           if [[ "${capability}" == full ]]; then
             installer_state="$(classify_npm_input .github/workflows/install-husky.mjs)"
@@ -474,17 +776,318 @@ jobs:
           $env:GIT_CONFIG_NOSYSTEM = '1'
           $env:GIT_CONFIG_GLOBAL = '/dev/null'
           $env:GIT_TERMINAL_PROMPT = '0'
+          function Read-SetupJson {
+              # .SYNOPSIS
+              # Reads one bounded regular JSON object with strict UTF8 decoding.
+              #
+              # .DESCRIPTION
+              # Checks the literal input item, its size and its reparse status before reading.
+              # Resolves the checked native FullName through the FileSystem provider and
+              # requires exact ordinal equality before the static file read. Rejects duplicate
+              # members recursively and any non-object root. Returns the converted dictionary.
+              # Failures propagate with their original error records; debug text is fixed.
+              #
+              # .PARAMETER Path
+              # Literal PowerShell path to the JSON input. Internal callers supply fixed paths.
+              #
+              # .PARAMETER Limit
+              # Maximum permitted file length in bytes. Existing callers supply explicit limits.
+              #
+              # .EXAMPLE
+              # Read-SetupJson -Path ".github/workflows/ci-toolchain.json" -Limit 16384
+              # # Returns the admitted runtime declaration dictionary without other output.
+              #
+              # .EXAMPLE
+              # Read-SetupJson ".github/workflows/ci-toolchain.json" 1
+              # # Rejects a declaration that exceeds the one-byte limit before decoding it.
+              #
+              # .INPUTS
+              # None. Pipeline input is not accepted.
+              #
+              # .OUTPUTS
+              # System.Collections.IDictionary. One converted object-root dictionary, whose
+              # concrete type is a hashtable or ordered hashtable supplied by ConvertFrom-Json.
+              # Errors terminate the call instead of returning an admission result.
+              #
+              # .NOTES
+              # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+              # Parameters, return shape and positional contract may change without notice.
+              # This function supports positional parameters
+              # (internal-caller contract only; subject to change):
+              #   Position 0: Path
+              #   Position 1: Limit
+              # Version: 1.0.20261008.0
+              [CmdletBinding()]
+              [OutputType([Collections.IDictionary])]
+              param (
+                  [Parameter(Position = 0)]
+                  [string]$Path,
+
+                  [Parameter(Position = 1)]
+                  [long]$Limit
+              )
+
+              try {
+                  $objInputItem = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+                  if ($objInputItem.PSIsContainer -or ($objInputItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+                      $objInputItem.Length -gt $Limit) {
+                      throw "toolchain: bounded regular JSON input required"
+                  }
+                  [Management.Automation.ProviderInfo]$objPathProvider = $null
+                  [Management.Automation.PSDriveInfo]$objPathDrive = $null
+                  $strResolvedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                      $objInputItem.FullName, [ref]$objPathProvider, [ref]$objPathDrive)
+                  if ($null -eq $objPathProvider -or $objPathProvider.Name -cne "FileSystem" -or
+                      -not [StringComparer]::Ordinal.Equals($strResolvedPath, $objInputItem.FullName)) {
+                      throw "toolchain: bounded regular JSON input required"
+                  }
+                  $strJsonText = [IO.File]::ReadAllText($strResolvedPath, [Text.UTF8Encoding]::new($false, $true))
+                  $objJsonDocument = [Text.Json.JsonDocument]::Parse($strJsonText)
+                  function Assert-UniqueJson {
+                      # .SYNOPSIS
+                      # Rejects duplicate JSON object member names recursively.
+                      #
+                      # .DESCRIPTION
+                      # Visits object members and array elements in the parsed document.
+                      # Compares each object member name with ordinal case-sensitive equality.
+                      # Scalars need no traversal. Duplicate members and traversal errors throw;
+                      # this function emits no success output and does not dispose the document.
+                      #
+                      # .PARAMETER Element
+                      # Live System.Text.Json.JsonElement from the document owned by the reader.
+                      # ValueKind may vary while the CLR type remains JsonElement.
+                      #
+                      # .EXAMPLE
+                      # $objExampleDocument = [Text.Json.JsonDocument]::Parse("{""member"":1}")
+                      # try {
+                      #     Assert-UniqueJson -Element $objExampleDocument.RootElement
+                      # } finally {
+                      #     [void]($objExampleDocument.Dispose())
+                      # }
+                      # # Emits no success output for the object with one member.
+                      #
+                      # .EXAMPLE
+                      # $objExampleDocument = [Text.Json.JsonDocument]::Parse("{""member"":1,""member"":2}")
+                      # try {
+                      #     Assert-UniqueJson $objExampleDocument.RootElement
+                      # } finally {
+                      #     [void]($objExampleDocument.Dispose())
+                      # }
+                      # # Throws the duplicate-member diagnostic and still disposes the example.
+                      #
+                      # .INPUTS
+                      # None. Pipeline input is not accepted.
+                      #
+                      # .OUTPUTS
+                      # None. System.Void indicates no success output; failures throw.
+                      #
+                      # .NOTES
+                      # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+                      # Parameters, return shape and positional contract may change without notice.
+                      # This function supports positional parameters
+                      # (internal-caller contract only; subject to change):
+                      #   Position 0: Element
+                      # Version: 1.0.20261008.0
+                      [CmdletBinding()]
+                      [OutputType([void])]
+                      param (
+                          [Parameter(Position = 0)]
+                          [Text.Json.JsonElement]$Element
+                      )
+
+                      try {
+                          if ($Element.ValueKind -eq [Text.Json.JsonValueKind]::Object) {
+                              $objMemberNameSet = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+                              foreach ($objJsonProperty in $Element.EnumerateObject()) {
+                                  if (-not $objMemberNameSet.Add($objJsonProperty.Name)) {
+                                      throw "toolchain: duplicate JSON member"
+                                  }
+                                  Assert-UniqueJson $objJsonProperty.Value
+                              }
+                          } elseif ($Element.ValueKind -eq [Text.Json.JsonValueKind]::Array) {
+                              foreach ($objArrayElement in $Element.EnumerateArray()) {
+                                  Assert-UniqueJson $objArrayElement
+                              }
+                          }
+                      } catch {
+                          Write-Debug -Message "toolchain: JSON member validation failed"
+                          throw
+                      }
+                  }
+                  try {
+                      if ($objJsonDocument.RootElement.ValueKind -ne [Text.Json.JsonValueKind]::Object) {
+                          throw "toolchain: JSON input must be an object"
+                      }
+                      Assert-UniqueJson $objJsonDocument.RootElement
+                  } finally {
+                      [void]($objJsonDocument.Dispose())
+                  }
+                  return ConvertFrom-Json -InputObject $strJsonText -AsHashtable -Depth 64 -ErrorAction Stop
+              } catch {
+                  Write-Debug -Message "toolchain: JSON reader failed"
+                  throw
+              }
+          }
+
+
+          function Assert-SetupShape {
+              # .SYNOPSIS
+              # Requires an exact runtime declaration object shape.
+              #
+              # .DESCRIPTION
+              # Accepts deliberately polymorphic input so null, scalar and array values reach
+              # the existing shape diagnostic. Requires an IDictionary, its exact psbase key
+              # count and case-sensitive expected keys. Does not convert the input dictionary.
+              # Shape failures and unexpected errors throw with no success output.
+              #
+              # .PARAMETER Object
+              # Object to inspect, including malformed non-dictionary input that must be refused.
+              #
+              # .PARAMETER Keys
+              # Exact case-sensitive member names required by the internal caller.
+              #
+              # .EXAMPLE
+              # Assert-SetupShape -Object @{ linuxX64Sha256 = "example" } -Keys @("linuxX64Sha256")
+              # # Emits no success output when the dictionary has exactly the expected key.
+              #
+              # .EXAMPLE
+              # Assert-SetupShape $null @("linuxX64Sha256")
+              # # Throws the existing field-shape diagnostic for the malformed object.
+              #
+              # .INPUTS
+              # None. Pipeline input is not accepted.
+              #
+              # .OUTPUTS
+              # None. System.Void indicates no success output; failures throw.
+              #
+              # .NOTES
+              # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+              # Parameters, return shape and positional contract may change without notice.
+              # This function supports positional parameters
+              # (internal-caller contract only; subject to change):
+              #   Position 0: Object
+              #   Position 1: Keys
+              # Version: 1.0.20261008.0
+              [CmdletBinding()]
+              [OutputType([void])]
+              param (
+                  [Parameter(Position = 0)]
+                  [object]$Object,
+
+                  [Parameter(Position = 1)]
+                  [string[]]$Keys
+              )
+
+              try {
+                  if ($Object -isnot [Collections.IDictionary] -or $Object.psbase.Count -ne $Keys.Count -or
+                      @($Object.psbase.Keys | Where-Object {
+                          $_ -cnotin $Keys
+                      }).Count) {
+                      throw "toolchain: invalid runtime declaration fields"
+                  }
+              } catch {
+                  Write-Debug -Message "toolchain: runtime field validation failed"
+                  throw
+              }
+          }
+
+
+          function Read-SetupRuntime {
+              # .SYNOPSIS
+              # Reads the admitted preferred Linux Node runtime tuple and digest.
+              #
+              # .DESCRIPTION
+              # Reads the bounded declaration and package objects with the strict JSON reader.
+              # Validates the declared runtime tuple, exact schema2 or historical shape, all
+              # required digests and the fixed recovery tuple. A present malformed schema never
+              # selects the historical branch. Returns the preferred digest in uppercase with
+              # its declared source field. Failures propagate; debug messages reveal no input.
+              #
+              # .EXAMPLE
+              # $hashtableRuntimeResult = Read-SetupRuntime
+              # # Version is the exact package Node version; Digest is its uppercase Linux SHA256.
+              # # Field names the admitted schema2 or exact historical digest source.
+              #
+              # .EXAMPLE
+              # (Read-SetupRuntime).Field
+              # # Returns preferred.linuxX64Sha256 for schema2, or linuxX64Sha256 for history.
+              # # A malformed present declaration throws instead of selecting a fallback.
+              #
+              # .INPUTS
+              # None. Pipeline input is not accepted.
+              #
+              # .OUTPUTS
+              # System.Collections.Hashtable. One hashtable containing Version, Digest and Field.
+              # Version is the exact declared stable Node24 tuple;
+              # Digest is the selected uppercase SHA256 string; Field is its exact source name.
+              # Errors terminate the call without returning a runtime result.
+              #
+              # .NOTES
+              # PRIVATE/INTERNAL HELPER. This function is not part of the public API.
+              # Parameters, return shape and positional contract may change without notice.
+              # No declared parameters or positional arguments; internal-caller contract only.
+              # Version: 1.0.20261008.0
+              [CmdletBinding()]
+              [OutputType([hashtable])]
+              param ()
+
+              try {
+                  $objRuntimeDeclaration = Read-SetupJson .github/workflows/ci-toolchain.json 16384
+                  $objPackage = Read-SetupJson package.json 1048576
+                  if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "\A24\.[0-9]+\.[0-9]+\z" -or
+                      $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "\A[0-9]+\.[0-9]+\.[0-9]+\z") {
+                      throw "toolchain: invalid declared runtime tuple"
+                  }
+                  if ($objRuntimeDeclaration -is [Collections.IDictionary] -and $objRuntimeDeclaration.Contains("schemaVersion")) {
+                      Assert-SetupShape $objRuntimeDeclaration @("schemaVersion", "preferred", "recoveryCompatibility")
+                      Assert-SetupShape $objRuntimeDeclaration.preferred @("linuxX64Sha256", "windowsX64Sha256")
+                      Assert-SetupShape $objRuntimeDeclaration.recoveryCompatibility @("node", "npm", "linuxX64Sha256")
+                      if ($objRuntimeDeclaration.schemaVersion -isnot [long] -or $objRuntimeDeclaration.schemaVersion -ne 2 -or
+                          $objRuntimeDeclaration.recoveryCompatibility.node -isnot [string] -or
+                          $objRuntimeDeclaration.recoveryCompatibility.node -cne "22.23.3" -or
+                          $objRuntimeDeclaration.recoveryCompatibility.npm -isnot [string] -or
+                          $objRuntimeDeclaration.recoveryCompatibility.npm -cne "10.9.9") {
+                          throw "toolchain: invalid runtime schema or compatibility tuple"
+                      }
+                      $arrRuntimeDigest = @(
+                          $objRuntimeDeclaration.preferred.linuxX64Sha256,
+                          $objRuntimeDeclaration.preferred.windowsX64Sha256,
+                          $objRuntimeDeclaration.recoveryCompatibility.linuxX64Sha256
+                      )
+                      $strRuntimeDigest = $objRuntimeDeclaration.preferred.linuxX64Sha256
+                      $strRuntimeDigestField = "preferred.linuxX64Sha256"
+                  } else {
+                      # This is the exact evidenced historical format, not schema-error fallback.
+                      Assert-SetupShape $objRuntimeDeclaration @("linuxX64Sha256")
+                      $arrRuntimeDigest = @($objRuntimeDeclaration.linuxX64Sha256)
+                      $strRuntimeDigest = $objRuntimeDeclaration.linuxX64Sha256
+                      $strRuntimeDigestField = "linuxX64Sha256"
+                  }
+                  foreach ($objDigestValue in $arrRuntimeDigest) {
+                      if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "\A[a-f0-9]{64}\z") {
+                          throw "toolchain: invalid runtime digest"
+                      }
+                  }
+                  return @{
+                      Version = $objPackage.engines.node
+                      Digest = $strRuntimeDigest.ToUpperInvariant()
+                      Field = $strRuntimeDigestField
+                  }
+              } catch {
+                  Write-Debug -Message "toolchain: runtime declaration validation failed"
+                  throw
+              }
+          }
           $strDigestSource = 'copilot-setup-steps.yml retained runtime digest'
           if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
               $strVersion = '20.20.2'
               $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
           } elseif ($env:TOOLCHAIN_LAYOUT -ceq 'modern') {
               if (Test-Path -LiteralPath '.github/workflows/ci-toolchain.json') {
-                  $objRuntimePin = Get-Content -Raw -LiteralPath '.github/workflows/ci-toolchain.json' | ConvertFrom-Json -ErrorAction Stop
-                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
-                  $strVersion = $objPackage.engines.node
-                  $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()
-                  $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'
+                  $hashtableRuntimeResult = Read-SetupRuntime
+                  $strVersion = $hashtableRuntimeResult.Version
+                  $strReviewedSha256 = $hashtableRuntimeResult.Digest
+                  $strDigestSource = "package.json engines.node and .github/workflows/ci-toolchain.json $($hashtableRuntimeResult.Field)"
               } else {
                   # Preserve service setup for published branches from before the shared declaration.
                   $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
@@ -504,8 +1107,8 @@ jobs:
                       }
                   }
               }
-              if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
-                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+              if ($strVersion -cnotmatch '\A24\.[0-9]+\.[0-9]+\z' -or
+                  $strReviewedSha256 -cnotmatch '\A[A-F0-9]{64}\z') {
                   throw 'toolchain: the reviewed runtime declaration is invalid'
               }
           } else {
