@@ -1,0 +1,63 @@
+{
+  "at": "2026-10-09T17:25:01.851453+00:00",
+  "state": "root_accepted_pr239_round3_linux_selectors",
+  "cell": "selectors",
+  "run_id": "pr239-round3-selectors-20261009-a1",
+  "session_id": 72736,
+  "observed_native_exit": 0,
+  "terminal_chunk": "eff7b6",
+  "manifest_sha256": "7beb07ba164b52129cfd92b11f7adf4b829b62e8c465a8c845eae15ed072cd03",
+  "source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+  "index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-selectors-20261009-a1",
+  "started_utc": "2026-10-09T17:21:36.846590+00:00",
+  "finished_utc": "2026-10-09T17:24:40.700562+00:00",
+  "elapsed_seconds": 183.9220000000205,
+  "tap": {
+    "names": [
+      "R3 credential selectors: subsets and present value boundaries",
+      "R3 credential selectors: native platform name casing",
+      "R3 credential selectors: each guard-name removal reaches Git",
+      "R3 credential selectors: absent ordinary and linked-worktree real Git positives",
+      "R3 credential selectors: real helper refuses through Initialize-CiToolchain.ps1",
+      "R3 credential selectors: real helper refuses through Invoke-MarkdownLint.ps1"
+    ],
+    "summary": {
+      "tests": 6,
+      "pass": 6,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 6,
+  "fixture_calls": 27,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round3 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-selectors-20261009-a1\\status.json",
+      "sha256": "72d6e4f21bfd1aba8219ea05e77808b93dd8a483e75658dd133ac857dcc99061"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-selectors-20261009-a1\\output\\result.json",
+      "sha256": "c2d92e60b9876aa4d630260f62a24c2c8b255d993f226b249faaddda99bd750b"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-selectors-20261009-a1\\output\\f5-ordinary.log",
+      "sha256": "d305d9a048d1f0f1d98344b470fb54894901ee99bbc87073969e12b88cbf57e2"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-selectors-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

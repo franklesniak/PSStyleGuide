@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-09T17:29:04.589577+00:00",
+  "state": "root_accepted_pr239_round3_linux_download-whole",
+  "cell": "download-whole",
+  "run_id": "pr239-round3-download-whole-20261009-a1",
+  "session_id": 44414,
+  "observed_native_exit": 0,
+  "terminal_chunk": "dc1114",
+  "manifest_sha256": "7b211c9de4de63ee02eeab36331e64e669880328c1cfa6e573fe08241e50704c",
+  "source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+  "index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-whole-20261009-a1",
+  "started_utc": "2026-10-09T17:25:34.814785+00:00",
+  "finished_utc": "2026-10-09T17:28:48.546131+00:00",
+  "elapsed_seconds": 193.85899999999674,
+  "tap": {
+    "names": [
+      "FQ40 completed compressed-size guard precedes hash/listing: preferred",
+      "FQ40 completed compressed-size guard precedes hash/listing: recoveryCompatibility",
+      "FQ40 valid preferred and recovery archives retain the production-size argv",
+      "FQ40 download63 retains whole-initializer cleanup and publication refusal: preferred",
+      "FQ40 download63 retains whole-initializer cleanup and publication refusal: recoveryCompatibility"
+    ],
+    "summary": {
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 5,
+  "fixture_calls": 7,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round3 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-whole-20261009-a1\\status.json",
+      "sha256": "e6d2a90f0648f1fad034cba1171537927e396e02920bce5e35685286b5c98a5a"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-whole-20261009-a1\\output\\result.json",
+      "sha256": "ca192c1cda1f1b8c7039436656b668513ab306c65d67263eebb8b04f9a3e76c4"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-whole-20261009-a1\\output\\f5-ordinary.log",
+      "sha256": "5b45d59d3b9f02e781d90b9c58d8356eff586dd6c2cbd1d2f37cb4137ca80c16"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-whole-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

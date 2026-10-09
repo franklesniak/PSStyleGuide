@@ -1,0 +1,52 @@
+{
+  "at": "2026-10-09T20:07:16.641831+00:00",
+  "state": "root_accepted_pr239_round3_v5_windows_precommit",
+  "mode": "precommit",
+  "run_id": "pr239-round3-v5-win-precommit-20261009-a2",
+  "manifest_sha256": "fff8b49ee67249564c48d7dfb423467e378063f5193817f4705763867dbf685d",
+  "source_catalog_sha256": "db4d32c87208d5621e5f5675a25685034ed3c858a1c7f852838d7494e6f27dda",
+  "index_tree": "cacf070b07d66231d792f28e6d37091ea3655b31",
+  "session_id": 6608,
+  "terminal_chunk": "81cd16",
+  "observed_native_exit": 0,
+  "summary": {
+    "configured_hooks": 11,
+    "passed": 11,
+    "skipped": 0
+  },
+  "started_utc": "2026-10-09T19:31:14.243727+00:00",
+  "finished_utc": "2026-10-09T20:06:42.823805+00:00",
+  "elapsed_seconds": 2128.5779999999795,
+  "jobs_empty_without_termination": true,
+  "source_runtime_dependencies_and_git_unchanged": true,
+  "private_temp_removed": true,
+  "result_namespace_retained": true,
+  "raw_run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2",
+  "receipts": {
+    "result.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\result.json",
+      "sha256": "ec5c40587e00fd70a9765f6a2aff3037ebe2c07b65f9771fc2410b8ce8a2a44f"
+    },
+    "native.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\native.json",
+      "sha256": "f2e20eb1ba8c8bb46737a13225e5fc122e5ec26e1bcd3b1c045da0c62a7cd354"
+    },
+    "command.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\command.json",
+      "sha256": "edcd816cbadb0f0abb8ac5e564352d8056cf7dd7fa0e9340d3c71d282c071dc3"
+    },
+    "owner.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\owner.json",
+      "sha256": "dcf665ae9f0d757cd477a84149f39b0580100139698bf3aaa1e847b8b94704c9"
+    },
+    "stdout.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\stdout.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    "stderr.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-v5-win-precommit-20261009-a2\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "remaining_scope": "This integrated PR239 Windows gate only; normal commit hooks, public reviews/greenCI/landing, PR239 service proof and paired delivery remain."
+}

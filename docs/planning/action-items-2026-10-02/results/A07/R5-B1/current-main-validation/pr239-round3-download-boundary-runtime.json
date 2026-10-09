@@ -1,0 +1,74 @@
+{
+  "at": "2026-10-09T17:32:44.382960+00:00",
+  "state": "root_accepted_pr239_round3_linux_download-boundary",
+  "cell": "download-boundary",
+  "run_id": "pr239-round3-download-boundary-20261009-a1",
+  "session_id": 32262,
+  "observed_native_exit": 0,
+  "terminal_chunk": "644ee6",
+  "manifest_sha256": "9ab8cb7ecdafacf7a6d7a507f1a8330ca4d6ce5093c237ffdbb919d576e16028",
+  "source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+  "index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-boundary-20261009-a1",
+  "started_utc": "2026-10-09T17:29:26.584830+00:00",
+  "finished_utc": "2026-10-09T17:32:26.363950+00:00",
+  "elapsed_seconds": 179.829000000027,
+  "tap": {
+    "names": [
+      "FQ40 actual compressed-byte boundary: known/-1",
+      "FQ40 actual compressed-byte boundary: known/0",
+      "FQ40 actual compressed-byte boundary: known/1",
+      "FQ40 actual compressed-byte boundary: close/-1",
+      "FQ40 actual compressed-byte boundary: close/0",
+      "FQ40 actual compressed-byte boundary: close/1",
+      "FQ40 actual compressed-byte boundary: chunked/-1",
+      "FQ40 actual compressed-byte boundary: chunked/0",
+      "FQ40 actual compressed-byte boundary: chunked/1",
+      "FQ40 actual compressed-byte framing refusal: lying-low",
+      "FQ40 actual compressed-byte framing refusal: lying-high",
+      "FQ40 actual compressed-byte framing refusal: partial",
+      "FQ40 chunked body with misleading Content-Length remains bounded",
+      "FQ40 production compressed-byte cap refuses a declared oversized response",
+      "FQ40 compressed-byte mutation witness: removed-flag",
+      "FQ40 compressed-byte mutation witness: zero-flag",
+      "FQ40 compressed-byte mutation witness: raised-cap"
+    ],
+    "summary": {
+      "tests": 17,
+      "pass": 17,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 17,
+  "fixture_calls": 29,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round3 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-boundary-20261009-a1\\status.json",
+      "sha256": "ab243ec198aedca85d96c99f9d9e53f99ad33b891c841bdd749d03c100e43723"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-boundary-20261009-a1\\output\\result.json",
+      "sha256": "c880120dc5efd6f89a990c6649dcf306e005429287ec9713afa884b45cd8300d"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-boundary-20261009-a1\\output\\f5-ordinary.log",
+      "sha256": "025ace0db626778fe6f62de8a3f632d1288cc538fd39638bcb762f4d5c12cce0"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round3-download-boundary-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

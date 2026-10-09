@@ -1,0 +1,76 @@
+{
+  "at": "2026-10-09T01:37:29.883162+00:00",
+  "state": "root_accepted_fq24_linux",
+  "cell": "fq24-focused",
+  "run_id": "fq24-focused-20261009-a1",
+  "session_id": 63859,
+  "observed_native_exit": 0,
+  "terminal_chunk": "65b97e",
+  "manifest_sha256": "ec396c4d95587af4dd50246191a189aa4e575c8f644f3e9a1b209f54d5e2937f",
+  "source_catalog_sha256": "a3d995d2e256dc1525b9abd403706e4328571dc07acd497c82ec004599ef237e",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\fq24-focused-20261009-a1",
+  "started_utc": "2026-10-09T01:34:29.956195+00:00",
+  "finished_utc": "2026-10-09T01:37:23.542788+00:00",
+  "elapsed_seconds": 173.64100000000326,
+  "tap": {
+    "names": [
+      "lint records both native results: success",
+      "lint records both native results: outer-failure",
+      "lint records both native results: nested-failure",
+      "lint records both native results: package-array",
+      "lint records both native results: ready-array",
+      "lint records both native results: FQ23 default all",
+      "lint records both native results: FQ23 default absent",
+      "lint records both native results: FQ23 Low all",
+      "lint records both native results: FQ23 Low absent",
+      "lint records both native results: FQ23 WhatIf all",
+      "lint records both native results: FQ23 WhatIf absent",
+      "lint records both native results: FQ23 Low+WhatIf all",
+      "lint records both native results: FQ23 Low+WhatIf absent",
+      "FQ23 ordinary Low sanitation npm",
+      "FQ23 ordinary Low sanitation absent",
+      "FQ23 initializer internal-stage WhatIf sanitation",
+      "FQ23 initializer sanitation mutation Confirm fixed",
+      "FQ23 initializer sanitation mutation Confirm npm",
+      "FQ23 initializer sanitation mutation WhatIf fixed",
+      "FQ23 initializer sanitation mutation WhatIf npm",
+      "F5 ordinary valid declaration proves curl dispatch observation"
+    ],
+    "summary": {
+      "tests": 21,
+      "pass": 21,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 21,
+  "source_predicted_PowerShell_children": 27,
+  "scope_limit": "Current integration FQ23/FQ24 focused21 actual Linux registrations only. Windows40 retain stage-only scope; FQ20 prerequisite, aggregates, all11hooks/reviews/CI/landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\fq24-focused-20261009-a1\\status.json",
+      "sha256": "4a48bb567411e42dca4132d08a4a108592880b50e450b8802171fb7f35b326a9"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\fq24-focused-20261009-a1\\output\\result.json",
+      "sha256": "0bd764e2c3d9c4f6ed3b9dc9e4b8f9a0652ef247d4d300dc5a91af36b6cf5f6c"
+    },
+    "output/fq24-focused.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\fq24-focused-20261009-a1\\output\\fq24-focused.log",
+      "sha256": "d1fd2597de84e6f39f13f6597c4ea1c55856da73fa3f4fdb86694f6f8c203741"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\fq24-focused-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "61eca96014762257ee82a5f2962a69c69feeb48772077a8a5f8fd0091793a5b7"
+    }
+  }
+}

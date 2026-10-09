@@ -1,0 +1,76 @@
+{
+  "state": "root_reconciled_failed_windows_aggregate",
+  "at": "2026-10-09T18:49:41.519212+00:00",
+  "session_id": 77691,
+  "start_chunk": "2b0d11",
+  "terminal_chunk": "98ec1d",
+  "observed_native_exit": 1,
+  "run_id": "pr239-round3-win-aggregate-20261009-a1",
+  "source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+  "index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90",
+  "summary": {
+    "tests": 816,
+    "pass": 359,
+    "fail": 18,
+    "cancelled": 0,
+    "skipped": 439,
+    "todo": 0
+  },
+  "failed_names": [
+    "R3 credential selectors: real helper refuses through Initialize-CiToolchain.ps1",
+    "FQ40 actual compressed-byte boundary: known/-1",
+    "FQ40 actual compressed-byte boundary: known/0",
+    "FQ40 actual compressed-byte boundary: known/1",
+    "FQ40 actual compressed-byte boundary: close/-1",
+    "FQ40 actual compressed-byte boundary: close/0",
+    "FQ40 actual compressed-byte boundary: close/1",
+    "FQ40 actual compressed-byte boundary: chunked/-1",
+    "FQ40 actual compressed-byte boundary: chunked/0",
+    "FQ40 actual compressed-byte boundary: chunked/1",
+    "FQ40 actual compressed-byte framing refusal: lying-low",
+    "FQ40 actual compressed-byte framing refusal: lying-high",
+    "FQ40 actual compressed-byte framing refusal: partial",
+    "FQ40 chunked body with misleading Content-Length remains bounded",
+    "FQ40 production compressed-byte cap refuses a declared oversized response",
+    "FQ40 compressed-byte mutation witness: removed-flag",
+    "FQ40 compressed-byte mutation witness: zero-flag",
+    "FQ40 compressed-byte mutation witness: raised-cap"
+  ],
+  "primary_failure": "Direct native command failure",
+  "cleanup_failures": [],
+  "job_after_cleanup": {
+    "total": 3704,
+    "active": 0,
+    "terminated": 0
+  },
+  "temp_exists": true,
+  "namespace_retained": true,
+  "receipts": {
+    "result.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\result.json",
+      "sha256": "e8e7b88d6cd4d730c939765b8fcc480d046d1165bfbdc1654ecb217d5e8ebca3"
+    },
+    "native.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\native.json",
+      "sha256": "17c579d45c39e0e63b2727b036bf18dc250e935a364452d4b4b106ec23ae670d"
+    },
+    "command.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\command.json",
+      "sha256": "9a3f03e87722976e957f3c7687894eacdcdd561b3cffec71eb31b8ba2cfc3759"
+    },
+    "owner.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\owner.json",
+      "sha256": "79fa3065e80c6b7a4edef96c65720686257fdcba86602d836f56af8a8cdf01d0"
+    },
+    "stdout.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\stdout.log",
+      "sha256": "0a347da5303be3764f81d83b96587e5a9558850a3fefa1ca10c8f82615de7d78"
+    },
+    "stderr.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round3-win-aggregate-20261009-a1\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "runtime_gate_credit": false,
+  "next_action": "Repair two confirmed Windows test-fixture defects; preserve failed namespace and rerun only after current-input attribution and one-use release. Do not publish or merge until required validation passes."
+}

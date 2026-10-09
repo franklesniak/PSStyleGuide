@@ -1,0 +1,60 @@
+{
+  "at": "2026-10-09T16:56:37.268280+00:00",
+  "state": "ACCEPTED_SOURCE_ONLY",
+  "source_freeze": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3\\source-freeze-v4.json",
+    "bytes": 3288,
+    "sha256": "ff19e58cf4f9b0be320952b3a23994aff1b26189643f265ad2bb39b9841dd227"
+  },
+  "independent_reports": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-independent-source-quality\\REPORT.md",
+      "bytes": 6059,
+      "sha256": "4a2d5953a1d46476f282881dfa6bc47abcf264e129500ba1d779575b717d245d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-fq41-independent-review\\REPORT.md",
+      "bytes": 2512,
+      "sha256": "e22d19d006f1b1f81c8bdbb06fc74e82a35c327695e1b60859ba36a39cd233ae"
+    }
+  ],
+  "seals": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-independent-source-quality\\seal.json",
+      "bytes": 438,
+      "sha256": "52c67f39d8cc7a3cc64892331499d742faa96d8bc0027265057c647edcffb148"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-fq41-independent-review\\seal.json",
+      "bytes": 385,
+      "sha256": "20ff2f43cac5d2cd0a7f71a170093203886e9ac4026be4a313e5f7fb76b9517a"
+    }
+  ],
+  "root_review": "Complete reports read and four report/evidence assets verified in native7bf950; v3 source review plus exact v4 identifier delta accepted. No unresolved material source finding.",
+  "fq39_syntax": {
+    "forms": 70,
+    "byte_equal_reused": 67,
+    "fresh": 3,
+    "prior": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-validation\\fq39-syntax-result.json",
+      "bytes": 16619,
+      "sha256": "cc594d2207ab372efe4897a670fad04fa77e981b2bd74b6d6d824845d06a3f9a"
+    },
+    "fresh_result": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-validation\\fq39-syntax-result-v4.json",
+      "bytes": 2146,
+      "sha256": "a931e8b11add771e0fb3f8c08e0d62889363b21c296e855fcd5680c5ff4c1ab0"
+    },
+    "reuse": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-validation\\fq39-syntax-reuse-v4.json",
+      "bytes": 26441,
+      "sha256": "f44e507b24d7c7fbb4e0ec728049f13676974d3d152d800dac84774d77c84057"
+    },
+    "parser_errors": 0,
+    "raw_current_warnings": 3,
+    "applicable_findings": 0,
+    "disposition": "All three raw warnings concern exact unchanged 2630B New-ArchiveProcess body, SHA45e7d8912d72b8a71425369f3dfe508490f9fa90b5c2e97fb5dde54f53a0470b. It constructs an unstarted Process object; FQ24/FQ30 disposition independently revalidated. Raw warnings retained.",
+    "runtime_acceptance": false
+  },
+  "remaining": "Review/parse/check 87 FQ40/legacy forms, root runtime binding, affected Linux, Windows aggregate/all11, normal commit/publication/current-head reviews/CI, landing and paired convergence."
+}

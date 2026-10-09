@@ -1,0 +1,24 @@
+{
+  "state": "root_accepted_complete_v5_syntax",
+  "at": "2026-10-09T19:06:57.886466+00:00",
+  "source_catalog_sha256": "db4d32c87208d5621e5f5675a25685034ed3c858a1c7f852838d7494e6f27dda",
+  "driver_sha256": "c57e2447d7f7da7e36828e6e8f74c781c617c74274c9e0e80d48dc840f3b0bfd",
+  "index_tree": "cacf070b07d66231d792f28e6d37091ea3655b31",
+  "runtime_credit": false,
+  "fresh_generated_forms": 2,
+  "retained_generated_forms": 265,
+  "unique_bodies": 249,
+  "parser_errors": 0,
+  "new_analyzer_issues": 0,
+  "prior_syntax_receipt_pins_checked": 11,
+  "outputs": {
+    "generated-syntax-attribution.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-v5-root-validation\\generated-syntax-attribution.json",
+      "sha256": "c6e50e9345cc8bdac03d79b1e364903d4f694afebc110499d0c19f50eae9bf50"
+    },
+    "syntax-result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-v5-root-validation\\syntax-result.json",
+      "sha256": "b512c001a20068362115262d455cf8d0cbbfa9259735fd603e20932b8c051d40"
+    }
+  }
+}
