@@ -23,6 +23,20 @@ const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 const runtimePin = digest => ({ ...JSON.parse(read('ci-toolchain.json')), preferred: { ...JSON.parse(read('ci-toolchain.json')).preferred, linuxX64Sha256: digest } });
 
+
+// Capability probes are not download dispatches; each transfer retains its old behavior.
+const fq40CurlQueryStub = String.raw`{
+const queryArgs=process.argv.slice(2);
+if(JSON.stringify(queryArgs)===JSON.stringify(['--disable','--version'])) {
+console.log('curl 8.5.0 (fixture) libcurl/8.5.0 OpenSSL/3.0.0\nProtocols: https\nFeatures: SSL');
+process.exit(0);
+}
+if(JSON.stringify(queryArgs)===JSON.stringify(['--disable','--help','all'])) {
+console.log(['disable','silent','show-error','fail','location','proto','proto-redir','tlsv1.2','connect-timeout','max-time','retry','retry-max-time','output','max-filesize'].map(flag=>' --'+flag+' fixture').join('\n'));
+process.exit(0);
+}
+}`;
+
 // Keep reader fixture declarations independent of the repository producer.
 const copilotReaderPin = digest => ({ schemaVersion: 2,
   preferred: { linuxX64Sha256: digest,
@@ -994,6 +1008,7 @@ for (const mode of ['native-download-failure', 'wrong-download-bytes', 'unsafe-n
     const curl = path.join(f.root, 'curl');
     fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl'])+'\\n');
 if (process.env.TEST_MODE === 'native-download-failure') process.exit(19);
 fs.writeFileSync(args[args.indexOf('--output')+1], 'incorrect archive bytes');
@@ -1089,6 +1104,7 @@ if (args.includes('--version')) console.log(executable === 'node' ? '${mode === 
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl', ...args])+'\\n');
 fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
 `, { mode: 0o700 });
@@ -1145,6 +1161,7 @@ if (args.includes('--version')) console.log('${rootManifest.engines.npm}');
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl'])+'\\n');
 fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
 `, { mode: 0o700 });
@@ -2675,6 +2692,7 @@ function ordinaryDeclarationFixture(t, raw, source = read('Initialize-CiToolchai
   const curl = path.join(f.root, 'curl'), dispatchLog = path.join(f.root, 'curl-dispatches');
   assert.equal(fs.existsSync(dispatchLog), false);
   fs.writeFileSync(curl, `#!${process.execPath}
+${fq40CurlQueryStub}
 ${options.selectors ? `{ const fs = require('node:fs'); ${selectorObserver} }` : ''}
 require('node:fs').appendFileSync(${JSON.stringify(dispatchLog)}, 'dispatch\\n');
 ${curlAction}
@@ -3275,8 +3293,14 @@ for (const mode of ['transient', 'retry-after-number', 'retry-after-date', 'stal
     fs.writeFileSync(curl, `#!${process.execPath}
 const assert = require('node:assert/strict'), fs = require('node:fs'), { spawnSync } = require('node:child_process');
 const args = process.argv.slice(2);
+if(JSON.stringify(args)===JSON.stringify(['--disable','--version']) || JSON.stringify(args)===JSON.stringify(['--disable','--help','all'])) {
+const query=spawnSync('/usr/bin/curl',args,{stdio:'inherit',timeout:15000});
+if(query.error || query.signal || !Number.isInteger(query.status)) process.exit(98);
+process.exit(query.status);
+}
 assert.equal(args[0], '--disable'); assert.equal(args.includes('--retry-all-errors'), false);
-for (const [flag, value] of [['--connect-timeout','20'],['--max-time','180'],['--retry','2'],['--retry-max-time','300'],['--proto','=https'],['--proto-redir','=https']]) assert.equal(args[args.indexOf(flag)+1], value);
+assert.equal(args.filter(value => value === '--max-filesize').length, 1);
+for (const [flag, value] of [['--connect-timeout','20'],['--max-time','180'],['--retry','2'],['--retry-max-time','300'],['--proto','=https'],['--proto-redir','=https'],['--max-filesize','67108864']]) assert.equal(args[args.indexOf(flag)+1], value);
 args[args.indexOf('--connect-timeout')+1]='1'; args[args.indexOf('--max-time')+1]='1';
 args[args.indexOf('--proto')+1]='=http'; args[args.indexOf('--proto-redir')+1]='=http'; args[args.length-1]=${JSON.stringify(endpoint + '/archive')};
 const result=spawnSync('/usr/bin/curl', args, {stdio:'inherit',timeout:16000});
@@ -3369,6 +3393,7 @@ if(args.includes('ci') && process.env.TEST_MODE==='lock-mutation') fs.appendFile
     const curl = path.join(f.root, 'curl');
     fs.writeFileSync(curl, `#!${process.execPath}
 const fs=require('node:fs'), args=process.argv.slice(2), archives=${JSON.stringify(archives)};
+${fq40CurlQueryStub}
 const role=args.at(-1).includes('/v22.23.3/')?'recoveryCompatibility':'preferred';
 fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['curl',role,...args])+'\\n');
 fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
@@ -3397,6 +3422,183 @@ fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
       assert.equal(environment, ''); assert.equal(publishedPath, '');
       if (!['install', 'lock-mutation'].includes(mode)) assert.equal(calls.some(row => row.includes('ci')), false);
     }
+  });
+}
+
+// R3 selector controls execute copied current helpers. Only fixed Git/curl paths
+// are replaced in the refusal fixtures; the real-Git positives use neither mock.
+const r3GitSelectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR'];
+const r3SelectorDiagnostic = 'credential-policy: repository selector environment variables are not allowed';
+function r3CredentialFixture(t, nativeGit = false) {
+  const f = fixture(t), scripts = path.join(f.work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const script = path.join(scripts, 'Test-CheckoutCredentials.ps1');
+  const mock = path.join(f.root, 'r3-git.ps1');
+  fs.writeFileSync(mock, `
+[IO.File]::AppendAllText($env:TEST_LOG, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
+$global:LASTEXITCODE = 0
+if ($args -contains '--version') { 'git version 2.55.0.windows.5'; return }
+if ($IsWindows) {
+    $objConfig = Get-Item -LiteralPath $env:GIT_CONFIG_GLOBAL -Force -ErrorAction Stop
+    $strParent = [IO.Path]::GetDirectoryName($env:GIT_CONFIG_GLOBAL)
+    if ($objConfig -isnot [IO.FileInfo] -or $objConfig.Length -ne 0 -or
+        ($objConfig.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+        [IO.Path]::GetFileName($env:GIT_CONFIG_GLOBAL) -cne 'global.config' -or
+        [IO.Path]::GetFileName($strParent) -cnotmatch '^styleguide-git-[a-f0-9]{32}$' -or
+        -not [IO.Path]::GetDirectoryName($strParent).Equals($env:RUNNER_TEMP, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'R3 fixture requires the ordinary private empty config after version'
+    }
+}
+if ($args -contains 'get-url') { 'https://github.com/franklesniak/PSStyleGuide' }
+elseif ($args -contains '--get-all' -or $args -contains '--get-regexp') { $global:LASTEXITCODE = 1 }
+elseif ($args -notcontains '--list') { throw 'R3 unexpected Git dispatch' }
+`);
+  let source = read('Test-CheckoutCredentials.ps1');
+  if (!nativeGit) {
+    const fixed = "Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)) 'Git/cmd/git.exe'";
+    for (const anchor of [fixed, "'/usr/bin/git'", "'/bin/git'"]) {
+      assert.equal(source.split(anchor).length, 2, 'R3 fixed Git anchor must occur once');
+      source = source.replace(anchor, quote(mock));
+    }
+  }
+  fs.writeFileSync(script, source);
+  function run(overrides = {}, target = script, cwd = f.work) {
+    const env = { ...process.env, RUNNER_TEMP: f.root, TEST_LOG: f.log,
+      GITHUB_PATH: path.join(f.root, 'path'), GITHUB_ENV: path.join(f.root, 'env') };
+    const removed = [...r3GitSelectors, 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL'];
+    const canonical = name => process.platform === 'win32' ? name.toUpperCase() : name;
+    for (const key of Object.keys(env)) if (removed.includes(canonical(key))) delete env[key];
+    Object.assign(env, overrides);
+    const expected = new Map(Object.entries(overrides).map(([name, value]) => [canonical(name), value]));
+    const checks = [...new Set([...r3GitSelectors, ...Object.keys(overrides)])].map(name => {
+      const present = expected.has(canonical(name));
+      return `$arrNames = @([Environment]::GetEnvironmentVariables().Keys | Where-Object {
+    [string]::Equals([string]$_, ${quote(name)}, ${process.platform === 'win32' ? '[StringComparison]::OrdinalIgnoreCase' : '[StringComparison]::Ordinal'})
+})
+if ($arrNames.Count -ne ${present ? 1 : 0}) { throw 'R3 fixture selector presence mismatch' }
+${present ? `if ([Environment]::GetEnvironmentVariable(${quote(name)}) -cne ${quote(expected.get(canonical(name)))}) { throw 'R3 fixture selector value mismatch' }` : ''}`;
+    }).join('\n');
+    const wrapper = path.join(f.root, 'r3-wrapper.ps1');
+    fs.writeFileSync(wrapper, `$ErrorActionPreference = 'Stop'\n${checks}\n& ${quote(target)}\nWrite-Output 'R3 helper completed'\n`);
+    const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', wrapper], {
+      cwd, env, encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+    }), 'R3 credential selector child');
+    assert.ok(Buffer.byteLength(result.stdout) + Buffer.byteLength(result.stderr) <= 256 * 1024, 'R3 combined output cap');
+    return result;
+  }
+  return { ...f, scripts, script, source, run };
+}
+function assertR3SelectorRefusal(f, result) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+  assert.ok(diagnostic.includes(r3SelectorDiagnostic), diagnostic);
+  assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+  assert.deepEqual(f.calls(), [], 'A selector must refuse before even the Git version probe');
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+}
+
+test('R3 credential selectors: subsets and present value boundaries', { skip: !linux && process.platform !== 'win32' }, t => {
+  const cases = [];
+  for (let mask = 1; mask < 8; mask++) {
+    cases.push(Object.fromEntries(r3GitSelectors.filter((_, index) => mask & (1 << index)).map(name => [name, 'r3-selector-private-value'])));
+  }
+  for (const name of r3GitSelectors) for (const value of ['', '   ', './relative-selector']) cases.push({ [name]: value });
+  // A combined relative-dot selection is still a present-selector case.
+  cases.push(Object.fromEntries(r3GitSelectors.map(name => [name, '.'])));
+  assert.equal(cases.length, 17);
+  for (const env of cases) {
+    const f = r3CredentialFixture(t), result = f.run(env);
+    assertR3SelectorRefusal(f, result);
+    assert.equal((result.stdout + result.stderr).includes('r3-selector-private-value'), false);
+  }
+});
+
+test('R3 credential selectors: native platform name casing', { skip: !linux && process.platform !== 'win32' }, t => {
+  for (const name of r3GitSelectors) {
+    const f = r3CredentialFixture(t), result = f.run({ [name.toLowerCase()]: 'r3-selector-private-value' });
+    if (process.platform === 'win32') assertR3SelectorRefusal(f, result);
+    else {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.match(result.stdout, /R3 helper completed/u);
+      assert.equal(f.calls().length, 4, 'Linux lowercase names are unrelated to the uppercase Git selectors');
+    }
+  }
+});
+
+test('R3 credential selectors: each guard-name removal reaches Git', { skip: !linux && process.platform !== 'win32' }, t => {
+  const anchor = "@('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR')";
+  for (const name of r3GitSelectors) {
+    const f = r3CredentialFixture(t);
+    assert.equal(f.source.split(anchor).length, 2, 'The selected guard list must occur exactly once');
+    const replacement = `@(${r3GitSelectors.filter(item => item !== name).map(quote).join(', ')})`;
+    const mutant = f.source.replace(anchor, replacement);
+    assert.equal(mutant.replace(replacement, anchor), f.source, 'The mutant changes only one guard name');
+    fs.writeFileSync(f.script, mutant);
+    const result = f.run({ [name]: 'r3-selector-private-value' });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 5 : 4);
+    assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
+  }
+});
+
+test('R3 credential selectors: absent ordinary and linked-worktree real Git positives', { skip: !linux && process.platform !== 'win32' }, t => {
+  const f = r3CredentialFixture(t, true), metadata = path.join(f.work, '.git');
+  // Authored ordinary Git metadata: no commits, hooks, network or Git setup command.
+  for (const entry of ['objects', 'refs/heads']) fs.mkdirSync(path.join(metadata, entry), { recursive: true });
+  fs.writeFileSync(path.join(metadata, 'HEAD'), 'ref: refs/heads/fixture\n');
+  fs.writeFileSync(path.join(metadata, 'config'),
+    '[core]\nrepositoryformatversion = 0\nbare = false\n[remote "origin"]\nurl = https://github.com/franklesniak/PSStyleGuide\n');
+  const linked = path.join(f.root, 'linked'), admin = path.join(metadata, 'worktrees/linked');
+  fs.mkdirSync(linked); fs.mkdirSync(admin, { recursive: true });
+  fs.writeFileSync(path.join(admin, 'HEAD'), 'ref: refs/heads/fixture\n');
+  fs.writeFileSync(path.join(admin, 'commondir'), '../..\n');
+  fs.writeFileSync(path.join(admin, 'gitdir'), path.join(linked, '.git') + '\n');
+  fs.writeFileSync(path.join(linked, '.git'), 'gitdir: ' + admin + '\n');
+  for (const cwd of [f.work, linked]) {
+    const result = f.run({}, f.script, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.deepEqual(f.calls(), [], 'The real-Git positive must not use the Git mock');
+  }
+});
+
+for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) {
+  test(`R3 credential selectors: real helper refuses through ${caller}`, { skip: !linux && process.platform !== 'win32' }, t => {
+    const f = r3CredentialFixture(t), curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
+    let source = read(caller);
+    const helperCall = '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"';
+    assert.equal(source.split(helperCall).length, 2, 'The real credential helper call must remain exactly once');
+    fs.writeFileSync(path.join(f.work, 'package.json'), fs.readFileSync(path.join(directory, '../../package.json')));
+    fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+    for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
+    fs.writeFileSync(curl, `
+[IO.File]::AppendAllText(${quote(curlLog)}, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
+$global:LASTEXITCODE = 0
+if ($args -contains '--version') {
+    'curl 8.5.0 fixture libcurl/8.5.0'; 'Protocols: https'; 'Features: SSL'; return
+}
+if ($args -contains '--help') {
+    ${['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir', 'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'].map(name => quote('--' + name + ' fixture')).join('; ')}
+    return
+}
+throw 'R3 unexpected acquisition dispatch'
+`);
+    if (caller === 'Initialize-CiToolchain.ps1') {
+      for (const anchor of ["$strCurlPath = Join-Path ([Environment]::SystemDirectory) 'curl.exe'", "$strCurlPath = '/usr/bin/curl'"]) {
+        assert.equal(source.split(anchor).length, 2, 'R3 fixed curl anchor must occur once');
+        source = source.replace(anchor, `$strCurlPath = ${quote(curl)}`);
+      }
+    }
+    const target = path.join(f.scripts, caller); fs.writeFileSync(target, source);
+    const result = f.run({ GIT_COMMON_DIR: 'r3-selector-private-value' }, target);
+    assertR3SelectorRefusal(f, result);
+    const curlCalls = fs.existsSync(curlLog) ? fs.readFileSync(curlLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
+    assert.deepEqual(curlCalls, caller === 'Initialize-CiToolchain.ps1' && process.platform === 'win32'
+      ? [['--disable', '--version'], ['--disable', '--help', 'all']] : []);
+    for (const name of ['path', 'env']) assert.equal(fs.readFileSync(path.join(f.root, name), 'utf8'), '');
   });
 }
 
@@ -3811,8 +4013,10 @@ if(args.includes('ci') && role==='recoveryCompatibility') process.exit(92);
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs=require('node:fs'),path=require('node:path'),args=process.argv.slice(2),archives=${JSON.stringify(archives)};
+${fq40CurlQueryStub}
 const role=args.at(-1).includes('/v22.23.3/')?'recoveryCompatibility':'preferred';
 fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['curl',role,...args])+'\\n');
+if(process.env.TEST_MODE==='fq40-native63-'+role) process.exit(63);
 fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
 if(process.env.TEST_MODE==='write-refusal') fs.chmodSync(path.join(process.env.RUNNER_TEMP,role==='preferred'?'styleguide-node/preferred':'styleguide-node/recoveryCompatibility'),0o500);
 if(process.env.TEST_MODE==='native-status') process.exit(77);
@@ -4207,6 +4411,11 @@ async function foundationCurlCell(t, kind, mutation = '') {
     : kind === 'retry-start-bound' ? 'retry-after-number' : kind === 'retry-count' ? 'exhaustion' : 'transient';
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs=require('node:fs'),{spawnSync}=require('node:child_process'),args=process.argv.slice(2);
+if(JSON.stringify(args)===JSON.stringify(['--disable','--version']) || JSON.stringify(args)===JSON.stringify(['--disable','--help','all'])) {
+const query=spawnSync('/usr/bin/curl',args,{stdio:'inherit',timeout:15000});
+if(query.error || query.signal || !Number.isInteger(query.status)) process.exit(98);
+process.exit(query.status);
+}
 fs.writeFileSync(${JSON.stringify(argumentsFile)},JSON.stringify(args),{flag:'wx'});
 const clock=(flag,value)=>{const index=args.indexOf(flag);if(index>=0)args[index+1]=value;};
 clock('--connect-timeout','1');clock('--max-time',${JSON.stringify(kind === 'tls-stall' ? '3' : '1')});
@@ -4247,8 +4456,9 @@ if(result.error)process.exit(98);process.exit(result.status??97);
 }
 
 function foundationCurlOracle(f, kind) {
-  const expected = { '--connect-timeout': '20', '--max-time': '180', '--retry': '2', '--retry-max-time': '300', '--proto': '=https', '--proto-redir': '=https' };
+  const expected = { '--connect-timeout': '20', '--max-time': '180', '--retry': '2', '--retry-max-time': '300', '--proto': '=https', '--proto-redir': '=https', '--max-filesize': '67108864' };
   assert.equal(f.arguments[0], '--disable');
+  assert.equal(f.arguments.filter(value => value === '--max-filesize').length, 1);
   for (const [flag, value] of Object.entries(expected)) { const index = f.arguments.indexOf(flag); assert.ok(index >= 0); assert.equal(f.arguments[index + 1], value); }
   readCurlResultWitness(f.witness, f.mode, `F12/F14 ${kind}`);
   if (kind === 'tls-stall') { assert.ok(f.elapsed < 9000, 'Connect1 must bound TLS before the larger max3 attempt budget'); assert.equal(f.requests.length, 3); assert.equal(fs.existsSync(path.join(f.root, 'tar-marker')), false); }
@@ -4341,5 +4551,300 @@ for (const mode of ['digest-gate', 'extraction-order', 'role-admission', 'platfo
     assert.equal(fs.readFileSync(bad.sentinel, 'utf8'), 'unchanged'); assert.equal(read('Initialize-CiToolchain.ps1'), original);
     assert.equal((good.result.stdout + good.result.stderr + bad.result.stdout + bad.result.stderr).includes('dummy-never-publish'), false);
     t.diagnostic(`${mode}: baseline oracle accepts; observed changed phase makes the same oracle reject the private mutant.`);
+  });
+}
+
+// Selected FQ40 controls use the actual shared capability and acquisition bodies.
+// Native boundary cells isolate download/digest/extraction ordering; they do not
+// impersonate a whole Windows installer or native hosted runner.
+function fq40Region(source, start, end) {
+  assert.equal(source.split(start).length, 2, start);
+  const at = source.indexOf(start), stop = source.indexOf(end, at);
+  assert.ok(stop > at, end);
+  return source.slice(at, stop);
+}
+function fq40Constant(source, value = 8192) {
+  const declaration = source.match(/^New-Variable -Name intMaximumRuntimeArchiveBytes -Value 67108864 -Option Constant -WhatIf:\$false -Confirm:\$false$/mu)?.[0];
+  assert.ok(declaration, 'The script-owned production cap must be exactly 67108864.');
+  assert.equal(source.split(declaration).length, 2);
+  return declaration.replace('-Value 67108864 ', `-Value ${value} `);
+}
+function fq40PostSizeOracle(f, role) {
+  assertCompletedProcess(f.result, `FQ40 ordinary ${role} filesize refusal`);
+  assert.notEqual(f.result.status, 0);
+  assert.match(stripVTControlCharacters(f.result.stderr), /compressed runtime archive exceeds the fixed size limit/u);
+  assert.equal(fs.existsSync(f.fq40HashMarker), false, 'Size refusal must precede hashing the completed archive.');
+  assert.equal(f.calls().some(row => row[0] === 'tar' && row[1] === role), false, 'Size refusal must precede even archive listing.');
+  foundationNoPublication(f);
+}
+test('FQ40 shared fixed archive cap and capability call ordering', () => {
+  const source = read('Initialize-CiToolchain.ps1');
+  fq40Constant(source);
+  const installer = fq40Region(source, 'function Install-ReviewedRuntime {', 'if ((-not $IsLinux');
+  assert.equal(installer.split('--max-filesize $intMaximumRuntimeArchiveBytes').length, 2);
+  const ordinary = installer.indexOf('$null = Assert-OrdinaryPath $strArchive');
+  const size = installer.indexOf('(Get-Item -LiteralPath $strArchive -Force -ErrorAction Stop).Length -gt $intMaximumRuntimeArchiveBytes');
+  assert.ok(ordinary < size && size < installer.indexOf('(Get-FileHash -LiteralPath $strArchive'));
+  const windows = source.indexOf('    Assert-CurlCapability -Path $strCurlPath -Windows');
+  assert.ok(windows > 0 && windows < source.indexOf('& "$PSScriptRoot/Test-CheckoutCredentials.ps1"'));
+  const linuxCall = source.indexOf('        Assert-CurlCapability -Path $strCurlPath');
+  const ownedTry = source.indexOf('$objEnvironmentChannel = $null\ntry {');
+  assert.ok(ownedTry >= 0 && linuxCall > ownedTry);
+  const sanitation = source.indexOf("    Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH");
+  assert.ok(sanitation >= 0 && linuxCall > sanitation);
+  assert.ok(linuxCall < source.indexOf('$hashtablePreferredRuntime = Install-ReviewedRuntime'));
+});
+test('FQ40 capability matrix rejects unsupported queries and causal gate omissions', { timeout: 90000 }, t => {
+  const source = read('Initialize-CiToolchain.ps1');
+  const actual = fq40Region(source, 'function Assert-CurlCapability {', 'function Install-ReviewedRuntime {');
+  const options = ['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir',
+    'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'];
+  const version = (curl = '8.5.0', lib = curl) => [`curl ${curl} (fixture) libcurl/${lib} OpenSSL/3.0.0`, 'Protocols: https', 'Features: SSL'];
+  const help = options.map(flag => ` --${flag} fixture`);
+  const item = (name, output, pass = false, extra = {}) => ({ name, version: output, help, pass, windows: false, versionExit: 0, helpExit: 0, ...extra });
+  const cases = [
+    item('minimum Linux', version(), true), item('newer Linux', version('8.21.0'), true),
+    item('later Linux major', version('9.0.0'), true),
+    item('minimum Windows policy', version(), true, { windows: true }),
+    item('newer Windows policy', version('8.21.0'), true, { windows: true }),
+    item('Windows major9', version('9.0.0'), false, { windows: true }),
+    item('Windows old8.4', version('8.4.0'), false, { windows: true }),
+    ...['7.88.1', '8.3.0', '8.4.0'].map(value => item(`old curl ${value}`, version(value, '8.5.0'))),
+    item('old library', version('8.5.0', '8.4.0')),
+    item('both old8.4', version('8.4.0')),
+    item('missing library', ['curl 8.5.0 (fixture)', 'Protocols: https', 'Features: SSL']),
+    item('malformed library', version().map((line, i) => i ? line : line.replace('libcurl/8.5.0', 'libcurl/8.5.bad'))),
+    item('duplicate curl', version().map((line, i) => i ? line : line + ' curl 8.5.0')),
+    item('duplicate library', version().map((line, i) => i ? line : line + ' libcurl/8.5.0')),
+    item('wrong first line', ['fixture', ...version()]),
+    item('no HTTPS', [version()[0], 'Protocols: http', 'Features: SSL']),
+    item('no SSL', [version()[0], 'Protocols: https', 'Features: IPv6']),
+    item('duplicate protocols', [...version(), 'Protocols: https']),
+    item('duplicate features', [...version(), 'Features: SSL']),
+    item('version query failure', version(), false, { versionExit: 17 }),
+    item('help query failure', version(), false, { helpExit: 19 }),
+    ...options.map(flag => item(`missing option ${flag}`, version(), false, { help: help.filter(line => !line.startsWith(` --${flag} `)) })),
+  ];
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-curl-capabilities-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const caseFile = path.join(root, 'case.json'), queryLog = path.join(root, 'queries.jsonl'), tool = path.join(root, 'curl.ps1');
+  fs.writeFileSync(tool, `$Arguments=@($args)
+$case=Get-Content -LiteralPath ${quote(caseFile)} -Raw | ConvertFrom-Json
+[IO.File]::AppendAllText(${quote(queryLog)}, (ConvertTo-Json -InputObject @($Arguments) -Compress)+[Environment]::NewLine)
+if(($Arguments -join '|') -ceq '--disable|--version') { $case.version; exit $case.versionExit }
+if(($Arguments -join '|') -ceq '--disable|--help|all') { $case.help; exit $case.helpExit }
+throw 'fixture: unreviewed capability query'
+`);
+  const run = body => {
+    const script = `Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$PSNativeCommandUseErrorActionPreference=$false
+${body}
+$cases=ConvertFrom-Json -InputObject ${quote(JSON.stringify(cases))}
+$rows=@(foreach($case in $cases) {
+ [IO.File]::WriteAllText(${quote(caseFile)}, (ConvertTo-Json -InputObject $case -Depth 6 -Compress))
+ try { Assert-CurlCapability -Path ${quote(tool)} -Windows:([bool]$case.windows) 6>$null; $accepted=$true }
+ catch { $accepted=$false }
+ [ordered]@{name=$case.name; accepted=$accepted}
+})
+ConvertTo-Json -InputObject $rows -Compress
+`;
+    const scriptFile = path.join(root, 'matrix.ps1'); fs.writeFileSync(scriptFile, script);
+    const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', scriptFile],
+      { encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true }), 'FQ40 actual capability matrix');
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const rows = JSON.parse(result.stdout); assert.equal(rows.length, cases.length);
+    return rows;
+  };
+  const oracle = rows => rows.forEach((row, index) => {
+    assert.equal(row.name, cases[index].name); assert.equal(row.accepted, cases[index].pass, row.name);
+  });
+  oracle(run(actual));
+  for (const [label, old, replacement] of [
+    ['minimum curl', "$objCurlVersion -lt [version]'8.5.0'", '$false'],
+    ['minimum library', "$objLibraryVersion -lt [version]'8.5.0'", '$false'],
+    ['Windows major', '($Windows -and $objCurlVersion.Major -ne 8)', '$false'],
+    ['max-filesize option', "'max-filesize', ", ''],
+  ]) {
+    const rows = run(foundationOnce(actual, old, replacement));
+    assert.throws(() => oracle(rows), assert.AssertionError, label);
+  }
+  const queries = fs.readFileSync(queryLog, 'utf8').trim().split('\n').map(line => JSON.parse(line));
+  assert.ok(queries.length > 0);
+  assert.ok(queries.every(args => JSON.stringify(args) === '["--disable","--version"]' || JSON.stringify(args) === '["--disable","--help","all"]'));
+});
+for (const role of ['preferred', 'recoveryCompatibility']) {
+  test(`FQ40 completed compressed-size guard precedes hash/listing: ${role}`, { skip: !linux, timeout: 90000 }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    const declaration = fq40Constant(original, 8192);
+    const source = foundationOnce(original, fq40Constant(original, 67108864), declaration);
+    const guard = "    if ((Get-Item -LiteralPath $strArchive -Force -ErrorAction Stop).Length -gt $intMaximumRuntimeArchiveBytes) {\n" +
+      "        throw 'toolchain: compressed runtime archive exceeds the fixed size limit'\n    }\n";
+    const prepare = body => {
+      const f = foundationFixture(t, { source: body, compatibility: true });
+      const archive = f.archives[role], bytes = fs.readFileSync(archive);
+      assert.ok(bytes.length < 8192);
+      fs.appendFileSync(archive, Buffer.alloc(8193 - bytes.length, 120));
+      const pin = JSON.parse(fs.readFileSync(path.join(f.scripts, 'ci-toolchain.json')));
+      pin[role].linuxX64Sha256 = createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+      fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), JSON.stringify(pin));
+      f.fq40HashMarker = path.join(f.root, 'archive-hash-marker');
+      const watched = path.join(f.runner, 'styleguide-node', role + '.tar.xz');
+      const hashObserver = `function Get-FileHash {
+[CmdletBinding()] param([string] $LiteralPath, [string] $Algorithm='SHA256')
+if($LiteralPath -ceq ${quote(watched)}) { [IO.File]::WriteAllText(${quote(f.fq40HashMarker)},'reached') }
+Microsoft.PowerShell.Utility\\Get-FileHash @PSBoundParameters
+}
+`;
+      fs.writeFileSync(f.script, foundationOnce(fs.readFileSync(f.script, 'utf8'), 'function Install-ReviewedRuntime {', hashObserver + 'function Install-ReviewedRuntime {'));
+      f.run(); return f;
+    };
+    fq40PostSizeOracle(prepare(source), role);
+    const mutant = prepare(foundationOnce(source, guard, ''));
+    assertCompletedProcess(mutant.result, 'FQ40 post-size omission');
+    assert.equal(fs.existsSync(mutant.fq40HashMarker), true, 'Omission mutant must reach the real hash.');
+    assert.equal(mutant.calls().some(row => row[0] === 'tar' && row[1] === role), true, 'Matching-digest mutant must reach listing.');
+    assert.throws(() => fq40PostSizeOracle(mutant, role), assert.AssertionError);
+  });
+}
+test('FQ40 valid preferred and recovery archives retain the production-size argv', { skip: !linux }, t => {
+  const f = foundationFixture(t, { compatibility: true }); f.run();
+  assertCompletedProcess(f.result, 'FQ40 valid two-role archive'); assert.equal(f.result.status, 0, f.result.stderr);
+  const calls = f.calls().filter(row => row[0] === 'curl');
+  assert.deepEqual(calls.map(row => row[1]), ['preferred', 'recoveryCompatibility']);
+  for (const row of calls) { assert.equal(row.filter(value => value === '--max-filesize').length, 1); assert.equal(row[row.indexOf('--max-filesize') + 1], '67108864'); }
+});
+
+
+for (const role of ['preferred', 'recoveryCompatibility']) {
+  test(`FQ40 download63 retains whole-initializer cleanup and publication refusal: ${role}`, { skip: !linux }, t => {
+    const f = foundationFixture(t, { compatibility: true, mode: 'fq40-native63-' + role });
+    f.run(); assertCompletedProcess(f.result, 'FQ40 injected process63 cleanup');
+    assert.match(stripVTControlCharacters(f.result.stderr), new RegExp('Runtime download failed: 63 \\(' + role + '/linux-x64\\)', 'u'));
+    assert.equal(f.calls().some(row => row.includes('ci')), false);
+    assert.equal(f.calls().some(row => row[0] === 'tar' && row[1] === role), false);
+    foundationNoPublication(f);
+  });
+}
+
+// Actual curl native codes are not inferred from the PowerShell refusal status.
+async function fq40NativeBoundary(t, framing, length, mutation = '', productionHeader = false, role = 'preferred') {
+  const source = read('Initialize-CiToolchain.ps1'), cap = productionHeader ? 67108864 : 8192;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-curl-filesize-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const payload = Buffer.alloc(length, 120), requests = [], sockets = new Set();
+  const server = createServer((req, res) => {
+    requests.push(req.url); sockets.add(req.socket); req.socket.on('close', () => sockets.delete(req.socket));
+    res.on('error', error => assert.ok(['ECONNRESET', 'EPIPE'].includes(error.code), error.message));
+    if (framing === 'known' || framing === 'lying-high' || productionHeader) res.writeHead(200, { 'Content-Length': productionHeader ? cap + 1 : framing === 'lying-high' ? cap + 1 : length, Connection: 'close' });
+    if (framing === 'lying-low') res.writeHead(200, { 'Content-Length': 4, Connection: 'close' });
+    if (framing === 'partial') res.writeHead(200, { 'Content-Length': length + 20, Connection: 'close' });
+    if (framing === 'close') { res.useChunkedEncodingByDefault = false; res.writeHead(200, { Connection: 'close' }); }
+    if (framing === 'chunked') res.writeHead(200, { 'Transfer-Encoding': 'chunked' });
+    if (framing === 'chunked-misleading-length') res.writeHead(200, { 'Transfer-Encoding': 'chunked', 'Content-Length': 4 });
+    res.write(payload.subarray(0, Math.min(3, payload.length))); res.end(payload.subarray(3));
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.closeAllConnections(); server.close(); });
+  const endpoint = `http://127.0.0.1:${server.address().port}/archive`;
+  let body = fq40Region(source, 'function Install-ReviewedRuntime {', 'if ((-not $IsLinux');
+  body = foundationOnce(body, '$strDownloadAddress = "https://nodejs.org/dist/v$Version/$strReleaseRoot.$strArchiveSuffix"', `$strDownloadAddress = ${quote(endpoint)}`);
+  body = foundationOnce(body, "--proto '=https'", "--proto '=http'");
+  body = foundationOnce(body, "--proto-redir '=https'", "--proto-redir '=http'");
+  const constant = fq40Constant(source, mutation === 'raised-cap' ? 16384 : cap);
+  if (mutation === 'removed-flag') body = foundationOnce(body, '--max-filesize $intMaximumRuntimeArchiveBytes ', '');
+  if (mutation === 'zero-flag') body = foundationOnce(body, '--max-filesize $intMaximumRuntimeArchiveBytes ', '--max-filesize 0 ');
+  const resultFile = path.join(root, 'result.json'), marker = path.join(root, 'listing-marker'), scriptFile = path.join(root, 'boundary.ps1');
+  const digest = createHash('sha256').update(payload).digest('hex');
+  fs.writeFileSync(scriptFile, `Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$PSNativeCommandUseErrorActionPreference=$false
+${constant}
+${fq40Region(source, 'function Assert-CurlCapability {', 'function Install-ReviewedRuntime {')}
+${body}
+function New-PrivateDirectory { param($Path,[switch]$Confirm,[switch]$WhatIf) [void][IO.Directory]::CreateDirectory($Path) }
+function Assert-OrdinaryPath { param($Path) if(-not [IO.File]::Exists($Path)){throw 'fixture: missing ordinary file'}; return $Path }
+function Expand-ReviewedArchive { param($Archive,$Destination,$Release) [IO.File]::WriteAllText(${quote(marker)},'reached'); throw 'fixture: digest verified before listing' }
+$strNodeRoot=${quote(root)}
+$strCurlPath=if($IsWindows){Join-Path ([Environment]::SystemDirectory) 'curl.exe'}else{'/usr/bin/curl'}
+Assert-CurlCapability -Path $strCurlPath -Windows:$IsWindows
+$message=''
+try { $null=Install-ReviewedRuntime -Role ${quote(role)} -Version ${quote(role === 'recoveryCompatibility' ? '22.23.3' : '24.18.1')} -NpmVersion ${quote(role === 'recoveryCompatibility' ? '10.9.9' : '11.16.0')} -Digest ${quote(digest)} }
+catch { $message=$_.Exception.Message }
+$archive=Join-Path $strNodeRoot (${quote(role)}+$(if($IsWindows){'.zip'}else{'.tar.xz'}))
+[IO.File]::WriteAllText(${quote(resultFile)}, (ConvertTo-Json -InputObject ([ordered]@{command=$strCurlPath; status=$LASTEXITCODE; bytes=$(if([IO.File]::Exists($archive)){(Get-Item -LiteralPath $archive).Length}else{0}); message=$message; listing=[IO.File]::Exists(${quote(marker)})}) -Compress))
+`);
+  const env = { ...process.env, HOME: root, TMPDIR: root, TEMP: root, TMP: root, CURL_HOME: root,
+    NO_PROXY: '127.0.0.1', no_proxy: '127.0.0.1', DOTNET_EnableDiagnostics: '0', POWERSHELL_DIAGNOSTICS_OPTOUT: '1' };
+  for (const name of ['NODE_OPTIONS', 'NODE_PATH', 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
+  const result = await new Promise((resolve, reject) => {
+    const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', scriptFile], { env, windowsHide: true });
+    let stdout = '', stderr = '', failedBound = false;
+    const timer = setTimeout(() => { failedBound = true; child.kill('SIGKILL'); }, 25000);
+    child.stdout.on('data', bytes => { stdout += bytes; if(Buffer.byteLength(stdout) + Buffer.byteLength(stderr) > 1048576) { failedBound = true; child.kill('SIGKILL'); } });
+    child.stderr.on('data', bytes => { stderr += bytes; if(Buffer.byteLength(stdout) + Buffer.byteLength(stderr) > 1048576) { failedBound = true; child.kill('SIGKILL'); } });
+    child.on('error', error => { clearTimeout(timer); reject(error); });
+    child.on('close', (status, signal) => { clearTimeout(timer); resolve({ stdout, stderr, status, signal, failedBound }); });
+  });
+  assert.equal(result.failedBound, false, 'FQ40 watchdog/output cap is always failure.');
+  assertCompletedProcess(result, 'FQ40 actual download boundary'); assert.equal(result.status, 0, result.stdout + result.stderr);
+  const raw = fs.readFileSync(resultFile); assert.ok(raw.length > 0 && raw.length <= 4096);
+  const observed = JSON.parse(raw);
+  assert.deepEqual(Object.keys(observed), ['command', 'status', 'bytes', 'message', 'listing']);
+  const expectedCommand = process.platform === 'win32'
+    ? path.join(process.env.SystemRoot, 'System32/curl.exe').replaceAll('/', '\\')
+    : '/usr/bin/curl';
+  if (process.platform === 'win32') {
+    assert.equal(observed.command.toLowerCase(), expectedCommand.toLowerCase());
+    const actualFile = fs.lstatSync(observed.command, { bigint: true });
+    const expectedFile = fs.lstatSync(expectedCommand, { bigint: true });
+    assert.equal(actualFile.isFile() && expectedFile.isFile(), true);
+    assert.equal(actualFile.dev, expectedFile.dev);
+    assert.ok(actualFile.ino > 0n);
+    assert.equal(actualFile.ino, expectedFile.ino);
+  } else assert.equal(observed.command, expectedCommand);
+  assert.equal(Number.isInteger(observed.status), true); assert.equal(Number.isInteger(observed.bytes), true);
+  assert.deepEqual(requests, ['/archive'], 'No default curlrc URL or automatic repeat is allowed.');
+  return { observed, cap, length };
+}
+function fq40NativeOracle(cell, framing, exceeds) {
+  const { observed, cap, length } = cell;
+  const expected = exceeds ? 63 : framing === 'partial' ? 18 : 0;
+  assert.equal(observed.status, expected, 'Actual curl native filesize/partial/success code must match.');
+  assert.ok(observed.bytes <= cap, 'Actual output must never exceed the admitted compressed cap.');
+  if (exceeds) { assert.match(observed.message, /Runtime download failed: 63/u); assert.equal(observed.listing, false); }
+  else if (framing === 'partial') { assert.match(observed.message, /Runtime download failed: 18/u); assert.equal(observed.listing, false); }
+  else if (framing === 'lying-low') { assert.equal(observed.bytes, 4); assert.match(observed.message, /archive digest is incorrect/u); assert.equal(observed.listing, false); }
+  else { assert.equal(observed.bytes, length); assert.equal(observed.listing, true, 'Only complete matching bytes may reach the isolated listing boundary.'); }
+}
+for (const framing of ['known', 'close', 'chunked']) for (const delta of [-1, 0, 1]) {
+  test(`FQ40 actual compressed-byte boundary: ${framing}/${delta}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    for (const role of linux ? ['preferred', 'recoveryCompatibility'] : ['preferred']) {
+      fq40NativeOracle(await fq40NativeBoundary(t, framing, 8192 + delta, '', false, role), framing, delta > 0);
+    }
+  });
+}
+for (const framing of ['lying-low', 'lying-high', 'partial']) {
+  test(`FQ40 actual compressed-byte framing refusal: ${framing}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    fq40NativeOracle(await fq40NativeBoundary(t, framing, framing === 'lying-low' ? 65536 : 16), framing, framing === 'lying-high');
+  });
+}
+test('FQ40 chunked body with misleading Content-Length remains bounded', { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+  const { observed, cap } = await fq40NativeBoundary(t, 'chunked-misleading-length', 8193);
+  assert.ok([8, 63].includes(observed.status), 'Require a completed curl framing or filesize refusal, not a transport failure.');
+  assert.ok(observed.bytes >= 0 && observed.bytes <= cap);
+  assert.match(observed.message, /^Runtime download failed: (?:8|63) \(preferred\/(?:win|linux)-x64\)$/u);
+  assert.equal(observed.listing, false, 'Mixed framing must not reach archive listing.');
+});
+test('FQ40 production compressed-byte cap refuses a declared oversized response', { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+  fq40NativeOracle(await fq40NativeBoundary(t, 'known', 1, '', true), 'known', true);
+});
+for (const mutation of ['removed-flag', 'zero-flag', 'raised-cap']) {
+  test(`FQ40 compressed-byte mutation witness: ${mutation}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    const good = await fq40NativeBoundary(t, 'chunked', 8193); fq40NativeOracle(good, 'chunked', true);
+    const bad = await fq40NativeBoundary(t, 'chunked', 8193, mutation);
+    assert.equal(bad.observed.status, 0, 'Weak native bound must complete as actual curl0, not a watchdog/native63.');
+    assert.equal(bad.observed.bytes, 8193);
+    assert.throws(() => fq40NativeOracle(bad, 'chunked', true), assert.AssertionError);
   });
 }

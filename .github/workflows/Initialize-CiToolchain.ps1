@@ -3,7 +3,7 @@
 # Acquires reviewed Linux/Windows x64 runtimes and requested locked dependencies.
 #
 # .DESCRIPTION
-# Requires a reviewed PowerShell host, native Linux or Windows x64, empty candidate permissions, and an anonymous credential-free checkout. Validates declarations and staging/communication paths, then acquires digest-verified runtime archives. Installs requested locked roots only with the preferred runtime. Publishes ready.json and runner records after all checks succeed. Throws on refusal or native failure. Retains uncertain failed staging. Node 22 is a separate optional Linux recovery executable, never an install/PATH runtime. Changes this process environment for Git/npm isolation and the completed handoff.
+# Requires a reviewed PowerShell host, native Linux or Windows x64, empty candidate permissions, and an anonymous credential-free checkout. Validates declarations and staging/communication paths, then acquires digest-verified runtime archives with a fixed 64 MiB compressed limit. Requires curl and libcurl 8.5 or later; Windows retains curl major version 8. Installs requested locked roots only with the preferred runtime. Publishes ready.json and runner records after all checks succeed. Throws on refusal or native failure. Retains uncertain failed staging. Node 22 is a separate optional Linux recovery executable, never an install/PATH runtime. Changes this process environment for Git/npm isolation and the completed handoff.
 #
 # .PARAMETER WorkflowDependencies
 # Installs locked .github/workflows dependencies with the preferred runtime.
@@ -33,7 +33,7 @@
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
 # The workflow must initialize the required host, checkout, and runner environment.
-# Version: 1.0.20261008.0
+# Version: 1.0.20261009.0
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
 param(
@@ -45,6 +45,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 $objStrictUtf8Encoding = [Text.UTF8Encoding]::new($false, $true)
+New-Variable -Name intMaximumRuntimeArchiveBytes -Value 67108864 -Option Constant -WhatIf:$false -Confirm:$false
 
 function Assert-OrdinaryPath {
     # .SYNOPSIS
@@ -973,12 +974,86 @@ function Expand-ReviewedArchive {
         throw 'toolchain: incomplete archive extraction'
     }
 }
+function Assert-CurlCapability {
+    # .SYNOPSIS
+    # Requires the reviewed streaming download capabilities.
+    #
+    # .DESCRIPTION
+    # Queries the already resolved curl application without default configuration. Requires unambiguous curl and libcurl versions of at least 8.5.0, HTTPS, SSL and every selected download option. Windows retains the curl major-version-8 restriction. Query failures or unsupported output throw before download. Produces no success output; Windows provenance uses the information stream.
+    #
+    # .PARAMETER Path
+    # Ordinary absolute path to the previously resolved and inspected curl application.
+    #
+    # .PARAMETER Windows
+    # Applies the retained Windows curl major-version restriction and provenance output.
+    #
+    # .EXAMPLE
+    # Assert-CurlCapability -Path $strCurlPath -Windows:$IsWindows
+    #
+    # # Internal caller example: verifies the selected application before runtime acquisition.
+    #
+    # .EXAMPLE
+    # Assert-CurlCapability -Path '/usr/bin/curl'
+    #
+    # # Internal Linux caller example: throws if the installed application lacks the required version or options.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # None. Unsupported capabilities and unexpected native statuses throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API surface.
+    # Parameters, return shape, and positional contract may change without notice.
+    # No positional parameters are supported.
+    #
+    # Version: 1.0.20261009.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory = $true)][string] $Path, [switch] $Windows)
+    $arrCurlVersionOutput = @(& $Path --disable --version)
+    if ($LASTEXITCODE -ne 0 -or $arrCurlVersionOutput.Count -lt 3 -or
+        -not $arrCurlVersionOutput[0].StartsWith('curl ', [StringComparison]::Ordinal)) {
+        throw 'toolchain: curl capability version query failed'
+    }
+    $objCurlVersionMatches = [regex]::Matches($arrCurlVersionOutput[0], '(?<!\S)curl ([0-9]+\.[0-9]+\.[0-9]+)(?= |$)')
+    $objLibraryVersionMatches = [regex]::Matches($arrCurlVersionOutput[0], '(?<!\S)libcurl/([0-9]+\.[0-9]+\.[0-9]+)(?= |$)')
+    [version] $objCurlVersion = $null
+    [version] $objLibraryVersion = $null
+    if ($objCurlVersionMatches.Count -ne 1 -or $objLibraryVersionMatches.Count -ne 1 -or
+        -not [version]::TryParse($objCurlVersionMatches[0].Groups[1].Value, [ref]$objCurlVersion) -or
+        -not [version]::TryParse($objLibraryVersionMatches[0].Groups[1].Value, [ref]$objLibraryVersion) -or
+        $objCurlVersion -lt [version]'8.5.0' -or $objLibraryVersion -lt [version]'8.5.0' -or
+        ($Windows -and $objCurlVersion.Major -ne 8)) {
+        throw 'toolchain: curl and libcurl 8.5+ are required; Windows curl must remain in major 8'
+    }
+    $arrProtocols = @($arrCurlVersionOutput | Where-Object { $_ -cmatch '^Protocols:' })
+    $arrFeatures = @($arrCurlVersionOutput | Where-Object { $_ -cmatch '^Features:' })
+    if ($arrProtocols.Count -ne 1 -or $arrProtocols[0] -cnotmatch '^Protocols:.*\bhttps\b' -or
+        $arrFeatures.Count -ne 1 -or $arrFeatures[0] -cnotmatch '^Features:.*\bSSL\b') {
+        throw 'toolchain: curl with HTTPS/TLS is required'
+    }
+    $arrCurlHelpOutput = @(& $Path --disable --help all)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'toolchain: curl capability query failed'
+    }
+    foreach ($strCurlOption in @('disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir',
+        'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output')) {
+        if (($arrCurlHelpOutput -join [Environment]::NewLine) -cnotmatch ('(?m)^[^\r\n]*--' + [regex]::Escape($strCurlOption) + '(?: |$)')) {
+            throw "toolchain: curl is missing required option --$strCurlOption"
+        }
+    }
+    if ($Windows) {
+        Write-Information -MessageData "curl $($arrCurlVersionOutput[0]) at $Path SHA256 $((Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash)." -InformationAction Continue
+    }
+}
 function Install-ReviewedRuntime {
     # .SYNOPSIS
     # Acquires and verifies one reviewed runtime role.
     #
     # .DESCRIPTION
-    # Requires the initialized script-owned staging root and resolved reviewed curl. Creates a private role directory, downloads with bounded retries, verifies the exact digest, and validates extraction. Checks absolute Node and bundled npm paths and versions. Writes visible provenance to the information stream. Acquisition, digest, archive, path, and version failures throw. The outer script owns failed-stage cleanup.
+    # Requires the initialized script-owned staging root and resolved reviewed curl. Creates a private role directory, downloads with bounded retries and a fixed compressed-byte limit, checks the completed file size, verifies the exact digest, and validates extraction. Checks absolute Node and bundled npm paths and versions. Writes visible provenance to the information stream. Acquisition, digest, archive, path, and version failures throw. The outer script owns failed-stage cleanup.
     #
     # .PARAMETER Role
     # Internal role preferred or recoveryCompatibility, admitted by the outer script.
@@ -1019,7 +1094,7 @@ function Install-ReviewedRuntime {
     #   Position 2: NpmVersion
     #   Position 3: Digest
     #
-    # Version: 1.0.20261008.0
+    # Version: 1.0.20261009.0
     [CmdletBinding()]
     [OutputType([hashtable])]
     param([string] $Role, [string] $Version, [string] $NpmVersion, [string] $Digest)
@@ -1041,11 +1116,14 @@ function Install-ReviewedRuntime {
     # This bounds retry admission, not an active transfer: nominal 483s/archive.
     & $strCurlPath --disable --silent --show-error --fail --location --proto '=https' `
     --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 `
-    --retry 2 --retry-max-time 300 --output $strArchive $strDownloadAddress
+    --retry 2 --retry-max-time 300 --max-filesize $intMaximumRuntimeArchiveBytes --output $strArchive $strDownloadAddress
     if ($LASTEXITCODE -ne 0) {
         throw "Runtime download failed: $LASTEXITCODE ($Role/$strPlatform)"
     }
     $null = Assert-OrdinaryPath $strArchive
+    if ((Get-Item -LiteralPath $strArchive -Force -ErrorAction Stop).Length -gt $intMaximumRuntimeArchiveBytes) {
+        throw 'toolchain: compressed runtime archive exceeds the fixed size limit'
+    }
     if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Digest) {
         throw "The runtime archive digest is incorrect for $strDownloadAddress. Check package.json engines.node and .github/workflows/ci-toolchain.json $Role. Verify the official release checksum before changing the declaration."
     }
@@ -1154,28 +1232,7 @@ if ($IsWindows) {
         }) {
         Assert-WindowsWriter $objPathComponent.FullName
     }
-    $arrCurlVersionOutput = @(& $strCurlPath --disable --version)
-    if ($LASTEXITCODE -ne 0 -or $arrCurlVersionOutput.Count -lt 3 -or
-        $arrCurlVersionOutput[0] -cnotmatch '^curl (8\.[0-9]+\.[0-9]+) ' -or [version]$Matches[1] -lt [version]'8.5.0' -or
-        @($arrCurlVersionOutput | Where-Object {
-            $_ -cmatch '^Protocols:.*\bhttps\b'
-        }).Count -ne 1 -or
-        @($arrCurlVersionOutput | Where-Object {
-            $_ -cmatch '^Features:.*\bSSL\b'
-        }).Count -ne 1) {
-        throw 'toolchain: Windows curl8.5+ in major8 with HTTPS/TLS is required'
-    }
-    $arrCurlHelpOutput = @(& $strCurlPath --disable --help all)
-    if ($LASTEXITCODE -ne 0) {
-        throw 'toolchain: curl capability query failed'
-    }
-    foreach ($strCurlOption in @('disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir',
-        'tlsv1.2', 'connect-timeout', 'max-time', 'retry', 'retry-max-time', 'output')) {
-        if (($arrCurlHelpOutput -join "`n") -cnotmatch ('(?m)^[^\r\n]*--' + [regex]::Escape($strCurlOption) + '(?: |$)')) {
-            throw "toolchain: curl is missing required option --$strCurlOption"
-        }
-    }
-    Write-Information -MessageData "curl $($arrCurlVersionOutput[0]) at $strCurlPath SHA256 $((Get-FileHash -LiteralPath $strCurlPath -Algorithm SHA256).Hash)." -InformationAction Continue
+    Assert-CurlCapability -Path $strCurlPath -Windows
 } elseif ([Environment]::UserName -ceq 'root') {
     throw 'toolchain: Linux extraction requires a non-root account'
 }
@@ -1224,6 +1281,9 @@ try {
         $objPin.preferred.windowsX64Sha256
     } else {
         $objPin.preferred.linuxX64Sha256
+    }
+    if (-not $IsWindows) {
+        Assert-CurlCapability -Path $strCurlPath
     }
     $hashtablePreferredRuntime = Install-ReviewedRuntime 'preferred' $objPackage.engines.node $objPackage.engines.npm $strRuntimeDigest
     $hashtableCompatibilityRuntime = $null

@@ -3,7 +3,7 @@
 # Verifies that the anonymous checkout retained no credentials.
 #
 # .DESCRIPTION
-# Requires PowerShell 7.3 or later for the retained helper APIs. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
+# Requires PowerShell 7.3 or later for the retained helper APIs. Callers must omit GIT_DIR, GIT_WORK_TREE and GIT_COMMON_DIR, including empty values. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
 #
 # .EXAMPLE
 # & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
@@ -24,7 +24,7 @@
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
 # The workflow must initialize the required host, checkout, and runner environment.
-# Version: 1.0.20261008.0
+# Version: 1.0.20261009.0
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param()
@@ -245,6 +245,12 @@ function New-PrivateDirectory {
         }
     }
     $null = Assert-OrdinaryPath $Path -Directory
+}
+
+foreach ($strRepositorySelector in @('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR')) {
+    if (Test-Path -LiteralPath ('Env:' + $strRepositorySelector)) {
+        throw 'credential-policy: repository selector environment variables are not allowed'
+    }
 }
 
 # Do not load user/system Git credentials or hooks during anonymous acquisition.
