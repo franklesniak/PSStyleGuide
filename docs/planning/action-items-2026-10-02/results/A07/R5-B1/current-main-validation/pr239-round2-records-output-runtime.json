@@ -1,0 +1,62 @@
+{
+  "at": "2026-10-09T12:47:22.469021+00:00",
+  "state": "root_accepted_pr239_round2_linux_records-output",
+  "cell": "records-output",
+  "run_id": "pr239-round2-records-output-20261009-a1",
+  "session_id": 96035,
+  "observed_native_exit": 0,
+  "terminal_chunk": "f9ee2b",
+  "manifest_sha256": "fa9505d9550fc249c6d91726c8bf334536d693728420cd141bd7760a9fc1ca39",
+  "source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+  "index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-records-output-20261009-a1",
+  "started_utc": "2026-10-09T12:44:20.662749+00:00",
+  "finished_utc": "2026-10-09T12:47:16.031106+00:00",
+  "elapsed_seconds": 175.420999999973,
+  "tap": {
+    "names": [
+      "FQ36 dependency logs stay outside the initializer success result",
+      "FQ35 actual recovery records reject line breaks before runner channel use",
+      "FQ37 runner model refuses blocked keys before assignment and permits recovery clearing",
+      "FQ35 recovery selection follows successful off and on setup across fresh roots",
+      "FQ35 and FQ37 runner-record controls detect omissions and preserve failed handoffs"
+    ],
+    "summary": {
+      "tests": 5,
+      "pass": 5,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 5,
+  "fixture_calls": 15,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round2 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-records-output-20261009-a1\\status.json",
+      "sha256": "61917b8d600f7ef1fdc185588a9dacbb9becd6bf3f8ea1e991691525a1f95fe3"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-records-output-20261009-a1\\output\\result.json",
+      "sha256": "2ee22fe12a1f32b12c83a9b2997cacf4292a3ef1ce7ff2bd9f6f184621b5a15c"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-records-output-20261009-a1\\output\\f5-ordinary.log",
+      "sha256": "29cb368e385ce2a786be3b3fbec31443170d644a7a3473eeb23e7e49535bddde"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-records-output-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

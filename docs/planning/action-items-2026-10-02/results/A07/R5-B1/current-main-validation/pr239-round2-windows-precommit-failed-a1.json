@@ -1,0 +1,74 @@
+{
+  "state": "failed_controller_hooks_passed_retention_disposition_pending",
+  "at": "2026-10-09T15:13:16.842052+00:00",
+  "session_id": 6435,
+  "terminal_chunk": "cdf533",
+  "controller_exit": 1,
+  "native_hook_exit": 0,
+  "worker_exit": 0,
+  "primary_failure": "Fixture temporary residue",
+  "summary": {
+    "configured_hooks": 11,
+    "passed": 11,
+    "skipped": 0
+  },
+  "job_before_cleanup": {
+    "total": 38910,
+    "active": 0,
+    "terminated": 0
+  },
+  "job_after_cleanup": {
+    "total": 38910,
+    "active": 0,
+    "terminated": 0
+  },
+  "cleanup_failures": [],
+  "started_utc": "2026-10-09T14:26:17.932682+00:00",
+  "finished_utc": "2026-10-09T15:08:58.443336+00:00",
+  "elapsed_seconds": 2560.5,
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-windows-bound-v2\\manifest.precommit.authorized.json",
+  "manifest_sha256": "8173f6e8bc4076ebeebd50e850ddea114dc8c8d7c83d92c6807bedf587e4619d",
+  "raw_run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1",
+  "source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+  "index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+  "receipts": {
+    "result.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\result.json",
+      "sha256": "2fd78f5c9cdf07c772c53979c585b323d38d317dda6f137e1e27786b98464f1a"
+    },
+    "native.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\native.json",
+      "sha256": "44199e683a4d4d7d41bdf6c12b3a101281d380f5fea8e4d1852bcff6cf857c60"
+    },
+    "command.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\command.json",
+      "sha256": "78414d65fbbb33745e5e17f7f9c16d4ed09cd28ec274018e621aea072f788071"
+    },
+    "owner.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\owner.json",
+      "sha256": "bbf4c830f2a27a64fe71c469a4f9f463cb087a80bf5b2a97054fe534c2f447ed"
+    },
+    "stdout.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\stdout.log",
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    "stderr.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-precommit-20261009-a1\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "initial_residue_observation": {
+    "terminal_chunk": "0837c4",
+    "count": 2,
+    "each_bytes": 69,
+    "names": [
+      "__PSScriptPolicyTest_amb5dfpl.y2x.ps1",
+      "__PSScriptPolicyTest_h4jg5bqb.rch.psm1"
+    ],
+    "full_identity_content_stream_access_checks_pending": true
+  },
+  "strict_controller_pass": false,
+  "acceptance_granted": false,
+  "namespace_retained": true,
+  "retry_authorized": false
+}

@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-09T13:35:12.218043+00:00",
+  "state": "root_accepted_pr239_round2_linux_consumers",
+  "cell": "consumers",
+  "run_id": "pr239-round2-consumers-20261009-a3",
+  "session_id": 16848,
+  "observed_native_exit": 0,
+  "terminal_chunk": "fded5c",
+  "manifest_sha256": "8059936180d4e112d260b9bbb5feeac8a7e03c7f3c8c6f0f0f5bafb0cb0994a0",
+  "source_catalog_sha256": "c4a3df2d40eb9de754576618cdb740755afe8fca61e80d637454651d6227d4ac",
+  "index_tree": "4369df7b8f4d98bc7b84abb2fed0a9db4582be0c",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-consumers-20261009-a3",
+  "started_utc": "2026-10-09T13:32:01.706315+00:00",
+  "finished_utc": "2026-10-09T13:35:04.954459+00:00",
+  "elapsed_seconds": 183.31199999997625,
+  "tap": {
+    "names": [
+      "FQ37 direct workflow Node caller clears inherited startup options: markdownlint.yml/policy",
+      "FQ37 direct workflow Node caller clears inherited startup options: markdownlint.yml/markdownlint",
+      "FQ37 direct workflow Node caller clears inherited startup options: agent-instructions.yml/accepted-policy",
+      "FQ37 direct workflow Node caller clears inherited startup options: agent-instructions.yml/candidate-tests"
+    ],
+    "summary": {
+      "tests": 4,
+      "pass": 4,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 4,
+  "fixture_calls": 16,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round2 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-consumers-20261009-a3\\status.json",
+      "sha256": "03070b50f2915cd5db6ff1cfa9e7f52b5a8afb37634db5c37cfe101efe42f164"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-consumers-20261009-a3\\output\\result.json",
+      "sha256": "1541c41873ad6e71c91621852d9846f17562a72baf87d33935b7dc45761f7cfa"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-consumers-20261009-a3\\output\\f5-ordinary.log",
+      "sha256": "01112658aee6507ce6c752bb0cbdeeac06764017216fda7d21ba43ace085db05"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-consumers-20261009-a3\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

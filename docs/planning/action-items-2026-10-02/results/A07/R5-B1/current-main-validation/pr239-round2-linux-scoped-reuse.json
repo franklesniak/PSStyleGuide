@@ -1,0 +1,153 @@
+{
+  "schema": "PR239.Round2.ScopedRuntimeReuse.v1",
+  "state": "root_accepted",
+  "authorizing_coordinator": "root",
+  "at": "2026-10-09T14:08:31.116722+00:00",
+  "source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+  "index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+  "driver_pre_sha256": "5e6111a12caf4cf7b65a518f5436d37d0f378eed6eb35bc6943f15f9721dce8a",
+  "driver_post_sha256": "2636b614af82374e5ca0c9836cf5037afcfb9a3ce25650f1fc6bee41793e3c08",
+  "inverse_exact_driver_delta_verified": true,
+  "other77_and_common_context_unchanged": true,
+  "reused_registrations": 108,
+  "groups": {
+    "lint": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-lint-runtime.json",
+      "sha256": "2ff758d9350adfb2d7efcb8f8e3d8d688d0c11751a60e34c6ed2326a1e8411e6",
+      "tests": 20,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "identity": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-identity-runtime.json",
+      "sha256": "1e312b6e5067ce3f4adc8816e649980e094e524a064d17890042376b69fe61d0",
+      "tests": 1,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "runtime": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-runtime-runtime.json",
+      "sha256": "b7475d98d86c4f91545602dda6cf28a338f00dd1d386e5df66daac053a39c3b6",
+      "tests": 12,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "compatibility": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-compatibility-runtime.json",
+      "sha256": "3c6e5aaeeb5be07cf16886a52cec91a0a814dc9d4859d8a6eef12fcc01f3171f",
+      "tests": 9,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "admission": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-admission-runtime.json",
+      "sha256": "14d4655796f798a7aeaf9158082bcd55d64a9c86ef745423a61b8a744e35ec8d",
+      "tests": 4,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "newline": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-newline-runtime.json",
+      "sha256": "43d40807b8c00889a5cf59d7d373b19a21ef9eb429eab96ea9c7984571800ce9",
+      "tests": 1,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "sanitation": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-sanitation-runtime.json",
+      "sha256": "ff1ebb4eb1aab00e29bfc85daf2797261d469aae334f5de9051ad67784b0686b",
+      "tests": 7,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "preflight": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-preflight-runtime.json",
+      "sha256": "aafa403b338124c36f076f7423bd033bd5d73b26b74e9efeb07ce62d2c265c34",
+      "tests": 1,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "cleanup": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-cleanup-runtime.json",
+      "sha256": "12b151c97b5b0a4c80026b177fdf1b8c8429ea4a2da66ab79881b182a5a8687d",
+      "tests": 11,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "filesystem": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-filesystem-runtime.json",
+      "sha256": "1b3c99f1156ed25cc740c14f3d6980917d5ce22e866882e4345a5985a1e5f1c7",
+      "tests": 8,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "tar": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-tar-runtime.json",
+      "sha256": "41706e346a8f91637ca70c75e07ca686a8746a3efae40936f301a58d76348892",
+      "tests": 4,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "records-output": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-records-output-runtime.json",
+      "sha256": "dee051b2f73ba0e4cb91d377a7578f96f09734ec90e6b1732f259b6db554b095",
+      "tests": 5,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "mutations": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-mutations-runtime.json",
+      "sha256": "0e223b3ff25c7774b1aa8ec6a3719f800a59eb8e240ba2ea81594b345734a78c",
+      "tests": 11,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "preinstall": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-preinstall-runtime.json",
+      "sha256": "eec155ca012c21cbc9ea434ee03a62a82c735e0174f9305e287dd175fb6b0f69",
+      "tests": 10,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18"
+    },
+    "consumers": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-consumers-runtime.json",
+      "sha256": "79d3fa84772bf455403aecfd5a78e35ae7c0a94e1187f0d7cc4d5ea1d8c6703b",
+      "tests": 4,
+      "observed_source_catalog_sha256": "c4a3df2d40eb9de754576618cdb740755afe8fca61e80d637454651d6227d4ac",
+      "observed_index_tree": "4369df7b8f4d98bc7b84abb2fed0a9db4582be0c"
+    }
+  },
+  "accepted_linux_counts": {
+    "lint": 20,
+    "identity": 1,
+    "runtime": 12,
+    "compatibility": 9,
+    "admission": 4,
+    "newline": 1,
+    "sanitation": 7,
+    "preflight": 1,
+    "cleanup": 11,
+    "filesystem": 8,
+    "tar": 4,
+    "records-output": 5,
+    "mutations": 11,
+    "preinstall": 10,
+    "consumers": 4
+  },
+  "accepted_linux_completed": 108,
+  "fresh_path_credit": 0,
+  "path_fresh_run_required": true,
+  "basis": "Two call sites of fq34Run belong only to Windows3 and Linux3 registrations. Full inverse31B restores current prior111 source. Other104 original registrations plus4 consumers retain their actual two historical origins. Prior path3 excluded; no Windows credit.",
+  "source_readback": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-root-validation\\fq34-encoding\\source78-readback.json",
+    "sha256": "5b676d7a46cb30ba186f55866e01d85b02efdd714ef0b8b09e8d0b82f61eae3b"
+  },
+  "whole_driver_syntax": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-root-validation\\fq34-encoding\\driver-syntax-result.json",
+    "sha256": "dabad77fec3f27ef3a665122adc0243e1b88cffa7ada69c210df790fc7ea4d8f"
+  },
+  "previous_admission": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-root-validation\\consumers-v2\\linux-scoped-reuse-acceptance.json",
+    "sha256": "9dda6198e87de9f66f74ec42e2fbc30e0ed5016180db8f9493d3f24209d1190a"
+  }
+}

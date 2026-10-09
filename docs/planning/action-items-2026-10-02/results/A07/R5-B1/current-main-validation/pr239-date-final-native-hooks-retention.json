@@ -1,0 +1,96 @@
+{
+  "at": "2026-10-09T09:23:55.836330+00:00",
+  "state": "native_hooks_passed_with_retained_platform_probe_residue",
+  "run_id": "pr239-date-final-win-precommit-20261009-a1",
+  "session_id": 5594,
+  "terminal_chunk": "03b7e9",
+  "observed_native_launcher_exit": 1,
+  "controller_state": "failed",
+  "controller_exit": 1,
+  "strict_controller_pass": false,
+  "original_primary_failure": "Fixture temporary residue",
+  "native_hook_exit": 0,
+  "worker_exit": 0,
+  "summary": {
+    "configured_hooks": 11,
+    "passed": 11,
+    "skipped": 0
+  },
+  "private_temp_removed": false,
+  "namespace_retained": true,
+  "namespace_must_not_be_reused": true,
+  "retention_disposition": "Exact138-byte inert pair retained as evidence in the owned private failed namespace.",
+  "raw_run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1",
+  "residue_count": 2,
+  "residue_bytes": 138,
+  "residue": [
+    {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1\\temp\\__PSScriptPolicyTest_glbrlxmx.tug.psm1",
+      "bytes": 69,
+      "sha256": "1e498b481b597e1897ab45df9d9f735b8044575bcaad5f7fa3b19051b722a093",
+      "file_id": [
+        2550303535,
+        1900544,
+        6119488
+      ],
+      "links": 1,
+      "attributes": 32,
+      "streams": [
+        {
+          "name": "::$DATA",
+          "bytes": 69
+        }
+      ],
+      "mtime_ns": 1791535242691315000
+    },
+    {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1\\temp\\__PSScriptPolicyTest_u4o5w0g5.345.ps1",
+      "bytes": 69,
+      "sha256": "1e498b481b597e1897ab45df9d9f735b8044575bcaad5f7fa3b19051b722a093",
+      "file_id": [
+        2550303535,
+        1835008,
+        6119357
+      ],
+      "links": 1,
+      "attributes": 32,
+      "streams": [
+        {
+          "name": "::$DATA",
+          "bytes": 69
+        }
+      ],
+      "mtime_ns": 1791535242690808200
+    }
+  ],
+  "exact_producer_pid_observed": false,
+  "deletion_reason_observed": false,
+  "decision": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-date-final-root-validation\\policy-probe-retention-root-decision.json",
+  "decision_sha256": "27f5d15322ed6284a2528e7984af353ee2feeecbeafe591d259196d5d714885d",
+  "manifest_sha256": "e87eed342ce06639e7748089a83151dd9a3687dd364783e152d8aa94f2014620",
+  "source_catalog_sha256": "b8da436211a61fefa982e355ad43aa8acce995b9948b0a88e2827476e58e6b82",
+  "source_runtime_dependencies_husky_git_unchanged": true,
+  "fresh_owner_nonce_verified": true,
+  "fresh_security_descriptors": {
+    "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+    "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+    "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1\\temp": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:(A;OICIID;FA;;;SY)(A;OICIID;FA;;;BA)(A;OICIID;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+    "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1\\temp\\__PSScriptPolicyTest_glbrlxmx.tug.psm1": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:(A;ID;FA;;;SY)(A;ID;FA;;;BA)(A;ID;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+    "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-date-final-win-precommit-20261009-a1\\temp\\__PSScriptPolicyTest_u4o5w0g5.345.ps1": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:(A;ID;FA;;;SY)(A;ID;FA;;;BA)(A;ID;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)"
+  },
+  "jobs_empty_without_controller_termination": true,
+  "raw_receipt_hashes": {
+    "result.json": "2df27541bdf6ba9f163e70e6aa13247b121d1e7ec38179863a3753c01a997f4c",
+    "native.json": "8b6d030b13fb2b69c21aa5f16238076251f53646f83a0ed5f0b2021a5e32274e",
+    "command.json": "ddb1205ac870195bdfbbdc8837dc38fd14abb31dc27c2fa4a08e3569b40eb62c",
+    "owner.json": "309dd7b3b90582a28ca61e0d703205ed8f85c6a03b4050005d50453ee59333e4",
+    "stdout.log": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "no_rerun": true,
+  "no_controller_pass_claim": true,
+  "no_deletion_or_product_controller_edit": true,
+  "verification_elapsed_seconds": 8.78100000001723,
+  "limits": "Point-in-time filesystem verification; no exact producer attribution, concurrent-writer atomicity or future-run guarantee.",
+  "remaining": "Independent readback of this disposition, normal commit/Husky, current public reviews and passing CI/service proof, landing and PS/TF convergence."
+}

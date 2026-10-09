@@ -1,0 +1,28 @@
+{
+  "state": "root_accepted_final_local_runtime_quality",
+  "owner": "fq18_final_integration_review",
+  "expected_output": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-final-runtime-quality",
+  "source_quality_reused": "Q2 unchanged source plus Q3 finite31B addendum",
+  "received_review": "Reviewer verified111 unique Linux results with explicit108 origins and freshpath3, all786 ordered Windows outcomes, actualnative/worker/controller0, unchanged guards and strictcleanup; final report/seal held for actualall11 terminal receipt.",
+  "all11_credit": true,
+  "all11_credit_scope": "Native hooks only; controller1 retained, strict_controller_pass=false, private_temp_removed=false.",
+  "root_full_read_chunk": "16c56c",
+  "material_findings": [],
+  "accepted_at": "2026-10-09T15:33:05.424512+00:00",
+  "accepted_artifacts": {
+    "REPORT.md": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-final-runtime-quality\\REPORT.md",
+      "sha256": "c17bb47b6f59f9163a2a339beff6e182656e03cd9776aad550582fbf52c61f75"
+    },
+    "evidence.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-final-runtime-quality\\evidence.json",
+      "sha256": "1f3180e092a573fce5d79ddd06b376b8230a9061682ef5685d514435ea0f86fc"
+    },
+    "seal.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-final-runtime-quality\\seal.json",
+      "sha256": "513c738f194bab49fa9df708dcddbab7a031582b2e5550fcf8519ff8fc5b317e"
+    }
+  },
+  "effective_settings_exposed": false,
+  "report_scope_clarification": "Only shared observation fields change at/state/actual terminal; the separate acceptance also adds root authority, original failure, raw location, observation hash, scope and remaining gates. No raw evidence was overwritten."
+}

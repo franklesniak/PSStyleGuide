@@ -1,0 +1,65 @@
+{
+  "at": "2026-10-09T15:20:16.272901+00:00",
+  "state": "root_selected_exact_run_retention",
+  "authorizing_coordinator": "root",
+  "selected_option": "K",
+  "run_id": "pr239-round2-win-precommit-20261009-a1",
+  "session_id": 6435,
+  "terminal_chunk": "cdf533",
+  "manifest_sha256": "8173f6e8bc4076ebeebd50e850ddea114dc8c8d7c83d92c6807bedf587e4619d",
+  "source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+  "index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+  "verifier_template_sha256": "020ed94072898fcbf6f6067428f3087e1b26648eb1e8e2b6bd5495cfa43b40cf",
+  "canonical_finding": "FQ32-POWERSHELL-POLICY-PROBE-RESIDUE.md",
+  "prior_selected_root_decision": "current-main-validation/policy-probe-retention-root-decision.json",
+  "selection_authority": "Standing owner direction: implement the clear winner after the finding-specific decision process. This is the same FQ32 finding with fresh exact-run applicability, not a new generic exception.",
+  "selection_basis": "Same qualified platform, exact inert two-file structure and size, genuine11-hook native0/worker0, sole temporary-residue failure, naturally empty Job and unchanged source scope. Different names/tick/file identities/manifest/current inputs are explicitly rebound. The existing K96 rationale remains applicable; no new production or acceptance-framework change is proposed. Fresh verification must pass before acceptance.",
+  "reviewed_preparation": {
+    "seal.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\seal.json",
+      "sha256": "327ca2b91f46d78f5577a04ed7c480d40d6f8e4cfe5ba33f8e476be28c10f780"
+    },
+    "REPORT.md": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\REPORT.md",
+      "sha256": "930231cb8ae33f484b319c380d816919e85c2202ec99d058b1c74713da0edcbd"
+    },
+    "evidence.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\evidence.json",
+      "sha256": "a25f6ce973c94a424fcaf273b39988ad4b9899082becf8b0f1e230ad9d994e57"
+    },
+    "ROOT-BINDING.md": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\ROOT-BINDING.md",
+      "sha256": "2475958609af5dda995500dba465372637fb1479ad549c136e83c78a50b8b398"
+    },
+    "verifier.diff": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\verifier.diff",
+      "sha256": "0f45ac33e6c106370953792b62510f2671a5efc6485eeaf2ba109e666702bb38"
+    },
+    "verify-round2-exact-probe-retention.py": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-policy-probe-retention-preparation\\verify-round2-exact-probe-retention.py",
+      "sha256": "020ed94072898fcbf6f6067428f3087e1b26648eb1e8e2b6bd5495cfa43b40cf"
+    }
+  },
+  "root_read_chunks": [
+    "c50e54",
+    "f68863",
+    "d0e6a1"
+  ],
+  "root_failed_observation": "e0c09b",
+  "independent_final_reader": "fq18_final_integration_review; reported genuine hooks and exact pair, final verdict held",
+  "exact_residue_names": [
+    "__PSScriptPolicyTest_amb5dfpl.y2x.ps1",
+    "__PSScriptPolicyTest_h4jg5bqb.rch.psm1"
+  ],
+  "each_bytes": 69,
+  "residue_sha256": "798b50e8b0e9932631ca4bd41c28e48381a5639c00af96fb0f160c2ffaf29c9c",
+  "limits": {
+    "verification_seconds": 60,
+    "residue_read_bytes_each": 70,
+    "temp_entries": 2,
+    "immediate_run_entries": 7,
+    "json_bytes_each": 1048576,
+    "output_receipt_bytes": 65536
+  },
+  "scope": "Only this named pair/run/current released input. Preserve controller1 and original receipts; no cleanup, namespace reuse, test rerun, product/controller edit or future exemption. Any failed fresh gate stops acceptance."
+}

@@ -1,0 +1,16 @@
+{
+  "schema": "PR239.FQ38.AnchorValidation.v1",
+  "observed_at": "2026-10-09T10:54:15.346480+00:00",
+  "state": "confirmed_source_constructor_mismatch",
+  "source": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide\\.github\\workflows\\Initialize-CiToolchain.ps1",
+  "source_sha256": "f79c560723233a22ce45a23602dcd1232fcd0fea949d8bae5d566592df43f57e",
+  "driver": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide\\.github\\workflows\\Test-CiHelpers.test.mjs",
+  "driver_sha256": "19ae06c0acd5f65c52be37f498aae71adc6a877b43ae8e427538c4c0343da815",
+  "old_combined_anchor_count": 0,
+  "current_routed_combined_anchor_count": 1,
+  "old_preflight": "        & $hashtablePreferredRuntime.Node --permission \"--allow-fs-read=$strRepositoryRoot\" \"$PSScriptRoot/Validate-WorkflowPolicy.mjs\" --preflight\n        if ($LASTEXITCODE -ne 0) {\n            throw 'Package and workflow preflight failed before installation.'\n        }\n",
+  "old_install": "        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true\n        if ($LASTEXITCODE -ne 0) {\n            throw \"Locked installation failed: $LASTEXITCODE\"\n        }\n",
+  "current_preflight": "        & $hashtablePreferredRuntime.Node --permission \"--allow-fs-read=$strRepositoryRoot\" \"$PSScriptRoot/Validate-WorkflowPolicy.mjs\" --preflight |\n            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }\n        if ($LASTEXITCODE -ne 0) {\n            throw 'Package and workflow preflight failed before installation.'\n        }\n",
+  "current_install": "        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true |\n            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }\n        if ($LASTEXITCODE -ne 0) {\n            throw \"Locked installation failed: $LASTEXITCODE\"\n        }\n",
+  "scope": "Text-only exact anchor validation. No target evaluation, parser, fixture, native test or runtime acceptance."
+}

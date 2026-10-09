@@ -1,0 +1,52 @@
+{
+  "powershell": "7.6.5",
+  "dotnet": "10.0.11",
+  "node": "v24.18.1",
+  "source_sha256": "7b3e3569dbdabe7823bfce777c02af7920c89f65f2d674f24315a9823d8c882b",
+  "admission_statement": "if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch '^24\\.[0-9]+\\.[0-9]+$') {\n    throw 'The preferred runtime declaration is invalid.'\n}",
+  "admission_cases": [
+    {
+      "name": "valid",
+      "refused": false
+    },
+    {
+      "name": "terminal-LF",
+      "refused": false
+    },
+    {
+      "name": "terminal-CRLF",
+      "refused": true
+    },
+    {
+      "name": "terminal-CR",
+      "refused": true
+    },
+    {
+      "name": "leading-LF",
+      "refused": true
+    },
+    {
+      "name": "suffix",
+      "refused": true
+    },
+    {
+      "name": "wrong-major",
+      "refused": true
+    }
+  ],
+  "original_success_values": [
+    "preflight-record",
+    "install-record",
+    "Reviewed runtime setup completed."
+  ],
+  "original_native_exit": 7,
+  "candidate_success_values": [
+    "Reviewed runtime setup completed."
+  ],
+  "candidate_native_exit": 7,
+  "candidate_information_values": [
+    "preflight-record",
+    "install-record"
+  ],
+  "scope": "Pure current-source admission and native stream semantics only; no installer, download, network share or product test harness executed."
+}

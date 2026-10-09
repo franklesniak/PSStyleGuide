@@ -1,0 +1,56 @@
+{
+  "at": "2026-10-09T14:25:16.023492+00:00",
+  "state": "root_accepted_pr239_round2_windows_aggregate",
+  "mode": "aggregate",
+  "run_id": "pr239-round2-win-aggregate-20261009-a2",
+  "manifest_sha256": "a6ec77dcff71ba485975a3b70a37d73af9a74c728d051c3b0366dfb4bb76e1ca",
+  "source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+  "index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+  "session_id": 22505,
+  "terminal_chunk": "736757",
+  "observed_native_exit": 0,
+  "summary": {
+    "tests": 786,
+    "suites": 0,
+    "pass": 352,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 434,
+    "todo": 0
+  },
+  "started_utc": "2026-10-09T14:21:41.001229+00:00",
+  "finished_utc": "2026-10-09T14:24:55.230676+00:00",
+  "elapsed_seconds": 194.23499999998603,
+  "jobs_empty_without_termination": true,
+  "source_runtime_dependencies_and_git_unchanged": true,
+  "private_temp_removed": true,
+  "result_namespace_retained": true,
+  "raw_run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2",
+  "receipts": {
+    "result.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\result.json",
+      "sha256": "dc8986c43c00e60dbb46b1041d73bfe1fea469777b3d9d57e73ad843e7cfa12a"
+    },
+    "native.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\native.json",
+      "sha256": "e8f11d1951aad46465ddf8fa66b91910e506ab15c9595a6058f09e6d9468ff05"
+    },
+    "command.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\command.json",
+      "sha256": "6edaa1944f2b4a43b4b2334064b7a0a7f530caaf98bf768e80be31cc094022b5"
+    },
+    "owner.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\owner.json",
+      "sha256": "3edd2d1fa5d6d28f375673f0ec93ac21ae69e84b4fba6ab1c6c943694bde30c9"
+    },
+    "stdout.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\stdout.log",
+      "sha256": "6a41e9696a18ab8bb6b201a38429d54295c9a084ce9eb4077e5f77a653115f02"
+    },
+    "stderr.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a2\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "remaining_scope": "This integrated PR239 Windows gate only; normal commit hooks, public reviews/greenCI/landing, PR239 service proof and paired delivery remain."
+}

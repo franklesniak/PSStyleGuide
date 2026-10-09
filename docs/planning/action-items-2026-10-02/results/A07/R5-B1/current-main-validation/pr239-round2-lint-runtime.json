@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-09T11:55:26.298003+00:00",
+  "state": "root_accepted_pr239_round2_linux_lint",
+  "cell": "lint",
+  "run_id": "pr239-round2-lint-20261009-a1",
+  "session_id": 30282,
+  "observed_native_exit": 0,
+  "terminal_chunk": "e54843",
+  "manifest_sha256": "42a49c9a02f299cd036efe12a14a59f652946218f6f600047342f03008cad678",
+  "source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+  "index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-lint-20261009-a1",
+  "started_utc": "2026-10-09T11:52:02.804283+00:00",
+  "finished_utc": "2026-10-09T11:55:20.306415+00:00",
+  "elapsed_seconds": 197.56299999996554,
+  "tap": {
+    "names": [
+      "lint records both native results: success",
+      "lint records both native results: outer-failure",
+      "lint records both native results: nested-failure",
+      "lint records both native results: package-array",
+      "lint records both native results: ready-array",
+      "lint records both native results: engine-lf",
+      "lint records both native results: engine-crlf",
+      "lint records both native results: engine-prefix",
+      "lint records both native results: engine-suffix",
+      "lint records both native results: engine-range",
+      "lint records both native results: engine-number",
+      "lint records both native results: FQ23 default all",
+      "lint records both native results: FQ23 default absent",
+      "lint records both native results: FQ23 Low all",
+      "lint records both native results: FQ23 Low absent",
+      "lint records both native results: FQ23 WhatIf all",
+      "lint records both native results: FQ23 WhatIf absent",
+      "lint records both native results: FQ23 Low+WhatIf all",
+      "lint records both native results: FQ23 Low+WhatIf absent",
+      "FQ33 lint engine admission requires the complete version value"
+    ],
+    "summary": {
+      "tests": 20,
+      "pass": 20,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 20,
+  "fixture_calls": 20,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round2 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-lint-20261009-a1\\status.json",
+      "sha256": "d9882426a5a103146f247f7a0433cc0c8c5e7d9e7624b564516b623514e126a6"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-lint-20261009-a1\\output\\result.json",
+      "sha256": "9d4e602f13ffa14860f51b2c94930e9497296c603365054c7d8a20bc228843be"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-lint-20261009-a1\\output\\f5-ordinary.log",
+      "sha256": "aaedd5d6d3eeb0eae13889deeba7931740e63ca65bcc69f9fbdfb99414c8c812"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-lint-20261009-a1\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

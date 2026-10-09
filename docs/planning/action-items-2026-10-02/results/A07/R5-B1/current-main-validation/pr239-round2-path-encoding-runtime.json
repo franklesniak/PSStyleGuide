@@ -1,0 +1,60 @@
+{
+  "at": "2026-10-09T14:13:42.448744+00:00",
+  "state": "root_accepted_pr239_round2_linux_path",
+  "cell": "path",
+  "run_id": "pr239-round2-path-20261009-a2",
+  "session_id": 89340,
+  "observed_native_exit": 0,
+  "terminal_chunk": "d7e3f4",
+  "manifest_sha256": "37724481888d93ce4808905b5cfaf7481918f6d8171384b29194792a8b72f83f",
+  "source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+  "index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+  "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-path-20261009-a2",
+  "started_utc": "2026-10-09T14:10:43.540762+00:00",
+  "finished_utc": "2026-10-09T14:13:34.640811+00:00",
+  "elapsed_seconds": 171.15600000001723,
+  "tap": {
+    "names": [
+      "FQ34 Linux ordinary and double-slash paths remain local: Initialize-CiToolchain.ps1",
+      "FQ34 Linux ordinary and double-slash paths remain local: Test-CheckoutCredentials.ps1",
+      "FQ34 Linux ordinary and double-slash paths remain local: Invoke-MarkdownLint.ps1"
+    ],
+    "summary": {
+      "tests": 3,
+      "pass": 3,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    }
+  },
+  "host_jobs_empty_without_termination": true,
+  "linux_children_empty_without_signals": true,
+  "guards_unchanged": true,
+  "scratch_empty": true,
+  "container_absent": true,
+  "owned_run_directory_removed": true,
+  "cleanup_failures": [],
+  "registration_credit": 3,
+  "fixture_calls": 3,
+  "ancestral_log_label": "f5-ordinary",
+  "scope_limit": "This round2 PR239 candidate and selected group only; aggregate/all11hooks/reviews/CI/normal landing/service/paired delivery remain incomplete.",
+  "receipts": {
+    "status.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-path-20261009-a2\\status.json",
+      "sha256": "a05a4d837657034690498cc02cae0557adcdfac85e59b3d1706f4ffd97603ff8"
+    },
+    "output/result.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-path-20261009-a2\\output\\result.json",
+      "sha256": "d2a7eb55a674e59d374bf9d7b014a6c36bad5656f4fbbcae4ce3b6a95ceac009"
+    },
+    "output/f5-ordinary.log": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-path-20261009-a2\\output\\f5-ordinary.log",
+      "sha256": "0f82b7b1aedbd957ec5d1df70fd43c4f57a12e5acde2729b87739c73efa26705"
+    },
+    "output/terminal-settlement.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round2-path-20261009-a2\\output\\terminal-settlement.json",
+      "sha256": "4aa1dc4bbcd0f6e75d757fd0f523638664cd24d96c3265fa4ef8cefd74ec4e9f"
+    }
+  }
+}

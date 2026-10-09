@@ -1,0 +1,64 @@
+{
+  "state": "failed_no_windows_gate_credit",
+  "at": "2026-10-09T13:51:06.528965+00:00",
+  "session_id": 64633,
+  "native_exit": 1,
+  "terminal_chunk": "526909",
+  "run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1",
+  "manifest_sha256": "d0e3f68820355dca3246e1eeea234a8c5f15477a27d17c0b777d001f32de797e",
+  "source_catalog_sha256": "c4a3df2d40eb9de754576618cdb740755afe8fca61e80d637454651d6227d4ac",
+  "index_tree": "4369df7b8f4d98bc7b84abb2fed0a9db4582be0c",
+  "tap": {
+    "tests": 786,
+    "suites": 0,
+    "pass": 349,
+    "fail": 3,
+    "cancelled": 0,
+    "skipped": 434,
+    "todo": 0
+  },
+  "failed_tests": [
+    "FQ34 Windows raw and normalized local path boundaries: Initialize-CiToolchain.ps1",
+    "FQ34 Windows raw and normalized local path boundaries: Test-CheckoutCredentials.ps1",
+    "FQ34 Windows raw and normalized local path boundaries: Invoke-MarkdownLint.ps1"
+  ],
+  "primary_failure": "Direct native command failure",
+  "diagnosis": "Allthree failures compare Unicode row.input expectedOmega with decodedU+FFFD. FQ34 generated JSON child output encoding is under bounded fixture diagnosis; no production defect or fix acceptance yet.",
+  "final_job": {
+    "total": 3535,
+    "active": 0,
+    "terminated": 0
+  },
+  "cleanup_failures": [],
+  "normal_success_cleanup_credit": false,
+  "private_temp_present": true,
+  "retained_temp_top_level": [],
+  "raw_receipts": {
+    "result.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\result.json",
+      "sha256": "58cca4eac0e753e247588d8b6eade6e2e7668ceda2cdc1b8e17c2f28afa06df8"
+    },
+    "native.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\native.json",
+      "sha256": "ea923e28314245daf67fcc4a28e96c76fd8d962e49e42df9d392eb72f123456c"
+    },
+    "command.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\command.json",
+      "sha256": "2c13d4f21d0a0c4e670ea0c422a843d7f246b328e2e0f7c0ec346e75b80dab7d"
+    },
+    "owner.json": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\owner.json",
+      "sha256": "e036029d791405dec52f6f318fd48da2fa35121da7f36e5ca895615c880c0a23"
+    },
+    "stdout.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\stdout.log",
+      "sha256": "7d029a5b27bf325df0334173fe9b58a8d25b99859c4802d10be817595136c6af"
+    },
+    "stderr.log": {
+      "path": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round2-win-aggregate-20261009-a1\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "preserve_namespace": true,
+  "retry_authorized": false
+}

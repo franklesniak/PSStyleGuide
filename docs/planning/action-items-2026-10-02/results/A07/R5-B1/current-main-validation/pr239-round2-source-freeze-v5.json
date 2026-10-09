@@ -1,0 +1,79 @@
+{
+  "state": "root_freeze_fq34_json_transport_pending_validation",
+  "at": "2026-10-09T14:01:10.575972+00:00",
+  "head": "c1ef946fe4585836f27a0a4480bd986899d7c316",
+  "branch": "codex/r5-toolchain-foundation",
+  "tree": "74c0023da71c709b8a711f5fae8f534ae019acde",
+  "no_more_source_writes": true,
+  "rows": [
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "sha256": "f79c560723233a22ce45a23602dcd1232fcd0fea949d8bae5d566592df43f57e",
+      "bytes": 66464,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "sha256": "357d9e38174f38a3aed100f5ad01445147819b6ababa4845042f48ea55f9e92e",
+      "bytes": 12684,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "sha256": "51b2144e2f05126b63b1abb2bc9cc0cdce9f1bb53bacd3dcea1ae48e8ee8b8f3",
+      "bytes": 19391,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "2636b614af82374e5ca0c9836cf5037afcfb9a3ce25650f1fc6bee41793e3c08",
+      "bytes": 299832,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "sha256": "f5ba2cc851955df17473969d210f7cd81965467398d0f398f4e5c83a8c385610",
+      "bytes": 31446,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "sha256": "0ea0392b9f3d5e6632071475d6dea9a2bccc0b1f083b4fd158ec357689a31ec0",
+      "bytes": 23115,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "sha256": "bc43089acec54054168b8f2ce9bada6cdd0d3a3ccbb626ac66fefd3503e02ce1",
+      "bytes": 13065,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "sha256": "5099d8228f41349fa9c4e598ca18dcf9914c412fb020d643db48851373025de0",
+      "bytes": 6886,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "sha256": "af2f35693fbc2074863c3a7bfed7151912a4a54785e5df661dfb89a479a0bd28",
+      "bytes": 17297,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "sha256": "ee9d6d87f6b3c61bc6654ffb2ef02580cbcb00bc71b5bb91202df22de83e3e15",
+      "bytes": 26671,
+      "mode": "100644"
+    }
+  ],
+  "native_tests_run": false,
+  "supersedes_for_current_source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2\\source-freeze-v4.json",
+  "prior_freeze_sha256": "78849d8b2cf3f50ed46bc50216b3c96ef3ad6c0c20cc6e7ba5ec53eb3575e94e",
+  "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\FQ34-WINDOWS-LOCAL-PATHS.md",
+  "note": "Only +31-byte FQ34 serializer correction. Fresh six-form syntax, Linux path3 and full Windows validation required; unchanged108 require scoped readmission.",
+  "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-fq34-encoding-fixture\\REPORT.md",
+  "proposal_sha256": "fc2f52a628e5b8f06dd7a344f748d68f1a5f8b147a935db4e899cf96076f829d",
+  "prior_note_snapshot": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\consumer-fixture-home-note-initial.txt",
+  "prior_note_sha256": "b12f33cebf50c4d2facefd1bc543fb62d5e8ff5288a3c82639b0a533fecdd0f2"
+}
