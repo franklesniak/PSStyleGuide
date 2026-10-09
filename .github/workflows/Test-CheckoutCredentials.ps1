@@ -76,10 +76,14 @@ function Assert-OrdinaryPath {
     [OutputType([string])]
     param([Parameter(Position = 0)][string] $Path, [switch] $Directory)
     if ([string]::IsNullOrWhiteSpace($Path) -or $Path -match '[\r\n]' -or
-        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\')) {
+        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\') -or
+        ($IsWindows -and $Path.Replace('/', '\').StartsWith('\\'))) {
         throw 'toolchain: an absolute local single-line path is required'
     }
     $strFullPath = [IO.Path]::GetFullPath($Path)
+    if ($IsWindows -and $strFullPath -cnotmatch '\A[A-Za-z]:\\') {
+        throw 'toolchain: an absolute local single-line path is required'
+    }
     if ($IsWindows -and ($strFullPath.Substring(2).Contains(':') -or
         @($strFullPath.Substring(3).Split('\') | Where-Object {
             $_ -match '[. ]$|~'

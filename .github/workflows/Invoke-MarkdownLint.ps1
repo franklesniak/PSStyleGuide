@@ -78,10 +78,14 @@ function Assert-OrdinaryPath {
     [OutputType([string])]
     param([Parameter(Position = 0)][string] $Path, [switch] $Directory)
     if ([string]::IsNullOrWhiteSpace($Path) -or $Path -match '[\r\n]' -or
-        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\')) {
+        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\') -or
+        ($IsWindows -and $Path.Replace('/', '\').StartsWith('\\'))) {
         throw 'toolchain: an absolute local single-line path is required'
     }
     $strFullPath = [IO.Path]::GetFullPath($Path)
+    if ($IsWindows -and $strFullPath -cnotmatch '\A[A-Za-z]:\\') {
+        throw 'toolchain: an absolute local single-line path is required'
+    }
     if ($IsWindows -and ($strFullPath.Substring(2).Contains(':') -or
         @($strFullPath.Substring(3).Split('\') | Where-Object {
             $_ -match '[. ]$|~'
@@ -241,7 +245,7 @@ $strRunner = Assert-OrdinaryPath $env:RUNNER_TEMP -Directory
 $strNodeRoot = Join-Path $strRunner 'styleguide-node'
 $null = Assert-OrdinaryPath $strNodeRoot -Directory
 $objPackage = Read-BoundedJson ([IO.Path]::GetFullPath("$PSScriptRoot/../../package.json"))
-if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch '^24\.[0-9]+\.[0-9]+$') {
+if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch '\A24\.[0-9]+\.[0-9]+\z') {
     throw 'The preferred runtime declaration is invalid.'
 }
 $hashtableReadyRuntime = Read-BoundedJson (Join-Path $strNodeRoot 'ready.json') 4096

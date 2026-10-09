@@ -369,7 +369,7 @@
         "run"
       ],
       "operation": "set",
-      "value": "& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml",
+      "value": "Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false\n& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml",
       "category": "helper-call"
     },
     {
@@ -383,7 +383,7 @@
         "run"
       ],
       "operation": "set",
-      "value": "& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { Write-Output 'ignored' }",
+      "value": "Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false\n& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { Write-Output 'ignored' }",
       "category": "native-failure-check"
     },
     {
@@ -397,7 +397,7 @@
         "run"
       ],
       "operation": "set",
-      "value": "& node ./candidate-policy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }",
+      "value": "Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false\n& node ./candidate-policy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }",
       "category": "helper-call"
     },
     {
@@ -425,7 +425,7 @@
         "run"
       ],
       "operation": "set",
-      "value": "& node ./.github/workflows/Check-NpmAudit.mjs",
+      "value": "Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false\n& node ./.github/workflows/Check-NpmAudit.mjs",
       "category": "helper-call"
     },
     {
@@ -439,7 +439,7 @@
         "run"
       ],
       "operation": "set",
-      "value": "& node ./.github/workflows/Check-NpmAudit.mjs --ci\nWrite-Output 'ok'",
+      "value": "Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false\n& node ./.github/workflows/Check-NpmAudit.mjs --ci\nWrite-Output 'ok'",
       "category": "native-failure-check"
     },
     {

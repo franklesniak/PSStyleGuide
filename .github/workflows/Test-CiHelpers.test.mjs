@@ -680,8 +680,11 @@ if (targets.some(name => Object.hasOwn(process.env, name)) || !ordinaryEmpty || 
 }
 `;
 
+const lintInvalidVersions = { 'engine-lf': '24.18.1\n', 'engine-crlf': '24.18.1\r\n',
+  'engine-prefix': '\n24.18.1', 'engine-suffix': '24.18.1x', 'engine-range': '^24.18.1', 'engine-number': 24 };
 const lintPreferenceCases = [
-  ...['', 'outer-failure', 'nested-failure', 'package-array', 'ready-array'].map(mode => ({ mode, preference: '', family: 'all', suffix: mode || 'success' })),
+  ...['', 'outer-failure', 'nested-failure', 'package-array', 'ready-array', ...Object.keys(lintInvalidVersions)]
+    .map(mode => ({ mode, preference: '', family: 'all', suffix: mode || 'success' })),
   ...['default', 'Low', 'WhatIf', 'Low+WhatIf'].flatMap(preference => ['all', 'absent'].map(family => ({
     mode: '', preference: (preference.includes('Low') ? "$ConfirmPreference='Low'; " : '') +
       (preference.includes('WhatIf') ? '$WhatIfPreference=$true; ' : ''), family, suffix: `FQ23 ${preference} ${family}`,
@@ -713,6 +716,9 @@ if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:neste
       const target = mode === 'package-array' ? path.join(f.work, 'package.json') : path.join(f.root, 'styleguide-node/ready.json');
       fs.writeFileSync(target, JSON.stringify([JSON.parse(fs.readFileSync(target, 'utf8'))]));
     }
+    if (Object.hasOwn(lintInvalidVersions, mode)) {
+      fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: lintInvalidVersions[mode], npm: '11.16.0' } }));
+    }
     const result = f.run(`${preference}& ${quote(path.join(workflows, 'Invoke-MarkdownLint.ps1'))}`, {
       ...selectorEnvironment(family, false), TEST_MODE: mode,
     });
@@ -722,8 +728,248 @@ if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:neste
       assert.deepEqual(f.calls().filter(row => row[0] === 'npm'), []);
       return;
     }
+    if (Object.hasOwn(lintInvalidVersions, mode)) {
+      assert.match(result.stderr, /The preferred runtime declaration is invalid/u);
+      assert.deepEqual(f.calls().filter(row => row[0] === 'npm'), []);
+      return;
+    }
     assert.ok(result.stdout.includes(`Markdown exits: outer=${mode === 'outer-failure' ? 5 : 0} nested=${mode === 'nested-failure' ? 6 : 0}`), result.stdout);
     assert.deepEqual(f.calls().filter(row => row[0] === 'npm').map(row => row.at(-1)), ['lint:md', 'lint:md:nested']);
+  });
+}
+
+// FQ34: exercise each real ordinary-path helper. Network-looking strings never
+// reach a provider or filesystem call, including in the causal mutants below.
+function fq34Once(source, anchor, replacement) {
+  assert.equal(source.split(anchor).length, 2, 'Exactly one FQ34 source boundary is required.');
+  return source.replace(anchor, replacement);
+}
+
+function fq34OrdinaryPath(helper) {
+  const source = read(helper).replaceAll('\r\n', '\n');
+  const start = source.indexOf('function Assert-OrdinaryPath {');
+  const end = source.indexOf('\nfunction ', start + 1);
+  assert.ok(start >= 0 && end > start, `${helper}: complete actual helper extraction`);
+  return source.slice(start, end) + '\n';
+}
+
+function fq34LexicalBoundary(ordinary) {
+  const anchor = '    [Management.Automation.ProviderInfo] $objPathProvider = $null';
+  assert.equal(ordinary.split(anchor).length, 2);
+  const prefix = ordinary.slice(0, ordinary.indexOf(anchor));
+  assert.equal(prefix.includes('GetUnresolvedProviderPathFromPSPath'), false);
+  assert.equal(prefix.includes('Get-Item -LiteralPath'), false);
+  return prefix + "    return 'FQ34 lexical boundary reached'\n}\n";
+}
+
+const fq34Normalize = '    $strFullPath = [IO.Path]::GetFullPath($Path)';
+const fq34RawGuard = String.raw` -or
+        ($IsWindows -and $Path.Replace('/', '\').StartsWith('\\'))`;
+const fq34NormalizedGuard = String.raw`    if ($IsWindows -and $strFullPath -cnotmatch '\A[A-Za-z]:\\') {
+        throw 'toolchain: an absolute local single-line path is required'
+    }
+`;
+
+function fq34Case(input, directory = false) { return { input, directory }; }
+
+// Run all finite stages for one source helper in one private native child.
+// Definitions change only in that child; the repository source is never written.
+function fq34Run(t, helper, buildStages) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-fq34-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const folder = path.join(root, 'space and Unicode Ω'); fs.mkdirSync(folder);
+  const file = path.join(folder, 'ordinary file Ω.txt'); fs.writeFileSync(file, 'FQ34 unchanged');
+  const ordinary = fq34OrdinaryPath(helper);
+  const stages = buildStages({ ordinary, folder, file });
+  assert.ok(stages.length > 0 && stages.length <= 6);
+  assert.ok(stages.reduce((count, stage) => count + stage.cases.length, 0) <= 41);
+  assert.ok(new Set(stages.flatMap(stage => stage.cases.map(item => item.input))).size <= 40);
+  const calls = stages.map(stage => {
+    assert.ok(stage.cases.length > 0 && stage.cases.length <= 40);
+    assert.ok(stage.cases.every(item => typeof item.input === 'string' && item.input.length <= 256));
+    return `${stage.source}\n$arrCases = ConvertFrom-Json -InputObject ${quote(JSON.stringify(stage.cases))}\n` +
+      `$arrResults += @(Invoke-Fq34Cases -Cases $arrCases -Stage ${quote(stage.name)})\n`;
+  }).join('\n');
+  const script = path.join(root, 'fq34.ps1');
+  const text = `$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+function Invoke-Fq34Cases {
+    param([object[]] $Cases, [string] $Stage)
+    foreach ($entry in $Cases) {
+        try {
+            $value = Assert-OrdinaryPath -Path $entry.input -Directory:([bool]$entry.directory)
+            [ordered]@{ stage = $Stage; input = $entry.input; directory = $entry.directory; admitted = $true; value = $value }
+        } catch {
+            [ordered]@{ stage = $Stage; input = $entry.input; directory = $entry.directory; admitted = $false; message = $_.Exception.Message }
+        }
+    }
+}
+$arrResults = @()
+${calls}
+ConvertTo-Json -InputObject $arrResults -Depth 5 -Compress -EscapeHandling EscapeNonAscii
+`;
+  assert.ok(Buffer.byteLength(text) <= 128 * 1024, 'FQ34 script is finite.');
+  fs.writeFileSync(script, text);
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+    encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+  }), `FQ34 ${helper}`);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const rows = JSON.parse(result.stdout);
+  assert.equal(rows.length, stages.reduce((count, stage) => count + stage.cases.length, 0));
+  const expected = stages.flatMap(stage => stage.cases.map(entry => ({ ...entry, stage: stage.name })));
+  for (const [index, row] of rows.entries()) {
+    assert.equal(row.stage, expected[index].stage);
+    assert.equal(row.input, expected[index].input);
+    assert.equal(row.directory, expected[index].directory);
+  }
+  assert.equal(fs.readFileSync(file, 'utf8'), 'FQ34 unchanged');
+  assert.equal(fs.statSync(folder).isDirectory(), true);
+  return { rows, folder, file };
+}
+
+for (const helper of ['Initialize-CiToolchain.ps1', 'Test-CheckoutCredentials.ps1', 'Invoke-MarkdownLint.ps1']) {
+  test(`FQ34 Windows raw and normalized local path boundaries: ${helper}`, {
+    skip: process.platform !== 'win32', timeout: 30000,
+  }, t => {
+    const { rows, folder, file } = fq34Run(t, helper, ({ ordinary, folder, file }) => {
+      const lexical = fq34LexicalBoundary(ordinary);
+      const spellings = value => [value, value.replaceAll('\\', '/'), value.replace(/\\/u, '/')];
+      const prefixes = ['\\\\', '//', '/\\', '\\/'];
+      const forbidden = prefixes.flatMap(prefix => [
+        prefix + 'fq34.invalid/share/item', prefix + '?/C:/fixture/item',
+        prefix + './C:/fixture/item', prefix + '?/UNC/fq34.invalid/share/item',
+      ]);
+      forbidden.push(String.raw`FileSystem::C:\fixture\item`,
+        String.raw`Microsoft.PowerShell.Core\FileSystem::C:\fixture\item`, 'Env:TEMP',
+        'C:fixture', String.raw`\fixture`, '/fixture', 'relative/item',
+        "C:\\fixture\\item\n", "C:\\fixture\\item\r\n", String.raw`C:\fixture\item:stream`);
+      assert.ok(forbidden.every(value => !value.includes('~')));
+      const tilde = prefixes.map(prefix => prefix + 'fq34.invalid/share/SHORT~1/item');
+      const normalizationSentinel = fq34Once(lexical, fq34Normalize, "    throw 'FQ34 normalization reached'");
+      const rawMutation = fq34Once(normalizationSentinel, fq34RawGuard, '');
+      // A deterministic substituted return tests the normalized invariant. It is
+      // not evidence that a native local input normalizes to this remote root.
+      const injected = fq34Once(lexical, fq34Normalize,
+        String.raw`    $strFullPath = '\\fq34.invalid\share\item'`);
+      return [
+        { name: 'real-local', source: ordinary,
+          cases: [...spellings(file).map(value => fq34Case(value)), ...spellings(folder).map(value => fq34Case(value, true))] },
+        { name: 'lexical-refusal', source: lexical, cases: forbidden.map(value => fq34Case(value)) },
+        { name: 'before-normalization', source: normalizationSentinel, cases: tilde.map(value => fq34Case(value)) },
+        { name: 'raw-guard-mutant', source: rawMutation, cases: tilde.slice(1).map(value => fq34Case(value)) },
+        { name: 'normalized-invariant', source: injected, cases: [fq34Case(file)] },
+        { name: 'normalized-invariant-mutant', source: fq34Once(injected, fq34NormalizedGuard, ''), cases: [fq34Case(file)] },
+      ];
+    });
+    for (const row of rows) {
+      const context = `${helper} ${row.stage} ${JSON.stringify(row.input)}`;
+      if (row.stage === 'real-local') {
+        assert.equal(row.admitted, true, context + ': ' + row.message);
+        assert.equal(row.value, path.resolve(row.directory ? folder : file), context);
+      } else if (row.stage === 'normalized-invariant-mutant') {
+        assert.equal(row.admitted, true, context);
+        assert.equal(row.value, 'FQ34 lexical boundary reached', context);
+      } else {
+        assert.equal(row.admitted, false, context);
+        assert.equal(row.message, row.stage === 'raw-guard-mutant' ? 'FQ34 normalization reached' :
+          row.input.endsWith(':stream') ? 'toolchain: path aliases are not supported' :
+            'toolchain: an absolute local single-line path is required', context);
+      }
+    }
+  });
+
+  test(`FQ34 Linux ordinary and double-slash paths remain local: ${helper}`, {
+    skip: !linux, timeout: 30000,
+  }, t => {
+    const { rows, folder, file } = fq34Run(t, helper, ({ ordinary, folder, file }) => [{
+      name: 'real-local', source: ordinary,
+      cases: [fq34Case(file), fq34Case('/' + file), fq34Case(folder, true), fq34Case('/' + folder, true)],
+    }]);
+    for (const row of rows) {
+      assert.equal(row.admitted, true, `${helper}: ${row.message}`);
+      assert.equal(row.value, path.resolve(row.directory ? folder : file));
+    }
+  });
+}
+
+test('FQ33 lint engine admission requires the complete version value', () => {
+  const source = read('Invoke-MarkdownLint.ps1');
+  const start = 'if ($objPackage.engines.node -isnot [string]';
+  const end = '$hashtableReadyRuntime = Read-BoundedJson';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const admission = source.slice(source.indexOf(start), source.indexOf(end));
+  const cases = [{ value: '24.18.1', accepted: true }, { value: '24.0.0', accepted: true },
+    ...Object.values(lintInvalidVersions).map(value => ({ value, accepted: false })),
+    ...['24.18.1\r', '24.18.1\t', '24.18.1 ', '22.18.1', null, ['24.18.1']].map(value => ({ value, accepted: false }))];
+  const payload = Buffer.from(JSON.stringify(cases)).toString('base64');
+  const script = `$ErrorActionPreference='Stop'; $admission={\n${admission}\n}
+$cases=ConvertFrom-Json -InputObject ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${payload}')))
+$results=@(foreach($case in $cases) {
+    $objPackage=@{engines=@{node=$case.value}}; $accepted=$false
+    try { & $admission; $accepted=$true }
+    catch { if($_.Exception.Message -cne 'The preferred runtime declaration is invalid.') { throw } }
+    $accepted
+})
+ConvertTo-Json -InputObject $results -Compress
+`;
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+    { encoding: 'utf8', timeout: 15000, windowsHide: true }), 'FQ33 actual lint admission');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), cases.map(item => item.accepted));
+});
+
+for (const [file, job, stepId] of [
+  ['markdownlint.yml', 'policy', 'validate'], ['markdownlint.yml', 'markdownlint', 'audit'],
+  ['agent-instructions.yml', 'accepted-policy', 'validate'], ['agent-instructions.yml', 'candidate-tests', 'test'],
+]) {
+  test(`FQ37 direct workflow Node caller clears inherited startup options: ${file}/${job}`, { skip: !linux, timeout: 90000 }, t => {
+    const sanitation = 'Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false';
+    const steps = parse(read(file)).jobs[job].steps;
+    const step = steps.find(item => item.id === stepId);
+    assert.ok(step, `${file}/${job}/${stepId}`);
+    const lines = step.run.split('\n').map(line => line.trim());
+    const nodeIndex = lines.findIndex(line => /& node /u.test(line));
+    assert.ok(nodeIndex > 0);
+    assert.equal(lines[nodeIndex - 1], sanitation);
+    assert.match(lines[nodeIndex + 1], /^if \(\$LASTEXITCODE -ne 0\)/u);
+    const command = lines.slice(nodeIndex - 1, nodeIndex + 2).join('\n');
+    for (const preference of ['', "$ConfirmPreference='Low'; ", "$ConfirmPreference='Low'; $WhatIfPreference=$true; ", 'mutant']) {
+      const f = fixture(t), executable = path.join(f.root, 'node');
+      fs.writeFileSync(executable, `#!${process.execPath}
+const fs=require('node:fs');
+fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['FQ37 node',...process.argv.slice(2)])+'\\n');
+if(Object.hasOwn(process.env,'NODE_OPTIONS')) { console.error('FQ37 retained startup selector'); process.exit(98); }
+console.log('FQ37 clean startup');
+`, { mode: 0o700 });
+      const source = preference === 'mutant' ? command.replace(sanitation + '\n', '') : preference + command;
+      const script = path.join(f.root, 'consumer.ps1');
+      fs.writeFileSync(script, "$ErrorActionPreference='Stop'\n" + source);
+      const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: f.work, encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+        env: { HOME: f.root, TMPDIR: f.root,
+          DOTNET_EnableDiagnostics: '0', POWERSHELL_DIAGNOSTICS_OPTOUT: '1',
+          PATH: f.root + path.delimiter + process.env.PATH, TEST_LOG: f.log,
+          NODE_OPTIONS: '--no-warnings', EXPECTED_BASE: base, EXPECTED_HEAD: head },
+      }), `FQ37 ${file}/${job}/${preference}`);
+      const calls = f.calls();
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0][0], 'FQ37 node');
+      const expected = job === 'policy' ? ['./.github/workflows/Validate-WorkflowPolicy.mjs', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml']
+        : job === 'markdownlint' ? ['./.github/workflows/Check-NpmAudit.mjs', '--ci']
+          : job === 'accepted-policy' ? ['.github/workflows/Classify-InstructionMaintenance.mjs', f.work, base, head]
+            : ['--test', ...['Classify-InstructionMaintenance.test.mjs', 'Validate-WorkflowPolicy.test.mjs', 'Test-CiHelpers.test.mjs',
+              'NpmTools.test.mjs', 'Check-NpmAudit.test.mjs', 'Test-LocalValidation.test.mjs', 'lint-markdown.test.mjs'].map(name => '.github/workflows/' + name)];
+      assert.deepEqual(calls[0].slice(1), expected);
+      if (preference === 'mutant') {
+        assert.notEqual(result.status, 0, result.stdout + result.stderr);
+        assert.match(result.stderr, /FQ37 retained startup selector/);
+      } else {
+        assert.equal(result.status, 0, result.stdout + result.stderr);
+        if (job !== 'accepted-policy') assert.match(result.stdout, /FQ37 clean startup/);
+        assert.doesNotMatch(result.stderr, /FQ37 retained startup selector/);
+      }
+    }
   });
 }
 
@@ -3509,7 +3755,8 @@ function foundationTar(entries) {
 }
 
 function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mode = '', compatibility = false,
-  installs = false, pinChange = pin => pin, extraEnv = {} } = {}) {
+  installs = false, dependencySwitches = installs ? ['WorkflowDependencies', 'InstructionDependencies'] : [],
+  pinChange = pin => pin, extraEnv = {} } = {}) {
   const f = fixture(t, 'repository space and Unicode Ω'), scripts = path.join(f.work, '.github/workflows');
   fs.mkdirSync(scripts, { recursive: true });
   const runner = path.join(f.root, 'runner space and Unicode Ω'); fs.mkdirSync(runner, { mode: 0o700 });
@@ -3533,6 +3780,12 @@ const record={status:child.status,signal:child.signal}; if(child.error) record.e
 fs.writeFileSync(${JSON.stringify(path.join(f.root, 'interrupted-child.json'))},JSON.stringify(record),{flag:'wx'}); process.exit(143);
 }
 if(args.includes('--version')) console.log(args[0]?.endsWith('npm-cli.js')?${JSON.stringify(npm)}:${JSON.stringify('v' + version)});
+if(process.env.TEST_MODE?.startsWith('fq36-') && (args.includes('--preflight') || args.includes('ci'))) {
+console.log(args.includes('--preflight')?'FQ36 preflight record':'FQ36 install record');
+console.error(args.includes('--preflight')?'FQ36 preflight stderr':'FQ36 install stderr');
+if(process.env.TEST_MODE==='fq36-preflight-failure' && args.includes('--preflight')) process.exit(31);
+if(process.env.TEST_MODE==='fq36-install-failure' && args.includes('ci')) process.exit(37);
+}
 if(args.includes('--preflight') && process.env.TEST_MODE==='preflight') process.exit(31);
 if(args.includes('ci') && role==='recoveryCompatibility') process.exit(92);
 `;
@@ -3581,9 +3834,198 @@ process.exit(result.status);
   const script = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, source);
   const env = { RUNNER_TEMP: runner, TEST_MODE: mode, ...extraEnv };
   for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
+  const capturedOutput = path.join(f.root, 'captured-output.json');
+  assert.ok(dependencySwitches.every(value => ['WorkflowDependencies', 'InstructionDependencies'].includes(value)));
   return { ...f, runner, sentinel, scripts, script, env, source, archives,
-    run() { this.result = f.run(`& ${quote(script)}${installs ? ' -WorkflowDependencies -InstructionDependencies' : ''}${compatibility ? ' -IncludeRecoveryCompatibility' : ''}`, env); return this.result; } };
+    capturedOutput,
+    run({ captureOutput = false } = {}) {
+      const command = `& ${quote(script)}${dependencySwitches.map(value => ` -${value}`).join('')}${compatibility ? ' -IncludeRecoveryCompatibility' : ''}`;
+      this.result = f.run(captureOutput ? `$arrFq36Result = @(${command}); [IO.File]::WriteAllText(${quote(capturedOutput)}, (ConvertTo-Json -InputObject $arrFq36Result -Compress))` : command, env);
+      return this.result;
+    } };
 }
+
+test('FQ36 dependency logs stay outside the initializer success result', { skip: !linux, timeout: 180000 }, t => {
+  for (const dependencySwitches of [[], ['WorkflowDependencies'], ['InstructionDependencies'], ['WorkflowDependencies', 'InstructionDependencies']]) {
+    const f = foundationFixture(t, { dependencySwitches, mode: 'fq36-success' });
+    assertCompletedProcess(f.run({ captureOutput: true }), 'FQ36 success');
+    assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+    assert.deepEqual(JSON.parse(fs.readFileSync(f.capturedOutput, 'utf8')), ['Reviewed runtime setup completed.']);
+    assert.equal((f.result.stdout.match(/FQ36 preflight record/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stdout.match(/FQ36 install record/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stderr.match(/FQ36 preflight stderr/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stderr.match(/FQ36 install stderr/gu) ?? []).length, dependencySwitches.length);
+    assert.equal(f.calls().filter(row => row.includes('ci')).length, dependencySwitches.length);
+  }
+  for (const mode of ['fq36-preflight-failure', 'fq36-install-failure']) {
+    const f = foundationFixture(t, { installs: true, mode });
+    f.run({ captureOutput: true }); foundationNoPublication(f);
+    assert.equal(fs.existsSync(f.capturedOutput), false);
+    assert.match(f.result.stderr, mode === 'fq36-preflight-failure' ? /preflight failed before installation/ : /Locked installation failed: 37/);
+    assert.equal(f.calls().filter(row => row.includes('ci')).length, mode === 'fq36-preflight-failure' ? 0 : 1);
+  }
+  const source = read('Initialize-CiToolchain.ps1');
+  const route = ' |\n            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }';
+  assert.equal(source.split(route).length, 3, 'Both dependency commands must have a stdout route.');
+  const mutant = foundationFixture(t, { source: source.replaceAll(route, ''), installs: true, mode: 'fq36-success' });
+  assertCompletedProcess(mutant.run({ captureOutput: true }), 'FQ36 route-removal control');
+  assert.equal(mutant.result.status, 0, mutant.result.stdout + mutant.result.stderr);
+  assert.deepEqual(JSON.parse(fs.readFileSync(mutant.capturedOutput, 'utf8')),
+    ['FQ36 preflight record', 'FQ36 install record', 'FQ36 preflight record', 'FQ36 install record', 'Reviewed runtime setup completed.']);
+});
+
+function applyRunnerEnvironment(records, environment) {
+  for (const line of records.split('\n').filter(Boolean)) {
+    const separator = line.indexOf('=');
+    assert.ok(separator > 0, 'Expected one-line NAME=VALUE runner records.');
+    environment[line.slice(0, separator)] = line.slice(separator + 1);
+  }
+  return environment;
+}
+
+// Extract the real publication checks, before either runner channel can be used.
+// This proves record construction on both platforms, not complete Windows setup.
+test('FQ35 actual recovery records reject line breaks before runner channel use', { timeout: 30000 }, () => {
+  const source = read('Initialize-CiToolchain.ps1').replaceAll('\r\n', '\n');
+  const start = '    $arrRunnerRecords = @(';
+  const end = '    $null = Assert-OrdinaryPath $env:GITHUB_PATH';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const boundary = source.slice(source.indexOf(start), source.indexOf(end));
+  assert.equal(boundary.includes('.Write('), false);
+  const cases = [{ name: 'off', node: null, accepted: true },
+    { name: 'on', node: 'synthetic-verified-node', accepted: true },
+    { name: 'LF', node: 'synthetic\nnode', accepted: false },
+    { name: 'CRLF', node: 'synthetic\r\nnode', accepted: false }];
+  const script = `$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+$env:npm_config_userconfig='synthetic-user-config'
+$env:npm_config_globalconfig='synthetic-global-config'
+$hashtablePreferredRuntime=@{Bin='synthetic-preferred-bin'}
+$cases=ConvertFrom-Json -InputObject ${quote(JSON.stringify(cases))}
+$results=@(foreach($case in $cases) {
+    $hashtableCompatibilityRuntime=if($null -eq $case.node) { $null } else { @{Node=$case.node} }
+    $channelBoundaryReached=$false
+    try {
+${boundary}
+        $channelBoundaryReached=$true
+        [ordered]@{name=$case.name; accepted=$true; channelBoundaryReached=$channelBoundaryReached; records=@($arrRunnerRecords)}
+    } catch {
+        if($_.Exception.Message -cne 'toolchain: invalid runner record') { throw }
+        [ordered]@{name=$case.name; accepted=$false; channelBoundaryReached=$channelBoundaryReached}
+    }
+})
+ConvertTo-Json -InputObject $results -Depth 5 -Compress
+`;
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+    { encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true }), 'FQ35 publication boundary');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const rows = JSON.parse(result.stdout);
+  assert.equal(rows.length, cases.length);
+  for (const [index, row] of rows.entries()) {
+    const expected = cases[index];
+    assert.equal(row.name, expected.name);
+    assert.equal(row.accepted, expected.accepted);
+    assert.equal(row.channelBoundaryReached, expected.accepted);
+    if (expected.accepted) {
+      assert.deepEqual(row.records.filter(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22=')),
+        [`STYLEGUIDE_RECOVERY_NODE22=${expected.node ?? ''}`]);
+      const environment = { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', FQ35_UNRELATED: 'preserved' };
+      applyRunnerEnvironment(row.records.join('\n'), environment);
+      assert.equal(environment.STYLEGUIDE_RECOVERY_NODE22, expected.node ?? '');
+      assert.equal(environment.FQ35_UNRELATED, 'preserved');
+      assert.equal(row.records.some(line => /^NODE_OPTIONS=/iu.test(line)), false);
+    }
+  }
+});
+
+// Finite LF test model of SetEnvFileCommand and EnvFileKeyValuePairs in
+// https://github.com/actions/runner/blob/main/src/Runner.Worker/FileCommandManager.cs
+// This is not a native runner test or a complete parser/platform implementation.
+function fq37RunnerModel(text, environment) {
+  assert.ok(Buffer.byteLength(text) <= 16384);
+  const lines = text.split('\n'), blocked = [];
+  assert.ok(lines.length <= 64);
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === '') continue;
+    const equal = line.indexOf('='), heredoc = line.indexOf('<<');
+    let name, value;
+    if (equal >= 0 && (heredoc < 0 || equal < heredoc)) {
+      name = line.slice(0, equal); value = line.slice(equal + 1);
+    } else {
+      assert.ok(heredoc > 0, 'Expected a supported fixture record.');
+      name = line.slice(0, heredoc);
+      const delimiter = line.slice(heredoc + 2), body = [];
+      assert.ok(delimiter.length > 0);
+      while (++index < lines.length && lines[index] !== delimiter) body.push(lines[index]);
+      assert.ok(index < lines.length, 'Expected the fixture delimiter.');
+      value = body.join('\n');
+    }
+    assert.ok(name.length > 0);
+    if (name.toUpperCase() === 'NODE_OPTIONS') blocked.push(name);
+    else environment[name] = value;
+  }
+  return { environment, blocked };
+}
+
+test('FQ37 runner model refuses blocked keys before assignment and permits recovery clearing', () => {
+  for (const record of ['NODE_OPTIONS=\n', 'NODE_OPTIONS=--no-warnings\n',
+    'NoDe_OpTiOnS=\n', 'NODE_OPTIONS<<END\nEND\n',
+    'nOdE_OpTiOnS<<END\n--no-warnings\nEND\n']) {
+    const environment = { NODE_OPTIONS: 'inherited-selector', STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', UNRELATED: 'preserved' };
+    const result = fq37RunnerModel(record + 'STYLEGUIDE_RECOVERY_NODE22=\n', environment);
+    assert.equal(result.blocked.length, 1);
+    assert.equal(result.blocked[0].toUpperCase(), 'NODE_OPTIONS');
+    assert.deepEqual(result.environment, { NODE_OPTIONS: 'inherited-selector', STYLEGUIDE_RECOVERY_NODE22: '', UNRELATED: 'preserved' });
+  }
+});
+
+test('FQ35 recovery selection follows successful off and on setup across fresh roots', { skip: !linux, timeout: 180000 }, t => {
+  const job = { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', FQ35_UNRELATED: 'preserved' };
+  for (const compatibility of [false, false, true, false]) {
+    const f = foundationFixture(t, { compatibility, extraEnv: { STYLEGUIDE_RECOVERY_NODE22: job.STYLEGUIDE_RECOVERY_NODE22 } });
+    assertCompletedProcess(f.run(), 'FQ35 successful setup');
+    assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+    const records = fs.readFileSync(path.join(f.root, 'env'), 'utf8');
+    const recovery = records.split('\n').filter(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22='));
+    const expected = compatibility ? path.join(f.runner, 'styleguide-node/recoveryCompatibility/node-v22.23.3-linux-x64/bin/node') : '';
+    assert.deepEqual(recovery, [`STYLEGUIDE_RECOVERY_NODE22=${expected}`]);
+    assert.doesNotMatch(records, /^NODE_OPTIONS=/gimu, 'The runner blocks NODE_OPTIONS even when its value is empty.');
+    assert.match(records, /^NODE_PATH=$/gmu);
+    applyRunnerEnvironment(records, job);
+    assert.equal(job.STYLEGUIDE_RECOVERY_NODE22, expected);
+    assert.equal(job.FQ35_UNRELATED, 'preserved');
+    assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8').includes('recoveryCompatibility'), false);
+  }
+});
+
+test('FQ35 and FQ37 runner-record controls detect omissions and preserve failed handoffs', { skip: !linux, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const clearRecovery = "    } else {\n        $arrRunnerRecords += 'STYLEGUIDE_RECOVERY_NODE22='\n    }";
+  const stale = foundationFixture(t, { source: foundationOnce(original, clearRecovery, '    }'),
+    extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
+  assertCompletedProcess(stale.run(), 'FQ35 omitted recovery reset control');
+  assert.equal(stale.result.status, 0, stale.result.stdout + stale.result.stderr);
+  const staleRecords = fs.readFileSync(path.join(stale.root, 'env'), 'utf8');
+  assert.doesNotMatch(staleRecords, /^STYLEGUIDE_RECOVERY_NODE22=/mu);
+  assert.equal(applyRunnerEnvironment(staleRecords, { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' }).STYLEGUIDE_RECOVERY_NODE22, 'stale-unverified');
+  const blocked = foundationFixture(t, { source: foundationOnce(original, "        'NODE_PATH=')", "        'NODE_OPTIONS=', 'NODE_PATH=')") });
+  assertCompletedProcess(blocked.run(), 'FQ37 restored blocked record control');
+  assert.equal(blocked.result.status, 0, blocked.result.stdout + blocked.result.stderr);
+  assert.match(fs.readFileSync(path.join(blocked.root, 'env'), 'utf8'), /^NODE_OPTIONS=$/mu);
+  const failed = foundationFixture(t, { installs: true, mode: 'fq36-preflight-failure', extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
+  const priorEnvironment = 'FQ35_UNRELATED=preserved\nSTYLEGUIDE_RECOVERY_NODE22=stale-unverified\n';
+  fs.writeFileSync(path.join(failed.root, 'env'), priorEnvironment);
+  assertCompletedProcess(failed.run(), 'FQ35 failed setup');
+  assert.notEqual(failed.result.status, 0, failed.result.stdout + failed.result.stderr);
+  assert.match(failed.result.stderr, /preflight failed before installation/);
+  assert.doesNotMatch(failed.result.stdout, /Reviewed runtime setup completed/);
+  assert.equal(fs.readFileSync(path.join(failed.root, 'env'), 'utf8'), priorEnvironment);
+  assert.equal(fs.readFileSync(path.join(failed.root, 'path'), 'utf8'), '');
+  assert.equal(fs.existsSync(path.join(failed.runner, 'styleguide-node')), false);
+  assert.equal(fs.readFileSync(failed.sentinel, 'utf8'), 'unchanged');
+});
 
 function foundationNoPublication(f, { partial = false, retained = false } = {}) {
   assertCompletedProcess(f.result, 'F10-F14 ordinary initializer');
@@ -3721,12 +4163,14 @@ function foundationMutation(source, mode) {
   if (mode === 'native-status') return foundationOnce(source,
     '    if ($LASTEXITCODE -ne 0) {\n        throw "Runtime download failed: $LASTEXITCODE ($Role/$strPlatform)"\n    }\n', '');
   assert.equal(mode, 'preflight-order');
-  const preflight = `        & $hashtablePreferredRuntime.Node --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight
+  const preflight = `        & $hashtablePreferredRuntime.Node --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
         if ($LASTEXITCODE -ne 0) {
             throw 'Package and workflow preflight failed before installation.'
         }
 `;
-  const install = `        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true
+  const install = `        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
         if ($LASTEXITCODE -ne 0) {
             throw "Locked installation failed: $LASTEXITCODE"
         }

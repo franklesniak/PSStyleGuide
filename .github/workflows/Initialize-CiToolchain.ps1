@@ -28,7 +28,7 @@
 # None. Pipeline input is not supported.
 #
 # .OUTPUTS
-# [string] Reviewed runtime setup completed. Emitted once after successful publication. Provenance uses the information stream. Failures throw; uncertain cleanup can warn. Also writes ready.json and runner communication files.
+# [string] Reviewed runtime setup completed. Emitted once after successful publication. Provenance and dependency-command stdout use the information stream. Native stderr remains separate. Failures throw; uncertain cleanup can warn. Also writes ready.json and runner communication files.
 #
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
@@ -90,10 +90,14 @@ function Assert-OrdinaryPath {
     [OutputType([string])]
     param([Parameter(Position = 0)][string] $Path, [switch] $Directory)
     if ([string]::IsNullOrWhiteSpace($Path) -or $Path -match '[\r\n]' -or
-        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\')) {
+        -not [IO.Path]::IsPathFullyQualified($Path) -or $Path.StartsWith('\\') -or
+        ($IsWindows -and $Path.Replace('/', '\').StartsWith('\\'))) {
         throw 'toolchain: an absolute local single-line path is required'
     }
     $strFullPath = [IO.Path]::GetFullPath($Path)
+    if ($IsWindows -and $strFullPath -cnotmatch '\A[A-Za-z]:\\') {
+        throw 'toolchain: an absolute local single-line path is required'
+    }
     if ($IsWindows -and ($strFullPath.Substring(2).Contains(':') -or
         @($strFullPath.Substring(3).Split('\') | Where-Object {
             $_ -match '[. ]$|~'
@@ -1254,11 +1258,13 @@ try {
         $arrManifestHashesBefore = @($arrManifestPaths | ForEach-Object {
             (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash
         })
-        & $hashtablePreferredRuntime.Node --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight
+        & $hashtablePreferredRuntime.Node --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
         if ($LASTEXITCODE -ne 0) {
             throw 'Package and workflow preflight failed before installation.'
         }
-        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true
+        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
         if ($LASTEXITCODE -ne 0) {
             throw "Locked installation failed: $LASTEXITCODE"
         }
@@ -1282,9 +1288,11 @@ try {
         } | ConvertTo-Json -Compress), $objStrictUtf8Encoding)
     $arrRunnerRecords = @("npm_config_userconfig=$env:npm_config_userconfig", "npm_config_globalconfig=$env:npm_config_globalconfig",
         'npm_config_registry=https://registry.npmjs.org/', 'npm_config_ignore_scripts=true', 'npm_config_audit=false', 'npm_config_fund=false', 'CI=true',
-        'NODE_OPTIONS=', 'NODE_PATH=')
+        'NODE_PATH=')
     if ($null -ne $hashtableCompatibilityRuntime) {
         $arrRunnerRecords += "STYLEGUIDE_RECOVERY_NODE22=$($hashtableCompatibilityRuntime.Node)"
+    } else {
+        $arrRunnerRecords += 'STYLEGUIDE_RECOVERY_NODE22='
     }
     foreach ($strRecord in $arrRunnerRecords + @($hashtablePreferredRuntime.Bin)) {
         if ($strRecord -match '[\r\n]') {
