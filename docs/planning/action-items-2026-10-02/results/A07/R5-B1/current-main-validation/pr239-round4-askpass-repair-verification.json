@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-09T20:52:39.907558+00:00",
+  "source": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide\\.github\\workflows\\Test-CheckoutCredentials.ps1",
+  "source_sha256": "85fc29a1f49ae427c206aba9da6d5e1fd5ee4ffc26cbba191c314d9593aef7c3",
+  "git_sha256": "54bda91c773c6bba2b970424423cfcb80552d92dc6967d766f98931fe1251a54",
+  "powershell_sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+  "git_version": "git version 2.56.0.windows.2",
+  "results": [
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 128,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-repair-verification-20261009-a1\\absent\\runner\\styleguide-git-045676b953d44b52b61af809db278f50\\global.config",
+      "case": "absent",
+      "askpass_calls": 0
+    },
+    {
+      "helperPassed": false,
+      "helperError": "credential-policy: askpass environment variables are not allowed",
+      "gitCredentialFillExit": null,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-repair-verification-20261009-a1\\empty-global.config",
+      "case": "GIT_ASKPASS",
+      "askpass_calls": 0
+    },
+    {
+      "helperPassed": false,
+      "helperError": "credential-policy: askpass environment variables are not allowed",
+      "gitCredentialFillExit": null,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-repair-verification-20261009-a1\\empty-global.config",
+      "case": "SSH_ASKPASS",
+      "askpass_calls": 0
+    },
+    {
+      "helperPassed": false,
+      "helperError": "credential-policy: askpass environment variables are not allowed",
+      "gitCredentialFillExit": null,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-repair-verification-20261009-a1\\empty-global.config",
+      "case": "both",
+      "askpass_calls": 0
+    },
+    {
+      "helperPassed": false,
+      "helperError": "credential-policy: effective core.askPass is not allowed",
+      "gitCredentialFillExit": null,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-repair-verification-20261009-a1\\core-askPass\\runner\\styleguide-git-a4c491ff232248ba8b5c7f0d4ebbadef\\global.config",
+      "case": "core.askPass",
+      "askpass_calls": 0
+    }
+  ],
+  "scope": "Actual repaired helper in five private synthetic repositories; anonymous control reaches offline git credential fill, configured askpass sources must refuse before it and never invoke the synthetic program; no network request or real credential access. Scratch and empty private config files retained as evidence. No host or product configuration changed."
+}

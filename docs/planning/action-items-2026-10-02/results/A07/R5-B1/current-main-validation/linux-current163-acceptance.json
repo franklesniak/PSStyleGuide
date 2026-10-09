@@ -1,0 +1,320 @@
+{
+  "state": "root_accepted",
+  "authorizing_coordinator": "root",
+  "at": "2026-10-09T22:39:29.131279+00:00",
+  "source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+  "index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+  "accepted_linux_completed": 163,
+  "groups": {
+    "newline": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-root-validation\\pr239-round3-newline-runtime.json",
+      "sha256": "8fa43087e8a2840e869077fe919198f9d1bc8421b8299294e5d4965c7cd6cc58",
+      "tests": 1,
+      "state": "root_accepted_pr239_round3_linux_newline",
+      "observed_source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+      "observed_index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90"
+    },
+    "download-capability": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-root-validation\\pr239-round3-download-capability-runtime.json",
+      "sha256": "90ed280b090ebf71f3a1eff347df3660881b29e7191e77f2f004e24ac56ce0c7",
+      "tests": 2,
+      "state": "root_accepted_pr239_round3_linux_download-capability",
+      "observed_source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+      "observed_index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90"
+    },
+    "download-boundary": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round3-root-validation\\pr239-round3-download-boundary-runtime.json",
+      "sha256": "42cc8f2fc64a8925411d30980fb10a57d6905d27055ab15d7f1d4489a29a738f",
+      "tests": 17,
+      "state": "root_accepted_pr239_round3_linux_download-boundary",
+      "observed_source_catalog_sha256": "c50a98bd9ecfc61bdc3a8fb0a06bfd90bb9b0904e4a22fd31dffc0640af0dda3",
+      "observed_index_tree": "27cdfb38cccc3171c0ddb7a53862c29a4cd41b90"
+    },
+    "path": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round2-root-validation\\fq34-encoding\\pr239-round2-path-encoding-runtime.json",
+      "sha256": "db97afdb559b04dcf19c7b2be30a67d6fd8acbab400b989cd06d9a3fcc2c293e",
+      "tests": 3,
+      "observed_source_catalog_sha256": "b3791c58e486f1740ea3539fc46d11ea28fdc455feca6a393ab40760eee91d88",
+      "observed_index_tree": "11559d9affe64b6549ce54cd1072e41e8190f575",
+      "state": "root_accepted_pr239_round2_linux_path"
+    },
+    "consumers": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-consumers-runtime.json",
+      "sha256": "79d3fa84772bf455403aecfd5a78e35ae7c0a94e1187f0d7cc4d5ea1d8c6703b",
+      "tests": 4,
+      "observed_source_catalog_sha256": "c4a3df2d40eb9de754576618cdb740755afe8fca61e80d637454651d6227d4ac",
+      "observed_index_tree": "4369df7b8f4d98bc7b84abb2fed0a9db4582be0c",
+      "state": "root_accepted_pr239_round2_linux_consumers"
+    },
+    "preinstall": {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round2-preinstall-runtime.json",
+      "sha256": "eec155ca012c21cbc9ea434ee03a62a82c735e0174f9305e287dd175fb6b0f69",
+      "tests": 10,
+      "observed_source_catalog_sha256": "552403b32abdc0a19fb93199e115b3dca57aaec96f290f5bd0c473ba024ee6cd",
+      "observed_index_tree": "f010003c57315614d3b3d99849cfe73ccf22fe18",
+      "state": "root_accepted_pr239_round2_linux_preinstall"
+    },
+    "lint": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-lint-runtime.json",
+      "sha256": "ebc888569e8d396b49f26f630eb5f6a20c5fd6325324e6a22a8f82e830fcc03b",
+      "tests": 21,
+      "state": "root_accepted_pr239_round4_linux_lint",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "runtime": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-runtime-runtime.json",
+      "sha256": "5eb221d44b98840b76eba69da44366ebc3d69a4a35f3872dd3c2325b9d8cf8ff",
+      "tests": 12,
+      "state": "root_accepted_pr239_round4_linux_runtime",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "preflight": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-preflight-runtime.json",
+      "sha256": "8d12f788887b3564b7390a6997ae61d3d08dc0975f2bcd66e6c78acbeb1f30b2",
+      "tests": 1,
+      "state": "root_accepted_pr239_round4_linux_preflight",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "compatibility": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-compatibility-runtime.json",
+      "sha256": "c3be1f79447b9bec8d04749dd0143e79f0699f4056b049832fec833af71b11c7",
+      "tests": 9,
+      "state": "root_accepted_pr239_round4_linux_compatibility",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "admission": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-admission-runtime.json",
+      "sha256": "bb6e39dcaeb1dc845aded51b87ef5428f23499bf3529f0b968872bf3cbc50e57",
+      "tests": 4,
+      "state": "root_accepted_pr239_round4_linux_admission",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "sanitation": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-sanitation-runtime.json",
+      "sha256": "2b580c9e7ee8b0f8679d785d7bb67d7a2a5d5d5f2a46e0cbb9bd0d33c176c1f8",
+      "tests": 7,
+      "state": "root_accepted_pr239_round4_linux_sanitation",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "cleanup": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-cleanup-runtime.json",
+      "sha256": "b284a23792a615708a6dc5c7ea1e2958894ea97ac2170c2accaf389d7419fd99",
+      "tests": 11,
+      "state": "root_accepted_pr239_round4_linux_cleanup",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "filesystem": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-filesystem-runtime.json",
+      "sha256": "bb09b4225025e3529de2cfe2343f6c1ec3f2a222aa7879b95762d3cffab8b742",
+      "tests": 8,
+      "state": "root_accepted_pr239_round4_linux_filesystem",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "tar": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-tar-runtime.json",
+      "sha256": "184f58e877616b3d3e3d79e1e4ade231746659ab58d4a1166ec3cd77541fe5df",
+      "tests": 4,
+      "state": "root_accepted_pr239_round4_linux_tar",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "records-output": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-records-output-runtime.json",
+      "sha256": "67d97154221f2af687d7c36479f14b4e8fae5d67c9b8638c5a952c0fabb8e512",
+      "tests": 5,
+      "state": "root_accepted_pr239_round4_linux_records-output",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "mutations": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-mutations-runtime.json",
+      "sha256": "5fd8852064cde566d81132c0e9a92df0832a5507dfa3bb6575d6b446dabb3b3d",
+      "tests": 11,
+      "state": "root_accepted_pr239_round4_linux_mutations",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "ordinary-curl": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-ordinary-curl-runtime.json",
+      "sha256": "dab87de2d09d9f16621aa1d74c44cc1a032bd439fc3b5f945d980f06f0ccf578",
+      "tests": 8,
+      "state": "root_accepted_pr239_round4_linux_ordinary-curl",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "curl-mutations": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-curl-mutations-runtime.json",
+      "sha256": "248327311acc38face5f423ab6f61f61853463b550a7f909f13ec2c5dc7b7c73",
+      "tests": 7,
+      "state": "root_accepted_pr239_round4_linux_curl-mutations",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "download-whole": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-download-whole-runtime.json",
+      "sha256": "1221c587af412594fe7f1f7daf27df3018674bf33e5025453f94fcb5c5d1f746",
+      "tests": 5,
+      "state": "root_accepted_pr239_round4_linux_download-whole",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "selectors": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-selectors-runtime.json",
+      "sha256": "e813253f9bbf608750a653bcb5c41e6fa922e9a98c8b3d7d5a2831853d271fd7",
+      "tests": 6,
+      "state": "root_accepted_pr239_round4_linux_selectors",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "askpass": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-askpass-runtime.json",
+      "sha256": "1c99756b7f171e630a8d85f45d2c715c3fe2b2c4d9ca858f1cb69606dc354467",
+      "tests": 6,
+      "state": "root_accepted_pr239_round4_linux_askpass",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    },
+    "identity": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\pr239-round4-identity-runtime.json",
+      "sha256": "eddc6c83ca9e8283c43a585085539f7f38616f689d8663cac9b38957ad1c637f",
+      "tests": 1,
+      "state": "root_accepted_pr239_round4_linux_identity",
+      "observed_source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+      "observed_index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5"
+    }
+  },
+  "reuse_admission": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\linux-scoped-reuse-acceptance.json",
+    "sha256": "89c1c1c67c322c67bc4488a742c2c0b9c944220b318db6c8799ad010648f11a2"
+  },
+  "fresh_native_origins": {
+    "lint": {
+      "session_id": 2567,
+      "terminal_chunk": "47a9ee",
+      "manifest_sha256": "3485abe97480c6467d9e0841938feb35f629ff064bf0c76d2ecd95ca81a55b47",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-lint-20261009-a1"
+    },
+    "runtime": {
+      "session_id": 21804,
+      "terminal_chunk": "11ae18",
+      "manifest_sha256": "1c84f59644860ced7e25d3a87f31f7fcd7da2766b9bfb15f77726024e50331e2",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-runtime-20261009-a1"
+    },
+    "preflight": {
+      "session_id": 93700,
+      "terminal_chunk": "68d86e",
+      "manifest_sha256": "f1610c7a4084d410986327b5fcc1b9f5b5b982ad471abbb653df78d43f0c43d9",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-preflight-20261009-a1"
+    },
+    "compatibility": {
+      "session_id": 74794,
+      "terminal_chunk": "3ab9dc",
+      "manifest_sha256": "fbd2a0eca714902886f745fbfb3917f5098424e3b220d01b6c7e0a6e7c2cf569",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-compatibility-20261009-a1"
+    },
+    "admission": {
+      "session_id": 76599,
+      "terminal_chunk": "2b38e9",
+      "manifest_sha256": "049b3173e47f5bd2fc7d72a39c0ad66147d36612317b9611ac4464035c8535b7",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-admission-20261009-a1"
+    },
+    "sanitation": {
+      "session_id": 96327,
+      "terminal_chunk": "b2e2c3",
+      "manifest_sha256": "3f062098890f760c6627c75ea175bb8870dd82bae6d36928c0d4a6693ad8ce54",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-sanitation-20261009-a1"
+    },
+    "cleanup": {
+      "session_id": 12276,
+      "terminal_chunk": "b0e881",
+      "manifest_sha256": "60616ed4a1b126ee66f32fd7fd5cdcf192a1b6c05971b0d0a4be978dd1912e18",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-cleanup-20261009-a1"
+    },
+    "filesystem": {
+      "session_id": 24455,
+      "terminal_chunk": "c2aff8",
+      "manifest_sha256": "98c6791c3f33e542da17803c427d52b107505b7d648fe0f17baba29899f13e2e",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-filesystem-20261009-a1"
+    },
+    "tar": {
+      "session_id": 47525,
+      "terminal_chunk": "814971",
+      "manifest_sha256": "9ea6e6c8b8d0c43bfadb4f6896048793bb9d2b6d56e933262468939e1be97dce",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-tar-20261009-a1"
+    },
+    "records-output": {
+      "session_id": 9204,
+      "terminal_chunk": "fcd279",
+      "manifest_sha256": "1508479e0135afdf018f972512ba8a08c0bd8fed48221c57b8127c2f7bcb58b4",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-records-output-20261009-a1"
+    },
+    "mutations": {
+      "session_id": 62408,
+      "terminal_chunk": "37741b",
+      "manifest_sha256": "563ed849710fcde73ef54d474aea82e2f255b70a182b472de4b5dbcad0ea6b9f",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-mutations-20261009-a1"
+    },
+    "ordinary-curl": {
+      "session_id": 41603,
+      "terminal_chunk": "ff5db5",
+      "manifest_sha256": "a6045f1b3b5bbd59affcb337a57ccca916f195ed6a53e9c06af5642015f6baa2",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-ordinary-curl-20261009-a1"
+    },
+    "curl-mutations": {
+      "session_id": 94411,
+      "terminal_chunk": "212956",
+      "manifest_sha256": "5cb1463f411f080da717bf2b6e9ada79a3a114a4bee9a7ad3165a450d9def4fb",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-curl-mutations-20261009-a1"
+    },
+    "download-whole": {
+      "session_id": 65676,
+      "terminal_chunk": "1383ac",
+      "manifest_sha256": "5f1b85a4b35600f0187827381c71df379ff68d95106af6c65405d41fec4b924f",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-download-whole-20261009-a1"
+    },
+    "selectors": {
+      "session_id": 69714,
+      "terminal_chunk": "05db39",
+      "manifest_sha256": "8af20b2829ed8014a84f34642436694b5c341540569c9f9150fc263db1a1c3ee",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-selectors-20261009-a1"
+    },
+    "askpass": {
+      "session_id": 51847,
+      "terminal_chunk": "6c8957",
+      "manifest_sha256": "5d2a90c685f857f98e4d8cb9005be492ddbbb6e7b908d07715606712bf3b47af",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-askpass-20261009-a1"
+    },
+    "identity": {
+      "session_id": 82253,
+      "terminal_chunk": "f609b9",
+      "manifest_sha256": "e534bfa092fd04d39a23d0209d881e2b255c4921d74e91a181cb80c10b5ef68f",
+      "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-identity-20261009-a1"
+    }
+  },
+  "fresh_tests": 126,
+  "historical_attributed_tests": 37,
+  "distinct_names": 163,
+  "original_receipts_rewritten": false,
+  "strict_acceptor": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\accept-round3-linux.py",
+    "sha256": "7274585bf4f06fb8f0a44838ba43ebe17afe813e6568d8c23eec2af3447a19ff"
+  },
+  "source_readiness": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\root-linux-readiness-verification.json",
+    "sha256": "b4ee155e94048b0fbffb8eb44c0e511e89e756e362d0e33d7b6404d286aaf6b1"
+  },
+  "helper_review": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\ROOT-LINUX-UNION-HELPER-REVIEW.md",
+    "sha256": "f85e8fce4c435c0b53d524c73579c1f7bfeedc5d2fb8424d89a1fe4e27acd9f2"
+  },
+  "state_readback_sha256": "28eb5fb1f2d711fd7ac54622100ce3a9f6eb2e4e0e6f6b21b3bf29ec68da0207",
+  "scope_limit": "Current selected Linux163 only; Windows aggregate/all11 hooks and public gates require separate acceptance."
+}

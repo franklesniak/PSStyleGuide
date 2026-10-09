@@ -1,0 +1,25 @@
+{
+  "state": "root_accepted",
+  "at": "2026-10-09T22:40:45.040616+00:00",
+  "authorizing_coordinator": "root",
+  "actual_native_exit": 0,
+  "actual_native_terminal_chunk": "a07693",
+  "source_files": 78,
+  "source_bytes": 4163190,
+  "native_read_only_commands": 9,
+  "observation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\windows-source-readback.json",
+    "sha256": "fb73a73ad4e5777a17f81e9f617fab33a997a3bb1f543bee763cfadb4bdc961e"
+  },
+  "accepted": {
+    "root-windows-readiness-verification": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\root-windows-readiness-verification.json",
+      "sha256": "f3f2420ba06ae82454a81a901a5fa8cf48d149a16552a10d03dfea0fc3ab1147"
+    },
+    "staged-input-acceptance": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\staged-input-acceptance.json",
+      "sha256": "9431345896e9643160d6b457fc806186a513953fee35c6826560e075d556da99"
+    }
+  },
+  "runtime_credit": false
+}

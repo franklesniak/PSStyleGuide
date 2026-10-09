@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-09T23:43:12.648786+00:00",
+  "state": "root_accepted_final_round4_local_quality",
+  "authorizing_coordinator": "root",
+  "reviewer": "/root/fq45_source_review",
+  "base_head": "11224a2f58e2cb1e2ffb3ab443ccc83dd0822950",
+  "source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+  "index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+  "findings": [],
+  "report": {
+    "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round4-final-local-quality.md",
+    "sha256": "f71bc60726ce314f2bde3b10a1103ab9429fa58e6d335876844248410602753c"
+  },
+  "evidence": {
+    "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\current-main-validation\\pr239-round4-final-local-quality-evidence.json",
+    "sha256": "71b09963fef207851a6bb0fccfc06b57aed42cd7345bcf14416724cb40bc7642"
+  },
+  "root_full_report_read_chunk": "1549ed",
+  "local_gates": {
+    "linux": 163,
+    "windows_tests": 822,
+    "windows_pass": 383,
+    "windows_platform_skips": 439,
+    "hooks_pass": 11,
+    "hooks_skip": 0,
+    "normal_commit": false
+  },
+  "hook_disposition": {
+    "state": "native_hooks_passed_with_retained_platform_probe_residue",
+    "receipt_sha256": "d0bc22757ff743ecf2d873310c6622fa86dc10bc8e8499d3c294cfa499473cc2",
+    "controller_exit": 1,
+    "strict_controller_pass": false,
+    "private_temp_removed": false
+  },
+  "remaining": "Normal commit/Husky, publication, new exact-input reviews and green CI, merge readiness, landing and paired delivery."
+}

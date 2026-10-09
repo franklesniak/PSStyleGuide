@@ -1,0 +1,265 @@
+{
+  "operation": {
+    "kind": "pr239-round4-normal-commit",
+    "state": "starting",
+    "started_at": "2026-10-09T23:43:23.696739+00:00",
+    "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide",
+    "expected_head": "11224a2f58e2cb1e2ffb3ab443ccc83dd0822950",
+    "expected_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+    "message_file": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-publication-native\\commit-message.txt",
+    "normal_hooks_required": true,
+    "ambiguous_until_native_reconciled": true
+  },
+  "preimage_reads": [
+    {
+      "args": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "11224a2f58e2cb1e2ffb3ab443ccc83dd0822950\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "branch",
+        "--show-current"
+      ],
+      "exit": 0,
+      "stdout": "codex/r5-toolchain-foundation\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "config",
+        "--get",
+        "core.hooksPath"
+      ],
+      "exit": 0,
+      "stdout": ".husky/_\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-path",
+        "MERGE_HEAD"
+      ],
+      "exit": 0,
+      "stdout": "C:/Users/flesniak/GitHub/PSStyleGuide/.git/worktrees/PSStyleGuide11/MERGE_HEAD\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "M  .github/workflows/Test-CheckoutCredentials.ps1\u0000M  .github/workflows/Test-CiHelpers.test.mjs\u0000M  .github/workflows/scripts-README.md\u0000",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "diff",
+        "--quiet"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "diff",
+        "--check",
+        "--cached"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "write-tree"
+      ],
+      "exit": 0,
+      "stdout": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5\n",
+      "stderr": ""
+    }
+  ],
+  "native_git_exit": 0,
+  "finished_at": "2026-10-09T23:43:31.996441+00:00",
+  "stdout_sha256": "71b8e2d873232457b3667208eb4a0326dd1b15711f6100ed5285ae770420f196",
+  "stderr_sha256": "5c18896e25a2aac761a63a3d1418553072f127dde021778e321abc2dc92fd569",
+  "final_local_quality_sha256": "a4b0d09e38719d603c4d272a55ff2cbd4198dc3fc9440382b81ec3a87b427052",
+  "linux_current163_sha256": "836882827b4638d9d6d826e147a972c54b578f22c212c135fa687adcf09758b8",
+  "windows_runtime_receipts_sha256": {
+    "aggregate": "75fd47fb80b43f543dc1121648522c76590f0bc41863f29e7acc889c09992e97",
+    "retained_native_hooks": "d0bc22757ff743ecf2d873310c6622fa86dc10bc8e8499d3c294cfa499473cc2"
+  },
+  "root_helper_review_sha256": "356607e1db3fc0c466856a99c24e2752762f332d219112df6b0f7eed95d1e468",
+  "state": "normal_commit_verified",
+  "commit": "03f1dbf72ce486c0fa1d2cdfb74aaf78143e4477",
+  "tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+  "postimage_reads": [
+    {
+      "args": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "03f1dbf72ce486c0fa1d2cdfb74aaf78143e4477\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "exit": 0,
+      "stdout": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-list",
+        "--parents",
+        "-n",
+        "1",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "03f1dbf72ce486c0fa1d2cdfb74aaf78143e4477 11224a2f58e2cb1e2ffb3ab443ccc83dd0822950\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "native_reads": [
+    {
+      "args": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "11224a2f58e2cb1e2ffb3ab443ccc83dd0822950\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "branch",
+        "--show-current"
+      ],
+      "exit": 0,
+      "stdout": "codex/r5-toolchain-foundation\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "config",
+        "--get",
+        "core.hooksPath"
+      ],
+      "exit": 0,
+      "stdout": ".husky/_\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-path",
+        "MERGE_HEAD"
+      ],
+      "exit": 0,
+      "stdout": "C:/Users/flesniak/GitHub/PSStyleGuide/.git/worktrees/PSStyleGuide11/MERGE_HEAD\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "status",
+        "--porcelain=v1",
+        "-z",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "M  .github/workflows/Test-CheckoutCredentials.ps1\u0000M  .github/workflows/Test-CiHelpers.test.mjs\u0000M  .github/workflows/scripts-README.md\u0000",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "diff",
+        "--quiet"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "diff",
+        "--check",
+        "--cached"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "write-tree"
+      ],
+      "exit": 0,
+      "stdout": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "03f1dbf72ce486c0fa1d2cdfb74aaf78143e4477\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "exit": 0,
+      "stdout": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "rev-list",
+        "--parents",
+        "-n",
+        "1",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "03f1dbf72ce486c0fa1d2cdfb74aaf78143e4477 11224a2f58e2cb1e2ffb3ab443ccc83dd0822950\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "status",
+        "--porcelain=v1"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

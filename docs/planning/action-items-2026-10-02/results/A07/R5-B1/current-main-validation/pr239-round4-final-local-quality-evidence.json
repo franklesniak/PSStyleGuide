@@ -1,0 +1,406 @@
+{
+  "state": "PASS_FINAL_LOCAL_QUALITY_WITH_EXACT_RUN_NATIVE_HOOK_RETENTION",
+  "candidate": {
+    "head": "11224a2f58e2cb1e2ffb3ab443ccc83dd0822950",
+    "index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+    "source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+    "source_files": 78,
+    "source_bytes": 4163190,
+    "changed_paths": 3,
+    "raw_files_reverified": 78,
+    "physical_git_metadata_pins_reverified": 30,
+    "full_current_diff_equals_frozen_patch": true,
+    "patch_sha256": "eb1b1d6284b3ee5a910932f719eaefcb576e1dde317b31197df9e6e9a434a736",
+    "final_source78_and_physical_metadata30_reverified": true,
+    "tree_reconciliation": "Accepted staged tree corroborated by unchanged exact physical Git index and metadata; no Git invocation by reviewer"
+  },
+  "source_findings": [],
+  "prior_review_pins": {
+    "pr239-round3-v5-final-local-quality": "236721e215b0ce083950b56ba4046d254992857c58f9cb06362cbf824babcf9c",
+    "pr239-round4-source-review": "dfd7e3352a94c3e666199f74da60a9c8d82da534623fa05c2d3c1737918d3b0c",
+    "pr239-round4-preparation-review": "9452418f59e7e3e9fa5b46ba6b7ebc68662593904ba69dd66f97ad1d47255b82",
+    "pr239-round4-reuse-selection-review": "ca6b174ff66df87f54eae8a839e8b0eed1e2cfb1e157df2e7c10084584eea0bc",
+    "pr239-round4-a2-preparation-review": "a8b53910e68b04ebdbd3b23021221afcd72f55ada2a23363b5d24228ed8cd22f"
+  },
+  "root_evidence_pins": {
+    "linux-current163-acceptance.json": "836882827b4638d9d6d826e147a972c54b578f22c212c135fa687adcf09758b8",
+    "linux-scoped-reuse-acceptance.json": "89c1c1c67c322c67bc4488a742c2c0b9c944220b318db6c8799ad010648f11a2",
+    "generated-syntax-attribution.json": "93f0ea0973a6b4a87a495b6bf94cd9b9585d842bfe8c11d877352342724d2539",
+    "ROOT-SOURCE-READINESS.md": "eddbbbd7b36d76de1c7408993dba21be2d71c820e18494ca0ff12828f57d4d00",
+    "staged-input-acceptance.json": "9431345896e9643160d6b457fc806186a513953fee35c6826560e075d556da99",
+    "pr239-round4-windows-readiness-acceptance.json": "856ca15f01eec93f0532b9312a8cd4c52d5a0d6fc229d4792e17eb63c2f9f938",
+    "root-windows-readiness-verification.json": "f3f2420ba06ae82454a81a901a5fa8cf48d149a16552a10d03dfea0fc3ab1147",
+    "pr239-round4-windows-aggregate-runtime.json": "75fd47fb80b43f543dc1121648522c76590f0bc41863f29e7acc889c09992e97",
+    "pr239-round4-windows-precommit-failed-a1.json": "d5405ec105ed6fbd261a80781eec9ae14cf407e88b162f8ddb5ea3952ef0bef2",
+    "round4-policy-probe-retention-root-decision.json": "d10a8f0c2ea5d6fc9f074d1f97258e8d47ccb22e3925c42303c74d9d9f595ee0",
+    "round4-policy-probe-retention-verification.json": "85ae699399cb243fc6a8708e9f063c2e828cc800a5d1a8543a57de377be360ca",
+    "pr239-round4-native-hooks-retention.json": "d0bc22757ff743ecf2d873310c6622fa86dc10bc8e8499d3c294cfa499473cc2"
+  },
+  "linux": {
+    "accepted_total": 163,
+    "fresh": 126,
+    "fresh_cells": 17,
+    "verified_reused": 37,
+    "retained_groups": 6,
+    "unique_exact_names": 163,
+    "all23_root_receipt_hashes_verified": true,
+    "all17_fresh_raw_receipt_hashes_tap_status_result_verified": true,
+    "all17_fresh_native_exits": 0,
+    "all17_fresh_cleanup_failures": 0,
+    "all17_fresh_guards_settlement_and_scratch_flags": true,
+    "fresh_native_origins": {
+      "lint": {
+        "session_id": 2567,
+        "terminal_chunk": "47a9ee",
+        "manifest_sha256": "3485abe97480c6467d9e0841938feb35f629ff064bf0c76d2ecd95ca81a55b47",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-lint-20261009-a1"
+      },
+      "runtime": {
+        "session_id": 21804,
+        "terminal_chunk": "11ae18",
+        "manifest_sha256": "1c84f59644860ced7e25d3a87f31f7fcd7da2766b9bfb15f77726024e50331e2",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-runtime-20261009-a1"
+      },
+      "preflight": {
+        "session_id": 93700,
+        "terminal_chunk": "68d86e",
+        "manifest_sha256": "f1610c7a4084d410986327b5fcc1b9f5b5b982ad471abbb653df78d43f0c43d9",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-preflight-20261009-a1"
+      },
+      "compatibility": {
+        "session_id": 74794,
+        "terminal_chunk": "3ab9dc",
+        "manifest_sha256": "fbd2a0eca714902886f745fbfb3917f5098424e3b220d01b6c7e0a6e7c2cf569",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-compatibility-20261009-a1"
+      },
+      "admission": {
+        "session_id": 76599,
+        "terminal_chunk": "2b38e9",
+        "manifest_sha256": "049b3173e47f5bd2fc7d72a39c0ad66147d36612317b9611ac4464035c8535b7",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-admission-20261009-a1"
+      },
+      "sanitation": {
+        "session_id": 96327,
+        "terminal_chunk": "b2e2c3",
+        "manifest_sha256": "3f062098890f760c6627c75ea175bb8870dd82bae6d36928c0d4a6693ad8ce54",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-sanitation-20261009-a1"
+      },
+      "cleanup": {
+        "session_id": 12276,
+        "terminal_chunk": "b0e881",
+        "manifest_sha256": "60616ed4a1b126ee66f32fd7fd5cdcf192a1b6c05971b0d0a4be978dd1912e18",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-cleanup-20261009-a1"
+      },
+      "filesystem": {
+        "session_id": 24455,
+        "terminal_chunk": "c2aff8",
+        "manifest_sha256": "98c6791c3f33e542da17803c427d52b107505b7d648fe0f17baba29899f13e2e",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-filesystem-20261009-a1"
+      },
+      "tar": {
+        "session_id": 47525,
+        "terminal_chunk": "814971",
+        "manifest_sha256": "9ea6e6c8b8d0c43bfadb4f6896048793bb9d2b6d56e933262468939e1be97dce",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-tar-20261009-a1"
+      },
+      "records-output": {
+        "session_id": 9204,
+        "terminal_chunk": "fcd279",
+        "manifest_sha256": "1508479e0135afdf018f972512ba8a08c0bd8fed48221c57b8127c2f7bcb58b4",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-records-output-20261009-a1"
+      },
+      "mutations": {
+        "session_id": 62408,
+        "terminal_chunk": "37741b",
+        "manifest_sha256": "563ed849710fcde73ef54d474aea82e2f255b70a182b472de4b5dbcad0ea6b9f",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-mutations-20261009-a1"
+      },
+      "ordinary-curl": {
+        "session_id": 41603,
+        "terminal_chunk": "ff5db5",
+        "manifest_sha256": "a6045f1b3b5bbd59affcb337a57ccca916f195ed6a53e9c06af5642015f6baa2",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-ordinary-curl-20261009-a1"
+      },
+      "curl-mutations": {
+        "session_id": 94411,
+        "terminal_chunk": "212956",
+        "manifest_sha256": "5cb1463f411f080da717bf2b6e9ada79a3a114a4bee9a7ad3165a450d9def4fb",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-curl-mutations-20261009-a1"
+      },
+      "download-whole": {
+        "session_id": 65676,
+        "terminal_chunk": "1383ac",
+        "manifest_sha256": "5f1b85a4b35600f0187827381c71df379ff68d95106af6c65405d41fec4b924f",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-download-whole-20261009-a1"
+      },
+      "selectors": {
+        "session_id": 69714,
+        "terminal_chunk": "05db39",
+        "manifest_sha256": "8af20b2829ed8014a84f34642436694b5c341540569c9f9150fc263db1a1c3ee",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-selectors-20261009-a1"
+      },
+      "askpass": {
+        "session_id": 51847,
+        "terminal_chunk": "6c8957",
+        "manifest_sha256": "5d2a90c685f857f98e4d8cb9005be492ddbbb6e7b908d07715606712bf3b47af",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-askpass-20261009-a1"
+      },
+      "identity": {
+        "session_id": 82253,
+        "terminal_chunk": "f609b9",
+        "manifest_sha256": "e534bfa092fd04d39a23d0209d881e2b255c4921d74e91a181cb80c10b5ef68f",
+        "raw_run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\runtime-runs\\pr239-round4-identity-20261009-a1"
+      }
+    },
+    "union_root_native_exit": 0,
+    "union_root_native_terminal_chunk": "137fe6"
+  },
+  "syntax": {
+    "root_attribution_sha256": "93f0ea0973a6b4a87a495b6bf94cd9b9585d842bfe8c11d877352342724d2539",
+    "current": 166,
+    "retained": 195,
+    "total_labels": 361,
+    "main_raw_exit": 1,
+    "main_raw_warnings": 2,
+    "applicable_findings": 0,
+    "exact_constructor_disposition_retained": true
+  },
+  "windows": {
+    "state": "ROOT_ACCEPTED_INDEPENDENT_RAW_RECONCILIATION_COMPLETE",
+    "receipt_sha256": "75fd47fb80b43f543dc1121648522c76590f0bc41863f29e7acc889c09992e97",
+    "tests": 822,
+    "pass": 383,
+    "skipped": 439,
+    "fail": 0,
+    "cancelled": 0,
+    "todo": 0,
+    "actual_session": 32463,
+    "terminal_chunk": "1c9cae",
+    "native_exit": 0,
+    "root_strict_acceptor_terminal_chunk": "574d81",
+    "root_strict_acceptor_native_exit": 0,
+    "raw_six_receipt_hashes_verified": true,
+    "raw_822_sequential_results_and_plan_verified": true,
+    "fq45_six_r3_six_identity_one_names_all_passed": true,
+    "stderr_empty": true,
+    "native_worker_controller_exits": 0,
+    "primary_failure": null,
+    "cleanup_failures": [],
+    "job_before_and_after": {
+      "total": 4057,
+      "active": 0,
+      "terminated": 0
+    },
+    "elapsed_seconds": 271.98499999998603,
+    "stage_limit_seconds": 900,
+    "whole_limit_seconds": 1200,
+    "temp_physically_absent": true,
+    "exact_six_result_files_retained": true,
+    "source78_metadata30_qualified_executables5_module_catalog_pins_hold": true,
+    "dependency_runtime_closure": "Checked by the already reviewed strict controller/root acceptor; catalog pins independently verified",
+    "source_observation_native_exit": 0,
+    "source_observation_chunk": "a07693"
+  },
+  "hooks": {
+    "state": "ROOT_ACCEPTED_NATIVE_11_WITH_EXACT_RETAINED_RESIDUE_CONTROLLER_REMAINS_FAILED",
+    "required": 11,
+    "actual_session": 71591,
+    "terminal_chunk": "ec8ec1",
+    "controller_exit": 1,
+    "native_exit": 0,
+    "worker_exit": 0,
+    "raw_passed": 11,
+    "raw_skipped": 0,
+    "acceptance_credit": true,
+    "raw_six_receipt_hashes_verified": true,
+    "raw_files": {
+      "command.json": {
+        "bytes": 2476,
+        "sha256": "b63b8bcd23541559fbeafa415f654abe4df892e057d293a6afb57e8549990e53"
+      },
+      "native.json": {
+        "bytes": 813,
+        "sha256": "aa2c64480c2048b3b6ff0116457fffdc0b3215af30e6094e16dab899e0274799"
+      },
+      "owner.json": {
+        "bytes": 139,
+        "sha256": "2fb481fc368b0335c4701f85076d9342c07c68a614b43cdefacf87ab58b9dc5c"
+      },
+      "result.json": {
+        "bytes": 6894,
+        "sha256": "8bd418dd63c17ef062d91a5970629e0b738b82f71b65d33c048b8135be97598c"
+      },
+      "stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout.log": {
+        "bytes": 880,
+        "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+      }
+    },
+    "raw_11_ordered_passed_verified": true,
+    "stderr_empty": true,
+    "manifest_sha256": "1624395c06338141bd5fc6df3e3ced5a56e8fc82069e4b9646f0e1ae24b38f29",
+    "owner_nonce_matches_manifest": true,
+    "primary_failure": "Fixture temporary residue",
+    "cleanup_failures": [],
+    "jobs_before_and_after": {
+      "total": 38904,
+      "active": 0,
+      "terminated": 0
+    },
+    "elapsed_seconds": 2094.9070000000065,
+    "stage_limit_seconds": 3600,
+    "whole_limit_seconds": 4200,
+    "source_runtime_checks_before_residue_guard": true,
+    "finally_source_job_guards_completed": true,
+    "namespace_retained": true,
+    "temp_removed": false,
+    "residue_initial_readback": [
+      {
+        "relative_path": "temp/__PSScriptPolicyTest_dperpolo.cve.ps1",
+        "bytes": 69,
+        "sha256": "966601704f73649c34384a3059d72dfcdd1f8066bfb1d55cecf1d7ca154e1d68",
+        "initial_attributes": 32,
+        "mtime_ns": 1791586321454727300
+      },
+      {
+        "relative_path": "temp/__PSScriptPolicyTest_gbvsalny.vnt.psm1",
+        "bytes": 69,
+        "sha256": "966601704f73649c34384a3059d72dfcdd1f8066bfb1d55cecf1d7ca154e1d68",
+        "initial_attributes": 32,
+        "mtime_ns": 1791586321455283500
+      }
+    ],
+    "residue_comment_ascii": "# PowerShell test file to determine AppLocker lockdown mode 369257218",
+    "bounded_residue_read_limit_bytes": 70,
+    "initial_lstat_ordinary_nlink1_attributes32_unchanged_during_read": true,
+    "fresh_win32_nofollow_stream_acl_verification_complete": true,
+    "producer_or_deletion_reason_claimed": false,
+    "fresh_win32_verification_origin": "Reviewed root verifier actual28101/e8a218/0; reviewer did not perform native probes",
+    "retention_receipt_sha256": "d0bc22757ff743ecf2d873310c6622fa86dc10bc8e8499d3c294cfa499473cc2",
+    "strict_controller_pass": false
+  },
+  "style": "Full canonical guide and applicable instructions review retained from source assessment; no secondary guide change",
+  "peer": {
+    "full_readiness_paths": 16,
+    "origin_contexts": 26,
+    "changed_candidate_origin_literal_counts_unchanged": [
+      1,
+      6,
+      0
+    ],
+    "A07_transfers": "9/12",
+    "round": "4/80",
+    "deadlines_unchanged": true,
+    "postlanding_destination_validation_still_required": true
+  },
+  "final_local_quality_pass": true,
+  "normal_commit_credit": false,
+  "public_lifecycle_credit": false,
+  "worker_native_execution": false,
+  "fq32_assessment": {
+    "canonical_path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\R5-B1\\FQ32-POWERSHELL-POLICY-PROBE-RESIDUE.md",
+    "canonical_sha256_at_read": "f6083d56775463761fee4c022bcdd4d9eaeb18acc47e87f338e480c76324ec96",
+    "existing_options_rubric_read_completely": true,
+    "K96_conditionally_applicable": false,
+    "prior_acceptance_does_not_admit_current_run": true,
+    "no_blanket_name_exception": true,
+    "no_native_rerun_or_cleanup_inferred": true,
+    "verification_preparation_review_pending": false,
+    "K96_exact_run_applicability_and_acceptance_complete": true,
+    "completed_prerequisites": [
+      "Exact current-run root decision selecting K with retained failed-controller truth",
+      "Fresh bounded verifier pins actual terminal, raw six receipts, manifest and owner",
+      "Fresh nofollow physical ancestry/private ACL and exact two ordinary no-reparse/no-ADS/single-link files, <=70B read each, exact names/69B/hash and138B total, no extra entries",
+      "Fresh full source78/index/metadata/MERGE_HEAD/config/dependency/runtime closure and exact all11 names/exits/Jobs/caps/no-other-failure",
+      "Distinct root native-hooks retention receipt; leave failed raw receipt, pair and namespace unchanged and never reuse namespace"
+    ],
+    "canonical_sha256_at_final_read": "837fb72228708dbe1ca063c9ee5cca2f5a25247bc56bf5a705c164386f4560c0"
+  },
+  "normal_commit_retention_template": {
+    "state": "NO_MATERIAL_DELTA_FINDING_TEMPLATE_STILL_UNBOUND",
+    "original_sha256": "4444c6ea95be5d25e1ecec52cbff5300ebbb135a064f3151c717da4f7a820929",
+    "template_sha256": "1c365a455217794643a7e1e08ae86f3b054697b70e175bc9b66323a864e00429",
+    "diff_sha256": "37755e92b2effe0ca88579f7914e29791d9f4edee17c87b2f05daf7e00232919",
+    "full_original_and_derivative_read": true,
+    "exact_diff_reconstructed": true,
+    "ast_parse_only": true,
+    "unbound_gate_count": 5,
+    "source_normal_commit_tail_exact": true,
+    "typed_retention_requires_failed_controller1_temp_false_native11_pass": true,
+    "root_decision_fresh_verifier_and_quality_hash_pins_required": true,
+    "strict_aggregate_and_linux_guards_preserved": true,
+    "normal_husky_and_one_use_commit_preserved": true,
+    "execution_or_binding_authorized_by_review": false
+  },
+  "fq32_verifier_preparation": {
+    "state": "REVIEWED_EXACT_HASH_BOUND_AND_ROOT_VERIFIED",
+    "seal_sha256": "96adebed24374817dd7ac020d4af63114d9ac830bb0abeda49d02d4586c8bb6e",
+    "template_sha256": "cb33582ed1a2540b49c3dff0259cab542f496e3a27616fd083736dd7cfeeba25",
+    "evidence_sha256": "7f43048a40b35e21adb98b03da7ec2544cb7a550aca583778a0f4536893c28c3",
+    "diff_sha256": "7298ef8e6626d2b481e2fb4aee8dfec96aac3677863e90779914c2f49ecd7e45",
+    "actual_ancestor_sha256": "020ed94072898fcbf6f6067428f3087e1b26648eb1e8e2b6bd5495cfa43b40cf",
+    "all_seal_assets_verified": 6,
+    "all_evidence_artifact_hashes_verified": 33,
+    "full_final_template_read": true,
+    "exact_diff_reconstructed": true,
+    "all7_functions_classes_ast_exact": true,
+    "four_current_guard_asts_exact": [
+      "ordinary",
+      "metadata",
+      "source_guard",
+      "hooks"
+    ],
+    "three_critical_hook_inputs_exact_actual_round2_catalog": true,
+    "root_initial_file_ids_pinned": "c0f515546c943d7bb3d5d85a83f093d64e6276d5f41cdbaf5bec2da1fb64a5db",
+    "current_state_key": "native_terminal",
+    "output_key": "terminal_chunk",
+    "existing_root_decision_template_hash_gate_retained": true,
+    "helper_review_prerequisite": "Root full review before decision creation; no additional in-code helper-review hash layer in final template or predecessor",
+    "full_source_dependency_runtime_husky_metadata_verification_pending_actual_execution": false,
+    "no_process_test_git_or_deletion_dispatch_in_reachable_verifier": true,
+    "worker_executed_or_imported_verifier": false,
+    "root_launch_prerequisites_completed": [
+      "Preserve inert template and evidence; bind only ROOT_DECISION_SHA256 in separate copy to exact run-specific root K decision",
+      "Qualified Python -X utf8 -I -B without optimization",
+      "Retain original release-date, 60s cap and state/source/no-extra-residue gates; stop on any mismatch",
+      "Actual verifier native0 and separate exact-run root retention acceptance before final-quality completion"
+    ]
+  },
+  "final_findings": [],
+  "reviewer": "/root/fq45_source_review",
+  "fq32_final_reconciliation": {
+    "bound_verifier_sha256": "fc345293e0c07ffc1aea7c4694ce5830ff218ff07c2c3369b8382684447f444b",
+    "bound_diff_only_one_decision_hash": true,
+    "actual_verifier_terminal": {
+      "session_id": 28101,
+      "launch_chunk": "28adf3",
+      "terminal_chunk": "e8a218",
+      "exit_code": 0,
+      "full_observation_read_chunk": "6a1b15",
+      "reconciled_at": "2026-10-09T23:40:38.192225+00:00"
+    },
+    "verification_elapsed_seconds": 26.42200000002049,
+    "observation_original_unchanged": true,
+    "root_acceptance_observation_fields_exact": true,
+    "canonical_acceptance_mirror_exact": true,
+    "root_decision_all6_preparation_pins_verified": true,
+    "raw6_files_and11_ordered_names_reverified": true,
+    "residue_exact2_files138bytes_stable_lstat_and_bounded_hash_reverified": true,
+    "source78_metadata30_runtime_executables5_reverified": true,
+    "full_fresh_acl_stream_nofollow_and_dependency_runtime_closure": "Supplied by actual successful root verifier whose exact code and output were independently reviewed",
+    "controller_failed1_preserved": true,
+    "private_temp_removed": false,
+    "namespace_retained_no_reuse": true,
+    "producer_pid_or_deletion_cause_claimed": false
+  },
+  "remaining_gates": [
+    "Root final-local-quality admission and hash binding",
+    "Normal commit with ordinary Husky and native readback",
+    "Publication and current-input public reviews/finding inventory",
+    "Passing CI/service and separate merge readiness",
+    "Landing and paired convergence/postlanding destination validation"
+  ]
+}

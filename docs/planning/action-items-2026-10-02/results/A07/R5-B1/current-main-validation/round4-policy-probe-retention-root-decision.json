@@ -1,0 +1,82 @@
+{
+  "at": "2026-10-09T23:38:53.894322+00:00",
+  "state": "root_selected_exact_run_retention",
+  "authorizing_coordinator": "root",
+  "selected_option": "K",
+  "score": 96,
+  "run_id": "pr239-round4-win-precommit-20261009-a1",
+  "session_id": 71591,
+  "terminal_chunk": "ec8ec1",
+  "manifest_sha256": "1624395c06338141bd5fc6df3e3ced5a56e8fc82069e4b9646f0e1ae24b38f29",
+  "source_catalog_sha256": "1e9e0365acb0df7c3c05eb4da9e01f1b4a9d755eab1be75104b0bb36d10397d5",
+  "index_tree": "0e448484daf1b50c9b0f8924188c4aa90c4c0db5",
+  "verifier_template_sha256": "cb33582ed1a2540b49c3dff0259cab542f496e3a27616fd083736dd7cfeeba25",
+  "canonical_finding": "FQ32-POWERSHELL-POLICY-PROBE-RESIDUE.md",
+  "selection_authority": "Standing owner direction: use the clear winner after the finding-specific decision process. Duplicate FQ32 recurrence uses its canonical options, rubric and scores after exact applicability checks.",
+  "selection_basis": "Same qualified platform, unchanged hook configuration and timeout-test bytes, exact two inert files totaling138 bytes, eleven native passes, sole residue failure and empty unforced Jobs. Fresh nofollow/ACL/stream/source/owner/limits checks remain mandatory; no acceptance follows from this selection alone.",
+  "root_full_read_chunks": [
+    "559f6c",
+    "0f72a1",
+    "8d9581",
+    "7a5289",
+    "c0452b",
+    "e114f8",
+    "bd680e",
+    "fce55e"
+  ],
+  "root_hook_source_equality_chunk": "98811b",
+  "root_initial_identity": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-root-validation\\round4-policy-probe-initial-file-identities.json",
+    "sha256": "c0f515546c943d7bb3d5d85a83f093d64e6276d5f41cdbaf5bec2da1fb64a5db",
+    "native_chunk": "44f20a",
+    "exit_code": 0
+  },
+  "reviewed_preparation": {
+    "ancestry.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\ancestry.json",
+      "bytes": 1486,
+      "sha256": "9439fff6ed6a1eca128e209a0fc10e34d7f65065e1f5ae86114563931b0ba9cd"
+    },
+    "evidence.json": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\evidence.json",
+      "bytes": 20875,
+      "sha256": "7f43048a40b35e21adb98b03da7ec2544cb7a550aca583778a0f4536893c28c3"
+    },
+    "REPORT.md": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\REPORT.md",
+      "bytes": 3027,
+      "sha256": "a945a08b4116f054b33dd62e145f104004a58f88bc983b6efc7f216756a7c66d"
+    },
+    "ROOT-BINDING.md": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\ROOT-BINDING.md",
+      "bytes": 2248,
+      "sha256": "79d0473f232a7289b6e8c754cc6fd766b12628c9196ea5167f8163175a318628"
+    },
+    "verifier.diff": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\verifier.diff",
+      "bytes": 9486,
+      "sha256": "7298ef8e6626d2b481e2fb4aee8dfec96aac3677863e90779914c2f49ecd7e45"
+    },
+    "verify-round4-exact-probe-retention.py": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-policy-probe-preparation\\verify-round4-exact-probe-retention.py",
+      "bytes": 15356,
+      "sha256": "cb33582ed1a2540b49c3dff0259cab542f496e3a27616fd083736dd7cfeeba25"
+    }
+  },
+  "preparation_seal_sha256": "96adebed24374817dd7ac020d4af63114d9ac830bb0abeda49d02d4586c8bb6e",
+  "exact_residue_names": [
+    "__PSScriptPolicyTest_dperpolo.cve.ps1",
+    "__PSScriptPolicyTest_gbvsalny.vnt.psm1"
+  ],
+  "each_bytes": 69,
+  "residue_sha256": "966601704f73649c34384a3059d72dfcdd1f8066bfb1d55cecf1d7ca154e1d68",
+  "limits": {
+    "verification_seconds": 60,
+    "residue_read_bytes_each": 70,
+    "temp_entries": 2,
+    "immediate_run_entries": 7,
+    "json_bytes_each": 1048576,
+    "output_receipt_bytes": 65536
+  },
+  "scope": "This exact run/pair/current released input only. Preserve controller1, original receipts and files. No deletion, test rerun, product/controller edit, future waiver or namespace reuse. Stop acceptance on any failed fresh gate."
+}

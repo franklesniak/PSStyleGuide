@@ -1,0 +1,140 @@
+{
+  "state": "strict_controller_failed_native_hooks_passed_pending_fq32_assessment",
+  "observed_at": "2026-10-09T23:29:30.176201+00:00",
+  "session_id": 71591,
+  "terminal_chunk": "ec8ec1",
+  "terminal_exit": 1,
+  "readback_chunk": "c5f6a5",
+  "run_directory": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\pr239-round4-win-precommit-20261009-a1",
+  "raw_files": {
+    "command.json": {
+      "bytes": 2476,
+      "sha256": "b63b8bcd23541559fbeafa415f654abe4df892e057d293a6afb57e8549990e53"
+    },
+    "native.json": {
+      "bytes": 813,
+      "sha256": "aa2c64480c2048b3b6ff0116457fffdc0b3215af30e6094e16dab899e0274799"
+    },
+    "owner.json": {
+      "bytes": 139,
+      "sha256": "2fb481fc368b0335c4701f85076d9342c07c68a614b43cdefacf87ab58b9dc5c"
+    },
+    "result.json": {
+      "bytes": 6894,
+      "sha256": "8bd418dd63c17ef062d91a5970629e0b738b82f71b65d33c048b8135be97598c"
+    },
+    "stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.log": {
+      "bytes": 880,
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    }
+  },
+  "result": {
+    "state": "failed",
+    "primary_failure": "Fixture temporary residue",
+    "cleanup_failures": [],
+    "source_before": {
+      "source": 78,
+      "metadata": {
+        "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide\\.git": "e7ec960722bb8ba29dcf15caaf2c538a58a295a43ca812a8eb371570b0a2bc43",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\commondir": "340ddcb67a6204f742cd1e28e5b462622dde7daaa8ee36001897196aacdc6d47",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\HEAD": "57cc062e6ae6f980ebf3e9428bb02b4ab92dd261582219ee086001d362c760b2",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\MERGE_HEAD": null,
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\index": "e65d9f11747ed0b1a3155e195befd7c1e97205f3e0360b12b8b6b3f24d9e169b",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\config.worktree": "da89256d91364984591e686f641271bbbf63fc48a9e6add5690bf9979b795529",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\worktrees\\PSStyleGuide11\\packed-refs": null,
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\HEAD": "3a6f35aabd853cbb6e930aadbc5be04be0e1995df805afb3b2c0f80e0586383a",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\config": "7c9e3b89658439bc8c76872773209016718bd78461eba63e04fc54757df1e66d",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\packed-refs": "58ce5e191b03987f11458b2b3f5fb6150762a4d19aa12fca2a4cc7d980aaf6e1",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\stash": "86eade0e05f3d3e25f6deab302b252921ebd613485c26588be1ae9b1132ce148",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\planning-CRT-PR-852": "3562b8e483d80dc19665e059eefbef316597b015c90c59b6c74d3a9a01e2be58",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\a05-immutable-acquisition": "a2c7f50d3f6dda80f9398bf8ed137897c364bfd8ebc1911ba8738a2643c74268",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\a05-metadata-carryback": "c23e559189257c6d1d4a444393f57c19a3d670ec2bdfcfa3db5703e6cedc1d5c",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\a06-generator-convergence": "657527c5a7c5403f35194a08ea54cff2ba974c28b36160825224809eb0fbfb30",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\b99-accepted-main": "57fb44ba975e74f32e79d34138d3574e10cc4acffe5cc7d65cd492adbe9c99d9",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\copilot-reader-compatibility": "5c0046cb1373aaf701057807fa715665b81166c851d9c5ae4bf0675325f459da",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\no-tracked-compiled-python": "a76172623950e1a8ae143edb1746dc98633b8403d441fa7d5fdad3bddaac8e71",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\r5-toolchain-foundation": "8ead29ebb17c0d8ec5a6629a91b73cc8ea0a5044899f45cb6dc560184852d4b0",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\heads\\codex\\tf68-compareback": "e8c89f485f4df70f9eb4fe1282212c59248f31e837c2c99ba806d3171d066204",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\HEAD": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\main": "2e92f565b7eaaea39edbd270d9ef7d9b3b2a6d8338142c5e486504e3c1ff1680",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\planning-CRT-PR-852": "3562b8e483d80dc19665e059eefbef316597b015c90c59b6c74d3a9a01e2be58",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\a05-immutable-acquisition": "a2c7f50d3f6dda80f9398bf8ed137897c364bfd8ebc1911ba8738a2643c74268",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\a05-metadata-carryback": "c23e559189257c6d1d4a444393f57c19a3d670ec2bdfcfa3db5703e6cedc1d5c",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\a06-generator-convergence": "657527c5a7c5403f35194a08ea54cff2ba974c28b36160825224809eb0fbfb30",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\b99-accepted-main": "57fb44ba975e74f32e79d34138d3574e10cc4acffe5cc7d65cd492adbe9c99d9",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\copilot-reader-compatibility": "5c0046cb1373aaf701057807fa715665b81166c851d9c5ae4bf0675325f459da",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\r5-toolchain-foundation": "8ead29ebb17c0d8ec5a6629a91b73cc8ea0a5044899f45cb6dc560184852d4b0",
+        "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\.git\\refs\\remotes\\origin\\codex\\tf68-compareback": "e8c89f485f4df70f9eb4fe1282212c59248f31e837c2c99ba806d3171d066204"
+      }
+    },
+    "startedUtc": "2026-10-09T22:48:29.202358+00:00",
+    "native": {
+      "failure": null,
+      "native_exit": 0,
+      "storage_before": {
+        "sddl": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+        "filesystem": "NTFS",
+        "available_bytes": 1720098078720,
+        "ps": "7.6.5",
+        "dotnet": "10.0.11",
+        "policy": "RemoteSigned"
+      },
+      "storage_after": {
+        "sddl": "O:S-1-12-1-384438334-1177234844-3274432166-2012760315G:S-1-12-1-384438334-1177234844-3274432166-2012760315D:P(A;OICI;FA;;;SY)(A;OICI;FA;;;BA)(A;OICI;FA;;;S-1-12-1-384438334-1177234844-3274432166-2012760315)",
+        "filesystem": "NTFS",
+        "available_bytes": 1719990403072,
+        "ps": "7.6.5",
+        "dotnet": "10.0.11",
+        "policy": "RemoteSigned"
+      }
+    },
+    "worker_exit": 0,
+    "job_before_cleanup": {
+      "total": 38904,
+      "active": 0,
+      "terminated": 0
+    },
+    "summary": {
+      "configured_hooks": 11,
+      "passed": 11,
+      "skipped": 0
+    },
+    "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-windows-bound\\run.py\", line 157, in main\n    require(not list((run/'temp').iterdir()),'Fixture temporary residue')\n  File \"C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-windows-bound\\run.py\", line 12, in require\n    if not value:raise RuntimeError(message)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: Fixture temporary residue\n",
+    "job_after_cleanup": {
+      "total": 38904,
+      "active": 0,
+      "terminated": 0
+    },
+    "controller_exit": 1,
+    "elapsed_seconds": 2094.9070000000065,
+    "finishedUtc": "2026-10-09T23:23:24.107756+00:00",
+    "namespace_retained_for_root": true
+  },
+  "residue_initial_observation": [
+    {
+      "relative_path": "temp/__PSScriptPolicyTest_dperpolo.cve.ps1",
+      "bytes": 69,
+      "sha256": "966601704f73649c34384a3059d72dfcdd1f8066bfb1d55cecf1d7ca154e1d68",
+      "initial_attributes": 32,
+      "mtime_ns": 1791586321454727300
+    },
+    {
+      "relative_path": "temp/__PSScriptPolicyTest_gbvsalny.vnt.psm1",
+      "bytes": 69,
+      "sha256": "966601704f73649c34384a3059d72dfcdd1f8066bfb1d55cecf1d7ca154e1d68",
+      "initial_attributes": 32,
+      "mtime_ns": 1791586321455283500
+    }
+  ],
+  "fresh_nofollow_link_stream_acl_input_verification_complete": false,
+  "strict_controller_accepted": false,
+  "native_hooks_acceptance_granted": false,
+  "private_temp_removed": false,
+  "namespace_retained": true,
+  "no_retry_no_cleanup_no_publication": true,
+  "next_action": "Establish exact-run applicability of canonical FQ32 before selecting and independently validating a disposition. Preserve the failed controller receipt and both files."
+}

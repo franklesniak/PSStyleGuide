@@ -1,0 +1,899 @@
+{
+  "at": "2026-10-09T20:54:40.5392525+00:00",
+  "PowerShell": "7.6.5",
+  "PSScriptAnalyzer": "1.24.0",
+  "manifest_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-B1-implementation-20261007\\pr239-round4-runtime-preparation\\syntax\\manifest.json",
+  "manifest_sha256": "04d7ac3a24f60e408507a0b7f7114c449da0142151fd0b6d7a6c7916689eb5cd",
+  "driver_sha256": "a2301e293e1cdb4f6c5d1c0903a8c4e441c4fcf306bc14f1b65c30881e5c940f",
+  "helper_sha256": "85fc29a1f49ae427c206aba9da6d5e1fd5ee4ffc26cbba191c314d9593aef7c3",
+  "generated_labels": 161,
+  "unique_bodies": 101,
+  "separately_accepted_shipping_labels": 1,
+  "forms": [
+    {
+      "paths": [
+        "forms-a3/windows/mutant-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "02799f75d5064cba86ff837f5254ca8718a73919055809f6f880371ea36c3261",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_WORK_TREE-relative.ps1"
+      ],
+      "sha256": "0334b07724f54108752f625f2e27d9e74ec71265cf4dcced23e76ddc2901e457",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Initialize-CiToolchain.ps1-1.ps1"
+      ],
+      "sha256": "088f0777470183d285c6246edb53147a8bb97d6c7af4b73e8a15f8bf7f1aa521",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-5.ps1"
+      ],
+      "sha256": "09a4c97f8b4564a4aef40eb60e86c2900e3ce4622336218fa365c5e8f35bd901",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-4.ps1",
+        "forms-a3/linux/wrapper-r3-mutant-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "0ee1f05b2bc55cff429f5c3678b10e874058c496ddd4e1484af0da65c18495a9",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-subset-1.ps1",
+        "forms-a3/linux/wrapper-fq45-mutant-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "1062d79bce43d8a4a1a21e68c074f2c7336f5639c18d7124cec49b149de4c7c3",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-config-mutant-local-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-local-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-local-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-local-key2-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-included-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-included-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-included-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-included-key2-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-worktree-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-worktree-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-worktree-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-mutant-worktree-key2-relative.ps1"
+      ],
+      "sha256": "1508f274a64ac3fbba68a83e29cf41c4e4de85acf1728593ebbdf6a8b0bedb58",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-Invoke-MarkdownLint.ps1.ps1"
+      ],
+      "sha256": "16ad3cddfa9d53b2da8c17af2c24417d9182d42fc6af108cdee26694c57ea73d",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_COMMON_DIR-empty.ps1"
+      ],
+      "sha256": "1e70a760a6b77dfa948c57e29429dd15e671a07cef7e3408078b67f02a824b88",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/mutant-GIT_DIR.ps1"
+      ],
+      "sha256": "213c289ddda96527d76fe3a87db738c91cc0220c0b5eb403e2a96d6605948b02",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-GIT_ASKPASS-relative.ps1"
+      ],
+      "sha256": "2186ced73cb03b88b34c1165fef119b4d1024cd524d2f9cd96a34c4f8addd60f",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-subset-3.ps1"
+      ],
+      "sha256": "25d938087cd5275f31184ac732082fe94453071979c2fd4f5048a8a09203409b",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_DIR-empty.ps1"
+      ],
+      "sha256": "27fa7ce838896bd8f4d6db315cd4e75b6700fca887d0dec33338e28c4bd15ffd",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-subset-2.ps1",
+        "forms-a3/linux/wrapper-fq45-mutant-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "2965d664e5fde06e7bcc75f1a9919abd1e4c910b3e62256269bc7828af198bcb",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Initialize-CiToolchain.ps1-2.ps1"
+      ],
+      "sha256": "2a27794fc906953be8c219882e66c6773e7c2480dcb9261cad27d989d13269b1",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-case-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "2b5f65f9429c362073db626a88935565c94fd2703e826c81b66d9166021622c0",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-subset-3.ps1"
+      ],
+      "sha256": "2da8ac8d33318c64bdfe9f03b75ec782d0dda1b6e4b2f07cf00ed4289fe26168",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/curl.ps1"
+      ],
+      "sha256": "2f067c24baf8b5d233ee720a2b748a7aa8af09f88bc644b39e6adcbc5ad7d4b8",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-GIT_ASKPASS-empty.ps1"
+      ],
+      "sha256": "3341c884e84da4f93c266a37bfd198feb5cd53bd2cfd8fa99ee4d6878c398b2c",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_COMMON_DIR-whitespace.ps1"
+      ],
+      "sha256": "3905ae1fbf19a1e843ea79039b8aebbaac164e99b586f9680a48ad28aaada8e1",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Initialize-CiToolchain.ps1-3.ps1"
+      ],
+      "sha256": "3a738bed04906bf867a1e066d163e8483e0649709502f03a1c20056757451745",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/initializer-rebound.ps1"
+      ],
+      "sha256": "3f8f9dd3027bf103c8a7401bb6336239df6f219e836d93c3b16dfcaa7e6b28a2",
+      "parser_errors": [],
+      "issues": [
+        {
+          "rule": "PSUseShouldProcessForStateChangingFunctions",
+          "severity": "Warning",
+          "line": 676,
+          "message": "Function 'New-ArchiveProcess' has verb that could change system state. Therefore, the function has to support 'ShouldProcess'."
+        }
+      ]
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-ordinary.ps1",
+        "forms-a3/windows/wrapper-r3-linked.ps1",
+        "forms-a3/windows/wrapper-fq45-near-key-positive.ps1",
+        "forms-a3/windows/wrapper-fq45-config-local-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-local-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-local-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-local-key2-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-included-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-included-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-included-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-included-key2-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-worktree-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-worktree-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-worktree-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-worktree-key2-relative.ps1"
+      ],
+      "sha256": "402e00752a927ab0ea887ef344b7aaecabaf97219a69a204af2c780ecabf7b56",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/mock/git.ps1"
+      ],
+      "sha256": "412055f943e904b5a928c94968949cab546e364622847e34d6cd416aa577ee80",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-7.ps1"
+      ],
+      "sha256": "41975bc6fbcf0e294c5b3a33166d73320a49c723f1a494b05f69f2834a4c7650",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-6.ps1"
+      ],
+      "sha256": "43a12728b064b1ed6a6dd34ee3f9960cccc67d5b776a895e70cd47dcd7c517da",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-SSH_ASKPASS-relative.ps1"
+      ],
+      "sha256": "4404919b104fa329c4f2600284fb6de0a9c73169ac9e267398dcba03ca63e8f9",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-case-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "443c9788a2320080279b3ff07499d1026483f67ca366d56cc10a67b4f1a9d61e",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/mutant-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "4812dd4a11ee8cfaab2677ae0e65164f301b008411b06547a20a402fa67fdbd9",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_WORK_TREE-empty.ps1"
+      ],
+      "sha256": "4f3f7f103d77fed72aa46ba943e43a8b903a6c3288a3889d3b1175af775db961",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_DIR-relative.ps1"
+      ],
+      "sha256": "4f6d1e5bba2d2487c12ff98ce42131987f0e98d6df19bec262e99a4422bc0d99",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-Invoke-MarkdownLint.ps1.ps1"
+      ],
+      "sha256": "507b6252534119e88cf2ce1a43a683c53fa707e5a4c86c41ddf657feacaf5cf5",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_WORK_TREE-relative.ps1"
+      ],
+      "sha256": "51015f2d7eea045294852383ce35d83af19485f17c8030ecbf5852aa58a55149",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-2.ps1",
+        "forms-a3/windows/wrapper-r3-mutant-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "55e0656be69131c17542a14e7fc839e46e889993bc2d822a48d9ea08a58c5732",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Initialize-CiToolchain.ps1-2.ps1"
+      ],
+      "sha256": "5602cfd8669f1ed112dd34a550a151c58bc695df9282264065d3989d3ab3a833",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Invoke-MarkdownLint.ps1-2.ps1"
+      ],
+      "sha256": "5686996af0e55d272e5ad2f29aecbf53d7f09fa1cf74c8d0aebea1266e5d72cc",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-2.ps1",
+        "forms-a3/linux/wrapper-r3-mutant-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "5cf773b8da142e4f17bbdd4eebf7423ae61078f13564e76b7181202788ce2744",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-Initialize-CiToolchain.ps1.ps1"
+      ],
+      "sha256": "5dc0c05b0468097d14dea4ff582cdd6b60a3b882dfa5334a667c44906b882b0f",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/mutant-GIT_DIR.ps1"
+      ],
+      "sha256": "6072bde6d2bf1f007131938b99e2cc03d40182704b96be79f345313283888c9c",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-case-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "617c35e08aa4cfd48ccb4d4ac372935a7f35f38a14d88f779096618c8d16d44e",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-case-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "639a982326724e79d9134e3f5650a83ea0b8cc3f724ed35bbf048ed520919448",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/curl.ps1"
+      ],
+      "sha256": "661a048e9ebf26a04d0ac51a06f85dd6500c1715211098f7e2d0fc5cb9bd3dc5",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-combined-dot.ps1"
+      ],
+      "sha256": "66441045c10969021db251723e804f6bb256b1605f4d7832eb327e36ba12e031",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-SSH_ASKPASS-empty.ps1"
+      ],
+      "sha256": "68ff037001089c15a5df2f8d939a08a9f07de93c442862136b230f0a093c67c5",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_COMMON_DIR-relative.ps1"
+      ],
+      "sha256": "6aa4666f7fb904a6fd2516b154ecf2713b8cb42fbefd702b5445f12710c328af",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/shipping/core-guard-mutant.ps1"
+      ],
+      "sha256": "6dc30e6c84bc14ee562bdc346f0314af069bf68bc95b46733c2d468d49cf890b",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-SSH_ASKPASS-whitespace.ps1"
+      ],
+      "sha256": "6f34c9833b89e193485e4f9ebed6f1aa0a6cd41ef05de635bb07da660cc5f3f3",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-SSH_ASKPASS-whitespace.ps1"
+      ],
+      "sha256": "71ef9936f1727140e718b5c15bd546bfc2ca79d04ecd700906aee6f68df364f1",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-config-mutant-local-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-local-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-local-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-local-key2-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-included-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-included-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-included-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-included-key2-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-worktree-key1-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-worktree-key1-relative.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-worktree-key2-empty.ps1",
+        "forms-a3/windows/wrapper-fq45-config-mutant-worktree-key2-relative.ps1"
+      ],
+      "sha256": "74eff0e38e928fe5ad7adafdb2d39740f4af25b76334d4ac844c36456f0b6826",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-Initialize-CiToolchain.ps1.ps1"
+      ],
+      "sha256": "7815b1cc124e0642636e149e6a7a9c809fa63358cea3ce6ad922344ab2277fbb",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_DIR-relative.ps1"
+      ],
+      "sha256": "787323003f0b6b8e426f96eb8ecca6a19320210cc5630cb62c940b862c34b3a8",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-GIT_ASKPASS-empty.ps1"
+      ],
+      "sha256": "78ad39693380b0bb0dc781c7f16f977f19061ef15214cd341ff0e38b70bc8857",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/mutant-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "7a8e2b10bca2dd0ed1ae5131933759e9ee1b5423d25d8ac8019164b869499120",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Invoke-MarkdownLint.ps1-1.ps1"
+      ],
+      "sha256": "7bb4897b042873db2af6deb3f7dcdc0c17dbcc771ed945f35406fa16210b5096",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-subset-2.ps1",
+        "forms-a3/windows/wrapper-fq45-mutant-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "7cd4c92f90bb62f51d8d4f685960889edbe16860775797bb99fe48c53162b1f4",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-case-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "7df1334dbf39a60056b146fc4f94ea1e0f4f96ce5f8234ed494be0e35b4c3e7d",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Invoke-MarkdownLint.ps1-3.ps1"
+      ],
+      "sha256": "7dfe4b76873ef12e86018689047ae25720b2c045788cd0d6e109642da98ddda6",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/initializer-rebound.ps1"
+      ],
+      "sha256": "7ec82e3a772814989c70fee9d24e179be3d2a3b1c7f642f1c5e2883d6d0362a3",
+      "parser_errors": [],
+      "issues": [
+        {
+          "rule": "PSUseShouldProcessForStateChangingFunctions",
+          "severity": "Warning",
+          "line": 676,
+          "message": "Function 'New-ArchiveProcess' has verb that could change system state. Therefore, the function has to support 'ShouldProcess'."
+        }
+      ]
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_DIR-whitespace.ps1"
+      ],
+      "sha256": "7f69d8143431c3421a3e885832f59b7c369a02fba4c2c8a6940d9196a1265de0",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-3.ps1"
+      ],
+      "sha256": "815f006669bf675960dbd13040d525b9ba85ae97bfdccfcb6a0e3b403a84374c",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Invoke-MarkdownLint.ps1-1.ps1"
+      ],
+      "sha256": "841b37b0e004452715958939e41ac6083c9011e8764b3983fd84da6e406923a8",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-7.ps1"
+      ],
+      "sha256": "8454cc8183f180e795c070f4360ebd0836fd7e0a796b1e3ad1a672c26eab149f",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Initialize-CiToolchain.ps1-1.ps1"
+      ],
+      "sha256": "874f06e66c45226af639cb63c4b87eece9d8e43f43a21579e293f48c88e3dc9e",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/mutant-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "8bb4362ededef57fdc2af6ad2d71f32ca030bbb826152760dda847488b2b7b75",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_DIR-whitespace.ps1"
+      ],
+      "sha256": "8dfaeb7ec93b6dc80b717e20f817fe28ec30f1734792e5b31bf31be2c205ce04",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-1.ps1",
+        "forms-a3/linux/wrapper-r3-mutant-GIT_DIR.ps1"
+      ],
+      "sha256": "9130762bf9ce8dfba68186df1da70ed373d0ee3a643102a802416ccfb4fbc4d2",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-GIT_ASKPASS-whitespace.ps1"
+      ],
+      "sha256": "942f4d207be2d317b52750df4ab67ae6397db9267bea0df98ebf95251bb8c29e",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_DIR-empty.ps1"
+      ],
+      "sha256": "96071f04c0004c4771b1e2313ea0e76a75e642fea3b90d0723e1b6e175c59886",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_COMMON_DIR-empty.ps1"
+      ],
+      "sha256": "96380499ba446f12c28f34b69f6ff3e72731dd1b0af8cf838ecfcf1506e4b1fe",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-case-SSH_ASKPASS.ps1"
+      ],
+      "sha256": "9ad7f5def3a063b71f0e1e6b7f55cb2b30d27912dd2cf1effe623f963012a30c",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-GIT_ASKPASS-whitespace.ps1"
+      ],
+      "sha256": "9bd0f79d8a39a375cfbd17ca94d10b3e00b836b975cbb8345f21adb28b28de68",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-SSH_ASKPASS-empty.ps1"
+      ],
+      "sha256": "9d56467a0e130bff55014c383566db3065d6ad0961de8d48eeb1bd600cb091ad",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-case-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "9db9769c7121254569b30c565307718bd17f2df451c790ce461effafc9fadad5",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-case-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "9ff4ae3aea54b3d88f11905ed4d6ed1a366832dd692515baf2fa53325409426e",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-GIT_ASKPASS-relative.ps1"
+      ],
+      "sha256": "a391d8727c3b9aba57b03bffc6969f4be266e4d39a8a4b14cae37dd07c454043",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_COMMON_DIR-relative.ps1"
+      ],
+      "sha256": "a8bda3d8eb92e0f1d544ff166af3db2f391cad0471270b42afe52bb56ce0b62b",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-1.ps1",
+        "forms-a3/windows/wrapper-r3-mutant-GIT_DIR.ps1"
+      ],
+      "sha256": "af8d82c7d6a4149331d35b7ce6cf4cfcba655cddbccff2666d3b31adb399cf2d",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_WORK_TREE-empty.ps1"
+      ],
+      "sha256": "b17e5248f4959015b25c7a74f47642fce2db8bc7e366c79770ddcd0a1f559df5",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-SSH_ASKPASS-relative.ps1"
+      ],
+      "sha256": "b2b105366f52f163766bfec492b756fdc9d2785aa516ca57e2317e27db4c9942",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-combined-dot.ps1"
+      ],
+      "sha256": "b32948f6873615da36922470c35a4565c2cc1b84af1cb83d1122815c0ef6facc",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-5.ps1"
+      ],
+      "sha256": "b79bc53d16f04f8d1c451cc9587a7e88b89ae613564c6bd4d3e85a9c8e751508",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-GIT_WORK_TREE-whitespace.ps1"
+      ],
+      "sha256": "bd79918f201e0b2a6f2649d1e6da6ec61316939b409813c187d8a70cf663542b",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-3.ps1"
+      ],
+      "sha256": "be60cb8f091ab245f358cfa493ab65f7d8edc0f7092f596bb74b7f286f774a9d",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-subset-4.ps1",
+        "forms-a3/windows/wrapper-r3-mutant-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "c5c55227d284af098a64bd14666a0dd0db9c5b341366cb71e545b89b637332d1",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-subset-6.ps1"
+      ],
+      "sha256": "c66cf856dc2352d9433de9febd55834c525f15b1631d376944963682b9cab76a",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Invoke-MarkdownLint.ps1-2.ps1"
+      ],
+      "sha256": "c6d6e7eb7501a5630e8cae064d3fb69ad17f60dfbc8d91fc5ee437579d89b008",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/mutant-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "c73346a9b8f7a39390cf3fa61bb6ba00a085d475ef8a82e1ba97bca10d2e8206",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/mutant-GIT_COMMON_DIR.ps1"
+      ],
+      "sha256": "cd94bcfc63ee70c325435b2a27c85240ee99e60319e0c86faa5333ee8ab1d53b",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/ordinary-fixture-rebound.ps1"
+      ],
+      "sha256": "ced0491c15e8aaaa489336f173efc32a850667cebe1347bffea599f04a39bad8",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-case-GIT_DIR.ps1"
+      ],
+      "sha256": "d69398c0ba0854a83a4469982d7c07f53ee8bd6fcfa93c1e69f2a7fc70673736",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_WORK_TREE-whitespace.ps1"
+      ],
+      "sha256": "d69ad8b66ff3295203ad43c08fd19260b614b1de8b70cdc7b8d2d927544ace6f",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-Initialize-CiToolchain.ps1-3.ps1"
+      ],
+      "sha256": "d90ea66bbd3af354c894307bf638383283f8c2ef012db25b99661d0953a2ae64",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-ordinary.ps1",
+        "forms-a3/linux/wrapper-r3-linked.ps1",
+        "forms-a3/linux/wrapper-fq45-near-key-positive.ps1",
+        "forms-a3/linux/wrapper-fq45-config-local-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-local-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-local-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-local-key2-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-included-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-included-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-included-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-included-key2-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-worktree-key1-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-worktree-key1-relative.ps1",
+        "forms-a3/linux/wrapper-fq45-config-worktree-key2-empty.ps1",
+        "forms-a3/linux/wrapper-fq45-config-worktree-key2-relative.ps1"
+      ],
+      "sha256": "dc87f5c9ee69d6e011852c348ef202fee308c90edb61df924ed4e4b75bee6507",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/helper-rebound.ps1"
+      ],
+      "sha256": "dcdb33584d01cd07e809ecf5543e5ca4c40c8871e07d8bbd90b91ec8758a6980",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-fq45-Invoke-MarkdownLint.ps1-3.ps1"
+      ],
+      "sha256": "dfc0ca96d78d615dd590169ab4303455002ee6457597e7639fc40fdad8318f5a",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-r3-GIT_COMMON_DIR-whitespace.ps1"
+      ],
+      "sha256": "e73f62fa770cf2ce1d0d9a2f89ed5f02de196c05b773f4a95fc87f4f85fcf5e4",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/mutant-GIT_WORK_TREE.ps1"
+      ],
+      "sha256": "e7a7a2f1b108e6d61d657953420b8c5097503babc98777b9607884ae68803851",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/wrapper-r3-case-GIT_DIR.ps1"
+      ],
+      "sha256": "efe58380bb770a3da339a346da9e0e81c0d19726233aa1c833770f198f2eb5b1",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/linux/mutant-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "f958f52d83e6b2665e96b3737a7825bc994bea72d31a9e57f817123b6f5e4aef",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/helper-rebound.ps1"
+      ],
+      "sha256": "fcaf941cf9a935013e8cb2aeaa277ff0fa5668d9204525ff777fd8d391376487",
+      "parser_errors": [],
+      "issues": []
+    },
+    {
+      "paths": [
+        "forms-a3/windows/wrapper-fq45-subset-1.ps1",
+        "forms-a3/windows/wrapper-fq45-mutant-GIT_ASKPASS.ps1"
+      ],
+      "sha256": "fcb0e294f1cd2a074a0b977607981358630e541a0bb0f848f1cdad7264da4653",
+      "parser_errors": [],
+      "issues": []
+    }
+  ],
+  "parser_error_count": 0,
+  "analyzer_issue_count": 2,
+  "scope": "Static generated PowerShell parsing and analyzer; no helper or fixture execution. Complete effective-source and retained-form attribution requires separate review."
+}

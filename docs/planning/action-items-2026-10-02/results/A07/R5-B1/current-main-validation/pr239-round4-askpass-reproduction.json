@@ -1,0 +1,66 @@
+{
+  "at": "2026-10-09T20:35:39.073517+00:00",
+  "source": "C:\\Users\\flesniak\\.codex\\worktrees\\r5-toolchain-integration\\PSStyleGuide\\.github\\workflows\\Test-CheckoutCredentials.ps1",
+  "source_sha256": "dc8b92d3bc2d849fc6c304168213ad06cd3da036a4e2d88057cbf2b38397d791",
+  "git_sha256": "54bda91c773c6bba2b970424423cfcb80552d92dc6967d766f98931fe1251a54",
+  "powershell_sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139",
+  "git_version": "git version 2.56.0.windows.2",
+  "results": [
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 128,
+      "syntheticPair": false,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-reproduction-20261009-a1\\absent\\runner\\styleguide-git-4ced1307e375494f8ca2dfad40671e82\\global.config",
+      "case": "absent",
+      "askpass_calls": 0
+    },
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 0,
+      "syntheticPair": true,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-reproduction-20261009-a1\\GIT_ASKPASS\\runner\\styleguide-git-957bf70073c1415a929813d1c6feaa1b\\global.config",
+      "case": "GIT_ASKPASS",
+      "askpass_calls": 2
+    },
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 0,
+      "syntheticPair": true,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-reproduction-20261009-a1\\SSH_ASKPASS\\runner\\styleguide-git-51b7d9f1b0864006a751c6482fa9b721\\global.config",
+      "case": "SSH_ASKPASS",
+      "askpass_calls": 2
+    },
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 0,
+      "syntheticPair": true,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-reproduction-20261009-a1\\both\\runner\\styleguide-git-4ab66155ca204562bc133d0adb386adc\\global.config",
+      "case": "both",
+      "askpass_calls": 2
+    },
+    {
+      "helperPassed": true,
+      "helperError": null,
+      "gitCredentialFillExit": 0,
+      "syntheticPair": true,
+      "gitTerminalPrompt": "0",
+      "PowerShell": "7.6.5",
+      "configurationPath": "C:\\Users\\flesniak\\PSStyleGuide-R5-private-runner-20261005\\fq45-askpass-reproduction-20261009-a1\\core-askPass\\runner\\styleguide-git-aa8f5f60d7644aad95d04fe14fe616ef\\global.config",
+      "case": "core.askPass",
+      "askpass_calls": 2
+    }
+  ],
+  "scope": "Actual unchanged helper in private synthetic repositories followed by git credential fill in the same child PowerShell process; no network request or real credential access. Scratch and empty private config files retained as evidence. No host or product configuration changed."
+}
