@@ -648,8 +648,8 @@ jobs:
                   try {
                       $objRuntimeDeclaration = Read-SetupJson .github/workflows/ci-toolchain.json 16384
                       $objPackage = Read-SetupJson package.json 1048576
-                      if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "^24\.[0-9]+\.[0-9]+$" -or
-                          $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "^[0-9]+\.[0-9]+\.[0-9]+$") {
+                      if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "\A24\.[0-9]+\.[0-9]+\z" -or
+                          $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "\A[0-9]+\.[0-9]+\.[0-9]+\z") {
                           throw "toolchain: invalid declared runtime tuple"
                       }
                       if ($objRuntimeDeclaration -is [Collections.IDictionary] -and $objRuntimeDeclaration.Contains("schemaVersion")) {
@@ -678,7 +678,7 @@ jobs:
                           $strRuntimeDigestField = "linuxX64Sha256"
                       }
                       foreach ($objDigestValue in $arrRuntimeDigest) {
-                          if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "^[a-f0-9]{64}$") {
+                          if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "\A[a-f0-9]{64}\z") {
                               throw "toolchain: invalid runtime digest"
                           }
                       }
@@ -1034,8 +1034,8 @@ jobs:
               try {
                   $objRuntimeDeclaration = Read-SetupJson .github/workflows/ci-toolchain.json 16384
                   $objPackage = Read-SetupJson package.json 1048576
-                  if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "^24\.[0-9]+\.[0-9]+$" -or
-                      $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "^[0-9]+\.[0-9]+\.[0-9]+$") {
+                  if ($objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch "\A24\.[0-9]+\.[0-9]+\z" -or
+                      $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch "\A[0-9]+\.[0-9]+\.[0-9]+\z") {
                       throw "toolchain: invalid declared runtime tuple"
                   }
                   if ($objRuntimeDeclaration -is [Collections.IDictionary] -and $objRuntimeDeclaration.Contains("schemaVersion")) {
@@ -1064,7 +1064,7 @@ jobs:
                       $strRuntimeDigestField = "linuxX64Sha256"
                   }
                   foreach ($objDigestValue in $arrRuntimeDigest) {
-                      if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "^[a-f0-9]{64}$") {
+                      if ($objDigestValue -isnot [string] -or $objDigestValue -cnotmatch "\A[a-f0-9]{64}\z") {
                           throw "toolchain: invalid runtime digest"
                       }
                   }
@@ -1107,8 +1107,8 @@ jobs:
                       }
                   }
               }
-              if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
-                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+              if ($strVersion -cnotmatch '\A24\.[0-9]+\.[0-9]+\z' -or
+                  $strReviewedSha256 -cnotmatch '\A[A-F0-9]{64}\z') {
                   throw 'toolchain: the reviewed runtime declaration is invalid'
               }
           } else {

@@ -8,6 +8,7 @@ import { createServer } from 'node:http';
 import { createServer as createConnectionServer } from 'node:net';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
+import { stripVTControlCharacters } from 'node:util';
 import test from 'node:test';
 import { readContract } from './Validate-WorkflowPolicy.mjs';
 
@@ -21,6 +22,31 @@ const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 const runtimePin = digest => ({ ...JSON.parse(read('ci-toolchain.json')), preferred: { ...JSON.parse(read('ci-toolchain.json')).preferred, linuxX64Sha256: digest } });
+
+// Keep reader fixture declarations independent of the repository producer.
+const copilotReaderPin = digest => ({ schemaVersion: 2,
+  preferred: { linuxX64Sha256: digest,
+    windowsX64Sha256: 'ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765' },
+  recoveryCompatibility: { node: '22.23.3', npm: '10.9.9',
+    linuxX64Sha256: 'df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de' } });
+
+// A timeout, signal or launch error is not a completed product refusal.
+function assertReaderCompleted(result, context) {
+  const details = `${context}: error=${result.error?.stack ?? result.error ?? 'none'}; ` +
+    `signal=${String(result.signal)}; status=${String(result.status)}\n${result.stdout ?? ''}${result.stderr ?? ''}`;
+  assert.equal(result.error, undefined, details);
+  assert.equal(result.signal, null, details);
+  assert.equal(Number.isInteger(result.status), true, details);
+  return result;
+}
+
+// Remove terminal styling and join the PowerShell margin; keep message tokens exact.
+function assertCopilotDigestDeclaration(stderr, format) {
+  const diagnostic = stripVTControlCharacters(stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
+  const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
+  const declaration = `package.json engines.node and .github/workflows/ci-toolchain.json ${field}.`;
+  assert.ok(diagnostic.includes(declaration), stderr);
+}
 
 // A nonzero status proves product refusal only after ordinary process completion.
 function assertCompletedProcess(result, context) {
@@ -560,6 +586,8 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
       GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,
       TEST_REVISION: head, TEST_LOG: log, TEST_MODE: '', RUNNER_TEMP: root,
       GITHUB_PATH: path.join(root, 'path'), GITHUB_ENV: path.join(root, 'env'), ...env };
+    // Explicit undefined overrides delete only named keys from this private child map.
+    for (const [name, value] of Object.entries(env)) if (value === undefined) delete environment[name];
     for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
       'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) {
       if (!Object.hasOwn(env, name)) delete environment[name];
@@ -600,9 +628,69 @@ for (const [file, job] of [['build.yml', artifactVerifier],
   }
 }
 
-for (const mode of ['', 'outer-failure', 'nested-failure', 'package-array', 'ready-array']) {
-  test(`lint records both native results: ${mode || 'success'}`, { skip: !linux }, t => {
+// Harmless synthetic selectors replace ambient host inputs in private children only.
+const selectorSeeds = {
+  STYLEGUIDE_RECOVERY_NODE22: 'fq23-stale-recovery', NODE_OPTIONS: '--no-warnings', NODE_PATH: '/fq23-unused-node-path',
+  npm_config_script_shell: 'fq23-unused-shell', NPM_CONFIG_SCRIPT_SHELL: 'fq23-unused-shell-upper',
+  NpM_CoNfIg_FQ23: 'fq23-unused-mixed',
+};
+function selectorEnvironment(family = 'all', recovery = true) {
+  const environment = { TEST_FQ23_UNRELATED: 'fq23-preserved' };
+  for (const name of Object.keys(process.env)) {
+    const fixed = process.platform === 'win32' ? name.toUpperCase() : name;
+    if (['STYLEGUIDE_RECOVERY_NODE22', 'NODE_OPTIONS', 'NODE_PATH'].includes(fixed) || /^npm_config_/iu.test(name)) {
+      environment[name] = undefined;
+    }
+  }
+  for (const [name, value] of Object.entries(selectorSeeds)) {
+    environment[name] = family === 'all' || (family === 'fixed' && !/^npm_config_/iu.test(name)) ||
+      (family === 'npm' && /^npm_config_/iu.test(name)) ? value : undefined;
+  }
+  if (!recovery) environment.STYLEGUIDE_RECOVERY_NODE22 = undefined;
+  if (family === 'all' || family === 'npm') {
+    environment.npm_config_userconfig = '/dev/null';
+    environment.npm_config_globalconfig = '/etc/npmrc-absent-by-policy';
+  }
+  return environment;
+}
+
+// The real credential helper still runs. Only synthetic Node inputs are removed
+// before the Node-based fixed Git mock; product sanitation is observed separately.
+function selectorGitLauncher(f) {
+  const nodeGit = `${f.git}-node`;
+  fs.renameSync(f.git, nodeGit);
+  fs.writeFileSync(f.git, `#!/bin/sh
+if [ "$NODE_OPTIONS" = '--no-warnings' ]; then unset NODE_OPTIONS; fi
+if [ "$NODE_PATH" = '/fq23-unused-node-path' ]; then unset NODE_PATH; fi
+exec '${process.execPath.replaceAll("'", "'\\''")}' '${nodeGit.replaceAll("'", "'\\''")}' "$@"
+`, { mode: 0o700 });
+}
+
+const selectorObserver = `
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['FQ23 sanitation observer']) + '\\n');
+const targets = ${JSON.stringify(Object.keys(selectorSeeds))};
+const owned = require('node:path').join(process.env.RUNNER_TEMP, 'styleguide-node');
+const configs = ['npm_config_userconfig', 'npm_config_globalconfig'];
+const ordinaryEmpty = configs.every(name => {
+  const target = process.env[name], expected = require('node:path').join(owned, name === configs[0] ? 'npm-user.config' : 'npm-global.config');
+  return target === expected && fs.lstatSync(target).isFile() && !fs.lstatSync(target).isSymbolicLink() && fs.readFileSync(target, 'utf8') === '';
+});
+if (targets.some(name => Object.hasOwn(process.env, name)) || !ordinaryEmpty || process.env.TEST_FQ23_UNRELATED !== 'fq23-preserved') {
+  console.error('FQ23 sanitation observer rejected retained selector or invalid owned configuration'); process.exit(98);
+}
+`;
+
+const lintPreferenceCases = [
+  ...['', 'outer-failure', 'nested-failure', 'package-array', 'ready-array'].map(mode => ({ mode, preference: '', family: 'all', suffix: mode || 'success' })),
+  ...['default', 'Low', 'WhatIf', 'Low+WhatIf'].flatMap(preference => ['all', 'absent'].map(family => ({
+    mode: '', preference: (preference.includes('Low') ? "$ConfirmPreference='Low'; " : '') +
+      (preference.includes('WhatIf') ? '$WhatIfPreference=$true; ' : ''), family, suffix: `FQ23 ${preference} ${family}`,
+  }))),
+];
+for (const { mode, preference, family, suffix } of lintPreferenceCases) {
+  test(`lint records both native results: ${suffix}`, { skip: !linux }, t => {
     const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
+    selectorGitLauncher(f);
     fs.mkdirSync(workflows, { recursive: true });
     fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
       read('Test-CheckoutCredentials.ps1').replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
@@ -616,10 +704,8 @@ for (const mode of ['', 'outer-failure', 'nested-failure', 'package-array', 'rea
     fs.writeFileSync(path.join(f.root, 'styleguide-node/ready.json'), JSON.stringify({ node: '24.18.1', npm: '11.16.0' }));
     fs.writeFileSync(path.join(bin, 'node'), `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(3);
+${selectorObserver}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['npm', ...args])+'\\n');
-if (process.env.npm_config_script_shell || process.env.NPM_CONFIG_SCRIPT_SHELL ||
-  fs.readFileSync(process.env.npm_config_userconfig, 'utf8') !== '' ||
-  fs.readFileSync(process.env.npm_config_globalconfig, 'utf8') !== '' || process.env.NODE_OPTIONS || process.env.NODE_PATH) process.exit(97);
 if (process.env.TEST_MODE === 'outer-failure' && args.at(-1) === 'lint:md') process.exit(5);
 if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:nested') process.exit(6);
 `, { mode: 0o700 });
@@ -627,9 +713,8 @@ if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:neste
       const target = mode === 'package-array' ? path.join(f.work, 'package.json') : path.join(f.root, 'styleguide-node/ready.json');
       fs.writeFileSync(target, JSON.stringify([JSON.parse(fs.readFileSync(target, 'utf8'))]));
     }
-    const result = f.run(`& ${quote(path.join(workflows, 'Invoke-MarkdownLint.ps1'))}`, {
-      TEST_MODE: mode, npm_config_userconfig: '/dev/null',
-      npm_config_globalconfig: '/etc/npmrc-absent-by-policy', NPM_CONFIG_SCRIPT_SHELL: 'hostile',
+    const result = f.run(`${preference}& ${quote(path.join(workflows, 'Invoke-MarkdownLint.ps1'))}`, {
+      ...selectorEnvironment(family, false), TEST_MODE: mode,
     });
     assert.equal(result.status === 0, mode === '', result.stderr);
     if (mode.endsWith('-array')) {
@@ -1125,7 +1210,7 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
     });
   }
 
-  for (const format of ['historical-flat', 'schema2']) for (const mode of ['', 'download-failure', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
+  for (const format of ['historical-flat', 'schema2']) for (const mode of ['', 'download-failure', 'wrong-digest', 'version-failure', 'version-empty', 'version-multiline', 'version-wrong']) {
     test(`${setupWorkflowName}: Copilot ${format} runtime failure: ${mode || 'success'}`, { skip: !linux }, t => {
       const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
       fs.mkdirSync(workflows, { recursive: true });
@@ -1144,8 +1229,8 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
       const archive = path.join(f.root, 'runtime.tar.xz');
       const packed = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
       assert.equal(packed.status, 0, packed.stderr);
-      const digest = createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
-      fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(format === 'schema2' ? runtimePin(digest) : { linuxX64Sha256: digest }));
+      const digest = mode === 'wrong-digest' ? 'b'.repeat(64) : createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+      fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(format === 'schema2' ? copilotReaderPin(digest) : { linuxX64Sha256: digest }));
       const curl = path.join(f.root, 'curl');
       fs.writeFileSync(curl, `#!${process.execPath}
   const fs = require('node:fs'), args = process.argv.slice(2);
@@ -1157,6 +1242,7 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
         .find(step => step.name === 'Set up verified official Node.js runtime').run
         .replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl));
       const result = f.run(source, { TOOLCHAIN_LAYOUT: 'modern', TEST_MODE: mode });
+      assertReaderCompleted(result, `${setupWorkflowName}/${format}/${mode || 'success'}`);
       assert.equal(result.status === 0, mode === '', result.stderr);
       const request = f.calls().find(row => row[0] === 'curl');
       assert.equal(request[1], '--disable');
@@ -1168,6 +1254,30 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
         assert.equal(request[request.indexOf(flag) + 1], value);
       }
       if (mode === 'download-failure') assert.match(result.stderr, /download exited 28/);
+      if (mode === 'wrong-digest') {
+        assert.match(result.stderr, /official Node archive does not match the reviewed digest/);
+        const declarationPath = '.github/workflows/ci-toolchain.json';
+        const field = format === 'schema2' ? 'preferred.linuxX64Sha256' : 'linuxX64Sha256';
+        const colored = result.stderr.split('\n').map(line => `\u001b[31m${line}\u001b[0m`).join('\n');
+        for (const diagnosticText of [result.stderr, colored]) {
+          assertCopilotDigestDeclaration(diagnosticText, format);
+          const diagnosticMutations = [
+            ['wrong-path', diagnosticText.replaceAll(declarationPath, '.github/workflows/other-toolchain.json')],
+            ['missing-path', diagnosticText.replaceAll(declarationPath, '')],
+            ['wrong-field', diagnosticText.replaceAll(field,
+              format === 'schema2' ? 'recoveryCompatibility.linuxX64Sha256' : 'windowsX64Sha256')],
+            ['missing-field', diagnosticText.replaceAll(field, '')],
+            ['misordered-field', diagnosticText.replaceAll(field, '').replaceAll(declarationPath, `${field} ${declarationPath}`)],
+          ];
+          for (const [mutation, mutated] of diagnosticMutations) {
+            const context = `${setupWorkflowName}/${format}/${mutation}`;
+            assert.notEqual(mutated, diagnosticText, `${context}: control must change actual native stderr.`);
+            assert.throws(() => assertCopilotDigestDeclaration(mutated, format),
+              { name: 'AssertionError', code: 'ERR_ASSERTION' }, `${context}: incorrect declaration must be refused.`);
+          }
+        }
+        assert.equal(fs.existsSync(path.join(f.root, 'agent-validation-node')), false, 'Digest failure must precede extraction.');
+      }
       if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
       if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
       if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
@@ -2080,6 +2190,52 @@ test('dedicated review setup preserves every preparation guard and omits only th
   assert.match(complete.run, /-m pre_commit run --all-files/u);
   assert.deepEqual(reviewJob.steps, copilotJob.steps.filter(step => step !== complete));
   assert.equal(reviewJob.steps.some(step => step.run.includes('-m pre_commit run --all-files')), false);
+  const readerGroup = run => {
+    const source = run.replaceAll('\r\n', '\n');
+    const starts = [...source.matchAll(/^([ \t]*)function Read-SetupJson \{$/gmu)];
+    const runtimes = [...source.matchAll(/^([ \t]*)function Read-SetupRuntime \{$/gmu)];
+    assert.equal(starts.length, 1, 'Exactly one JSON reader group is required.');
+    assert.equal(runtimes.length, 1, 'Exactly one runtime reader is required.');
+    const [start] = starts, [runtime] = runtimes, indent = start[1];
+    assert.equal(runtime[1], indent);
+    assert.ok(runtime.index > start.index);
+    const end = new RegExp(`^${indent}\\}$`, 'mu').exec(source.slice(runtime.index));
+    assert.ok(end, 'The runtime reader must have one closing group boundary.');
+    const group = source.slice(start.index, runtime.index + end.index + end[0].length);
+    for (const name of ['Read-SetupJson', 'Assert-UniqueJson', 'Assert-SetupShape', 'Read-SetupRuntime']) {
+      assert.equal([...group.matchAll(new RegExp(`^[ \\t]*function ${name} \\{$`, 'gmu'))].length, 1, name);
+    }
+    return group.split('\n').map(line => {
+      if (line === '') return line;
+      assert.ok(line.startsWith(indent), 'Only embedding indentation may be removed.');
+      return line.slice(indent.length);
+    }).join('\n');
+  };
+  const compareReaders = runs => {
+    assert.equal(runs.length, 4);
+    const groups = runs.map(readerGroup);
+    for (const [index, group] of groups.entries()) assert.equal(group, groups[0], `Reader group ${index} differs.`);
+  };
+  const runs = [coding.jobs['copilot-setup-steps'], reviewJob].flatMap(job =>
+    ['Detect locked validation-tool layout', 'Set up verified official Node.js runtime'].map(name => {
+      const steps = job.steps.filter(step => step.name === name);
+      assert.equal(steps.length, 1, name);
+      return steps[0].run;
+    }));
+  compareReaders(runs);
+  const changedReader = run => {
+    const from = '-AsHashtable -Depth 64 -ErrorAction Stop';
+    assert.equal(run.split(from).length, 2, 'Mutation must change one actual JSON reader.');
+    return run.replace(from, '-AsHashtable -Depth 63 -ErrorAction Stop');
+  };
+  assert.throws(() => compareReaders(runs.map((run, index) => index === 0 ? changedReader(run) : run)), { code: 'ERR_ASSERTION' });
+  const pairedDrift = runs.map((run, index) => index % 2 === 0 ? changedReader(run) : run);
+  assert.equal(pairedDrift[0], pairedDrift[2]);
+  assert.equal(pairedDrift[1], pairedDrift[3]);
+  assert.throws(() => compareReaders(pairedDrift), { code: 'ERR_ASSERTION' });
+  for (const replacement of ['', 'function Read-SetupJson {\nfunction Read-SetupJson {']) {
+    assert.throws(() => readerGroup(runs[0].replace('function Read-SetupJson {', replacement)), { code: 'ERR_ASSERTION' });
+  }
 });
 for (const mode of ['declared', 'historical', 'missing-current-input']) {
   test(`dedicated review actual capability selection: ${mode}`, { skip: !linux }, t => {
@@ -2119,6 +2275,29 @@ for (const mode of ['clean', 'worktree', 'index-masked', 'untracked']) {
 }
 
 // Strict whole declarations must fail at each actual workflow admission site.
+const copilotMalformedRuntimeDeclarations = () => {
+  const pin = copilotReaderPin('a'.repeat(64));
+  const changed = edit => { const value = structuredClone(pin); edit(value); return JSON.stringify(value); };
+  const spoof = object => ({ ...object, Count: Object.keys(object).length, Keys: Object.keys(object), PSBase: 'shadow', extra: true });
+  const flat = { linuxX64Sha256: 'a'.repeat(64) };
+  return [JSON.stringify(spoof(pin)), changed(p => p.preferred = spoof(p.preferred)),
+    changed(p => p.recoveryCompatibility = spoof(p.recoveryCompatibility)), JSON.stringify(spoof(flat)),
+    changed(p => Object.assign(p, { count: 3, keys: Object.keys(pin), extra: true })),
+    ...[[], [pin], [flat], [pin, pin], [[pin]]].map(JSON.stringify),
+    'null', '"declaration"', '{}', '{', '{"linuxX64Sha256":"' + 'a'.repeat(64) + '","linuxX64Sha256":"' + 'b'.repeat(64) + '"}',
+    changed(p => p.schemaVersion = 1), changed(p => p.schemaVersion = '2'), changed(p => p.schemaVersion = 99),
+    changed(p => p.linuxX64Sha256 = 'a'.repeat(64)), changed(p => delete p.preferred),
+    changed(p => delete p.preferred.linuxX64Sha256), changed(p => delete p.preferred.windowsX64Sha256),
+    changed(p => p.preferred.linuxX64Sha256 = 'A'.repeat(64)), changed(p => p.preferred.windowsX64Sha256 = []),
+    ...[null, 1, []].flatMap(value => [changed(p => p.preferred = value), changed(p => p.recoveryCompatibility = value)]),
+    ...[null, 1, [], 'A'.repeat(64), 'a'.repeat(63), 'a'.repeat(65)].map(linuxX64Sha256 => JSON.stringify({ linuxX64Sha256 })),
+    changed(p => p.preferred.linuxX64Sha256 = null), changed(p => p.preferred.windowsX64Sha256 = 'b'.repeat(63)),
+    changed(p => p.recoveryCompatibility.linuxX64Sha256 = 'C'.repeat(64)),
+    changed(p => p.recoveryCompatibility.node = '22.x'), changed(p => p.recoveryCompatibility.npm = ['10.9.9']),
+    changed(p => delete p.recoveryCompatibility.linuxX64Sha256), changed(p => p.recoveryCompatibility.url = 'https://example.invalid/'),
+    JSON.stringify(pin).replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2'),
+    JSON.stringify(pin).replace('"node":"22.23.3"', '"node":"22.23.3","n\\u006fde":"22.23.3"')];
+};
 const malformedRuntimeDeclarations = () => {
   const pin = runtimePin('a'.repeat(64));
   const changed = edit => { const value = structuredClone(pin); edit(value); return JSON.stringify(value); };
@@ -2141,17 +2320,18 @@ const malformedRuntimeDeclarations = () => {
 for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
   test(`${workflow}: whole malformed declaration rejects before curl at both sites`, { skip: !linux }, t => {
     const job = parse(read(workflow)).jobs['copilot-setup-steps'];
-    for (const raw of malformedRuntimeDeclarations()) {
+    for (const raw of copilotMalformedRuntimeDeclarations()) {
       const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
       f.put('.github/workflows/ci-toolchain.json', raw);
       const curl = path.join(f.root, 'curl');
       fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${f.root}/curl-marker'\nexit 19\n`, { mode: 0o700 });
       const admitted = f.run('Detect locked validation-tool layout');
-      assert.equal(admitted.error, undefined);
+      assertReaderCompleted(admitted, 'Reader detection malformed input');
       assert.notEqual(admitted.status, 0, raw);
+      assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
       const acquired = f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
         source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl)));
-      assert.equal(acquired.error, undefined);
+      assertReaderCompleted(acquired, 'Reader runtime malformed input');
       assert.notEqual(acquired.status, 0, raw);
       assert.equal(fs.existsSync(path.join(f.root, 'curl-marker')), false, raw);
       assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, raw);
@@ -2159,23 +2339,103 @@ for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
   });
 }
 
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  test(`${workflow}: reader bridge rejects terminal newlines in declared tokens`, { skip: !linux }, t => {
+    const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+    for (const format of ['historical-flat', 'schema2']) {
+      const digestFields = format === 'schema2'
+        ? ['preferred.linuxX64Sha256', 'preferred.windowsX64Sha256', 'recoveryCompatibility.linuxX64Sha256']
+        : ['linuxX64Sha256'];
+      for (const field of ['engines.node', 'engines.npm', ...digestFields]) for (const suffix of ['\n', '\r\n']) {
+        const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
+        const declaration = format === 'schema2' ? copilotReaderPin('a'.repeat(64)) : { linuxX64Sha256: 'a'.repeat(64) };
+        const manifest = JSON.parse(fs.readFileSync(path.join(f.work, 'package.json'), 'utf8'));
+        const keys = field.split('.'), leaf = keys.pop();
+        const target = keys.reduce((value, key) => value[key], field.startsWith('engines.') ? manifest : declaration);
+        target[leaf] += suffix;
+        f.put('package.json', JSON.stringify(manifest));
+        f.put('.github/workflows/ci-toolchain.json', JSON.stringify(declaration));
+        const label = `${workflow}/${format}/${field}/${JSON.stringify(suffix)}`;
+        const curl = path.join(f.root, 'curl'), marker = path.join(f.root, 'curl-marker');
+        fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${marker}'\nexit 19\n`, { mode: 0o700 });
+        const detected = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${label}/detection`);
+        assert.notEqual(detected.status, 0, label);
+        assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='), label);
+        const acquired = assertReaderCompleted(f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
+          source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl))), `${label}/runtime`);
+        assert.notEqual(acquired.status, 0, label);
+        const diagnostic = field.startsWith('engines.') ? /invalid declared runtime tuple/ : /invalid runtime digest/;
+        assert.match(detected.stderr, diagnostic, label);
+        assert.match(acquired.stderr, diagnostic, label);
+        assert.equal(fs.existsSync(marker), false, label);
+        assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, label);
+      }
+    }
+  });
+}
+
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  for (const kind of ['historical-flat', 'schema2', 'pre-declaration', 'historical', 'historical-full', 'legacy']) {
+    test(`${workflow}: reader bridge capability: ${kind}`, { skip: !linux }, t => {
+      const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+      const f = copilotBodyFixture(t, 'work', job);
+      copilotInputs(f, ['historical-flat', 'schema2'].includes(kind) ? 'declared' : kind === 'historical-full' ? 'historical' : kind);
+      if (kind === 'schema2') f.put('.github/workflows/ci-toolchain.json', JSON.stringify(copilotReaderPin('a'.repeat(64))));
+      if (kind === 'historical-full') for (const name of copilotFullInputs) f.put(name);
+      const result = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${workflow}/${kind}`);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      const output = fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8');
+      assert.match(output, new RegExp(`layout=${kind === 'legacy' ? 'legacy' : 'modern'}`));
+      assert.match(output, new RegExp(`validation=${['historical', 'legacy'].includes(kind) ? 'node-only' : 'full'}`));
+      if (['historical', 'legacy'].includes(kind)) assert.match(result.stdout, /Python and full validation are unavailable/);
+      assert.equal(fs.existsSync(f.env.GITHUB_PATH), false, 'Detection cannot publish a runtime.');
+    });
+  }
+}
+
+for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
+  test(`${workflow}: reader bridge declaration exact and oversized byte bounds`, { skip: !linux }, t => {
+    const job = parse(read(workflow)).jobs['copilot-setup-steps'];
+    for (const length of [16384, 16385]) {
+      const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
+      const raw = JSON.stringify({ linuxX64Sha256: 'a'.repeat(64) }).padEnd(length, ' ');
+      assert.equal(Buffer.byteLength(raw), length);
+      f.put('.github/workflows/ci-toolchain.json', raw);
+      const curl = path.join(f.root, 'curl'), marker = path.join(f.root, 'curl-marker');
+      fs.writeFileSync(curl, `#!/bin/sh\nprintf reached > '${marker}'\nexit 19\n`, { mode: 0o700 });
+      const detected = assertReaderCompleted(f.run('Detect locked validation-tool layout'), `${workflow}/bound detection/${length}`);
+      assert.equal(detected.status === 0, length === 16384, detected.stdout + detected.stderr);
+      const acquired = assertReaderCompleted(f.run('Set up verified official Node.js runtime', { TOOLCHAIN_LAYOUT: 'modern' },
+        source => source.replaceAll("'/usr/bin/curl'", quote(curl)).replaceAll("'/bin/curl'", quote(curl))),
+      `${workflow}/bound runtime/${length}`);
+      assert.notEqual(acquired.status, 0);
+      assert.equal(fs.existsSync(marker), length === 16384, acquired.stdout + acquired.stderr);
+      assert.match(acquired.stderr, length === 16384 ? /download exited 19/ : /bounded regular JSON input required/);
+      assert.equal(fs.existsSync(f.env.GITHUB_PATH), false);
+      if (length === 16385) assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
+    }
+  });
+}
+
 // The dispatch log is outside owned staging, so cleanup cannot erase evidence
 // that a malformed declaration reached the replacement acquisition executable.
-function ordinaryDeclarationFixture(t, raw, source = read('Initialize-CiToolchain.ps1'), curlAction = '') {
+function ordinaryDeclarationFixture(t, raw, source = read('Initialize-CiToolchain.ps1'), curlAction = '', options = {}) {
   const f = fixture(t), workflows = path.join(f.work, '.github/workflows'); fs.mkdirSync(workflows, { recursive: true });
-  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+  if (options.selectors) selectorGitLauncher(f);
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify(options.packageValue ?? { engines: { node: '24.18.1', npm: '11.16.0' } }));
   fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), raw);
   fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
     .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
   const curl = path.join(f.root, 'curl'), dispatchLog = path.join(f.root, 'curl-dispatches');
   assert.equal(fs.existsSync(dispatchLog), false);
   fs.writeFileSync(curl, `#!${process.execPath}
+${options.selectors ? `{ const fs = require('node:fs'); ${selectorObserver} }` : ''}
 require('node:fs').appendFileSync(${JSON.stringify(dispatchLog)}, 'dispatch\\n');
 ${curlAction}
 process.exit(99);
 `, { mode: 0o700 });
   fs.writeFileSync(path.join(workflows, 'Initialize-CiToolchain.ps1'), source.replaceAll('/usr/bin/curl', curl));
-  const result = f.run(`& ${quote(path.join(workflows, 'Initialize-CiToolchain.ps1'))}`);
+  const result = f.run(`${options.preference ?? ''}& ${quote(path.join(workflows, 'Initialize-CiToolchain.ps1'))}`, options.selectors ? selectorEnvironment(options.selectors) : {});
   const dispatches = fs.existsSync(dispatchLog) ? fs.readFileSync(dispatchLog, 'utf8').trim().split('\n') : [];
   return { ...f, result, dispatches };
 }
@@ -2209,20 +2469,188 @@ test('ordinary schema2 rejects malformed and historical declarations before down
   }
 });
 
+// These cases belong to the ordinary initializer, whose schema is always schema2.
+function ordinaryExactTokenCases() {
+  const pin = runtimePin('a'.repeat(64));
+  const packageValue = { engines: { node: '24.18.1', npm: '11.16.0' } };
+  const make = (name, edit, valid = false) => {
+    const value = { pin: structuredClone(pin), package: structuredClone(packageValue) };
+    edit(value);
+    return { name, valid, pin: JSON.stringify(value.pin), package: JSON.stringify(value.package) };
+  };
+  const fields = ['package.engines.node', 'package.engines.npm',
+    'pin.preferred.linuxX64Sha256', 'pin.preferred.windowsX64Sha256', 'pin.recoveryCompatibility.linuxX64Sha256',
+    'pin.recoveryCompatibility.node', 'pin.recoveryCompatibility.npm'];
+  const change = (value, field, text, prefix = false) => {
+    const parts = field.split('.'), key = parts.pop();
+    const owner = parts.reduce((object, part) => object[part], value);
+    owner[key] = prefix ? text + owner[key] : owner[key] + text;
+  };
+  return [make('valid baseline', () => {}, true),
+    make('valid variable patch', value => value.package.engines.node = '24.18.2', true),
+    ...fields.flatMap(field => [['LF', '\n'], ['CRLF', '\r\n'], ['TAB', '\t'], ['extra', 'x']]
+      .map(([label, text]) => make(`${field} ${label}`, value => change(value, field, text)))),
+    ...fields.slice(0, 5).map(field => make(`${field} leadingLF`, value => change(value, field, '\n', true)))];
+}
+
+test('FQ30 ordinary exact token admission preserves valid values and refuses extra characters', t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const boundaries = ['function Assert-Shape {', 'function Assert-WindowsWriter {',
+    "Assert-Shape $objPin @('schemaVersion', 'preferred', 'recoveryCompatibility')",
+    '$strRunnerRoot = Assert-OrdinaryPath $env:RUNNER_TEMP -Directory'];
+  const offsets = boundaries.map(anchor => {
+    assert.equal(original.split(anchor).length, 2, 'Admission extraction boundary must occur exactly once.');
+    return original.indexOf(anchor);
+  });
+  assert.ok(offsets.every((offset, index) => index === 0 || offset > offsets[index - 1]));
+  const helper = original.slice(offsets[0], offsets[1]);
+  const admission = original.slice(offsets[2], offsets[3]);
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-admission-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const cases = ordinaryExactTokenCases(), casesPath = path.join(root, 'cases.json');
+  fs.writeFileSync(casesPath, JSON.stringify(cases));
+  const script = path.join(root, 'admission.ps1');
+  // Execute the actual pure admission stage. Whole-script side effects are tested separately.
+  fs.writeFileSync(script, `$ErrorActionPreference = 'Stop'\n${helper}\n$admission = {\n${admission}\n}
+$cases = Get-Content -LiteralPath ${quote(casesPath)} -Raw | ConvertFrom-Json
+$results = @(foreach ($case in $cases) {
+    $objPin = ConvertFrom-Json -InputObject $case.pin -AsHashtable
+    $objPackage = ConvertFrom-Json -InputObject $case.package -AsHashtable
+    $accepted = $false
+    try { & $admission; $accepted = $true }
+    catch { if ($_.Exception.Message -cne 'The reviewed runtime declaration is invalid.') { throw } }
+    [ordered]@{ name = $case.name; accepted = $accepted }
+})
+ConvertTo-Json -InputObject $results -Depth 3
+`);
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+    cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+  }), 'FQ30 actual ordinary admission stage');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), cases.map(value => ({ name: value.name, accepted: value.valid })));
+  assert.equal(read('Initialize-CiToolchain.ps1'), original);
+});
+
+test('FQ30 ordinary newline declarations refuse before download and runner publication', { skip: !linux }, t => {
+  for (const value of ordinaryExactTokenCases().filter(row => / (?:LF|CRLF)$/u.test(row.name))) {
+    const f = ordinaryDeclarationFixture(t, value.pin, read('Initialize-CiToolchain.ps1'), '', {
+      packageValue: JSON.parse(value.package),
+    });
+    assertOrdinaryFailureCleanup(f);
+    assertNoOrdinaryDispatch(f);
+    assert.match(f.result.stderr, /The reviewed runtime declaration is invalid/u, value.name);
+    assert.deepEqual(f.calls(), [], 'Malformed values must not reach credential setup.');
+  }
+});
+
+
+// Whole WhatIf still refuses at the real directory gate. This exact copied-source
+// anchor perturbs cleanup preferences only after successful real ownership.
+function initializerCleanupStage(source, whatIf = false) {
+  const anchor = '    $boolOwned = $true\n';
+  assert.equal(source.split(anchor).length, 2, 'Cleanup ownership anchor must occur exactly once.');
+  const marker = "    Write-Output 'FQ23 cleanup stage'\n";
+  if (!whatIf) return source.replace(anchor, anchor + marker);
+  const endAnchor = "    $env:npm_config_userconfig = Join-Path $strNodeRoot 'npm-user.config'\n";
+  assert.equal(source.split(endAnchor).length, 2, 'Cleanup configuration anchor must occur exactly once.');
+  assert.equal(source.includes('$boolFq24PriorWhatIf'), false, 'Fixture preference variable must not collide with actual source.');
+  const start = source.indexOf(anchor) + anchor.length, end = source.indexOf(endAnchor);
+  assert.ok(end > start, 'Actual cleanup must end before reviewed configuration and runtime acquisition.');
+  const cleanup = source.slice(start, end);
+  const scoped = marker + '    $boolFq24PriorWhatIf = $WhatIfPreference\n' +
+    '    try {\n        $WhatIfPreference = $true\n' +
+    cleanup.replace(/^/gmu, '    ').trimEnd() + '\n' +
+    '    } finally {\n        $WhatIfPreference = $boolFq24PriorWhatIf\n    }\n' +
+    '    if ($WhatIfPreference -ne $boolFq24PriorWhatIf) {\n' +
+    "        throw 'FQ24 cleanup preference restoration failed'\n    }\n" +
+    "    Write-Output 'FQ24 cleanup preference restored'\n";
+  return source.slice(0, start) + scoped + source.slice(end);
+}
+
+for (const family of ['npm', 'absent']) {
+  test(`FQ23 ordinary Low sanitation ${family}`, { skip: !linux }, t => {
+    const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(read('Initialize-CiToolchain.ps1')), '', { selectors: family, preference: "$ConfirmPreference='Low'; " });
+    assertOrdinaryFailureCleanup(f);
+    assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+    assert.match(f.result.stderr, /Runtime download failed: 99/u);
+    assert.deepEqual(f.dispatches, ['dispatch']);
+    assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+  });
+}
+
+test('FQ23 initializer internal-stage WhatIf sanitation', { skip: !linux }, t => {
+  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+    initializerCleanupStage(read('Initialize-CiToolchain.ps1'), true), '', { selectors: 'all' });
+  assertOrdinaryFailureCleanup(f);
+  assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+  assert.match(f.result.stdout, /FQ24 cleanup preference restored/u);
+  assert.doesNotMatch(f.result.stderr, /Restricted staging directory creation was declined/u);
+  assert.match(f.result.stderr, /Runtime download failed: 99/u);
+  assert.deepEqual(f.dispatches, ['dispatch']);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+});
+
+for (const parameter of ['Confirm', 'WhatIf']) for (const family of ['fixed', 'npm']) {
+  test(`FQ23 initializer sanitation mutation ${parameter} ${family}`, { skip: !linux }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    const anchor = family === 'fixed'
+      ? 'Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false'
+      : 'Remove-Item -LiteralPath "Env:$($_.Name)" -Confirm:$false -WhatIf:$false';
+    assert.equal(original.split(anchor).length, 2, 'Exactly one intended removal site must change.');
+    const mutated = original.replace(anchor, anchor.replace(` -${parameter}:$false`, ''));
+    assert.notEqual(mutated, original);
+    const options = { selectors: family, preference: parameter === 'Confirm' ? "$ConfirmPreference='Low'; " : '' };
+    const baseline = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(original, parameter === 'WhatIf'), '', options);
+    assertOrdinaryFailureCleanup(baseline);
+    assert.match(baseline.result.stdout, /FQ23 cleanup stage/u);
+    if (parameter === 'WhatIf') assert.match(baseline.result.stdout, /FQ24 cleanup preference restored/u);
+    assert.match(baseline.result.stderr, /Runtime download failed: 99/u);
+    assert.deepEqual(baseline.dispatches, ['dispatch']);
+    assert.equal(baseline.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+    const witness = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(mutated, parameter === 'WhatIf'), '', options);
+    assertOrdinaryFailureCleanup(witness);
+    assert.match(witness.result.stdout, /FQ23 cleanup stage/u);
+    assert.deepEqual(witness.dispatches, []);
+    if (parameter === 'Confirm') {
+      assert.match(witness.result.stderr, family === 'fixed' ? /Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22/u : /Remove-Item -LiteralPath/u);
+      assert.match(witness.result.stderr, /NonInteractive|non-interactive/iu);
+      assert.doesNotMatch(witness.result.stderr, /FQ23 sanitation observer/u);
+      assert.equal(witness.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 0);
+    } else {
+      assert.match(witness.result.stdout, /FQ24 cleanup preference restored/u);
+      assert.doesNotMatch(witness.result.stderr, /Restricted staging directory creation was declined/u);
+      assert.match(witness.result.stderr, /FQ23 sanitation observer rejected retained selector/u);
+      assert.match(witness.result.stderr, /Runtime download failed: 98/u);
+      assert.equal(witness.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+    }
+    assert.doesNotMatch(witness.result.stderr, /Runtime download failed: 99/u);
+  });
+}
+
 test('F5 ordinary valid declaration proves curl dispatch observation', { skip: !linux }, t => {
-  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))));
+  const source = initializerCleanupStage(read('Initialize-CiToolchain.ps1'));
+  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))), source, '', { selectors: 'fixed' });
   assertOrdinaryFailureCleanup(f);
   assert.deepEqual(f.dispatches, ['dispatch']);
-  assert.match(f.result.stderr, /download failed/u);
+  assert.match(f.result.stderr, /Runtime download failed: 99/u);
+  assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
   const initializer = path.join(f.work, '.github/workflows/Initialize-CiToolchain.ps1');
   const dispatchLog = path.join(f.root, 'curl-dispatches'), initialDispatches = fs.readFileSync(dispatchLog);
-  const whatIf = f.run(`$WhatIfPreference=$true; $ConfirmPreference='Low'; & ${quote(initializer)}`);
+  const whatIf = f.run(`$WhatIfPreference=$true; $ConfirmPreference='Low'; & ${quote(initializer)}`, selectorEnvironment('fixed'));
   assertOrdinaryFailureCleanup({ ...f, result: whatIf });
   assert.match(whatIf.stderr, /Restricted staging directory creation was declined/u);
+  assert.doesNotMatch(whatIf.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
   assert.deepEqual(fs.readFileSync(dispatchLog), initialDispatches, 'Inherited WhatIf must refuse before additional curl dispatch.');
-  const lowConfirm = f.run(`$ConfirmPreference='Low'; & ${quote(initializer)}`);
+  const lowConfirm = f.run(`$ConfirmPreference='Low'; & ${quote(initializer)}`, selectorEnvironment('fixed'));
   assertOrdinaryFailureCleanup({ ...f, result: lowConfirm });
   assert.match(lowConfirm.stderr, /Runtime download failed: 99/u);
+  assert.match(lowConfirm.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 2);
   assert.deepEqual(fs.readFileSync(dispatchLog, 'utf8').trim().split('\n'), ['dispatch', 'dispatch'],
     'Low confirmation preference must reach exactly one additional curl dispatch without prompting.');
   t.diagnostic(`Valid declaration control: child status ${f.result.status}, curl dispatches ${f.dispatches.length}; inherited WhatIf refused and low confirmation completed.`);

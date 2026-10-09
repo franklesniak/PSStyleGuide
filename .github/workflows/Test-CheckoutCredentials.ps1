@@ -1,9 +1,9 @@
-#Requires -Version 7.0
+#Requires -Version 7.3
 # .SYNOPSIS
 # Verifies that the anonymous checkout retained no credentials.
 #
 # .DESCRIPTION
-# Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
+# Requires PowerShell 7.3 or later for the retained helper APIs. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
 #
 # .EXAMPLE
 # & "$PSScriptRoot/Test-CheckoutCredentials.ps1"

@@ -1100,13 +1100,13 @@ Assert-Shape $objPin @('schemaVersion', 'preferred', 'recoveryCompatibility')
 Assert-Shape $objPin.preferred @('linuxX64Sha256', 'windowsX64Sha256')
 Assert-Shape $objPin.recoveryCompatibility @('node', 'npm', 'linuxX64Sha256')
 if ($objPin.schemaVersion -isnot [long] -or $objPin.schemaVersion -ne 2 -or
-    $objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
-    $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or
+    $objPackage.engines.node -isnot [string] -or $objPackage.engines.node -cnotmatch '\A24\.[0-9]+\.[0-9]+\z' -or
+    $objPackage.engines.npm -isnot [string] -or $objPackage.engines.npm -cnotmatch '\A[0-9]+\.[0-9]+\.[0-9]+\z' -or
     $objPin.recoveryCompatibility.node -isnot [string] -or $objPin.recoveryCompatibility.node -cne '22.23.3' -or $objPin.recoveryCompatibility.npm -isnot [string] -or $objPin.recoveryCompatibility.npm -cne '10.9.9') {
     throw 'The reviewed runtime declaration is invalid.'
 }
 foreach ($strRuntimeDigest in @($objPin.preferred.linuxX64Sha256, $objPin.preferred.windowsX64Sha256, $objPin.recoveryCompatibility.linuxX64Sha256)) {
-    if ($strRuntimeDigest -isnot [string] -or $strRuntimeDigest -cnotmatch '^[a-f0-9]{64}$') {
+    if ($strRuntimeDigest -isnot [string] -or $strRuntimeDigest -cnotmatch '\A[a-f0-9]{64}\z') {
         throw 'The reviewed runtime declaration is invalid.'
     }
 }
@@ -1198,12 +1198,13 @@ try {
     [IO.File]::WriteAllText($strMarker, $strOwnership, $objStrictUtf8Encoding)
     $strMarkerIdentity = Get-OwnedPathIdentity $strMarker
     $boolOwned = $true
-    Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue
+    # Process-local selector cleanup is mandatory before child execution.
+    Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
     Get-ChildItem Env: | Where-Object {
         $_.Name -imatch '^npm_config_'
     } |
     ForEach-Object {
-        Remove-Item -LiteralPath "Env:$($_.Name)"
+        Remove-Item -LiteralPath "Env:$($_.Name)" -Confirm:$false -WhatIf:$false
     }
     $env:npm_config_userconfig = Join-Path $strNodeRoot 'npm-user.config'
     $env:npm_config_globalconfig = Join-Path $strNodeRoot 'npm-global.config'

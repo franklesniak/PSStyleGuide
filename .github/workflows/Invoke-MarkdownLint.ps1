@@ -268,12 +268,13 @@ $strNpmScriptPath = Join-Path $strRuntimePath $(if ($IsWindows) {
 })
 $null = Assert-OrdinaryPath $strNodePath
 $null = Assert-OrdinaryPath $strNpmScriptPath
-Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue
+# Process-local selector cleanup is mandatory before child execution.
+Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
 Get-ChildItem Env: | Where-Object {
     $_.Name -imatch '^npm_config_'
 } |
 ForEach-Object {
-    Remove-Item -LiteralPath "Env:$($_.Name)"
+    Remove-Item -LiteralPath "Env:$($_.Name)" -Confirm:$false -WhatIf:$false
 }
 $env:npm_config_userconfig = Join-Path $strNodeRoot 'npm-user.config'
 $env:npm_config_globalconfig = Join-Path $strNodeRoot 'npm-global.config'
