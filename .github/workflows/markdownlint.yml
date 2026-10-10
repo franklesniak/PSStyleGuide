@@ -65,6 +65,7 @@ jobs:
         id: validate
         shell: pwsh
         run: |
+          Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
           & node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml
           if ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }
   markdownlint:
@@ -131,5 +132,6 @@ jobs:
         id: audit
         shell: pwsh
         run: |
+          Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
           & node ./.github/workflows/Check-NpmAudit.mjs --ci
           if ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }

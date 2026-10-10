@@ -93,6 +93,7 @@ jobs:
           if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }
           & ./.github/workflows/Test-AgentInstructions.ps1 -MetadataClassificationOnly -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE
           if ($LASTEXITCODE -ne 0) { throw 'Accepted metadata classification rejected PR data.' }
+          Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
           $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Maintenance classification failed.' }
           $objResult = $strResult | ConvertFrom-Json -ErrorAction Stop
@@ -208,5 +209,6 @@ jobs:
                   }
               }
           }
+          Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
           & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

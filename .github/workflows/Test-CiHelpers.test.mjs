@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn, spawnSync } from 'node:child_process';
 import { createServer } from 'node:http';
+import { createServer as createConnectionServer } from 'node:net';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { stripVTControlCharacters } from 'node:util';
@@ -20,8 +21,23 @@ const head = 'a'.repeat(40), base = 'b'.repeat(40);
 const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
+const runtimePin = digest => ({ ...JSON.parse(read('ci-toolchain.json')), preferred: { ...JSON.parse(read('ci-toolchain.json')).preferred, linuxX64Sha256: digest } });
 
-// The bridge keeps its flat producer. Future schema2 is inert fixture input only.
+
+// Capability probes are not download dispatches; each transfer retains its old behavior.
+const fq40CurlQueryStub = String.raw`{
+const queryArgs=process.argv.slice(2);
+if(JSON.stringify(queryArgs)===JSON.stringify(['--disable','--version'])) {
+console.log('curl 8.5.0 (fixture) libcurl/8.5.0 OpenSSL/3.0.0\nProtocols: https\nFeatures: SSL');
+process.exit(0);
+}
+if(JSON.stringify(queryArgs)===JSON.stringify(['--disable','--help','all'])) {
+console.log(['disable','silent','show-error','fail','location','proto','proto-redir','tlsv1.2','connect-timeout','max-time','retry','retry-max-time','output','max-filesize'].map(flag=>' --'+flag+' fixture').join('\n'));
+process.exit(0);
+}
+}`;
+
+// Keep reader fixture declarations independent of the repository producer.
 const copilotReaderPin = digest => ({ schemaVersion: 2,
   preferred: { linuxX64Sha256: digest,
     windowsX64Sha256: 'ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765' },
@@ -45,6 +61,133 @@ function assertCopilotDigestDeclaration(stderr, format) {
   const declaration = `package.json engines.node and .github/workflows/ci-toolchain.json ${field}.`;
   assert.ok(diagnostic.includes(declaration), stderr);
 }
+
+// A nonzero status proves product refusal only after ordinary process completion.
+function assertCompletedProcess(result, context) {
+  const details = `${context}: error=${result.error?.stack ?? result.error ?? 'none'}; ` +
+    `signal=${String(result.signal)}; status=${String(result.status)}\n${result.stdout ?? ''}${result.stderr ?? ''}`;
+  assert.equal(result.error, undefined, details);
+  assert.equal(result.signal, null, details);
+  assert.equal(Number.isInteger(result.status), true, details);
+  return result;
+}
+
+test('F7 ordinary process completion preserves native statuses and result identity', () => {
+  for (const status of [0, 1, 37]) {
+    const result = Object.freeze({ error: undefined, signal: null, status,
+      stdout: 'fixture stdout', stderr: 'fixture stderr' });
+    assert.equal(assertCompletedProcess(result, `completed ${status}`), result);
+    assert.equal(result.status, status);
+  }
+});
+
+test('F7 ordinary process completion rejects incomplete or invalid native results', () => {
+  const cases = [
+    ['launch error', { status: null, signal: null, error: new Error('fixture ENOENT') }],
+    ['timeout error', { status: null, signal: 'SIGTERM', error: new Error('fixture ETIMEDOUT') }],
+    ['signal only', { status: null, signal: 'SIGTERM' }],
+    ['error with numeric status', { status: 1, signal: null, error: new Error('fixture ETIMEDOUT') }],
+    ['missing status', { signal: null }],
+    ['missing signal', { status: 1 }],
+    ['null status', { status: null, signal: null }],
+    ['NaN status', { status: NaN, signal: null }],
+    ['string status', { status: '1', signal: null }],
+    ['fractional status', { status: 1.5, signal: null }],
+  ];
+  for (const [name, shape] of cases) {
+    const result = { stdout: 'fixture stdout', stderr: 'fixture stderr', ...shape };
+    assert.throws(() => assertCompletedProcess(result, `F7 negative ${name}`), error => {
+      assert.equal(error instanceof assert.AssertionError, true);
+      for (const detail of [`F7 negative ${name}`, 'signal=', 'status=', 'fixture stdout', 'fixture stderr']) {
+        assert.ok(error.message.includes(detail), error.message);
+      }
+      if (result.error) assert.ok(error.message.includes(result.error.message), error.message);
+      return true;
+    }, name);
+  }
+});
+
+// The inner curl adapter must prove native completion before product refusal.
+function assertCurlResultWitness(bytes, mode, context) {
+  assert.equal(Buffer.isBuffer(bytes), true, `${context}: missing curl result witness`);
+  assert.ok(bytes.length > 0 && bytes.length <= 4096, `${context}: curl result witness size is invalid`);
+  const text = bytes.toString('utf8');
+  let result;
+  try { result = JSON.parse(text); }
+  catch (error) { assert.fail(`${context}: malformed curl result witness: ${error.message}`); }
+  assert.ok(result && typeof result === 'object' && !Array.isArray(result), `${context}: curl result witness must be an object`);
+  // The adapter writes canonical JSON once. Equality also rejects duplicate keys.
+  assert.equal(JSON.stringify(result), text, `${context}: noncanonical or duplicate curl result witness`);
+  assert.deepEqual(Object.keys(result).sort(), ['command', 'mode', 'signal', 'status', ...(Object.hasOwn(result, 'error') ? ['error'] : [])].sort(),
+    `${context}: curl result witness fields do not match`);
+  assert.equal(result.mode, mode, `${context}: curl result witness mode does not match`);
+  assert.equal(result.command, '/usr/bin/curl', `${context}: curl result witness command does not match`);
+  assertCompletedProcess(result, context);
+  const nativeCodes = { transient: 0, 'retry-after-number': 22, 'retry-after-date': 22,
+    stall: 28, 'partial-stall': 28, exhaustion: 22, 'partial-eof': 18, 'wrong-digest': 0 };
+  assert.equal(Object.hasOwn(nativeCodes, mode), true, `${context}: unknown curl mode`);
+  assert.equal(result.status, nativeCodes[mode], `${context}: unexpected native curl code`);
+  return result;
+}
+
+function readCurlResultWitness(file, mode, context) {
+  const descriptor = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);
+  try {
+    const identity = fs.fstatSync(descriptor);
+    assert.equal(identity.isFile(), true, `${context}: curl result witness must be an ordinary file`);
+    assert.equal(identity.nlink, 1, `${context}: curl result witness must have one link`);
+    assert.ok(identity.size > 0 && identity.size <= 4096, `${context}: curl result witness size is invalid`);
+    const bytes = Buffer.alloc(4097);
+    const count = fs.readSync(descriptor, bytes, 0, bytes.length, 0);
+    assert.equal(count, identity.size, `${context}: curl result witness size changed`);
+    assert.equal(fs.fstatSync(descriptor).size, identity.size, `${context}: curl result witness size changed`);
+    return assertCurlResultWitness(bytes.subarray(0, count), mode, context);
+  } finally { fs.closeSync(descriptor); }
+}
+
+test('F8 inner curl witness admits only the completed native code for each mode', () => {
+  const nativeCodes = { transient: 0, 'retry-after-number': 22, 'retry-after-date': 22,
+    stall: 28, 'partial-stall': 28, exhaustion: 22, 'partial-eof': 18, 'wrong-digest': 0 };
+  for (const [mode, status] of Object.entries(nativeCodes)) {
+    const bytes = Buffer.from(JSON.stringify({ mode, command: '/usr/bin/curl', status, signal: null }));
+    const result = assertCurlResultWitness(bytes, mode, `F8 completed ${mode}`);
+    assert.equal(result.status, status);
+    assert.equal(result.signal, null);
+    assert.equal(result.error, undefined);
+    const unrelated = Buffer.from(JSON.stringify({ mode, command: '/usr/bin/curl', status: 37, signal: null }));
+    assert.throws(() => assertCurlResultWitness(unrelated, mode, `F8 unrelated ${mode}`), /unexpected native curl code/);
+  }
+});
+
+test('F8 inner curl witness rejects absent invalid mismatched and incomplete records', () => {
+  const completed = { mode: 'stall', command: '/usr/bin/curl', status: 28, signal: null };
+  const cases = [
+    ['missing', undefined],
+    ['empty', Buffer.alloc(0)],
+    ['malformed', Buffer.from('{')],
+    ['oversized', Buffer.alloc(4097, 32)],
+    ['duplicate', Buffer.from('{"mode":"stall","command":"/usr/bin/curl","status":28,"signal":null,"status":28}')],
+    ['wrong mode', Buffer.from(JSON.stringify({ ...completed, mode: 'partial-stall' }))],
+    ['wrong command', Buffer.from(JSON.stringify({ ...completed, command: '/other/curl' }))],
+    ['extra field', Buffer.from(JSON.stringify({ ...completed, expected: 28 }))],
+    ['launch error', Buffer.from(JSON.stringify({ ...completed, status: null, error: { name: 'Error', message: 'fixture ENOENT', stack: 'fixture ENOENT', code: 'ENOENT' } }))],
+    ['timeout error', Buffer.from(JSON.stringify({ ...completed, status: null, signal: 'SIGTERM', error: { name: 'Error', message: 'fixture ETIMEDOUT', stack: 'fixture ETIMEDOUT', code: 'ETIMEDOUT' } }))],
+    ['error with native code', Buffer.from(JSON.stringify({ ...completed, error: { name: 'Error', message: 'fixture ETIMEDOUT', stack: 'fixture ETIMEDOUT', code: 'ETIMEDOUT' } }))],
+    ['signal with native code', Buffer.from(JSON.stringify({ ...completed, signal: 'SIGTERM' }))],
+    ['null status', Buffer.from(JSON.stringify({ ...completed, status: null }))],
+    ['string status', Buffer.from(JSON.stringify({ ...completed, status: '28' }))],
+    ['mapped watchdog code', Buffer.from(JSON.stringify({ ...completed, status: 98 }))],
+  ];
+  for (const [name, bytes] of cases) {
+    const context = `F8 negative ${name}`;
+    assert.throws(() => assertCurlResultWitness(bytes, 'stall', context), error => {
+      assert.equal(error instanceof assert.AssertionError, true);
+      assert.ok(error.message.includes(context), error.message);
+      if (name.includes('error')) assert.match(error.message, /fixture (?:ENOENT|ETIMEDOUT)/);
+      return true;
+    }, name);
+  }
+});
 
 // Private fixture discovery follows the contributor's required PowerShell7 PATH.
 // Production acquisition keeps its fixed Git application paths unchanged.
@@ -116,6 +259,7 @@ exit 0
         cwd: work, env: { ...env, GITHUB_SHA: sha, GITHUB_OUTPUT: output, GENERATOR_PROOF_MODE: mode, GENERATOR_PROOF_LOG: log },
         encoding: 'utf8', timeout: 30000, windowsHide: true,
       });
+      assertCompletedProcess(result, `generator proof ${id}:${mode}`);
       assert.equal(result.error, undefined, `${id}:${mode}`);
       assert.equal(result.status === 0, mode === 'success', `${id}:${mode}: ${result.stderr}`);
       const calls = fs.readFileSync(log, 'utf8').trim().split('\n');
@@ -162,6 +306,7 @@ test('generator platform admission rejects every incomplete or wrong-revision re
       cwd: root, env: { ...process.env, GENERATOR_RESULTS: item.raw ?? JSON.stringify(item.results), GITHUB_SHA: item.sha ?? head },
       encoding: 'utf8', timeout: 30000, windowsHide: true,
     });
+    assertCompletedProcess(result, `generator result admission ${item.name}`);
     assert.equal(result.error, undefined, item.name);
     assert.equal(result.status === 0, item.pass === true, `${item.name}: ${result.stderr}`);
   }
@@ -243,6 +388,7 @@ if ($args -contains '--list') {
     const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
       cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
     });
+    assertCompletedProcess(result, `Windows generator acquisition ${mode}`);
     assert.equal(result.error, undefined, mode);
     assert.equal(result.status === 0, mode === '', `${mode}: ${result.stderr}`);
     assert.ok(!`${result.stdout}${result.stderr}`.includes('fixture-secret'), mode);
@@ -289,6 +435,7 @@ if ($args -contains 'rev-parse') { $env:GITHUB_SHA }
       const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
         cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
       });
+      assertCompletedProcess(result, `Linux build acquisition ${id}:${mode}`);
       assert.equal(result.error, undefined, `${id}:${mode}`);
       assert.equal(result.status === 0, mode === '', `${id}:${mode}: ${result.stderr}`);
       if (selectors.includes(mode)) {
@@ -419,10 +566,18 @@ for (const [mode, status] of [['', 0], ['module-failure', 7]]) {
   });
 }
 
+// Match the runner's direct-child command-file layout without creating the files.
+function runnerChannelFiles(root) {
+  const directory = path.join(root, '_runner_file_commands');
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  return { path: path.join(directory, 'path'), env: path.join(directory, 'env') };
+}
+
 function fixture(t, workDirectoryName = 'work') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-ci-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const work = path.join(root, workDirectoryName); fs.mkdirSync(work);
+  const channels = runnerChannelFiles(root);
   const log = path.join(root, 'calls');
   const git = path.join(root, 'git');
   fs.writeFileSync(git, `#!${process.execPath}
@@ -444,6 +599,7 @@ if (args.includes('rev-parse')) {
 }
 if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/PSStyleGuide');
 if (args.includes('config') && (args.includes('--get-all') || args.includes('--get-regexp'))) process.exit(1);
+if (args.includes('config') && args.includes('--null') && args.includes('--list')) process.stdout.write('local\\0core.repositoryformatversion\\0');
 `, { mode: 0o700 });
   function run(source, env = {}) {
     const script = path.join(root, 'case.ps1');
@@ -452,17 +608,22 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
     const environment = { ...process.env, GITHUB_SERVER_URL: 'https://github.com',
       GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,
       TEST_REVISION: head, TEST_LOG: log, TEST_MODE: '', RUNNER_TEMP: root,
-      GITHUB_PATH: path.join(root, 'path'), GITHUB_ENV: path.join(root, 'env'), ...env };
+      GITHUB_PATH: channels.path, GITHUB_ENV: channels.env, ...env };
+    // Explicit undefined overrides delete only named keys from this private child map.
+    for (const [name, value] of Object.entries(env)) if (value === undefined) delete environment[name];
     for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
-      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) {
+      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG']) {
       if (!Object.hasOwn(env, name)) delete environment[name];
     }
-    return spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+    if (source.includes('Initialize-CiToolchain.ps1')) for (const name of ['GITHUB_PATH', 'GITHUB_ENV']) {
+      if (environment[name]?.trim() && !fs.existsSync(environment[name])) fs.writeFileSync(environment[name], '');
+    }
+    return assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
       cwd: work, env: environment, encoding: 'utf8', timeout: 30000,
-    });
+    }), `PowerShell fixture ${script}`);
   }
   const calls = () => fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
-  return { root, work, git, log, run, calls };
+  return { root, work, git, log, channels, run, calls };
 }
 
 for (const [file, job] of [['build.yml', artifactVerifier],
@@ -490,30 +651,348 @@ for (const [file, job] of [['build.yml', artifactVerifier],
   }
 }
 
-for (const mode of ['', 'outer-failure', 'nested-failure']) {
-  test(`lint records both native results: ${mode || 'success'}`, { skip: !linux }, t => {
+// Harmless synthetic selectors replace ambient host inputs in private children only.
+const selectorSeeds = {
+  STYLEGUIDE_RECOVERY_NODE22: 'fq23-stale-recovery', NODE_OPTIONS: '--no-warnings', NODE_PATH: '/fq23-unused-node-path',
+  npm_config_script_shell: 'fq23-unused-shell', NPM_CONFIG_SCRIPT_SHELL: 'fq23-unused-shell-upper',
+  NpM_CoNfIg_FQ23: 'fq23-unused-mixed',
+};
+function selectorEnvironment(family = 'all', recovery = true) {
+  const environment = { TEST_FQ23_UNRELATED: 'fq23-preserved' };
+  for (const name of Object.keys(process.env)) {
+    const fixed = process.platform === 'win32' ? name.toUpperCase() : name;
+    if (['STYLEGUIDE_RECOVERY_NODE22', 'NODE_OPTIONS', 'NODE_PATH'].includes(fixed) || /^npm_config_/iu.test(name)) {
+      environment[name] = undefined;
+    }
+  }
+  for (const [name, value] of Object.entries(selectorSeeds)) {
+    environment[name] = family === 'all' || (family === 'fixed' && !/^npm_config_/iu.test(name)) ||
+      (family === 'npm' && /^npm_config_/iu.test(name)) ? value : undefined;
+  }
+  if (!recovery) environment.STYLEGUIDE_RECOVERY_NODE22 = undefined;
+  if (family === 'all' || family === 'npm') {
+    environment.npm_config_userconfig = '/dev/null';
+    environment.npm_config_globalconfig = '/etc/npmrc-absent-by-policy';
+  }
+  return environment;
+}
+
+// The real credential helper still runs. Only synthetic Node inputs are removed
+// before the Node-based fixed Git mock; product sanitation is observed separately.
+function selectorGitLauncher(f) {
+  const nodeGit = `${f.git}-node`;
+  fs.renameSync(f.git, nodeGit);
+  fs.writeFileSync(f.git, `#!/bin/sh
+if [ "$NODE_OPTIONS" = '--no-warnings' ]; then unset NODE_OPTIONS; fi
+if [ "$NODE_PATH" = '/fq23-unused-node-path' ]; then unset NODE_PATH; fi
+exec '${process.execPath.replaceAll("'", "'\\''")}' '${nodeGit.replaceAll("'", "'\\''")}' "$@"
+`, { mode: 0o700 });
+}
+
+const selectorObserver = `
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['FQ23 sanitation observer']) + '\\n');
+const targets = ${JSON.stringify(Object.keys(selectorSeeds))};
+const owned = require('node:path').join(process.env.RUNNER_TEMP, 'styleguide-node');
+const configs = ['npm_config_userconfig', 'npm_config_globalconfig'];
+const ordinaryEmpty = configs.every(name => {
+  const target = process.env[name], expected = require('node:path').join(owned, name === configs[0] ? 'npm-user.config' : 'npm-global.config');
+  return target === expected && fs.lstatSync(target).isFile() && !fs.lstatSync(target).isSymbolicLink() && fs.readFileSync(target, 'utf8') === '';
+});
+if (targets.some(name => Object.hasOwn(process.env, name)) || !ordinaryEmpty || process.env.TEST_FQ23_UNRELATED !== 'fq23-preserved') {
+  console.error('FQ23 sanitation observer rejected retained selector or invalid owned configuration'); process.exit(98);
+}
+`;
+
+const lintInvalidVersions = { 'engine-lf': '24.18.1\n', 'engine-crlf': '24.18.1\r\n',
+  'engine-prefix': '\n24.18.1', 'engine-suffix': '24.18.1x', 'engine-range': '^24.18.1', 'engine-number': 24 };
+const lintPreferenceCases = [
+  ...['', 'outer-failure', 'nested-failure', 'package-array', 'ready-array', ...Object.keys(lintInvalidVersions)]
+    .map(mode => ({ mode, preference: '', family: 'all', suffix: mode || 'success' })),
+  ...['default', 'Low', 'WhatIf', 'Low+WhatIf'].flatMap(preference => ['all', 'absent'].map(family => ({
+    mode: '', preference: (preference.includes('Low') ? "$ConfirmPreference='Low'; " : '') +
+      (preference.includes('WhatIf') ? '$WhatIfPreference=$true; ' : ''), family, suffix: `FQ23 ${preference} ${family}`,
+  }))),
+];
+for (const { mode, preference, family, suffix } of lintPreferenceCases) {
+  test(`lint records both native results: ${suffix}`, { skip: !linux }, t => {
     const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
+    selectorGitLauncher(f);
     fs.mkdirSync(workflows, { recursive: true });
     fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
       read('Test-CheckoutCredentials.ps1').replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
     fs.copyFileSync(path.join(directory, 'Invoke-MarkdownLint.ps1'), path.join(workflows, 'Invoke-MarkdownLint.ps1'));
-    const bin = path.join(f.root, 'styleguide-node/bin'); fs.mkdirSync(bin, { recursive: true });
-    fs.writeFileSync(path.join(bin, 'npm'), `#!${process.execPath}
-const fs = require('node:fs'), args = process.argv.slice(2);
+    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    const runtime = path.join(f.root, 'styleguide-node/preferred/node-v24.18.1-linux-x64');
+    const bin = path.join(runtime, 'bin'); fs.mkdirSync(bin, { recursive: true });
+    const cli = path.join(runtime, 'lib/node_modules/npm/bin'); fs.mkdirSync(cli, { recursive: true });
+    fs.writeFileSync(path.join(cli, 'npm-cli.js'), 'fixture');
+    for (const config of ['npm-user.config', 'npm-global.config']) fs.writeFileSync(path.join(f.root, 'styleguide-node', config), '');
+    fs.writeFileSync(path.join(f.root, 'styleguide-node/ready.json'), JSON.stringify({ node: '24.18.1', npm: '11.16.0' }));
+    fs.writeFileSync(path.join(bin, 'node'), `#!${process.execPath}
+const fs = require('node:fs'), args = process.argv.slice(3);
+${selectorObserver}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['npm', ...args])+'\\n');
-if (process.env.npm_config_script_shell || process.env.NPM_CONFIG_SCRIPT_SHELL ||
-  process.env.npm_config_userconfig !== '/dev/null' ||
-  process.env.npm_config_globalconfig !== '/etc/npmrc-absent-by-policy') process.exit(97);
 if (process.env.TEST_MODE === 'outer-failure' && args.at(-1) === 'lint:md') process.exit(5);
 if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:nested') process.exit(6);
 `, { mode: 0o700 });
-    const result = f.run(`& ${quote(path.join(workflows, 'Invoke-MarkdownLint.ps1'))}`, {
-      TEST_MODE: mode, npm_config_userconfig: '/dev/null',
-      npm_config_globalconfig: '/etc/npmrc-absent-by-policy', NPM_CONFIG_SCRIPT_SHELL: 'hostile',
+    if (mode === 'package-array' || mode === 'ready-array') {
+      const target = mode === 'package-array' ? path.join(f.work, 'package.json') : path.join(f.root, 'styleguide-node/ready.json');
+      fs.writeFileSync(target, JSON.stringify([JSON.parse(fs.readFileSync(target, 'utf8'))]));
+    }
+    if (Object.hasOwn(lintInvalidVersions, mode)) {
+      fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: lintInvalidVersions[mode], npm: '11.16.0' } }));
+    }
+    const result = f.run(`${preference}& ${quote(path.join(workflows, 'Invoke-MarkdownLint.ps1'))}`, {
+      ...selectorEnvironment(family, false), TEST_MODE: mode,
     });
     assert.equal(result.status === 0, mode === '', result.stderr);
+    if (mode.endsWith('-array')) {
+      assert.match(result.stderr, /JSON input must be an object/u);
+      assert.deepEqual(f.calls().filter(row => row[0] === 'npm'), []);
+      return;
+    }
+    if (Object.hasOwn(lintInvalidVersions, mode)) {
+      assert.match(result.stderr, /The preferred runtime declaration is invalid/u);
+      assert.deepEqual(f.calls().filter(row => row[0] === 'npm'), []);
+      return;
+    }
     assert.ok(result.stdout.includes(`Markdown exits: outer=${mode === 'outer-failure' ? 5 : 0} nested=${mode === 'nested-failure' ? 6 : 0}`), result.stdout);
     assert.deepEqual(f.calls().filter(row => row[0] === 'npm').map(row => row.at(-1)), ['lint:md', 'lint:md:nested']);
+  });
+}
+
+// FQ34: exercise each real ordinary-path helper. Network-looking strings never
+// reach a provider or filesystem call, including in the causal mutants below.
+function fq34Once(source, anchor, replacement) {
+  assert.equal(source.split(anchor).length, 2, 'Exactly one FQ34 source boundary is required.');
+  return source.replace(anchor, replacement);
+}
+
+function fq34OrdinaryPath(helper) {
+  const source = read(helper).replaceAll('\r\n', '\n');
+  const start = source.indexOf('function Assert-OrdinaryPath {');
+  const end = source.indexOf('\nfunction ', start + 1);
+  assert.ok(start >= 0 && end > start, `${helper}: complete actual helper extraction`);
+  return source.slice(start, end) + '\n';
+}
+
+function fq34LexicalBoundary(ordinary) {
+  const anchor = '    [Management.Automation.ProviderInfo] $objPathProvider = $null';
+  assert.equal(ordinary.split(anchor).length, 2);
+  const prefix = ordinary.slice(0, ordinary.indexOf(anchor));
+  assert.equal(prefix.includes('GetUnresolvedProviderPathFromPSPath'), false);
+  assert.equal(prefix.includes('Get-Item -LiteralPath'), false);
+  return prefix + "    return 'FQ34 lexical boundary reached'\n}\n";
+}
+
+const fq34Normalize = '    $strFullPath = [IO.Path]::GetFullPath($Path)';
+const fq34RawGuard = String.raw` -or
+        ($IsWindows -and $Path.Replace('/', '\').StartsWith('\\'))`;
+const fq34NormalizedGuard = String.raw`    if ($IsWindows -and $strFullPath -cnotmatch '\A[A-Za-z]:\\') {
+        throw 'toolchain: an absolute local single-line path is required'
+    }
+`;
+
+function fq34Case(input, directory = false) { return { input, directory }; }
+
+// Run all finite stages for one source helper in one private native child.
+// Definitions change only in that child; the repository source is never written.
+function fq34Run(t, helper, buildStages) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-fq34-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const folder = path.join(root, 'space and Unicode Ω'); fs.mkdirSync(folder);
+  const file = path.join(folder, 'ordinary file Ω.txt'); fs.writeFileSync(file, 'FQ34 unchanged');
+  const ordinary = fq34OrdinaryPath(helper);
+  const stages = buildStages({ ordinary, folder, file });
+  assert.ok(stages.length > 0 && stages.length <= 6);
+  assert.ok(stages.reduce((count, stage) => count + stage.cases.length, 0) <= 41);
+  assert.ok(new Set(stages.flatMap(stage => stage.cases.map(item => item.input))).size <= 40);
+  const calls = stages.map(stage => {
+    assert.ok(stage.cases.length > 0 && stage.cases.length <= 40);
+    assert.ok(stage.cases.every(item => typeof item.input === 'string' && item.input.length <= 256));
+    return `${stage.source}\n$arrCases = ConvertFrom-Json -InputObject ${quote(JSON.stringify(stage.cases))}\n` +
+      `$arrResults += @(Invoke-Fq34Cases -Cases $arrCases -Stage ${quote(stage.name)})\n`;
+  }).join('\n');
+  const script = path.join(root, 'fq34.ps1');
+  const text = `$ErrorActionPreference = 'Stop'
+Set-StrictMode -Version Latest
+function Invoke-Fq34Cases {
+    param([object[]] $Cases, [string] $Stage)
+    foreach ($entry in $Cases) {
+        try {
+            $value = Assert-OrdinaryPath -Path $entry.input -Directory:([bool]$entry.directory)
+            [ordered]@{ stage = $Stage; input = $entry.input; directory = $entry.directory; admitted = $true; value = $value }
+        } catch {
+            [ordered]@{ stage = $Stage; input = $entry.input; directory = $entry.directory; admitted = $false; message = $_.Exception.Message }
+        }
+    }
+}
+$arrResults = @()
+${calls}
+ConvertTo-Json -InputObject $arrResults -Depth 5 -Compress -EscapeHandling EscapeNonAscii
+`;
+  assert.ok(Buffer.byteLength(text) <= 128 * 1024, 'FQ34 script is finite.');
+  fs.writeFileSync(script, text);
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+    encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+  }), `FQ34 ${helper}`);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const rows = JSON.parse(result.stdout);
+  assert.equal(rows.length, stages.reduce((count, stage) => count + stage.cases.length, 0));
+  const expected = stages.flatMap(stage => stage.cases.map(entry => ({ ...entry, stage: stage.name })));
+  for (const [index, row] of rows.entries()) {
+    assert.equal(row.stage, expected[index].stage);
+    assert.equal(row.input, expected[index].input);
+    assert.equal(row.directory, expected[index].directory);
+  }
+  assert.equal(fs.readFileSync(file, 'utf8'), 'FQ34 unchanged');
+  assert.equal(fs.statSync(folder).isDirectory(), true);
+  return { rows, folder, file };
+}
+
+for (const helper of ['Initialize-CiToolchain.ps1', 'Test-CheckoutCredentials.ps1', 'Invoke-MarkdownLint.ps1']) {
+  test(`FQ34 Windows raw and normalized local path boundaries: ${helper}`, {
+    skip: process.platform !== 'win32', timeout: 30000,
+  }, t => {
+    const { rows, folder, file } = fq34Run(t, helper, ({ ordinary, folder, file }) => {
+      const lexical = fq34LexicalBoundary(ordinary);
+      const spellings = value => [value, value.replaceAll('\\', '/'), value.replace(/\\/u, '/')];
+      const prefixes = ['\\\\', '//', '/\\', '\\/'];
+      const forbidden = prefixes.flatMap(prefix => [
+        prefix + 'fq34.invalid/share/item', prefix + '?/C:/fixture/item',
+        prefix + './C:/fixture/item', prefix + '?/UNC/fq34.invalid/share/item',
+      ]);
+      forbidden.push(String.raw`FileSystem::C:\fixture\item`,
+        String.raw`Microsoft.PowerShell.Core\FileSystem::C:\fixture\item`, 'Env:TEMP',
+        'C:fixture', String.raw`\fixture`, '/fixture', 'relative/item',
+        "C:\\fixture\\item\n", "C:\\fixture\\item\r\n", String.raw`C:\fixture\item:stream`);
+      assert.ok(forbidden.every(value => !value.includes('~')));
+      const tilde = prefixes.map(prefix => prefix + 'fq34.invalid/share/SHORT~1/item');
+      const normalizationSentinel = fq34Once(lexical, fq34Normalize, "    throw 'FQ34 normalization reached'");
+      const rawMutation = fq34Once(normalizationSentinel, fq34RawGuard, '');
+      // A deterministic substituted return tests the normalized invariant. It is
+      // not evidence that a native local input normalizes to this remote root.
+      const injected = fq34Once(lexical, fq34Normalize,
+        String.raw`    $strFullPath = '\\fq34.invalid\share\item'`);
+      return [
+        { name: 'real-local', source: ordinary,
+          cases: [...spellings(file).map(value => fq34Case(value)), ...spellings(folder).map(value => fq34Case(value, true))] },
+        { name: 'lexical-refusal', source: lexical, cases: forbidden.map(value => fq34Case(value)) },
+        { name: 'before-normalization', source: normalizationSentinel, cases: tilde.map(value => fq34Case(value)) },
+        { name: 'raw-guard-mutant', source: rawMutation, cases: tilde.slice(1).map(value => fq34Case(value)) },
+        { name: 'normalized-invariant', source: injected, cases: [fq34Case(file)] },
+        { name: 'normalized-invariant-mutant', source: fq34Once(injected, fq34NormalizedGuard, ''), cases: [fq34Case(file)] },
+      ];
+    });
+    for (const row of rows) {
+      const context = `${helper} ${row.stage} ${JSON.stringify(row.input)}`;
+      if (row.stage === 'real-local') {
+        assert.equal(row.admitted, true, context + ': ' + row.message);
+        assert.equal(row.value, path.resolve(row.directory ? folder : file), context);
+      } else if (row.stage === 'normalized-invariant-mutant') {
+        assert.equal(row.admitted, true, context);
+        assert.equal(row.value, 'FQ34 lexical boundary reached', context);
+      } else {
+        assert.equal(row.admitted, false, context);
+        assert.equal(row.message, row.stage === 'raw-guard-mutant' ? 'FQ34 normalization reached' :
+          row.input.endsWith(':stream') ? 'toolchain: path aliases are not supported' :
+            'toolchain: an absolute local single-line path is required', context);
+      }
+    }
+  });
+
+  test(`FQ34 Linux ordinary and double-slash paths remain local: ${helper}`, {
+    skip: !linux, timeout: 30000,
+  }, t => {
+    const { rows, folder, file } = fq34Run(t, helper, ({ ordinary, folder, file }) => [{
+      name: 'real-local', source: ordinary,
+      cases: [fq34Case(file), fq34Case('/' + file), fq34Case(folder, true), fq34Case('/' + folder, true)],
+    }]);
+    for (const row of rows) {
+      assert.equal(row.admitted, true, `${helper}: ${row.message}`);
+      assert.equal(row.value, path.resolve(row.directory ? folder : file));
+    }
+  });
+}
+
+test('FQ33 lint engine admission requires the complete version value', () => {
+  const source = read('Invoke-MarkdownLint.ps1');
+  const start = 'if ($objPackage.engines.node -isnot [string]';
+  const end = '$hashtableReadyRuntime = Read-BoundedJson';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const admission = source.slice(source.indexOf(start), source.indexOf(end));
+  const cases = [{ value: '24.18.1', accepted: true }, { value: '24.0.0', accepted: true },
+    ...Object.values(lintInvalidVersions).map(value => ({ value, accepted: false })),
+    ...['24.18.1\r', '24.18.1\t', '24.18.1 ', '22.18.1', null, ['24.18.1']].map(value => ({ value, accepted: false }))];
+  const payload = Buffer.from(JSON.stringify(cases)).toString('base64');
+  const script = `$ErrorActionPreference='Stop'; $admission={\n${admission}\n}
+$cases=ConvertFrom-Json -InputObject ([Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('${payload}')))
+$results=@(foreach($case in $cases) {
+    $objPackage=@{engines=@{node=$case.value}}; $accepted=$false
+    try { & $admission; $accepted=$true }
+    catch { if($_.Exception.Message -cne 'The preferred runtime declaration is invalid.') { throw } }
+    $accepted
+})
+ConvertTo-Json -InputObject $results -Compress
+`;
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+    { encoding: 'utf8', timeout: 15000, windowsHide: true }), 'FQ33 actual lint admission');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), cases.map(item => item.accepted));
+});
+
+for (const [file, job, stepId] of [
+  ['markdownlint.yml', 'policy', 'validate'], ['markdownlint.yml', 'markdownlint', 'audit'],
+  ['agent-instructions.yml', 'accepted-policy', 'validate'], ['agent-instructions.yml', 'candidate-tests', 'test'],
+]) {
+  test(`FQ37 direct workflow Node caller clears inherited startup options: ${file}/${job}`, { skip: !linux, timeout: 90000 }, t => {
+    const sanitation = 'Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false';
+    const steps = parse(read(file)).jobs[job].steps;
+    const step = steps.find(item => item.id === stepId);
+    assert.ok(step, `${file}/${job}/${stepId}`);
+    const lines = step.run.split('\n').map(line => line.trim());
+    const nodeIndex = lines.findIndex(line => /& node /u.test(line));
+    assert.ok(nodeIndex > 0);
+    assert.equal(lines[nodeIndex - 1], sanitation);
+    assert.match(lines[nodeIndex + 1], /^if \(\$LASTEXITCODE -ne 0\)/u);
+    const command = lines.slice(nodeIndex - 1, nodeIndex + 2).join('\n');
+    for (const preference of ['', "$ConfirmPreference='Low'; ", "$ConfirmPreference='Low'; $WhatIfPreference=$true; ", 'mutant']) {
+      const f = fixture(t), executable = path.join(f.root, 'node');
+      fs.writeFileSync(executable, `#!${process.execPath}
+const fs=require('node:fs');
+fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['FQ37 node',...process.argv.slice(2)])+'\\n');
+if(Object.hasOwn(process.env,'NODE_OPTIONS')) { console.error('FQ37 retained startup selector'); process.exit(98); }
+console.log('FQ37 clean startup');
+`, { mode: 0o700 });
+      const source = preference === 'mutant' ? command.replace(sanitation + '\n', '') : preference + command;
+      const script = path.join(f.root, 'consumer.ps1');
+      fs.writeFileSync(script, "$ErrorActionPreference='Stop'\n" + source);
+      const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: f.work, encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+        env: { HOME: f.root, TMPDIR: f.root,
+          DOTNET_EnableDiagnostics: '0', POWERSHELL_DIAGNOSTICS_OPTOUT: '1',
+          PATH: f.root + path.delimiter + process.env.PATH, TEST_LOG: f.log,
+          NODE_OPTIONS: '--no-warnings', EXPECTED_BASE: base, EXPECTED_HEAD: head },
+      }), `FQ37 ${file}/${job}/${preference}`);
+      const calls = f.calls();
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0][0], 'FQ37 node');
+      const expected = job === 'policy' ? ['./.github/workflows/Validate-WorkflowPolicy.mjs', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml']
+        : job === 'markdownlint' ? ['./.github/workflows/Check-NpmAudit.mjs', '--ci']
+          : job === 'accepted-policy' ? ['.github/workflows/Classify-InstructionMaintenance.mjs', f.work, base, head]
+            : ['--test', ...['Classify-InstructionMaintenance.test.mjs', 'Validate-WorkflowPolicy.test.mjs', 'Test-CiHelpers.test.mjs',
+              'NpmTools.test.mjs', 'Check-NpmAudit.test.mjs', 'Test-LocalValidation.test.mjs', 'lint-markdown.test.mjs'].map(name => '.github/workflows/' + name)];
+      assert.deepEqual(calls[0].slice(1), expected);
+      if (preference === 'mutant') {
+        assert.notEqual(result.status, 0, result.stdout + result.stderr);
+        assert.match(result.stderr, /FQ37 retained startup selector/);
+      } else {
+        assert.equal(result.status, 0, result.stdout + result.stderr);
+        if (job !== 'accepted-policy') assert.match(result.stdout, /FQ37 clean startup/);
+        assert.doesNotMatch(result.stderr, /FQ37 retained startup selector/);
+      }
+    }
   });
 }
 
@@ -538,6 +1017,7 @@ for (const mode of ['native-download-failure', 'wrong-download-bytes', 'unsafe-n
     const curl = path.join(f.root, 'curl');
     fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl'])+'\\n');
 if (process.env.TEST_MODE === 'native-download-failure') process.exit(19);
 fs.writeFileSync(args[args.indexOf('--output')+1], 'incorrect archive bytes');
@@ -604,29 +1084,36 @@ test(`runtime setup uses root engines and safe npm inputs: ${mode}`, { skip: !li
   const selectedNpm = mode === 'updated-engines' ? '11.17.0' : '11.16.0';
   fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: selectedNode, npm: selectedNpm } }));
   const archiveRoot = path.join(f.root, 'archive');
-  const bin = path.join(archiveRoot, 'runtime/bin'); fs.mkdirSync(bin, { recursive: true });
-  for (const executable of ['node', 'npm']) {
+  const bin = path.join(archiveRoot, `node-v${selectedNode}-linux-x64/bin`); fs.mkdirSync(bin, { recursive: true });
+  const cli = path.join(bin, '../lib/node_modules/npm/bin'); fs.mkdirSync(cli, { recursive: true });
+  fs.writeFileSync(path.join(cli, 'npm-cli.js'), 'fixture');
+  fs.writeFileSync(path.join(cli, 'npx-cli.js'), 'fixture');
+  fs.writeFileSync(path.join(cli, '../package.json'), JSON.stringify({ version: selectedNpm }));
+  for (const executable of ['node']) {
     fs.writeFileSync(path.join(bin, executable), `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
-fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['${executable}', ...args])+'\\n');
-if ('${executable}' === 'npm') {
+const executable = args[0]?.endsWith('npm-cli.js') ? 'npm' : 'node';
+if (executable === 'npm') args.shift();
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([executable, ...args])+'\\n');
+if (executable === 'npm') {
   if (process.env.NPM_CONFIG_SCRIPT_SHELL || process.env.npm_config_script_shell ||
-      process.env.npm_config_userconfig !== '/dev/null' ||
-      process.env.npm_config_globalconfig !== '/etc/npmrc-absent-by-policy' ||
+      fs.readFileSync(process.env.npm_config_userconfig, 'utf8') !== '' ||
+      fs.readFileSync(process.env.npm_config_globalconfig, 'utf8') !== '' ||
+      process.env.NODE_OPTIONS || process.env.NODE_PATH ||
       process.env.npm_config_ignore_scripts !== 'true') process.exit(97);
   if (args.includes('ci') && !args.includes('--ignore-scripts')) process.exit(98);
 }
-if (args.includes('--version')) console.log('${executable === 'node' ? (mode === 'wrong-node' ? 'v0.0.0' : 'v' + selectedNode) : (mode === 'wrong-npm' ? '0.0.0' : selectedNpm)}');
+if (args.includes('--version')) console.log(executable === 'node' ? '${mode === 'wrong-node' ? 'v0.0.0' : 'v' + selectedNode}' : '${mode === 'wrong-npm' ? '0.0.0' : selectedNpm}');
 `, { mode: 0o700 });
   }
   const archive = path.join(f.root, 'fixture.tar.xz');
-  const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
+  const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, fs.readdirSync(archiveRoot)[0]], { encoding: 'utf8' });
   assert.equal(tar.status, 0, tar.stderr);
-  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
-    linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
+  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(runtimePin(createHash('sha256').update(fs.readFileSync(archive)).digest('hex'))));
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl', ...args])+'\\n');
 fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
 `, { mode: 0o700 });
@@ -645,7 +1132,7 @@ fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
     `https://nodejs.org/dist/v${selectedNode}/node-v${selectedNode}-linux-x64.tar.xz`);
   const calls = f.calls().filter(row => ['node', 'npm'].includes(row[0]));
   assert.deepEqual(calls.map(row => row.includes('ci') ? 'ci' : row.at(-1)),
-    ['--version', '--version', '--preflight', 'ci', 'ci']);
+    ['--version', '--version', '--preflight', 'ci', '--preflight', 'ci']);
 });
 }
 
@@ -665,22 +1152,25 @@ test('runtime preflight uses one read grant for a spaced repository and denies w
   fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
     read('Test-CheckoutCredentials.ps1').replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
 
-  const archiveRoot = path.join(f.root, 'archive'), bin = path.join(archiveRoot, 'runtime/bin');
+  const archiveRoot = path.join(f.root, 'archive'), bin = path.join(archiveRoot, `node-v${rootManifest.engines.node}-linux-x64/bin`);
   fs.mkdirSync(bin, { recursive: true });
-  fs.symlinkSync(process.execPath, path.join(bin, 'node'));
-  fs.writeFileSync(path.join(bin, 'npm'), `#!${process.execPath}
+  fs.copyFileSync(process.execPath, path.join(bin, 'node')); fs.chmodSync(path.join(bin, 'node'), 0o755);
+  const cli = path.join(bin, '../lib/node_modules/npm/bin'); fs.mkdirSync(cli, { recursive: true });
+  fs.writeFileSync(path.join(cli, 'npx-cli.js'), 'fixture');
+  fs.writeFileSync(path.join(cli, '../package.json'), JSON.stringify({ version: rootManifest.engines.npm }));
+  fs.writeFileSync(path.join(cli, 'npm-cli.js'), `
 const fs = require('node:fs'), args = process.argv.slice(2);
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['npm', ...args])+'\\n');
 if (args.includes('--version')) console.log('${rootManifest.engines.npm}');
 `, { mode: 0o700 });
   const archive = path.join(f.root, 'runtime.tar.xz');
-  const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
+  const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, fs.readdirSync(archiveRoot)[0]], { encoding: 'utf8' });
   assert.equal(tar.status, 0, tar.stderr);
-  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
-    linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
+  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(runtimePin(createHash('sha256').update(fs.readFileSync(archive)).digest('hex'))));
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+${fq40CurlQueryStub}
 fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl'])+'\\n');
 fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
 `, { mode: 0o700 });
@@ -693,7 +1183,6 @@ fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
     ['--version', 'ci', 'ci']);
 
   fs.rmSync(path.join(f.root, 'styleguide-node'), { recursive: true });
-  fs.rmSync(path.join(f.root, 'styleguide-node.tar.xz'), { force: true });
   const validatorPath = path.join(workflows, 'Validate-WorkflowPolicy.mjs');
   const validator = fs.readFileSync(validatorPath, 'utf8');
   const marker = path.join(f.root, 'preflight-write');
@@ -1064,8 +1553,8 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
       if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
       if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
       if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
-      if (mode) assert.equal(fs.existsSync(path.join(f.root, 'path')), false);
-      else assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
+      if (mode) assert.equal(fs.existsSync(f.channels.path), false);
+      else assert.equal(fs.readFileSync(f.channels.path, 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
     });
   }
 
@@ -1131,6 +1620,7 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
           TOOLCHAIN_LAYOUT: 'modern', GITHUB_ENV: path.join(f.root, 'step-env') };
         for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
         const result = spawnSync('bash', ['--noprofile', '--norc', '-c', source], { cwd: f.work, env, encoding: 'utf8' });
+        assertCompletedProcess(result, `${setupWorkflowName}: ${name}: partial=${partial}`);
         assert.notEqual(result.status, 0);
         assert.match(result.stdout + result.stderr, /Unable to read the package-manager environment/);
         assert.equal(fs.existsSync(f.log), false);
@@ -1465,9 +1955,9 @@ function copilotBodyFixture(t, workName = 'work', job = copilotJob) {
       ? '\nif ($env:GIT_CONFIG_NOSYSTEM -cne "1" -or $env:GIT_CONFIG_GLOBAL -cne "/dev/null" -or $env:GIT_TERMINAL_PROMPT -cne "0") { throw "Fixture: body depends on job.env isolation" }\n'
       : '\n[[ "${GIT_CONFIG_NOSYSTEM:-}" == 1 && "${GIT_CONFIG_GLOBAL:-}" == /dev/null && "${GIT_TERMINAL_PROMPT:-}" == 0 ]] || { echo "Fixture: body depends on job.env isolation"; exit 93; }\n';
     fs.writeFileSync(file, transform(step.run) + isolationProbe);
-    return spawnSync(step.shell === 'pwsh' ? 'pwsh' : 'bash', step.shell === 'pwsh'
+    return assertCompletedProcess(spawnSync(step.shell === 'pwsh' ? 'pwsh' : 'bash', step.shell === 'pwsh'
       ? ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', file] : ['--noprofile', '--norc', file],
-    { cwd: work, env: { ...env, ...extra }, encoding: 'utf8', timeout: 45000 });
+    { cwd: work, env: { ...env, ...extra }, encoding: 'utf8', timeout: 45000 }), `${name}: ${step.shell}: ${file}`);
   }
   function git(...args) {
     const r = spawnSync('/usr/bin/git', args, { cwd: work,
@@ -1484,10 +1974,11 @@ function copilotInputs(f, kind = 'declared') {
   if (kind === 'legacy') return;
   f.put('package.json', JSON.stringify({ engines: { node: kind === 'historical' ? '24.18.0' : '24.18.1', npm: '11.16.0' } }));
   f.put('package-lock.json', '{}');
-  if (kind === 'declared') f.put('.github/workflows/ci-toolchain.json', JSON.stringify({ linuxX64Sha256: 'a'.repeat(64) }));
+  if (kind === 'declared' || kind === 'declared-schema2') f.put('.github/workflows/ci-toolchain.json',
+    JSON.stringify(kind === 'declared-schema2' ? runtimePin('a'.repeat(64)) : { linuxX64Sha256: 'a'.repeat(64) }));
   if (kind !== 'historical') for (const name of copilotFullInputs) f.put(name);
 }
-for (const kind of ['declared', 'pre-declaration', 'historical', 'legacy', 'historical-full']) {
+for (const kind of ['declared-schema2', 'declared', 'pre-declaration', 'historical', 'legacy', 'historical-full']) {
   test(`Copilot finite capability classification: ${kind}`, { skip: !linux }, t => {
     const f = copilotBodyFixture(t); copilotInputs(f, kind === 'historical-full' ? 'historical' : kind);
     if (kind === 'historical-full') for (const name of copilotFullInputs) f.put(name);
@@ -2056,7 +2547,7 @@ for (const mode of ['clean', 'worktree', 'index-masked', 'untracked']) {
 }
 
 // Strict whole declarations must fail at each actual workflow admission site.
-const malformedRuntimeDeclarations = () => {
+const copilotMalformedRuntimeDeclarations = () => {
   const pin = copilotReaderPin('a'.repeat(64));
   const changed = edit => { const value = structuredClone(pin); edit(value); return JSON.stringify(value); };
   const spoof = object => ({ ...object, Count: Object.keys(object).length, Keys: Object.keys(object), PSBase: 'shadow', extra: true });
@@ -2079,10 +2570,29 @@ const malformedRuntimeDeclarations = () => {
     JSON.stringify(pin).replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2'),
     JSON.stringify(pin).replace('"node":"22.23.3"', '"node":"22.23.3","n\\u006fde":"22.23.3"')];
 };
+const malformedRuntimeDeclarations = () => {
+  const pin = runtimePin('a'.repeat(64));
+  const changed = edit => { const value = structuredClone(pin); edit(value); return JSON.stringify(value); };
+  const spoof = object => ({ ...object, Count: Object.keys(object).length, Keys: Object.keys(object), PSBase: 'shadow', extra: true });
+  const flat = { linuxX64Sha256: 'a'.repeat(64) };
+  return [JSON.stringify(spoof(pin)), changed(p => p.preferred = spoof(p.preferred)),
+    changed(p => p.recoveryCompatibility = spoof(p.recoveryCompatibility)), JSON.stringify(spoof(flat)),
+    changed(p => Object.assign(p, { count: 3, keys: Object.keys(pin), extra: true })),
+    ...[[], [pin], [flat], [pin, pin], [[pin]]].map(JSON.stringify),
+    'null', '"declaration"', '{}', '{', '{"linuxX64Sha256":"' + 'a'.repeat(64) + '","linuxX64Sha256":"' + 'b'.repeat(64) + '"}',
+    changed(p => p.schemaVersion = 1), changed(p => p.schemaVersion = '2'), changed(p => p.schemaVersion = 99),
+    changed(p => p.linuxX64Sha256 = 'a'.repeat(64)), changed(p => delete p.preferred),
+    changed(p => delete p.preferred.linuxX64Sha256), changed(p => delete p.preferred.windowsX64Sha256),
+    changed(p => p.preferred.linuxX64Sha256 = 'A'.repeat(64)), changed(p => p.preferred.windowsX64Sha256 = []),
+    changed(p => p.recoveryCompatibility.node = '22.x'), changed(p => p.recoveryCompatibility.npm = ['10.9.9']),
+    changed(p => delete p.recoveryCompatibility.linuxX64Sha256), changed(p => p.recoveryCompatibility.url = 'https://example.invalid/'),
+    JSON.stringify(pin).replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2'),
+    JSON.stringify(pin).replace('"node":"22.23.3"', '"node":"22.23.3","n\\u006fde":"22.23.3"')];
+};
 for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
   test(`${workflow}: whole malformed declaration rejects before curl at both sites`, { skip: !linux }, t => {
     const job = parse(read(workflow)).jobs['copilot-setup-steps'];
-    for (const raw of malformedRuntimeDeclarations()) {
+    for (const raw of copilotMalformedRuntimeDeclarations()) {
       const f = copilotBodyFixture(t, 'work', job); copilotInputs(f);
       f.put('.github/workflows/ci-toolchain.json', raw);
       const curl = path.join(f.root, 'curl');
@@ -2176,5 +2686,2870 @@ for (const workflow of ['copilot-setup-steps.yml', 'copilot-code-review.yml']) {
       assert.equal(fs.existsSync(f.env.GITHUB_PATH), false);
       if (length === 16385) assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
     }
+  });
+}
+
+// The dispatch log is outside owned staging, so cleanup cannot erase evidence
+// that a malformed declaration reached the replacement acquisition executable.
+function ordinaryDeclarationFixture(t, raw, source = read('Initialize-CiToolchain.ps1'), curlAction = '', options = {}) {
+  const f = fixture(t), workflows = path.join(f.work, '.github/workflows'); fs.mkdirSync(workflows, { recursive: true });
+  if (options.selectors) selectorGitLauncher(f);
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify(options.packageValue ?? { engines: { node: '24.18.1', npm: '11.16.0' } }));
+  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), raw);
+  fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
+    .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+  const curl = path.join(f.root, 'curl'), dispatchLog = path.join(f.root, 'curl-dispatches');
+  assert.equal(fs.existsSync(dispatchLog), false);
+  fs.writeFileSync(curl, `#!${process.execPath}
+${fq40CurlQueryStub}
+${options.selectors ? `{ const fs = require('node:fs'); ${selectorObserver} }` : ''}
+require('node:fs').appendFileSync(${JSON.stringify(dispatchLog)}, 'dispatch\\n');
+${curlAction}
+process.exit(99);
+`, { mode: 0o700 });
+  fs.writeFileSync(path.join(workflows, 'Initialize-CiToolchain.ps1'), source.replaceAll('/usr/bin/curl', curl));
+  const result = f.run(`${options.preference ?? ''}& ${quote(path.join(workflows, 'Initialize-CiToolchain.ps1'))}`, options.selectors ? selectorEnvironment(options.selectors) : {});
+  const dispatches = fs.existsSync(dispatchLog) ? fs.readFileSync(dispatchLog, 'utf8').trim().split('\n') : [];
+  return { ...f, result, dispatches };
+}
+
+function assertOrdinaryFailureCleanup(f) {
+  assert.equal(f.result.error, undefined);
+  assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false, f.result.stdout + f.result.stderr);
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
+}
+
+function assertNoOrdinaryDispatch(f) {
+  assert.deepEqual(f.dispatches, [], 'Malformed declaration must not dispatch curl.');
+}
+
+test('ordinary schema2 rejects malformed and historical declarations before download', { skip: !linux }, t => {
+  const nestedInvalidShapes = ['preferred', 'recoveryCompatibility'].flatMap(role =>
+    [null, 1, []].map(value => { const pin = runtimePin('a'.repeat(64)); pin[role] = value; return JSON.stringify(pin); }));
+  for (const raw of [...malformedRuntimeDeclarations(), JSON.stringify({ linuxX64Sha256: 'a'.repeat(64) }), ...nestedInvalidShapes]) {
+    const f = ordinaryDeclarationFixture(t, raw);
+    assertOrdinaryFailureCleanup(f);
+    assertNoOrdinaryDispatch(f);
+    let document;
+    try { document = JSON.parse(raw); } catch { continue; }
+    if (document === null || Array.isArray(document) || typeof document !== 'object') {
+      assert.match(f.result.stderr, /JSON input must be an object/u);
+    } else if (nestedInvalidShapes.includes(raw)) {
+      assert.match(f.result.stderr, /unexpected object fields/u);
+    }
+  }
+});
+
+// These cases belong to the ordinary initializer, whose schema is always schema2.
+function ordinaryExactTokenCases() {
+  const pin = runtimePin('a'.repeat(64));
+  const packageValue = { engines: { node: '24.18.1', npm: '11.16.0' } };
+  const make = (name, edit, valid = false) => {
+    const value = { pin: structuredClone(pin), package: structuredClone(packageValue) };
+    edit(value);
+    return { name, valid, pin: JSON.stringify(value.pin), package: JSON.stringify(value.package) };
+  };
+  const fields = ['package.engines.node', 'package.engines.npm',
+    'pin.preferred.linuxX64Sha256', 'pin.preferred.windowsX64Sha256', 'pin.recoveryCompatibility.linuxX64Sha256',
+    'pin.recoveryCompatibility.node', 'pin.recoveryCompatibility.npm'];
+  const change = (value, field, text, prefix = false) => {
+    const parts = field.split('.'), key = parts.pop();
+    const owner = parts.reduce((object, part) => object[part], value);
+    owner[key] = prefix ? text + owner[key] : owner[key] + text;
+  };
+  return [make('valid baseline', () => {}, true),
+    make('valid variable patch', value => value.package.engines.node = '24.18.2', true),
+    ...fields.flatMap(field => [['LF', '\n'], ['CRLF', '\r\n'], ['TAB', '\t'], ['extra', 'x']]
+      .map(([label, text]) => make(`${field} ${label}`, value => change(value, field, text)))),
+    ...fields.slice(0, 5).map(field => make(`${field} leadingLF`, value => change(value, field, '\n', true)))];
+}
+
+test('FQ30 ordinary exact token admission preserves valid values and refuses extra characters', t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const boundaries = ['function Assert-Shape {', 'function Assert-WindowsWriter {',
+    "Assert-Shape $objPin @('schemaVersion', 'preferred', 'recoveryCompatibility')",
+    '$strRunnerRoot = Assert-OrdinaryPath $env:RUNNER_TEMP -Directory'];
+  const offsets = boundaries.map(anchor => {
+    assert.equal(original.split(anchor).length, 2, 'Admission extraction boundary must occur exactly once.');
+    return original.indexOf(anchor);
+  });
+  assert.ok(offsets.every((offset, index) => index === 0 || offset > offsets[index - 1]));
+  const helper = original.slice(offsets[0], offsets[1]);
+  const admission = original.slice(offsets[2], offsets[3]);
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-admission-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const cases = ordinaryExactTokenCases(), casesPath = path.join(root, 'cases.json');
+  fs.writeFileSync(casesPath, JSON.stringify(cases));
+  const script = path.join(root, 'admission.ps1');
+  // Execute the actual pure admission stage. Whole-script side effects are tested separately.
+  fs.writeFileSync(script, `$ErrorActionPreference = 'Stop'\n${helper}\n$admission = {\n${admission}\n}
+$cases = Get-Content -LiteralPath ${quote(casesPath)} -Raw | ConvertFrom-Json
+$results = @(foreach ($case in $cases) {
+    $objPin = ConvertFrom-Json -InputObject $case.pin -AsHashtable
+    $objPackage = ConvertFrom-Json -InputObject $case.package -AsHashtable
+    $accepted = $false
+    try { & $admission; $accepted = $true }
+    catch { if ($_.Exception.Message -cne 'The reviewed runtime declaration is invalid.') { throw } }
+    [ordered]@{ name = $case.name; accepted = $accepted }
+})
+ConvertTo-Json -InputObject $results -Depth 3
+`);
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+    cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+  }), 'FQ30 actual ordinary admission stage');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(JSON.parse(result.stdout), cases.map(value => ({ name: value.name, accepted: value.valid })));
+  assert.equal(read('Initialize-CiToolchain.ps1'), original);
+});
+
+test('FQ30 ordinary newline declarations refuse before download and runner publication', { skip: !linux }, t => {
+  for (const value of ordinaryExactTokenCases().filter(row => / (?:LF|CRLF)$/u.test(row.name))) {
+    const f = ordinaryDeclarationFixture(t, value.pin, read('Initialize-CiToolchain.ps1'), '', {
+      packageValue: JSON.parse(value.package),
+    });
+    assertOrdinaryFailureCleanup(f);
+    assertNoOrdinaryDispatch(f);
+    assert.match(f.result.stderr, /The reviewed runtime declaration is invalid/u, value.name);
+    assert.deepEqual(f.calls(), [], 'Malformed values must not reach credential setup.');
+  }
+});
+
+
+// Whole WhatIf still refuses at the real directory gate. This exact copied-source
+// anchor perturbs cleanup preferences only after successful real ownership.
+function initializerCleanupStage(source, whatIf = false) {
+  const anchor = '    $boolOwned = $true\n';
+  assert.equal(source.split(anchor).length, 2, 'Cleanup ownership anchor must occur exactly once.');
+  const marker = "    Write-Output 'FQ23 cleanup stage'\n";
+  if (!whatIf) return source.replace(anchor, anchor + marker);
+  const endAnchor = "    $env:npm_config_userconfig = Join-Path $strNodeRoot 'npm-user.config'\n";
+  assert.equal(source.split(endAnchor).length, 2, 'Cleanup configuration anchor must occur exactly once.');
+  assert.equal(source.includes('$boolFq24PriorWhatIf'), false, 'Fixture preference variable must not collide with actual source.');
+  const start = source.indexOf(anchor) + anchor.length, end = source.indexOf(endAnchor);
+  assert.ok(end > start, 'Actual cleanup must end before reviewed configuration and runtime acquisition.');
+  const cleanup = source.slice(start, end);
+  const scoped = marker + '    $boolFq24PriorWhatIf = $WhatIfPreference\n' +
+    '    try {\n        $WhatIfPreference = $true\n' +
+    cleanup.replace(/^/gmu, '    ').trimEnd() + '\n' +
+    '    } finally {\n        $WhatIfPreference = $boolFq24PriorWhatIf\n    }\n' +
+    '    if ($WhatIfPreference -ne $boolFq24PriorWhatIf) {\n' +
+    "        throw 'FQ24 cleanup preference restoration failed'\n    }\n" +
+    "    Write-Output 'FQ24 cleanup preference restored'\n";
+  return source.slice(0, start) + scoped + source.slice(end);
+}
+
+for (const family of ['npm', 'absent']) {
+  test(`FQ23 ordinary Low sanitation ${family}`, { skip: !linux }, t => {
+    const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(read('Initialize-CiToolchain.ps1')), '', { selectors: family, preference: "$ConfirmPreference='Low'; " });
+    assertOrdinaryFailureCleanup(f);
+    assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+    assert.match(f.result.stderr, /Runtime download failed: 99/u);
+    assert.deepEqual(f.dispatches, ['dispatch']);
+    assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+  });
+}
+
+test('FQ23 initializer internal-stage WhatIf sanitation', { skip: !linux }, t => {
+  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+    initializerCleanupStage(read('Initialize-CiToolchain.ps1'), true), '', { selectors: 'all' });
+  assertOrdinaryFailureCleanup(f);
+  assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+  assert.match(f.result.stdout, /FQ24 cleanup preference restored/u);
+  assert.doesNotMatch(f.result.stderr, /Restricted staging directory creation was declined/u);
+  assert.match(f.result.stderr, /Runtime download failed: 99/u);
+  assert.deepEqual(f.dispatches, ['dispatch']);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+});
+
+for (const parameter of ['Confirm', 'WhatIf']) for (const family of ['fixed', 'npm']) {
+  test(`FQ23 initializer sanitation mutation ${parameter} ${family}`, { skip: !linux }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    const anchor = family === 'fixed'
+      ? 'Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false'
+      : 'Remove-Item -LiteralPath "Env:$($_.Name)" -Confirm:$false -WhatIf:$false';
+    assert.equal(original.split(anchor).length, 2, 'Exactly one intended removal site must change.');
+    const mutated = original.replace(anchor, anchor.replace(` -${parameter}:$false`, ''));
+    assert.notEqual(mutated, original);
+    const options = { selectors: family, preference: parameter === 'Confirm' ? "$ConfirmPreference='Low'; " : '' };
+    const baseline = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(original, parameter === 'WhatIf'), '', options);
+    assertOrdinaryFailureCleanup(baseline);
+    assert.match(baseline.result.stdout, /FQ23 cleanup stage/u);
+    if (parameter === 'WhatIf') assert.match(baseline.result.stdout, /FQ24 cleanup preference restored/u);
+    assert.match(baseline.result.stderr, /Runtime download failed: 99/u);
+    assert.deepEqual(baseline.dispatches, ['dispatch']);
+    assert.equal(baseline.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+    const witness = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      initializerCleanupStage(mutated, parameter === 'WhatIf'), '', options);
+    assertOrdinaryFailureCleanup(witness);
+    assert.match(witness.result.stdout, /FQ23 cleanup stage/u);
+    assert.deepEqual(witness.dispatches, []);
+    if (parameter === 'Confirm') {
+      assert.match(witness.result.stderr, family === 'fixed' ? /Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22/u : /Remove-Item -LiteralPath/u);
+      assert.match(witness.result.stderr, /NonInteractive|non-interactive/iu);
+      assert.doesNotMatch(witness.result.stderr, /FQ23 sanitation observer/u);
+      assert.equal(witness.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 0);
+    } else {
+      assert.match(witness.result.stdout, /FQ24 cleanup preference restored/u);
+      assert.doesNotMatch(witness.result.stderr, /Restricted staging directory creation was declined/u);
+      assert.match(witness.result.stderr, /FQ23 sanitation observer rejected retained selector/u);
+      assert.match(witness.result.stderr, /Runtime download failed: 98/u);
+      assert.equal(witness.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+    }
+    assert.doesNotMatch(witness.result.stderr, /Runtime download failed: 99/u);
+  });
+}
+
+test('F5 ordinary valid declaration proves curl dispatch observation', { skip: !linux }, t => {
+  const source = initializerCleanupStage(read('Initialize-CiToolchain.ps1'));
+  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))), source, '', { selectors: 'fixed' });
+  assertOrdinaryFailureCleanup(f);
+  assert.deepEqual(f.dispatches, ['dispatch']);
+  assert.match(f.result.stderr, /Runtime download failed: 99/u);
+  assert.match(f.result.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+  const initializer = path.join(f.work, '.github/workflows/Initialize-CiToolchain.ps1');
+  const dispatchLog = path.join(f.root, 'curl-dispatches'), initialDispatches = fs.readFileSync(dispatchLog);
+  const whatIf = f.run(`$WhatIfPreference=$true; $ConfirmPreference='Low'; & ${quote(initializer)}`, selectorEnvironment('fixed'));
+  assertOrdinaryFailureCleanup({ ...f, result: whatIf });
+  assert.match(whatIf.stderr, /Restricted staging directory creation was declined/u);
+  assert.doesNotMatch(whatIf.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 1);
+  assert.deepEqual(fs.readFileSync(dispatchLog), initialDispatches, 'Inherited WhatIf must refuse before additional curl dispatch.');
+  const lowConfirm = f.run(`$ConfirmPreference='Low'; & ${quote(initializer)}`, selectorEnvironment('fixed'));
+  assertOrdinaryFailureCleanup({ ...f, result: lowConfirm });
+  assert.match(lowConfirm.stderr, /Runtime download failed: 99/u);
+  assert.match(lowConfirm.stdout, /FQ23 cleanup stage/u);
+  assert.equal(f.calls().filter(row => row[0] === 'FQ23 sanitation observer').length, 2);
+  assert.deepEqual(fs.readFileSync(dispatchLog, 'utf8').trim().split('\n'), ['dispatch', 'dispatch'],
+    'Low confirmation preference must reach exactly one additional curl dispatch without prompting.');
+  t.diagnostic(`Valid declaration control: child status ${f.result.status}, curl dispatches ${f.dispatches.length}; inherited WhatIf refused and low confirmation completed.`);
+});
+
+for (const mutation of ['dotted-shape-properties', 'enumerated-singleton-root']) {
+  test(`F5 ordinary admission mutation witness: ${mutation}`, { skip: !linux }, t => {
+    const original = read('Initialize-CiToolchain.ps1'), pin = runtimePin('a'.repeat(64));
+    const shape = `    if ($Object -isnot [Collections.IDictionary] -or $Object.psbase.Count -ne $Keys.Count -or
+        @($Object.psbase.Keys | Where-Object {
+            $_ -cnotin $Keys
+        }).Count) {
+        throw 'The reviewed runtime declaration is invalid: unexpected object fields.'
+    }
+`;
+    const rootGuard = `        if ($objJsonDocument.RootElement.ValueKind -ne [Text.Json.JsonValueKind]::Object) {
+            throw 'toolchain: JSON input must be an object'
+        }
+`;
+    const anchor = mutation === 'dotted-shape-properties' ? shape : rootGuard;
+    assert.equal(original.split(anchor).length, 2, 'The exact mutation anchor must occur once.');
+    const replacement = mutation === 'dotted-shape-properties'
+      ? shape.replace('$Object.psbase.Count', '$Object.Count').replace('$Object.psbase.Keys', '$Object.Keys') : '';
+    const mutated = original.replace(anchor, replacement);
+    assert.notEqual(mutated, original);
+    const raw = JSON.stringify(mutation === 'dotted-shape-properties'
+      ? { ...pin, Count: Object.keys(pin).length, Keys: Object.keys(pin), PSBase: 'shadow', extra: true } : [pin]);
+    const admitted = ordinaryDeclarationFixture(t, raw, original);
+    assertOrdinaryFailureCleanup(admitted);
+    assertNoOrdinaryDispatch(admitted);
+    assert.match(admitted.result.stderr, mutation === 'dotted-shape-properties'
+      ? /unexpected object fields/u : /JSON input must be an object/u);
+    const witness = ordinaryDeclarationFixture(t, raw, mutated);
+    // The former status/cleanup/channel oracle still passes for this regression.
+    assertOrdinaryFailureCleanup(witness);
+    assert.deepEqual(witness.dispatches, ['dispatch']);
+    assert.match(witness.result.stderr, /download failed/u);
+    assert.throws(() => assertNoOrdinaryDispatch(witness), /Malformed declaration must not dispatch curl/u);
+    assert.equal(read('Initialize-CiToolchain.ps1'), original, 'Mutation must remain inside the disposable fixture.');
+    t.diagnostic(`${mutation}: original dispatches 0; mutated dispatches 1; child status ${witness.result.status}; old cleanup oracle passes; new dispatch oracle rejects.`);
+  });
+}
+
+function cleanupAction(mode) {
+  return `
+const fs = require('node:fs'), path = require('node:path');
+const root = process.env.RUNNER_TEMP, stage = path.join(root, 'styleguide-node');
+const marker = path.join(stage, '.owner'), mode = ${JSON.stringify(mode)};
+const original = fs.lstatSync(stage, { bigint: true }), nonce = fs.readFileSync(marker, 'utf8');
+const outside = path.join(root, 'outside'); fs.mkdirSync(outside);
+fs.writeFileSync(path.join(outside, 'sentinel'), 'outside must survive');
+if (mode === 'metadata-change') {
+  fs.writeFileSync(path.join(stage, 'normal-work'), 'ordinary staged data');
+  fs.utimesSync(stage, new Date('2001-01-01T00:00:00Z'), new Date('2001-01-01T00:00:00Z'));
+} else if (mode === 'directory-replace' || mode === 'root-link') {
+  fs.renameSync(stage, path.join(root, 'retained-original'));
+  if (mode === 'root-link') fs.symlinkSync(outside, stage, 'dir');
+  else {
+    fs.mkdirSync(stage, { mode: 0o700 });
+    fs.writeFileSync(path.join(stage, '.owner'), nonce);
+    fs.writeFileSync(path.join(stage, 'replacement-sentinel'), 'replacement must survive');
+  }
+} else if (mode === 'marker-replace' || mode === 'marker-link') {
+  fs.renameSync(marker, path.join(root, 'retained-marker'));
+  if (mode === 'marker-link') {
+    fs.writeFileSync(path.join(outside, 'marker'), nonce);
+    fs.symlinkSync(path.join(outside, 'marker'), marker);
+  } else fs.writeFileSync(marker, nonce);
+} else if (mode === 'marker-content') fs.writeFileSync(marker, 'f'.repeat(32));
+else throw new Error('Unexpected cleanup fixture mode');
+const after = fs.lstatSync(stage, { bigint: true });
+fs.writeFileSync(path.join(root, 'cleanup-action.json'), JSON.stringify({ mode,
+  originalDevice: String(original.dev), originalInode: String(original.ino),
+  afterDevice: String(after.dev), afterInode: String(after.ino),
+  originalMtime: String(original.mtimeNs), afterMtime: String(after.mtimeNs) }));
+`;
+}
+
+function assertRetainedCleanup(f, mode) {
+  assert.equal(f.result.error, undefined);
+  assert.equal(f.result.signal, null);
+  assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
+  assert.deepEqual(f.dispatches, ['dispatch']);
+  assert.match(f.result.stderr, /Runtime download failed: 99/u);
+  assert.match(f.result.stdout, /Runtime cleanup could not prove completion/u);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), true);
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
+  assert.equal(fs.readFileSync(path.join(f.root, 'outside/sentinel'), 'utf8'), 'outside must survive');
+  if (mode === 'directory-replace') {
+    assert.equal(fs.readFileSync(path.join(f.root, 'styleguide-node/replacement-sentinel'), 'utf8'), 'replacement must survive');
+    assert.equal(fs.existsSync(path.join(f.root, 'retained-original/.owner')), true);
+  }
+  if (mode === 'marker-replace' || mode === 'marker-link') assert.equal(fs.existsSync(path.join(f.root, 'retained-marker')), true);
+  if (mode === 'root-link') assert.equal(fs.lstatSync(path.join(f.root, 'styleguide-node')).isSymbolicLink(), true);
+  if (mode === 'marker-link') assert.equal(fs.lstatSync(path.join(f.root, 'styleguide-node/.owner')).isSymbolicLink(), true);
+}
+
+for (const mode of ['metadata-change', 'directory-replace', 'marker-replace', 'marker-content', 'root-link', 'marker-link']) {
+  test(`F6 ordinary failure cleanup: ${mode}`, { skip: !linux }, t => {
+    const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+      read('Initialize-CiToolchain.ps1'), cleanupAction(mode));
+    if (mode === 'metadata-change') {
+      assertOrdinaryFailureCleanup(f);
+      assert.deepEqual(f.dispatches, ['dispatch']);
+      assert.match(f.result.stderr, /Runtime download failed: 99/u);
+      assert.doesNotMatch(f.result.stdout, /Runtime cleanup could not prove completion/u);
+      assert.equal(fs.readFileSync(path.join(f.root, 'outside/sentinel'), 'utf8'), 'outside must survive');
+      const action = JSON.parse(fs.readFileSync(path.join(f.root, 'cleanup-action.json')));
+      assert.equal(action.originalDevice, action.afterDevice);
+      assert.equal(action.originalInode, action.afterInode);
+      assert.notEqual(action.originalMtime, action.afterMtime);
+    } else assertRetainedCleanup(f, mode);
+  });
+}
+
+for (const mutation of ['timestamp-identity', 'directory-and-marker-identity', 'marker-identity', 'marker-content']) {
+  test(`F6 cleanup mutation witness: ${mutation}`, { skip: !linux }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    let source = original;
+    const once = (anchor, replacement) => {
+      assert.equal(source.split(anchor).length, 2, 'Exact F6 mutation anchor must occur once.');
+      source = source.replace(anchor, replacement);
+    };
+    const directoryCheck = '(Get-OwnedPathIdentity $strNodeRoot -Directory) -cne $strRootIdentity';
+    const markerCheck = '(Get-OwnedPathIdentity $strMarker) -cne $strMarkerIdentity';
+    let mode;
+    if (mutation === 'timestamp-identity') {
+      mode = 'metadata-change';
+      once('$strRootIdentity = Get-OwnedPathIdentity $strNodeRoot -Directory',
+        '$strRootIdentity = (Get-Item -LiteralPath $strNodeRoot).CreationTimeUtc.Ticks');
+      once(directoryCheck, '(Get-Item -LiteralPath $strNodeRoot).CreationTimeUtc.Ticks -ne $strRootIdentity');
+    } else if (mutation === 'directory-and-marker-identity') {
+      mode = 'directory-replace'; once(directoryCheck, '$false'); once(markerCheck, '$false');
+    } else if (mutation === 'marker-identity') {
+      mode = 'marker-replace'; once(markerCheck, '$false');
+    } else {
+      mode = 'marker-content'; once('[IO.File]::ReadAllText($strMarker) -cne $strOwnership', '$false');
+    }
+    const good = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))), original, cleanupAction(mode));
+    if (mode === 'metadata-change') assertOrdinaryFailureCleanup(good);
+    else assertRetainedCleanup(good, mode);
+    const bad = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))), source, cleanupAction(mode));
+    assert.deepEqual(bad.dispatches, ['dispatch']);
+    assert.match(bad.result.stderr, /Runtime download failed: 99/u);
+    if (mode === 'metadata-change') {
+      assert.equal(fs.existsSync(path.join(bad.root, 'styleguide-node')), true);
+      assert.match(bad.result.stdout, /Runtime cleanup could not prove completion/u);
+      assert.throws(() => assertOrdinaryFailureCleanup(bad));
+    } else {
+      assertOrdinaryFailureCleanup(bad);
+      assert.throws(() => assertRetainedCleanup(bad, mode));
+    }
+    assert.equal(fs.readFileSync(path.join(bad.root, 'outside/sentinel'), 'utf8'), 'outside must survive');
+    assert.equal(read('Initialize-CiToolchain.ps1'), original);
+  });
+}
+
+test('F6 missing Linux identity export stops before curl and retains uncertain staging', { skip: !linux }, t => {
+  const original = read('Initialize-CiToolchain.ps1'), anchor = 'NativeLibrary.GetExport(module, "GetInodeData")';
+  assert.equal(original.split(anchor).length, 2);
+  const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
+    original.replace(anchor, 'NativeLibrary.GetExport(module, path.EndsWith("styleguide-node", StringComparison.Ordinal) ? "F6MissingExport" : "GetInodeData")'));
+  assert.equal(f.result.error, undefined);
+  assert.notEqual(f.result.status, 0);
+  assert.deepEqual(f.dispatches, []);
+  assert.match(f.result.stderr, /F6MissingExport/u);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), true);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node/.owner')), false);
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
+});
+
+test('F6 native object identity survives writes and distinguishes copied replacements', {
+  skip: !linux && process.platform !== 'win32',
+}, t => {
+  const f = fixture(t), original = read('Initialize-CiToolchain.ps1');
+  const start = original.indexOf('function Assert-OrdinaryPath {'), end = original.indexOf('function Assert-JsonMember {');
+  assert.ok(start >= 0 && end > start);
+  const source = original.slice(start, end);
+  const result = f.run(source + `
+$directory = Join-Path $env:RUNNER_TEMP 'identity-directory'
+[IO.Directory]::CreateDirectory($directory) | Out-Null
+$marker = Join-Path $directory '.owner'
+[IO.File]::WriteAllText($marker, 'same contents')
+$firstDirectory = Get-OwnedPathIdentity $directory -Directory
+$firstMarker = Get-OwnedPathIdentity $marker
+[IO.File]::WriteAllText((Join-Path $directory 'normal-work'), 'data')
+$requestedLastWriteTimeUtc = ([datetime]'2001-01-01T00:00:00Z').ToUniversalTime()
+if ([IO.Directory]::GetLastWriteTimeUtc($directory) -eq $requestedLastWriteTimeUtc) {
+    throw 'F6 timestamp witness requires a different initial directory last-write UTC time'
+}
+[IO.Directory]::SetLastWriteTimeUtc($directory, $requestedLastWriteTimeUtc)
+if ([IO.Directory]::GetLastWriteTimeUtc($directory) -ne $requestedLastWriteTimeUtc) {
+    throw 'F6 directory last-write UTC time did not match the requested timestamp'
+}
+$afterWrite = Get-OwnedPathIdentity $directory -Directory
+[IO.File]::Move($marker, (Join-Path $env:RUNNER_TEMP 'original-marker'))
+[IO.File]::WriteAllText($marker, 'same contents')
+$replacementMarker = Get-OwnedPathIdentity $marker
+[IO.Directory]::Move($directory, (Join-Path $env:RUNNER_TEMP 'original-directory'))
+[IO.Directory]::CreateDirectory($directory) | Out-Null
+$replacementDirectory = Get-OwnedPathIdentity $directory -Directory
+@{ firstDirectory = $firstDirectory; afterWrite = $afterWrite; replacementDirectory = $replacementDirectory
+   firstMarker = $firstMarker; replacementMarker = $replacementMarker } | ConvertTo-Json -Compress
+`);
+  assert.equal(result.error, undefined);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const identities = JSON.parse(result.stdout);
+  assert.equal(identities.firstDirectory, identities.afterWrite);
+  assert.notEqual(identities.firstDirectory, identities.replacementDirectory);
+  assert.notEqual(identities.firstMarker, identities.replacementMarker);
+  const pattern = linux ? /^unix:[0-9]+:[0-9]+$/u : /^windows:[a-f0-9]{16}:[a-f0-9]{32}$/u;
+  for (const identity of Object.values(identities)) assert.match(identity, pattern);
+  if (linux) {
+    const value = fs.lstatSync(path.join(f.root, 'original-directory'), { bigint: true });
+    assert.equal(identities.firstDirectory, `unix:${value.dev}:${value.ino}`);
+  }
+  const marker = path.join(f.root, 'original-marker');
+  const retainedBytes = fs.readFileSync(marker);
+  const helperSources = ['Initialize-CiToolchain.ps1', 'Test-CheckoutCredentials.ps1', 'Invoke-MarkdownLint.ps1']
+    .map(helper => ({ helper, source: read(helper) }));
+  for (const { helper, source: helperSource } of helperSources) {
+    const start = helperSource.indexOf('function Assert-OrdinaryPath {');
+    const end = helperSource.indexOf('\nfunction ', start + 1);
+    assert.ok(start >= 0 && end > start, helper);
+    const ordinaryPath = helperSource.slice(start, end);
+    const admitted = `\n$strAdmittedPath = Assert-OrdinaryPath -Path ${quote(marker)}\nWrite-Output "FQ7 admitted: $strAdmittedPath"\n`;
+    const good = f.run(ordinaryPath + admitted);
+    assert.equal(good.status, 0, `${helper}: ${good.stderr}`);
+    assert.equal(good.stdout.trim(), `FQ7 admitted: ${path.resolve(marker)}`);
+    const anchor = '    $objPathComparison = ';
+    assert.equal(ordinaryPath.split(anchor).length, 2, `${helper}: exact FQ7 boundary anchor`);
+    // Injected boundary controls corrupt one operand after real provider resolution.
+    // They prove the refusal checks, not a genuine PSDrive redirection.
+    for (const replacement of [
+      "    $objPathProvider = Get-PSProvider -PSProvider Environment\n" + anchor,
+      "    $strProviderPath += '.provider-mismatch'\n" + anchor,
+    ]) {
+      const bad = f.run(ordinaryPath.replace(anchor, replacement) + admitted);
+      assert.notEqual(bad.status, 0, `${helper}: ${bad.stdout}${bad.stderr}`);
+      assert.match(bad.stderr.replace(/\x1B\[[0-?]*[ -/]*[@-~]/gu, '')
+        .replace(/^[ \t]*\|[ \t]?/gmu, '').replace(/\s+/gu, ' '),
+        /the FileSystem provider path must match the normalized native path/u);
+      assert.doesNotMatch(bad.stdout, /FQ7 admitted:/u);
+      assert.deepEqual(fs.readFileSync(marker), retainedBytes);
+    }
+    if (process.platform === 'win32' && helper === 'Initialize-CiToolchain.ps1') {
+      const redirected = f.run(ordinaryPath + `
+$arrOccupiedDriveNames = @((Get-PSDrive).Name) + @([IO.DriveInfo]::GetDrives() | ForEach-Object { $_.Name.Substring(0, 1) })
+$strUnusedDriveName = [string](90..68 | ForEach-Object { [char]$_ } | Where-Object { [string]$_ -inotin $arrOccupiedDriveNames } | Select-Object -First 1)
+if ([string]::IsNullOrEmpty($strUnusedDriveName)) { throw 'FQ7 fixture: no unused temporary drive letter' }
+$null = New-PSDrive -Name $strUnusedDriveName -Scope Local -PSProvider FileSystem -Root $env:RUNNER_TEMP
+try {
+    $strDrivePath = $strUnusedDriveName + ':\\original-marker'
+    if (-not [IO.Path]::IsPathFullyQualified($strDrivePath)) { throw 'FQ7 fixture: temporary drive path is not fully qualified' }
+    $strNativeDrivePath = [IO.Path]::GetFullPath($strDrivePath)
+    [Management.Automation.ProviderInfo] $objResolvedProvider = $null
+    [Management.Automation.PSDriveInfo] $objResolvedDrive = $null
+    $strResolvedProviderPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+        $strDrivePath, [ref]$objResolvedProvider, [ref]$objResolvedDrive)
+    if ($null -eq $objResolvedProvider -or $objResolvedProvider.Name -cne 'FileSystem' -or
+        -not [string]::Equals($strResolvedProviderPath, ${quote(marker)}, [StringComparison]::OrdinalIgnoreCase) -or
+        [string]::Equals($strResolvedProviderPath, $strNativeDrivePath, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'FQ7 fixture: temporary drive did not create the expected real provider mismatch'
+    }
+    Write-Output 'FQ7 temporary PSDrive differs'
+    $null = Assert-OrdinaryPath -Path $strDrivePath
+    Write-Output 'FQ7 admitted: unexpected temporary drive'
+} finally { Remove-PSDrive -Name $strUnusedDriveName -Scope Local -Force }
+`);
+      assert.notEqual(redirected.status, 0, redirected.stdout + redirected.stderr);
+      assert.match(redirected.stdout, /FQ7 temporary PSDrive differs/u);
+      assert.match(redirected.stderr.replace(/\x1B\[[0-?]*[ -/]*[@-~]/gu, '')
+        .replace(/^[ \t]*\|[ \t]?/gmu, '').replace(/\s+/gu, ' '),
+        /the FileSystem provider path must match the normalized native path/u);
+      assert.doesNotMatch(redirected.stdout, /FQ7 admitted:/u);
+      assert.deepEqual(fs.readFileSync(marker), retainedBytes);
+    }
+    assert.equal(read(helper), helperSource, `${helper}: source must remain unchanged`);
+  }
+  const channels = ['path', 'env'].map(channel => f.channels[channel]);
+  for (const channel of channels) {
+    assert.equal(fs.existsSync(channel), false, 'The helper controls begin with unpublished channels.');
+    fs.writeFileSync(channel, '', { flag: 'wx' });
+  }
+  for (const { helper, source: helperSource } of helperSources.filter(item => item.helper !== 'Invoke-MarkdownLint.ps1')) {
+    const start = helperSource.indexOf('function Assert-OrdinaryPath {');
+    const end = helper === 'Initialize-CiToolchain.ps1' ? helperSource.indexOf('function Assert-ArchiveName {', start)
+      : helperSource.indexOf('\n# Do not load user/system Git', start);
+    assert.ok(start >= 0 && end > start, helper);
+    const privateHelpers = helperSource.slice(start, end);
+    for (const whatIf of [true, false]) {
+      const destination = path.join(f.root, `shouldprocess-${helper}-${whatIf ? 'whatif' : 'confirm'}`);
+      assert.equal(fs.existsSync(destination), false);
+      const permissionWitness = linux ? `
+if ([int][IO.File]::GetUnixFileMode(${quote(destination)}) -ne 448) { throw 'FQ8 fixture: private mode must be 0700' }
+` : `
+$objAcl = Get-Acl -LiteralPath ${quote(destination)}
+$strOwner = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+$arrExpectedSids = @($strOwner, 'S-1-5-18', 'S-1-5-32-544')
+$arrRules = @($objAcl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]))
+if (-not $objAcl.AreAccessRulesProtected -or $objAcl.GetOwner([Security.Principal.SecurityIdentifier]).Value -cne $strOwner -or $arrRules.Count -ne 3) {
+    throw 'FQ8 fixture: private DACL protection, owner, or rule count differs'
+}
+foreach ($objRule in $arrRules) {
+    if ($objRule.IdentityReference.Value -cnotin $arrExpectedSids -or $objRule.IsInherited -or
+        $objRule.AccessControlType -ne [Security.AccessControl.AccessControlType]::Allow -or
+        $objRule.FileSystemRights -ne [Security.AccessControl.FileSystemRights]::FullControl -or
+        $objRule.InheritanceFlags -ne ([Security.AccessControl.InheritanceFlags]::ContainerInherit -bor [Security.AccessControl.InheritanceFlags]::ObjectInherit) -or
+        $objRule.PropagationFlags -ne [Security.AccessControl.PropagationFlags]::None) {
+        throw 'FQ8 fixture: private DACL rule differs'
+    }
+}
+if (@($arrRules.IdentityReference.Value | Sort-Object -Unique).Count -ne 3) { throw 'FQ8 fixture: private DACL SID set differs' }
+`;
+      const controlled = f.run(privateHelpers + `
+$WhatIfPreference=$${whatIf ? 'true' : 'false'}
+$ConfirmPreference='Low'
+New-PrivateDirectory -Path ${quote(destination)} -Confirm:$false -WhatIf:$WhatIfPreference
+${whatIf ? '' : permissionWitness}
+Write-Output 'FQ8 created directory'
+`);
+      if (whatIf) {
+        assert.notEqual(controlled.status, 0, `${helper}: ${controlled.stdout}${controlled.stderr}`);
+        assert.match(controlled.stderr, /Restricted staging directory creation was declined/u);
+        assert.doesNotMatch(controlled.stdout, /FQ8 created directory/u);
+        assert.equal(fs.existsSync(destination), false, 'Declined creation must not mutate the destination.');
+      } else {
+        assert.equal(controlled.status, 0, `${helper}: ${controlled.stdout}${controlled.stderr}`);
+        assert.equal(controlled.stdout.trim(), 'FQ8 created directory', 'Creation completes without a confirmation prompt or helper success output.');
+        assert.equal(fs.statSync(destination).isDirectory(), true);
+        if (linux) assert.equal(fs.statSync(destination).mode & 0o777, 0o700);
+      }
+      assert.deepEqual(fs.readFileSync(marker), retainedBytes);
+      assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+      for (const channel of channels) {
+        assert.equal(fs.existsSync(channel), true, 'Control must retain the prepared channel.');
+        assert.deepEqual(fs.readFileSync(channel), Buffer.alloc(0), 'Control must not publish channel bytes.');
+      }
+    }
+    assert.equal(read(helper), helperSource, `${helper}: source must remain unchanged`);
+  }
+});
+
+// Actual whole-helper curl control flow, served asynchronously so the fixture
+// cannot block its own server. Only endpoint/protocol/time values are adapted.
+for (const mode of ['transient', 'retry-after-number', 'retry-after-date', 'stall', 'partial-stall', 'exhaustion', 'partial-eof', 'wrong-digest']) {
+  test(`ordinary actual curl transport: ${mode}`, { skip: !linux, timeout: 25000 }, async t => {
+    const f = fixture(t), workflows = path.join(f.work, '.github/workflows'); fs.mkdirSync(workflows, { recursive: true });
+    const payload = Buffer.from('fixture validated bytes');
+    const requests = []; let count = 0;
+    const server = createServer((req, res) => {
+      requests.push({ url: req.url, header: req.headers['x-fixture-ambient'] });
+      count++;
+      if (req.url === '/ambient') { res.end('ambient must not be reached'); return; }
+      if (mode === 'stall') return;
+      if (mode === 'partial-stall') { res.writeHead(200, { 'Content-Length': 100 }); res.write('short'); return; }
+      if (mode === 'partial-eof') { res.writeHead(200, { 'Content-Length': 100, Connection: 'close' }); res.end('short'); return; }
+      if (mode === 'retry-after-number' || mode === 'retry-after-date') {
+        res.writeHead(503, { 'Retry-After': mode.endsWith('number') ? '600' : new Date(Date.now() + 600000).toUTCString() }); res.end('retry denied'); return;
+      }
+      if (mode === 'exhaustion' || (mode === 'transient' && count === 1)) { res.writeHead(503); res.end('reset this error body'); return; }
+      res.end(mode === 'wrong-digest' ? 'wrong bytes' : payload);
+    });
+    await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+    t.after(() => { server.closeAllConnections(); server.close(); });
+    const endpoint = `http://127.0.0.1:${server.address().port}`;
+    fs.writeFileSync(path.join(f.root, '.curlrc'), `header = "X-Fixture-Ambient: dummy-only"\nurl = "${endpoint}/ambient"\n`);
+    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(runtimePin(createHash('sha256').update(payload).digest('hex'))));
+    fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
+      .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+    const curl = path.join(f.root, 'curl'), curlResult = path.join(f.root, 'curl-result.json');
+    assert.throws(() => fs.lstatSync(curlResult), { code: 'ENOENT' }, 'The curl result witness must start absent.');
+    fs.writeFileSync(curl, `#!${process.execPath}
+const assert = require('node:assert/strict'), fs = require('node:fs'), { spawnSync } = require('node:child_process');
+const args = process.argv.slice(2);
+if(JSON.stringify(args)===JSON.stringify(['--disable','--version']) || JSON.stringify(args)===JSON.stringify(['--disable','--help','all'])) {
+const query=spawnSync('/usr/bin/curl',args,{stdio:'inherit',timeout:15000});
+if(query.error || query.signal || !Number.isInteger(query.status)) process.exit(98);
+process.exit(query.status);
+}
+assert.equal(args[0], '--disable'); assert.equal(args.includes('--retry-all-errors'), false);
+assert.equal(args.filter(value => value === '--max-filesize').length, 1);
+for (const [flag, value] of [['--connect-timeout','20'],['--max-time','180'],['--retry','2'],['--retry-max-time','300'],['--proto','=https'],['--proto-redir','=https'],['--max-filesize','67108864']]) assert.equal(args[args.indexOf(flag)+1], value);
+args[args.indexOf('--connect-timeout')+1]='1'; args[args.indexOf('--max-time')+1]='1';
+args[args.indexOf('--proto')+1]='=http'; args[args.indexOf('--proto-redir')+1]='=http'; args[args.length-1]=${JSON.stringify(endpoint + '/archive')};
+const result=spawnSync('/usr/bin/curl', args, {stdio:'inherit',timeout:16000});
+const witness = { mode: ${JSON.stringify(mode)}, command: '/usr/bin/curl', status: result.status, signal: result.signal };
+if (result.error) witness.error = { name: result.error.name, message: result.error.message, code: result.error.code, errno: result.error.errno, syscall: result.error.syscall, stack: result.error.stack };
+fs.writeFileSync(${JSON.stringify(curlResult)}, JSON.stringify(witness), { flag: 'wx', mode: 0o600 });
+if(result.error) { console.error('fixture curl watchdog/error'); process.exit(98); }
+process.exit(result.status ?? 97);
+`, { mode: 0o700 });
+    const tar = path.join(f.root, 'tar');
+    fs.writeFileSync(tar, `#!/bin/sh\nprintf listed > '${f.root}/tar-marker'\nexit 23\n`, { mode: 0o700 });
+    const initializer = path.join(workflows, 'Initialize-CiToolchain.ps1');
+    fs.writeFileSync(initializer, read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar));
+    for (const channel of ['path', 'env']) fs.writeFileSync(f.channels[channel], '');
+    const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env,
+      CURL_HOME: f.root, TEST_LOG: f.log, TEST_MODE: '' };
+    for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
+    const started = performance.now();
+    const result = await new Promise((resolve, reject) => {
+      const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', initializer], { cwd: f.work, env, windowsHide: true });
+      let stdout = '', stderr = '', expired = false;
+      const watchdog = setTimeout(() => { expired = true; child.kill('SIGKILL'); }, 20000);
+      child.stdout.on('data', bytes => stdout += bytes); child.stderr.on('data', bytes => stderr += bytes);
+      child.on('error', reject);
+      child.on('close', (status, signal) => { clearTimeout(watchdog); resolve({ status, signal, stdout, stderr, expired }); });
+    });
+    assert.equal(result.expired, false, 'A watchdog is failure, never a timing pass.');
+    assert.equal(result.signal, null);
+    readCurlResultWitness(curlResult, mode, `actual curl ${mode}: ${result.stderr}`);
+    assert.notEqual(result.status, 0);
+    assert.ok(performance.now() - started < 20000);
+    assert.equal(requests.some(row => row.url === '/ambient' || row.header), false, JSON.stringify(requests));
+    assert.equal(fs.existsSync(path.join(f.root, 'tar-marker')), mode === 'transient', result.stderr);
+    if (mode.startsWith('retry-after')) assert.equal(requests.length, 1, 'Retry-After600 must exceed unscaled retry-admission300.');
+    if (mode === 'transient') { assert.equal(requests.length, 2); assert.match(result.stderr, /archive listing failed: 23/); }
+    if (mode === 'exhaustion') assert.equal(requests.length, 3);
+    if (mode === 'partial-eof') assert.equal(requests.length, 1, 'Partial EOF must not become retry-all-errors.');
+    if (mode === 'wrong-digest') assert.match(result.stderr, /archive digest is incorrect/);
+    assert.equal(fs.readFileSync(env.GITHUB_PATH, 'utf8'), '');
+    assert.equal(fs.readFileSync(env.GITHUB_ENV, 'utf8'), '');
+  });
+}
+
+// Synthetic archives run through the real initializer, with only fixed curl
+// dispatch replaced. No production URL, version or timeout override exists.
+for (const mode of ['success', 'compatibility-version', 'compatibility-digest', 'preflight', 'install', 'lock-mutation', 'escape-link', 'wrong-root', 'unsafe-mode']) {
+  test(`R5 Linux compatibility and archive boundary: ${mode}`, { skip: !linux }, t => {
+    const f = fixture(t, 'space and Unicode Ω'), workflows = path.join(f.work, '.github/workflows'); fs.mkdirSync(workflows, { recursive: true });
+    for (const folder of [f.work, workflows]) {
+      fs.writeFileSync(path.join(folder, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+      fs.writeFileSync(path.join(folder, 'package-lock.json'), '{}');
+    }
+    fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
+      .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+    const archives = {}, pin = runtimePin('a'.repeat(64));
+    for (const [role, version, npm] of [['preferred', '24.18.1', '11.16.0'], ['recoveryCompatibility', '22.23.3', '10.9.9']]) {
+      const parent = path.join(f.root, `archive-${role}`);
+      const release = mode === 'wrong-root' && role === 'preferred' ? 'wrong-root' : `node-v${version}-linux-x64`;
+      const runtime = path.join(parent, release), bin = path.join(runtime, 'bin'), cli = path.join(runtime, 'lib/node_modules/npm/bin');
+      fs.mkdirSync(bin, { recursive: true }); fs.mkdirSync(cli, { recursive: true });
+      fs.writeFileSync(path.join(cli, 'npm-cli.js'), 'fixture');
+      fs.writeFileSync(path.join(cli, 'npx-cli.js'), 'fixture');
+      fs.writeFileSync(path.join(cli, '../package.json'), JSON.stringify({ version: npm }));
+      fs.writeFileSync(path.join(bin, 'node'), `#!${process.execPath}
+const fs=require('node:fs'), args=process.argv.slice(2), npm=args[0]?.endsWith('npm-cli.js');
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify([${JSON.stringify(role)}, ...args])+'\\n');
+if(process.env.NODE_OPTIONS || process.env.NODE_PATH || process.env.NPM_CONFIG_SCRIPT_SHELL) process.exit(91);
+if(npm && args.includes('ci') && ${JSON.stringify(role)}==='recoveryCompatibility') process.exit(92);
+if(args.includes('--version')) console.log(npm ? ${JSON.stringify(npm)} : ${JSON.stringify(mode === 'compatibility-version' && role === 'recoveryCompatibility' ? 'v0.0.0' : 'v' + version)});
+if(args.includes('--preflight') && process.env.TEST_MODE==='preflight') process.exit(31);
+if(args.includes('ci') && process.env.TEST_MODE==='install') process.exit(32);
+if(args.includes('ci') && process.env.TEST_MODE==='lock-mutation') fs.appendFileSync(${JSON.stringify(path.join(f.work, 'package-lock.json'))}, ' ');
+`, { mode: mode === 'unsafe-mode' && role === 'preferred' ? 0o777 : 0o755 });
+      if (mode === 'unsafe-mode' && role === 'preferred') {
+        const executable = path.join(bin, 'node');
+        assert.equal(fs.lstatSync(executable).isFile(), true);
+        fs.chmodSync(executable, 0o777);
+        assert.equal(fs.lstatSync(executable).mode & 0o777, 0o777);
+      }
+      fs.symlinkSync(mode === 'escape-link' && role === 'preferred' ? '../../../../outside-sentinel' : '../lib/node_modules/npm/bin/npm-cli.js', path.join(bin, 'npm'));
+      const archive = path.join(f.root, `${role}.tar.xz`);
+      const packed = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', parent, release], { encoding: 'utf8' });
+      assert.equal(packed.status, 0, packed.stderr); archives[role] = archive;
+      const digest = createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+      if (role === 'preferred') pin.preferred.linuxX64Sha256 = digest;
+      else pin.recoveryCompatibility.linuxX64Sha256 = mode === 'compatibility-digest' ? 'a'.repeat(64) : digest;
+    }
+    fs.writeFileSync(path.join(f.root, 'outside-sentinel'), 'unchanged');
+    fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify(pin));
+    const curl = path.join(f.root, 'curl');
+    fs.writeFileSync(curl, `#!${process.execPath}
+const fs=require('node:fs'), args=process.argv.slice(2), archives=${JSON.stringify(archives)};
+${fq40CurlQueryStub}
+const role=args.at(-1).includes('/v22.23.3/')?'recoveryCompatibility':'preferred';
+fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['curl',role,...args])+'\\n');
+fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
+`, { mode: 0o700 });
+    const initializer = path.join(workflows, 'Initialize-CiToolchain.ps1');
+    fs.writeFileSync(initializer, read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl));
+    const gitProgram = `${f.git}.cjs`; fs.renameSync(f.git, gitProgram);
+    fs.writeFileSync(f.git, `#!/bin/sh\nunset NODE_OPTIONS NODE_PATH\nexec '${process.execPath}' '${gitProgram}' "$@"\n`, { mode: 0o700 });
+    const result = f.run(`& ${quote(initializer)} -WorkflowDependencies -InstructionDependencies -IncludeRecoveryCompatibility`, {
+      TEST_MODE: mode, NODE_OPTIONS: '--require=/missing/preload', NODE_PATH: '/hostile', NPM_CONFIG_SCRIPT_SHELL: 'hostile',
+      TAR_OPTIONS: '--fixture-must-not-be-read', XZ_DEFAULTS: '--fixture-must-not-be-read', XZ_OPT: '--fixture-must-not-be-read',
+    });
+    assert.equal(result.error, undefined);
+    assert.equal(result.status === 0, mode === 'success', result.stderr);
+    if (mode === 'unsafe-mode') assert.match(result.stderr, /dangerous archive member permissions/);
+    assert.equal(fs.readFileSync(path.join(f.root, 'outside-sentinel'), 'utf8'), 'unchanged');
+    const calls = f.calls();
+    assert.equal(calls.some(row => row[0] === 'recoveryCompatibility' && row.includes('ci')), false);
+    const environment = fs.readFileSync(f.channels.env, 'utf8'), publishedPath = fs.readFileSync(f.channels.path, 'utf8');
+    if (mode === 'success') {
+      const compatibility = environment.split('\n').find(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22='));
+      assert.equal(compatibility, `STYLEGUIDE_RECOVERY_NODE22=${path.join(f.root, 'styleguide-node/recoveryCompatibility/node-v22.23.3-linux-x64/bin/node')}`);
+      assert.equal(publishedPath, path.join(f.root, 'styleguide-node/preferred/node-v24.18.1-linux-x64/bin') + '\n');
+      assert.equal(calls.filter(row => row[0] === 'preferred' && row.includes('ci')).length, 2);
+    } else {
+      assert.equal(environment, ''); assert.equal(publishedPath, '');
+      if (!['install', 'lock-mutation'].includes(mode)) assert.equal(calls.some(row => row.includes('ci')), false);
+    }
+  });
+}
+
+// R3 selector controls execute copied current helpers. Only fixed Git/curl paths
+// are replaced in the refusal fixtures; the real-Git positives use neither mock.
+const r3GitSelectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR'];
+const r3SelectorDiagnostic = 'credential-policy: repository selector environment variables are not allowed';
+const fq45AskpassNames = ['GIT_ASKPASS', 'SSH_ASKPASS'];
+const fq45AskpassDiagnostic = 'credential-policy: askpass environment variables are not allowed';
+const fq45CoreDiagnostic = 'credential-policy: effective core.askPass is not allowed';
+function r3CredentialFixture(t, nativeGit = false) {
+  const f = fixture(t), scripts = path.join(f.work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const script = path.join(scripts, 'Test-CheckoutCredentials.ps1');
+  const mock = path.join(f.root, 'r3-git.ps1');
+  fs.writeFileSync(mock, `
+[IO.File]::AppendAllText($env:TEST_LOG, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
+$global:LASTEXITCODE = 0
+if ($args -contains '--version') { 'git version 2.55.0.windows.5'; return }
+if ($IsWindows) {
+    $objConfig = Get-Item -LiteralPath $env:GIT_CONFIG_GLOBAL -Force -ErrorAction Stop
+    $strParent = [IO.Path]::GetDirectoryName($env:GIT_CONFIG_GLOBAL)
+    if ($objConfig -isnot [IO.FileInfo] -or $objConfig.Length -ne 0 -or
+        ($objConfig.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+        [IO.Path]::GetFileName($env:GIT_CONFIG_GLOBAL) -cne 'global.config' -or
+        [IO.Path]::GetFileName($strParent) -cnotmatch '^styleguide-git-[a-f0-9]{32}$' -or
+        -not [IO.Path]::GetDirectoryName($strParent).Equals($env:RUNNER_TEMP, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'R3 fixture requires the ordinary private empty config after version'
+    }
+}
+if ($args -contains 'get-url') { 'https://github.com/franklesniak/PSStyleGuide' }
+elseif ($args -contains '--list' -and $args -contains '--null' -and $args -contains '--includes') {
+    if (Test-Path Env:FQ47_QUERY_FILE) { [IO.File]::ReadAllText($env:FQ47_QUERY_FILE) }
+    else { 'local' + [char]0 + 'core.repositoryformatversion' + [char]0 }
+    if ($env:FQ47_QUERY_FAILURE -eq '1') { $global:LASTEXITCODE = 27 }
+}
+else { throw 'R3 unexpected Git dispatch' }
+`);
+  let source = read('Test-CheckoutCredentials.ps1');
+  if (!nativeGit) {
+    const fixed = "Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)) 'Git/cmd/git.exe'";
+    for (const anchor of [fixed, "'/usr/bin/git'", "'/bin/git'"]) {
+      assert.equal(source.split(anchor).length, 2, 'R3 fixed Git anchor must occur once');
+      source = source.replace(anchor, quote(mock));
+    }
+  }
+  fs.writeFileSync(script, source);
+  function run(overrides = {}, target = script, cwd = f.work) {
+    const env = { ...process.env, RUNNER_TEMP: f.root, TEST_LOG: f.log,
+      GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env };
+    const removed = [...r3GitSelectors, ...fq45AskpassNames, 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG'];
+    const canonical = name => process.platform === 'win32' ? name.toUpperCase() : name;
+    for (const key of Object.keys(env)) if (removed.includes(canonical(key))) delete env[key];
+    Object.assign(env, overrides);
+    const expected = new Map(Object.entries(overrides).map(([name, value]) => [canonical(name), value]));
+    const checks = [...new Set([...r3GitSelectors, ...fq45AskpassNames, 'GIT_CONFIG', ...Object.keys(overrides)])].map(name => {
+      const present = expected.has(canonical(name));
+      return `$arrNames = @([Environment]::GetEnvironmentVariables().Keys | Where-Object {
+    [string]::Equals([string]$_, ${quote(name)}, ${process.platform === 'win32' ? '[StringComparison]::OrdinalIgnoreCase' : '[StringComparison]::Ordinal'})
+})
+if ($arrNames.Count -ne ${present ? 1 : 0}) { throw 'R3 fixture selector presence mismatch' }
+${present ? `if ([Environment]::GetEnvironmentVariable(${quote(name)}) -cne ${quote(expected.get(canonical(name)))}) { throw 'R3 fixture selector value mismatch' }` : ''}`;
+    }).join('\n');
+    const wrapper = path.join(f.root, 'r3-wrapper.ps1');
+    fs.writeFileSync(wrapper, `$ErrorActionPreference = 'Stop'\n${checks}\n& ${quote(target)}\nWrite-Output 'R3 helper completed'\n`);
+    const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', wrapper], {
+      cwd, env, encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true,
+    }), 'R3 credential selector child');
+    assert.ok(Buffer.byteLength(result.stdout) + Buffer.byteLength(result.stderr) <= 256 * 1024, 'R3 combined output cap');
+    return result;
+  }
+  return { ...f, scripts, script, source, run };
+}
+function assertR3EarlyCredentialRefusal(f, result, expectedDiagnostic) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+  assert.ok(diagnostic.includes(expectedDiagnostic), diagnostic);
+  assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+  assert.deepEqual(f.calls(), [], 'An inherited credential selector must refuse before even the Git version probe');
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+}
+function assertR3SelectorRefusal(f, result) {
+  assertR3EarlyCredentialRefusal(f, result, r3SelectorDiagnostic);
+}
+function assertFq45AskpassRefusal(f, result) {
+  assertR3EarlyCredentialRefusal(f, result, fq45AskpassDiagnostic);
+}
+
+test('R3 credential selectors: subsets and present value boundaries', { skip: !linux && process.platform !== 'win32' }, t => {
+  const cases = [];
+  for (let mask = 1; mask < 8; mask++) {
+    cases.push(Object.fromEntries(r3GitSelectors.filter((_, index) => mask & (1 << index)).map(name => [name, 'r3-selector-private-value'])));
+  }
+  for (const name of r3GitSelectors) for (const value of ['', '   ', './relative-selector']) cases.push({ [name]: value });
+  // A combined relative-dot selection is still a present-selector case.
+  cases.push(Object.fromEntries(r3GitSelectors.map(name => [name, '.'])));
+  assert.equal(cases.length, 17);
+  for (const env of cases) {
+    const f = r3CredentialFixture(t), result = f.run(env);
+    assertR3SelectorRefusal(f, result);
+    assert.equal((result.stdout + result.stderr).includes('r3-selector-private-value'), false);
+  }
+});
+
+test('R3 credential selectors: native platform name casing', { skip: !linux && process.platform !== 'win32' }, t => {
+  for (const name of r3GitSelectors) {
+    const f = r3CredentialFixture(t), result = f.run({ [name.toLowerCase()]: 'r3-selector-private-value' });
+    if (process.platform === 'win32') assertR3SelectorRefusal(f, result);
+    else {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.match(result.stdout, /R3 helper completed/u);
+      assert.equal(f.calls().length, 2, 'Linux lowercase names are unrelated to the uppercase Git selectors');
+    }
+  }
+});
+
+test('R3 credential selectors: each guard-name removal reaches Git', { skip: !linux && process.platform !== 'win32' }, t => {
+  const anchor = "@('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR')";
+  for (const name of r3GitSelectors) {
+    const f = r3CredentialFixture(t);
+    assert.equal(f.source.split(anchor).length, 2, 'The selected guard list must occur exactly once');
+    const replacement = `@(${r3GitSelectors.filter(item => item !== name).map(quote).join(', ')})`;
+    const mutant = f.source.replace(anchor, replacement);
+    assert.equal(mutant.replace(replacement, anchor), f.source, 'The mutant changes only one guard name');
+    fs.writeFileSync(f.script, mutant);
+    const result = f.run({ [name]: 'r3-selector-private-value' });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 3 : 2);
+    assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
+  }
+});
+
+function r3NativeCredentialRepository(t) {
+  const f = r3CredentialFixture(t, true), metadata = path.join(f.work, '.git');
+  // Authored ordinary Git metadata: no commits, hooks, network or Git setup command.
+  for (const entry of ['objects', 'refs/heads']) fs.mkdirSync(path.join(metadata, entry), { recursive: true });
+  fs.writeFileSync(path.join(metadata, 'HEAD'), 'ref: refs/heads/fixture\n');
+  const baseConfig = '[core]\nrepositoryformatversion = 0\nbare = false\n[remote "origin"]\nurl = https://github.com/franklesniak/PSStyleGuide\n';
+  fs.writeFileSync(path.join(metadata, 'config'), baseConfig);
+  const linked = path.join(f.root, 'linked'), admin = path.join(metadata, 'worktrees/linked');
+  fs.mkdirSync(linked); fs.mkdirSync(admin, { recursive: true });
+  fs.writeFileSync(path.join(admin, 'HEAD'), 'ref: refs/heads/fixture\n');
+  fs.writeFileSync(path.join(admin, 'commondir'), '../..\n');
+  fs.writeFileSync(path.join(admin, 'gitdir'), path.join(linked, '.git') + '\n');
+  fs.writeFileSync(path.join(linked, '.git'), 'gitdir: ' + admin + '\n');
+  return { ...f, metadata, linked, admin, baseConfig };
+}
+
+test('R3 credential selectors: absent ordinary and linked-worktree real Git positives', { skip: !linux && process.platform !== 'win32' }, t => {
+  const f = r3NativeCredentialRepository(t), linked = f.linked;
+  for (const cwd of [f.work, linked]) {
+    const result = f.run({}, f.script, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.deepEqual(f.calls(), [], 'The real-Git positive must not use the Git mock');
+  }
+});
+
+test('FQ45 credential askpass: subsets and present value boundaries', { skip: !linux && process.platform !== 'win32' }, t => {
+  const cases = [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
+    .map(name => [name, 'fq45-private-askpass-value'])));
+  for (const name of fq45AskpassNames) for (const value of ['', '   ', './fq45-relative-askpass']) cases.push({ [name]: value });
+  assert.equal(cases.length, 9);
+  for (const env of cases) {
+    const f = r3CredentialFixture(t), result = f.run(env);
+    assertFq45AskpassRefusal(f, result);
+    for (const value of ['fq45-private-askpass-value', './fq45-relative-askpass']) {
+      assert.equal((result.stdout + result.stderr).includes(value), false, 'Askpass diagnostic must not reveal its value');
+    }
+  }
+});
+
+test('FQ45 credential askpass: native platform name casing', { skip: !linux && process.platform !== 'win32' }, t => {
+  for (const name of fq45AskpassNames) {
+    const mixed = name === 'GIT_ASKPASS' ? 'gIt_AsKpAsS' : 'sSh_AsKpAsS';
+    const f = r3CredentialFixture(t), result = f.run({ [mixed]: 'fq45-private-askpass-value' });
+    if (process.platform === 'win32') assertFq45AskpassRefusal(f, result);
+    else {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.match(result.stdout, /R3 helper completed/u);
+      assert.equal(f.calls().length, 2, 'Linux mixed-case names are unrelated to Git askpass environment names');
+    }
+    assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
+  }
+});
+
+test('FQ45 credential askpass: each guard-name removal defeats the refusal oracle', { skip: !linux && process.platform !== 'win32' }, t => {
+  const anchor = "@('GIT_ASKPASS', 'SSH_ASKPASS')";
+  for (const name of fq45AskpassNames) {
+    const f = r3CredentialFixture(t);
+    assert.equal(f.source.split(anchor).length, 2, 'The askpass guard list must occur exactly once');
+    const replacement = `@(${fq45AskpassNames.filter(item => item !== name).map(quote).join(', ')})`;
+    const mutant = f.source.replace(anchor, replacement);
+    assert.equal(mutant.replace(replacement, anchor), f.source, 'The mutant removes only one askpass guard name');
+    fs.writeFileSync(f.script, mutant);
+    const result = f.run({ [name]: 'fq45-private-askpass-value' });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 3 : 2);
+    assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
+    assert.throws(() => assertFq45AskpassRefusal(f, result), assert.AssertionError,
+      'The actual-helper refusal oracle must reject each weakened guard');
+  }
+});
+
+test('FQ45 credential askpass: effective real Git config and guard-removal control', { skip: !linux && process.platform !== 'win32' }, t => {
+  const guard = String.raw`        if ([string]::Equals($strConfigurationKey, 'core.askpass', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'credential-policy: effective core.askPass is not allowed'
+        }
+`;
+  // Similar keys are permitted; the guard matches the effective key, not a prefix.
+  const positive = r3NativeCredentialRepository(t);
+  fs.writeFileSync(path.join(positive.metadata, 'config'), positive.baseConfig + '[core]\naskPassExtra = unused\n[other]\naskPass = unused\n');
+  const positiveResult = positive.run();
+  assert.equal(positiveResult.status, 0, positiveResult.stdout + positiveResult.stderr);
+  assert.match(positiveResult.stdout, /R3 helper completed/u);
+  assert.deepEqual(positive.calls(), [], 'The config positive must resolve qualified real Git');
+  const cases = [];
+  for (const scope of ['local', 'included', 'worktree']) for (const key of ['askPass', 'aSkPaSs']) {
+    for (const value of ['', './fq45-private-unused-program']) cases.push({ scope, key, value });
+  }
+  assert.equal(cases.length, 12);
+  for (const { scope, key, value } of cases) {
+    const f = r3NativeCredentialRepository(t), local = path.join(f.metadata, 'config');
+    const setting = `[core]\n${key} = ${value}\n`;
+    let configured;
+    if (scope === 'local') {
+      configured = local; fs.writeFileSync(local, f.baseConfig + setting);
+    } else if (scope === 'included') {
+      configured = path.join(f.metadata, 'askpass.config'); fs.writeFileSync(configured, setting);
+      fs.writeFileSync(local, f.baseConfig + '[include]\npath = askpass.config\n');
+    } else {
+      configured = path.join(f.admin, 'config.worktree'); fs.writeFileSync(configured, setting);
+      fs.writeFileSync(local, f.baseConfig.replace('repositoryformatversion = 0', 'repositoryformatversion = 1')
+        + '[extensions]\nworktreeConfig = true\n');
+    }
+    const cwd = scope === 'worktree' ? f.linked : f.work;
+    const snapshots = new Map([local, configured].map(file => [file, fs.readFileSync(file)]));
+    const assertRefusal = result => {
+      assert.notEqual(result.status, 0, result.stdout + result.stderr);
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+      assert.ok(diagnostic.includes(fq45CoreDiagnostic), diagnostic);
+      assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+      assert.equal((result.stdout + result.stderr).includes('fq45-private-unused-program'), false);
+      assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false,
+        'The current helper must complete its strict failure cleanup');
+      assert.deepEqual(f.calls(), [], 'The config rejection must use qualified real Git, not the mock');
+      for (const [file, bytes] of snapshots) assert.deepEqual(fs.readFileSync(file), bytes, 'Helper must not mutate supplied config');
+    };
+    assertRefusal(f.run({}, f.script, cwd));
+    assert.equal(f.source.split(guard).length, 2, 'The effective-key guard must occur exactly once');
+    const mutant = f.source.replace(guard, '');
+    assert.equal(mutant.replace("        $intFirstSeparator = $strConfigurationKey.IndexOf('.')", guard + "        $intFirstSeparator = $strConfigurationKey.IndexOf('.')"), f.source,
+      'The config mutant removes only the effective-key refusal');
+    const mutantPath = path.join(f.scripts, 'fq45-core-mutant.ps1'); fs.writeFileSync(mutantPath, mutant);
+    const result = f.run({}, mutantPath, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /R3 helper completed/u);
+    assert.throws(() => assertRefusal(result), assert.AssertionError,
+      'Removing the actual effective-key guard must false-pass the same negative case');
+  }
+});
+
+const fq47Supported = linux || process.platform === 'win32';
+const fq47HelperDiagnostic = 'credential-policy: effective credential helpers are not allowed';
+const fq47HeaderDiagnostic = 'credential-policy: effective HTTP extra headers are not allowed';
+const fq47SelectorDiagnostic = 'credential-policy: GIT_CONFIG is not allowed';
+const fq47Forms = [
+  { section: 'credential', variable: 'helper', diagnostic: fq47HelperDiagnostic },
+  { section: 'credential "https://fq47.invalid/private-context"', variable: 'helper', diagnostic: fq47HelperDiagnostic },
+  { section: 'http', variable: 'extraHeader', diagnostic: fq47HeaderDiagnostic },
+  { section: 'http "https://fq47.invalid/private-context"', variable: 'extraHeader', diagnostic: fq47HeaderDiagnostic },
+];
+function fq47Configure(f, setting, scope = 'local') {
+  const local = path.join(f.metadata, 'config');
+  if (scope === 'local') fs.writeFileSync(local, f.baseConfig + setting);
+  else if (scope === 'included') {
+    fs.writeFileSync(path.join(f.metadata, 'fq47.config'), setting);
+    fs.writeFileSync(local, f.baseConfig + '[include]\npath = fq47.config\n');
+  } else {
+    assert.equal(scope, 'worktree');
+    fs.writeFileSync(path.join(f.admin, 'config.worktree'), setting);
+    fs.writeFileSync(local, f.baseConfig.replace('repositoryformatversion = 0', 'repositoryformatversion = 1')
+      + '[extensions]\nworktreeConfig = true\n');
+  }
+  return scope === 'worktree' ? f.linked : f.work;
+}
+function assertFq47Refusal(f, result, diagnostic) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  const message = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+  assert.ok(message.includes(diagnostic), message);
+  assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+  for (const secret of ['fq47-private-value', 'fq47.invalid/private-context', 'fq47-private-row']) {
+    assert.equal((result.stdout + result.stderr).includes(secret), false, 'No config values, keys or raw rows in diagnostics');
+  }
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+}
+function fq47Mutant(f, oldText, newText) {
+  assert.equal(f.source.split(oldText).length, 2, 'One actual source anchor');
+  const offset = f.source.indexOf(oldText);
+  const source = f.source.replace(oldText, newText);
+  assert.equal(source.slice(0, offset) + oldText + source.slice(offset + newText.length), f.source,
+    'One reversible source mutation at the selected span');
+  const target = path.join(f.scripts, 'fq47-mutant.ps1'); fs.writeFileSync(target, source);
+  return target;
+}
+
+for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) {
+  for (const family of ['R3 credential selectors', 'FQ45 credential askpass', 'FQ47 effective credentials']) {
+    test(`${family}: real helper refuses through ${caller}`, { skip: !linux && process.platform !== 'win32' }, t => {
+      const cases = family === 'R3 credential selectors' ? [{ GIT_COMMON_DIR: 'r3-selector-private-value' }]
+        : family === 'FQ47 effective credentials' ? [{}, {}] : [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
+          .map(name => [name, 'fq45-private-askpass-value'])));
+      for (const [caseIndex, env] of cases.entries()) {
+        const f = family === 'FQ47 effective credentials' ? r3NativeCredentialRepository(t) : r3CredentialFixture(t);
+        const cwd = family === 'FQ47 effective credentials'
+          ? fq47Configure(f, caseIndex === 0 ? '[credential]\nhelper = fq47-private-value\n' : '[http]\nextraHeader = fq47-private-value\n',
+            caseIndex === 0 ? 'included' : 'worktree') : f.work;
+        const curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
+        let source = read(caller);
+        const helperCall = '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"';
+        assert.equal(source.split(helperCall).length, 2, 'The real credential helper call must remain exactly once');
+        fs.writeFileSync(path.join(f.work, 'package.json'), fs.readFileSync(path.join(directory, '../../package.json')));
+        fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+        for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
+        fs.writeFileSync(curl, `
+    [IO.File]::AppendAllText(${quote(curlLog)}, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
+    $global:LASTEXITCODE = 0
+    if ($args -contains '--version') {
+        'curl 8.5.0 fixture libcurl/8.5.0'; 'Protocols: https'; 'Features: SSL'; return
+    }
+    if ($args -contains '--help') {
+        ${['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir', 'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'].map(name => quote('--' + name + ' fixture')).join('; ')}
+        return
+    }
+    throw 'R3 unexpected acquisition dispatch'
+    `);
+        if (caller === 'Initialize-CiToolchain.ps1') {
+          for (const anchor of ["$strCurlPath = Join-Path ([Environment]::SystemDirectory) 'curl.exe'", "$strCurlPath = '/usr/bin/curl'"]) {
+            assert.equal(source.split(anchor).length, 2, 'R3 fixed curl anchor must occur once');
+            source = source.replace(anchor, `$strCurlPath = ${quote(curl)}`);
+          }
+        }
+        const target = path.join(f.scripts, caller); fs.writeFileSync(target, source);
+        const result = f.run(env, target, cwd);
+        if (family === 'R3 credential selectors') assertR3SelectorRefusal(f, result);
+        else if (family === 'FQ45 credential askpass') assertFq45AskpassRefusal(f, result);
+        else assertFq47Refusal(f, result, caseIndex === 0 ? fq47HelperDiagnostic : fq47HeaderDiagnostic);
+        assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
+        const curlCalls = fs.existsSync(curlLog) ? fs.readFileSync(curlLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
+        assert.deepEqual(curlCalls, caller === 'Initialize-CiToolchain.ps1' && process.platform === 'win32'
+          ? [['--disable', '--version'], ['--disable', '--help', 'all']] : []);
+        for (const name of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[name], 'utf8'), '');
+      }
+    });
+  }
+}
+
+test('FQ47 effective credentials: real Git generic and URL keys across three sources', { skip: !fq47Supported }, t => {
+  for (const form of fq47Forms) for (const scope of ['local', 'included', 'worktree']) for (const value of ['', 'fq47-private-value']) {
+    const f = r3NativeCredentialRepository(t);
+    const cwd = fq47Configure(f, `[${form.section}]\n${form.variable} = ${value}\n`, scope);
+    const files = [path.join(f.metadata, 'config'), ...(scope === 'included' ? [path.join(f.metadata, 'fq47.config')] : []),
+      ...(scope === 'worktree' ? [path.join(f.admin, 'config.worktree')] : [])];
+    const before = files.map(file => fs.readFileSync(file));
+    assertFq47Refusal(f, f.run({}, f.script, cwd), form.diagnostic);
+    assert.deepEqual(f.calls(), [], 'The rejection uses qualified real Git');
+    files.forEach((file, index) => assert.deepEqual(fs.readFileSync(file), before[index]));
+    // One representative per form makes omission of either generic or URL keys causal.
+    if (scope === 'local' && value !== '') {
+      const old = form.diagnostic === fq47HelperDiagnostic
+        ? "[string]::Equals($strConfigurationSection, 'credential', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'helper', [StringComparison]::OrdinalIgnoreCase)"
+        : "[string]::Equals($strConfigurationSection, 'http', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'extraheader', [StringComparison]::OrdinalIgnoreCase)";
+      const target = fq47Mutant(f, old, "$strConfigurationSection -ieq 'fq47-disabled-family'");
+      const result = f.run({}, target, cwd);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.throws(() => assertFq47Refusal(f, result, form.diagnostic), assert.AssertionError);
+    }
+  }
+});
+
+test('FQ47 effective credentials: includes, worktrees and query mutations', { skip: !fq47Supported }, t => {
+  for (const scope of ['included', 'worktree']) {
+    const f = r3NativeCredentialRepository(t), cwd = fq47Configure(f, '[credential]\nhelper = fq47-private-value\n', scope);
+    assertFq47Refusal(f, f.run({}, f.script, cwd), fq47HelperDiagnostic);
+    const target = scope === 'included' ? fq47Mutant(f, '--null --includes --show-scope', '--null --no-includes --show-scope')
+      : fq47Mutant(f, '--null --includes --show-scope', '--local --null --includes --show-scope');
+    const result = f.run({}, target, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.throws(() => assertFq47Refusal(f, result, fq47HelperDiagnostic), assert.AssertionError);
+  }
+  for (const mode of ['active', 'inactive', 'nested']) {
+    const f = r3NativeCredentialRepository(t), local = path.join(f.metadata, 'config');
+    fs.writeFileSync(path.join(f.metadata, 'fq47.config'), '[http]\nextraHeader = fq47-private-value\n');
+    if (mode === 'nested') {
+      fs.writeFileSync(path.join(f.metadata, 'outer.config'), '[include]\npath = fq47.config\n');
+      fs.writeFileSync(local, f.baseConfig + '[include]\npath = outer.config\n');
+    } else {
+      const condition = mode === 'active' ? f.metadata.replaceAll('\\', '/') : '/fq47-nonexistent-directory/';
+      fs.writeFileSync(local, f.baseConfig + `[includeIf "gitdir:${condition}"]\npath = fq47.config\n`);
+    }
+    const result = f.run();
+    if (mode === 'inactive') assert.equal(result.status, 0, result.stdout + result.stderr);
+    else assertFq47Refusal(f, result, fq47HeaderDiagnostic);
+  }
+});
+
+test('FQ47 effective credentials: case, resets and opaque subsection framing', { skip: !fq47Supported }, t => {
+  const contexts = ['https://fq47.invalid/private-context', 'fq47-private-row\rglobal\tcore.repositoryformatversion',
+    'fq47-private-row\tlocal\tcore.askpass', 'quoted\\"part\\\\tail', 'literal\\n\\tpart'];
+  for (const section of ['CrEdEnTiAl', 'hTtP']) for (const context of contexts) {
+    const f = r3NativeCredentialRepository(t), helper = section.toLowerCase() === 'credential';
+    const variable = helper ? 'hElPeR' : 'eXtRaHeAdEr';
+    fq47Configure(f, `[${section} "${context}"]\n${variable} = fq47-private-value\n${variable} =\n`);
+    assertFq47Refusal(f, f.run(), helper ? fq47HelperDiagnostic : fq47HeaderDiagnostic);
+  }
+  const f = r3NativeCredentialRepository(t);
+  const setting = '[credential]\nhelperExtra = benign\n[http]\nextraHeaderExtra = benign\n'
+    + '[other]\nhelper = benign\nextraHeader = benign\n[credential "fq47-private-row\rglobal\tcore.askpass"]\nhelperExtra = benign\n'
+    + '[http "fq47-private-row\tlocal\tcredential.helper"]\nextraHeaderExtra = benign\n';
+  fq47Configure(f, setting);
+  const positive = f.run(); assert.equal(positive.status, 0, positive.stdout + positive.stderr);
+  const mutantFixture = r3NativeCredentialRepository(t);
+  fq47Configure(mutantFixture, setting);
+  const broad = fq47Mutant(mutantFixture, "[string]::Equals($strConfigurationVariable, 'helper', [StringComparison]::OrdinalIgnoreCase)", "$strConfigurationVariable -ilike 'helper*'");
+  assertFq47Refusal(mutantFixture, mutantFixture.run({}, broad), fq47HelperDiagnostic);
+  const invalid = r3NativeCredentialRepository(t);
+  fq47Configure(invalid, '[credential "fq47-private-row\ninvalid"]\nhelper = fq47-private-value\n');
+  assertFq47Refusal(invalid, invalid.run(), 'credential-policy: unable to resolve exactly one origin URL');
+});
+
+test('FQ47 effective credentials: line truncation loses a real Git subsection refusal', { skip: !fq47Supported }, t => {
+  const f = r3NativeCredentialRepository(t);
+  fq47Configure(f, '[credential "fq47-private-row\rcontinued"]\nhelper = fq47-private-value\n');
+  assertFq47Refusal(f, f.run(), fq47HelperDiagnostic);
+  const target = fq47Mutant(f, '$strConfigurationKey = $arrConfigurationFields[$intConfigurationField + 1]',
+    '$strConfigurationKey = $arrConfigurationFields[$intConfigurationField + 1].Split([char]10)[0]');
+  const result = f.run({}, target);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.throws(() => assertFq47Refusal(f, result, fq47HelperDiagnostic), assert.AssertionError);
+});
+
+test('FQ47 effective credentials: malformed native framing and statuses refuse without disclosure', { skip: !fq47Supported }, t => {
+  const cases = ['', 'local', 'local\0core.repositoryformatversion\0fq47-private-row', 'local\0core.repositoryformatversion', 'local\0', 'local\0core.repositoryformatversion\0worktree\0',
+    '\0credential.helper\0', 'unknown\0fq47-private-row.helper\0', 'local\0\0', 'local\0fq47-private-row\0',
+    'local\0fq47-private-row.\0', 'Local\0core.repositoryformatversion\0'];
+  for (const body of cases) {
+    const f = r3CredentialFixture(t), file = path.join(f.root, 'query-output'); fs.writeFileSync(file, body);
+    assertFq47Refusal(f, f.run({ FQ47_QUERY_FILE: file }), 'credential-policy: effective Git configuration framing is invalid');
+    if (body === 'local\0core.repositoryformatversion\0fq47-private-row') {
+      const target = fq47Mutant(f, '-not $strEffectiveConfiguration.EndsWith([string][char]0, [StringComparison]::Ordinal)', '$false');
+      const result = f.run({ FQ47_QUERY_FILE: file }, target);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.throws(() => assertFq47Refusal(f, result, 'credential-policy: effective Git configuration framing is invalid'), assert.AssertionError);
+    }
+  }
+  for (const scope of ['global', 'system']) {
+    const f = r3CredentialFixture(t), file = path.join(f.root, 'query-output');
+    fs.writeFileSync(file, `${scope}\0fq47-private-row.key\0`);
+    assertFq47Refusal(f, f.run({ FQ47_QUERY_FILE: file }), 'credential-policy: external Git configuration was not excluded');
+  }
+  const f = r3CredentialFixture(t);
+  assertFq47Refusal(f, f.run({ FQ47_QUERY_FAILURE: '1' }), 'credential-policy: effective Git configuration could not be read');
+});
+
+test('FQ47 effective credentials: config-only selectors refuse before Git with a causal real Git control', { skip: !fq47Supported }, t => {
+  for (const value of ['', 'fq47-private-value']) {
+    const f = r3CredentialFixture(t);
+    assertR3EarlyCredentialRefusal(f, f.run({ GIT_CONFIG: value }), fq47SelectorDiagnostic);
+  }
+  const f = r3NativeCredentialRepository(t);
+  fq47Configure(f, '[credential]\nhelper = fq47-private-value\n', 'included');
+  const alternate = path.join(f.root, 'alternate.config'); fs.writeFileSync(alternate, '');
+  assertR3EarlyCredentialRefusal(f, f.run({ GIT_CONFIG: alternate }), fq47SelectorDiagnostic);
+  assertFq47Refusal(f, f.run(), fq47HelperDiagnostic);
+  // Empty output independently fails framing. A valid benign alternate stream
+  // proves why the selector guard is required even with the framing guard intact.
+  fs.writeFileSync(alternate, '[core]\nrepositoryformatversion = 0\n');
+  const target = fq47Mutant(f, "if (Test-Path -LiteralPath 'Env:GIT_CONFIG')", "if ($false)");
+  const result = f.run({ GIT_CONFIG: alternate }, target);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.throws(() => assertR3EarlyCredentialRefusal(f, result, fq47SelectorDiagnostic), assert.AssertionError);
+  assert.equal(fs.readFileSync(alternate, 'utf8'), '[core]\nrepositoryformatversion = 0\n');
+});
+
+// Windows fixtures must run with TEMP/TMP under the qualified private runner
+// root. An untrusted parent DACL is a real prerequisite failure, not a skip-pass.
+for (const mode of ['clean', 'inherited-config', 'missing-config', 'outside-config', 'directory-config', 'nonempty-config', 'wrong-version', 'missing-fixed', 'origin', 'helper', 'header', 'global-scope', 'native-failure', 'token']) {
+  test(`B1 Windows credential helper: ${mode}`, { skip: process.platform !== 'win32' }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-b1-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+    const git = path.join(root, 'git.ps1'), log = path.join(root, 'calls');
+    fs.writeFileSync(git, `
+[IO.File]::AppendAllText($env:B1_LOG, ((@($args) | ConvertTo-Json -Compress) + "\n"))
+$global:LASTEXITCODE = 0
+if ($args -contains '--version') {
+    if ($env:B1_MODE -eq 'wrong-version') { 'git version 1.0.0.windows.1' } else { 'git version 2.55.0.windows.5' }
+    return
+}
+# The version probe precedes private configuration. Operational calls require it.
+if ([string]::IsNullOrEmpty($env:GIT_CONFIG_GLOBAL)) { throw 'private config missing' }
+[string]$strConfigParent = [IO.Path]::GetDirectoryName($env:GIT_CONFIG_GLOBAL)
+if ([IO.Path]::GetFileName($env:GIT_CONFIG_GLOBAL) -cne 'global.config' -or
+    [IO.Path]::GetFileName($strConfigParent) -cnotmatch '^styleguide-git-[a-f0-9]{32}$' -or
+    -not [IO.Path]::GetDirectoryName($strConfigParent).Equals($env:RUNNER_TEMP, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'private config outside owned staging'
+}
+$objConfig = Get-Item -LiteralPath $env:GIT_CONFIG_GLOBAL -Force -ErrorAction Stop
+if ($objConfig -isnot [IO.FileInfo] -or ($objConfig.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0 -or
+    $objConfig.Length -ne 0 -or [IO.File]::ReadAllText($env:GIT_CONFIG_GLOBAL) -cne '') {
+    throw 'private config must be an ordinary empty file'
+}
+if ($args -contains 'get-url') {
+    if ($env:B1_MODE -eq 'origin') { 'https://github.com/other/repository' } else { 'https://github.com/franklesniak/PSStyleGuide' }
+} elseif ($args -contains '--list' -and $args -contains '--null' -and $args -contains '--includes') {
+    if ($env:B1_MODE -eq 'global-scope') { 'global' + [char]0 + 'core.repositoryformatversion' + [char]0 }
+    elseif ($env:B1_MODE -eq 'helper') { 'local' + [char]0 + 'credential.helper' + [char]0 }
+    elseif ($env:B1_MODE -eq 'header') { 'local' + [char]0 + 'http.extraheader' + [char]0 }
+    else { 'local' + [char]0 + 'core.repositoryformatversion' + [char]0 }
+    if ($env:B1_MODE -eq 'native-failure') { $global:LASTEXITCODE = 27 }
+}
+`);
+    const selected = mode === 'missing-fixed' ? path.join(root, 'absent.ps1') : git;
+    let source = read('Test-CheckoutCredentials.ps1').replace(
+      "Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)) 'Git/cmd/git.exe'", quote(selected));
+    // These mutations prove the mock rejects a copied helper that loses its private configuration.
+    const mutationMarker = path.join(root, 'configuration-mutated');
+    const configMutations = {
+      'missing-config': ["$env:GIT_CONFIG_GLOBAL = $null", 'private config missing'],
+      'outside-config': [`$env:GIT_CONFIG_GLOBAL = ${quote(path.join(root, 'outside.config'))}\n[IO.File]::WriteAllText($env:GIT_CONFIG_GLOBAL, '')`, 'private config outside owned staging'],
+      'directory-config': ['[IO.File]::Delete($env:GIT_CONFIG_GLOBAL)\n[void][IO.Directory]::CreateDirectory($env:GIT_CONFIG_GLOBAL)', 'private config must be an ordinary empty file'],
+      'nonempty-config': ["[IO.File]::WriteAllText($env:GIT_CONFIG_GLOBAL, 'fixture')", 'private config must be an ordinary empty file'],
+    };
+    if (Object.hasOwn(configMutations, mode)) {
+      const ready = '        Assert-WindowsWriter $env:GIT_CONFIG_GLOBAL';
+      assert.equal(source.split(ready).length, 2, 'The mutation must follow actual configuration admission exactly once.');
+      source = source.replace(ready, `${ready}\n${configMutations[mode][0]}\n[IO.File]::WriteAllText(${quote(mutationMarker)}, 'mutated')`);
+    }
+    const script = path.join(scripts, 'Test-CheckoutCredentials.ps1'); fs.writeFileSync(script, source);
+    const env = { ...process.env, RUNNER_TEMP: root, B1_LOG: log, B1_MODE: mode };
+    for (const key of Object.keys(env)) {
+      if (['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG'].includes(key.toUpperCase())) delete env[key];
+    }
+    const inheritedConfig = path.join(root, 'inherited.config');
+    const inheritedContents = '[fixture]\n    unexpected = inherited\n';
+    if (mode === 'inherited-config') {
+      fs.writeFileSync(inheritedConfig, inheritedContents);
+      env.GIT_CONFIG_GLOBAL = inheritedConfig;
+    }
+    if (mode === 'token') env.GH_TOKEN = 'fixture-secret';
+    const success = mode === 'clean' || mode === 'inherited-config';
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+      cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
+    });
+    assertCompletedProcess(result, `Windows credential helper ${mode}`);
+    assert.equal(result.error, undefined);
+    assert.equal(result.status === 0, success, result.stderr);
+    assert.equal((result.stdout + result.stderr).includes('fixture-secret'), false);
+    const calls = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse) : [];
+    const expectedCalls = { clean: 3, 'inherited-config': 3,
+      'missing-config': 2, 'outside-config': 2, 'directory-config': 2, 'nonempty-config': 2,
+      'wrong-version': 1, 'missing-fixed': 0,
+      origin: 2, helper: 3, header: 3, 'global-scope': 3, 'native-failure': 3, token: 0 };
+    assert.equal(calls.length, expectedCalls[mode], `Git call sequence stopped at the wrong phase: ${mode}`);
+    if (Object.hasOwn(configMutations, mode)) {
+      assert.equal(fs.readFileSync(mutationMarker, 'utf8'), 'mutated');
+      assert.ok(result.stderr.includes(configMutations[mode][1]), result.stderr);
+    }
+    if (success) {
+      assert.ok(calls.some(args => args.includes('--show-scope')));
+      const configs = fs.readdirSync(root).filter(name => name.startsWith('styleguide-git-'));
+      assert.equal(configs.length, 1);
+      const config = fs.readFileSync(path.join(root, configs[0], 'global.config'));
+      assert.equal(config.length, 0); assert.equal(config.toString('utf8'), '');
+      const wrapper = path.join(root, 'preference-control.ps1');
+      const expectedInformation = `Git git version 2.55.0.windows.5 at ${git} SHA256 ${createHash('sha256').update(fs.readFileSync(git)).digest('hex').toUpperCase()}.\n`;
+      for (const whatIf of [true, false]) {
+        const informationFile = path.join(root, `preference-information-${whatIf ? 'whatif' : 'confirm'}.log`);
+        assert.equal(fs.existsSync(informationFile), false);
+        fs.writeFileSync(wrapper, `$ErrorActionPreference='Stop'\n$WhatIfPreference=$false\n$ConfirmPreference='None'\n& {\n    $WhatIfPreference=$${whatIf ? 'true' : 'false'}\n    $ConfirmPreference='Low'\n    & ${quote(script)}\n} 6> ${quote(informationFile)}\nWrite-Output 'FQ8 credential completed'\n`);
+        const controlled = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', wrapper], {
+          cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
+        }), `Windows credential preference ${whatIf ? 'WhatIf' : 'low confirmation'}`);
+        assert.equal(fs.readFileSync(informationFile, 'utf8').replaceAll('\r\n', '\n'), expectedInformation,
+          'Both preference controls must retain the exact Git version, executable path, and SHA256 information.');
+        const currentConfigs = fs.readdirSync(root).filter(name => name.startsWith('styleguide-git-'));
+        if (whatIf) {
+          assert.notEqual(controlled.status, 0, controlled.stdout + controlled.stderr);
+          assert.match(controlled.stderr, /Restricted staging directory creation was declined/u);
+          assert.doesNotMatch(controlled.stdout, /FQ8 credential completed/u);
+          assert.deepEqual(currentConfigs, configs, 'Inherited WhatIf must not create credential staging or publish a config.');
+        } else {
+          assert.equal(controlled.status, 0, controlled.stdout + controlled.stderr);
+          assert.equal(controlled.stdout.trim(), 'FQ8 credential completed', 'Low confirmation completes without prompting.');
+          assert.equal(currentConfigs.length, configs.length + 1);
+        }
+        for (const name of currentConfigs) assert.equal(fs.readFileSync(path.join(root, name, 'global.config')).length, 0);
+      }
+    }
+    if (mode === 'inherited-config') assert.equal(fs.readFileSync(inheritedConfig, 'utf8'), inheritedContents);
+  });
+}
+
+test('R5 refuses the compatibility switch on actual Windows before external work', { skip: process.platform !== 'win32' }, t => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-r5-platform-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const script = path.join(root, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, read('Initialize-CiToolchain.ps1'));
+  const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script, '-IncludeRecoveryCompatibility'], {
+    cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+  });
+  assertCompletedProcess(result, 'Windows compatibility refusal');
+  assert.equal(result.error, undefined); assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /supported only on Linux x64/);
+  assert.deepEqual(fs.readdirSync(root), ['Initialize-CiToolchain.ps1']);
+});
+
+for (const mode of ['safe', 'traversal', 'ads', 'device', 'case-collision', 'file-directory', 'link', 'entry-cap', 'byte-cap']) {
+  test(`R5 actual Windows ZIP member boundary: ${mode}`, { skip: process.platform !== 'win32' }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-r5-zip-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const source = read('Initialize-CiToolchain.ps1');
+    const start = source.indexOf('function Assert-OrdinaryPath'), end = source.indexOf('if ((-not $IsLinux -and -not $IsWindows)');
+    assert.ok(start > 0 && end > start);
+    let functions = source.slice(start, end);
+    // Keep production bounds explicit, then scale only fixture data thresholds.
+    assert.ok(functions.includes('$objArchiveMembers.Count -gt 50000 -or $intExpandedBytes -gt 1073741824'));
+    functions = functions.replaceAll('$objArchiveMembers.Count -gt 50000 -or $intExpandedBytes -gt 1073741824', '$objArchiveMembers.Count -gt 16 -or $intExpandedBytes -gt 1024');
+    const release = 'node-v24.18.1-win-x64';
+    const names = mode === 'traversal' ? [`${release}/../outside`] : mode === 'ads' ? [`${release}/name:stream`]
+      : mode === 'device' ? [`${release}/NUL.txt`] : mode === 'case-collision' ? [`${release}/Name`, `${release}/name`]
+      : mode === 'file-directory' ? [`${release}/item`, `${release}/item/child`]
+      : mode === 'entry-cap' ? Array.from({ length: 17 }, (_, i) => `${release}/${i}`) : [`${release}/safe`];
+    names.unshift(`${release}/`);
+    const script = path.join(root, 'zip.ps1');
+    fs.writeFileSync(script, `$ErrorActionPreference = 'Stop'\nSet-StrictMode -Version Latest\n${functions}
+$zipPath = ${quote(path.join(root, 'fixture.zip'))}
+$zip = [IO.Compression.ZipFile]::Open($zipPath, [IO.Compression.ZipArchiveMode]::Create)
+try {
+    foreach ($name in @(${names.map(quote).join(',')})) {
+        $entry = $zip.CreateEntry($name)
+        ${mode === 'link' ? '$entry.ExternalAttributes = [int]0xA0000000' : ''}
+        if ($name.EndsWith('/')) { continue }
+        $writer = [IO.StreamWriter]::new($entry.Open())
+        try { $writer.Write(('x' * ${mode === 'byte-cap' ? 2048 : 1})) } finally { $writer.Dispose() }
+    }
+} finally { $zip.Dispose() }
+$destination = ${quote(path.join(root, 'extract'))}
+[void][IO.Directory]::CreateDirectory($destination)
+Expand-ReviewedArchive $zipPath $destination '${release}'
+`);
+    fs.writeFileSync(path.join(root, 'outside'), 'sentinel');
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+      cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+    });
+    assertCompletedProcess(result, `Windows ZIP boundary ${mode}`);
+    assert.equal(result.error, undefined);
+    assert.equal(result.status === 0, mode === 'safe', result.stderr);
+    assert.equal(fs.readFileSync(path.join(root, 'outside'), 'utf8'), 'sentinel');
+    if (mode === 'safe') assert.equal(fs.readFileSync(path.join(root, 'extract', release, 'safe'), 'utf8'), 'x');
+    else assert.deepEqual(fs.readdirSync(path.join(root, 'extract')), [], 'Refuse the complete member list before extraction.');
+  });
+}
+
+
+// These F3 tests use in-memory security descriptors; they never change host ACLs.
+// Whole callers retain real ancestry checks and require the qualified Windows root.
+const aclOverlay = (target, rights, trusted = false, inheritOnly = false, { inherited = false, trustedSid = null } = {}) => {
+  const inheritedMask = { AppendData: '0x00000004', ReadData: '0x00000001' }[rights];
+  const trustedSids = ['S-1-5-18', 'S-1-5-32-544', 'S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464'];
+  if (inherited) assert.ok(inheritedMask && !trusted && !inheritOnly && trustedSid === null);
+  if (trustedSid !== null) assert.ok(trustedSids.includes(trustedSid) && rights === 'AppendData' && !trusted && !inheritOnly && !inherited);
+  return `
+function Get-Acl {
+    param([string] $LiteralPath)
+    if ($LiteralPath -cne ${quote(target)}) { return Microsoft.PowerShell.Security\\Get-Acl -LiteralPath $LiteralPath }
+    $acl = if ((Get-Item -LiteralPath $LiteralPath).PSIsContainer) {
+        [Security.AccessControl.DirectorySecurity]::new()
+    } else { [Security.AccessControl.FileSecurity]::new() }
+    $owner = [Security.Principal.WindowsIdentity]::GetCurrent().User
+    $acl.SetOwner($owner)
+    ${inherited ? `
+    if ((Get-Item -LiteralPath $LiteralPath).PSIsContainer) { throw 'fixture: inherited control requires a file' }
+    $acl.SetSecurityDescriptorSddlForm('D:(A;ID;${inheritedMask};;;WD)', [Security.AccessControl.AccessControlSections]::Access)
+    $rules = @($acl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]))
+    $explicit = @($acl.GetAccessRules($true, $false, [Security.Principal.SecurityIdentifier]))
+    $inheritedRules = @($acl.GetAccessRules($false, $true, [Security.Principal.SecurityIdentifier]))
+    if ($rules.Count -ne 1 -or $explicit.Count -ne 0 -or $inheritedRules.Count -ne 1) {
+        throw 'fixture: inherited ACE enumeration is invalid'
+    }
+    $rule = $rules[0]
+    if (-not $rule.IsInherited -or $rule.IdentityReference.Value -cne 'S-1-1-0' -or
+        $rule.AccessControlType -ne 'Allow' -or [int]$rule.FileSystemRights -ne ${inheritedMask} -or
+        $rule.InheritanceFlags -ne 'None' -or $rule.PropagationFlags -ne 'None' -or
+        $acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -cne $owner.Value) {
+        throw 'fixture: inherited ACE shape is invalid'
+    }
+    ` : `
+    $sid = ${trustedSid !== null ? `[Security.Principal.SecurityIdentifier]::new(${quote(trustedSid)})` : trusted ? '$owner' : "[Security.Principal.SecurityIdentifier]::new('S-1-1-0')"}
+    $rule = [Security.AccessControl.FileSystemAccessRule]::new($sid, '${rights}',
+        '${inheritOnly ? 'ObjectInherit' : 'None'}', '${inheritOnly ? 'InheritOnly' : 'None'}', 'Allow')
+    $acl.AddAccessRule($rule)
+    ${trustedSid === null ? '' : `
+    if ((Get-Item -LiteralPath $LiteralPath).PSIsContainer -or $owner.Value -ceq $sid.Value) {
+        throw 'fixture: trusted SID control requires a file and distinct current-user owner'
+    }
+    $rules = @($acl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier]))
+    if ($rules.Count -ne 1) { throw 'fixture: trusted SID control requires one rule' }
+    $rule = $rules[0]
+    $append = [Security.AccessControl.FileSystemRights]::AppendData
+    $allowed = $append -bor [Security.AccessControl.FileSystemRights]::Synchronize
+    if ($rule.IsInherited -or $rule.IdentityReference.Value -cne $sid.Value -or
+        $rule.AccessControlType -ne 'Allow' -or -not ($rule.FileSystemRights -band $append) -or
+        ([int]$rule.FileSystemRights -band (-bnot [int]$allowed)) -ne 0 -or
+        $rule.InheritanceFlags -ne 'None' -or $rule.PropagationFlags -ne 'None' -or
+        $acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -cne $owner.Value) {
+        throw 'fixture: trusted SID append shape is invalid'
+    }
+    `}
+    `}
+    return $acl
+}
+`;
+};
+
+for (const helper of ['Initialize-CiToolchain.ps1', 'Test-CheckoutCredentials.ps1']) {
+  test(`F3 ${helper}: file/directory writer properties`, { skip: process.platform !== 'win32' }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-writer-properties-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const source = read(helper);
+    const start = source.indexOf('function Assert-WindowsWriter {'), end = source.indexOf('function New-PrivateDirectory {', start);
+    assert.ok(start > 0 && end > start);
+    const file = path.join(root, 'file'); fs.writeFileSync(file, 'unchanged');
+    const cases = [
+      { name: 'untrusted append', target: file, rights: 'AppendData', pass: false },
+      { name: 'untrusted write', target: file, rights: 'WriteData', pass: false },
+      { name: 'untrusted read', target: file, rights: 'ReadData', pass: true },
+      { name: 'trusted append', target: file, rights: 'AppendData', trusted: true, pass: true },
+      { name: 'directory create directories', target: root, rights: 'CreateDirectories', pass: true },
+      { name: 'directory create files', target: root, rights: 'CreateFiles', pass: false },
+      { name: 'inherit only', target: root, rights: 'WriteData', inheritOnly: true, pass: true },
+      { name: 'inherited untrusted append', target: file, rights: 'AppendData', inherited: true, pass: false },
+      { name: 'SYSTEM append', target: file, rights: 'AppendData', trustedSid: 'S-1-5-18', pass: true },
+      { name: 'Administrators append', target: file, rights: 'AppendData', trustedSid: 'S-1-5-32-544', pass: true },
+      { name: 'TrustedInstaller append', target: file, rights: 'AppendData', trustedSid: 'S-1-5-80-956008885-3418522649-1831038044-1853292631-2271478464', pass: true },
+    ];
+    for (const item of cases) {
+      const script = path.join(root, 'property.ps1');
+      fs.writeFileSync(script, `$ErrorActionPreference = 'Stop'\n${aclOverlay(item.target, item.rights, item.trusted, item.inheritOnly, item)}\n` +
+        `${item.inherited || item.trustedSid ? `[void](Get-Acl -LiteralPath ${quote(item.target)})\n` : ''}` +
+        source.slice(start, end) + `\nAssert-WindowsWriter ${quote(item.target)}\n`);
+      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        encoding: 'utf8', timeout: 15000, windowsHide: true,
+      });
+      assertCompletedProcess(result, `${helper}: writer property ${item.name}`);
+      assert.equal(result.error, undefined, item.name);
+      assert.equal(result.status === 0, item.pass, `${item.name}: ${result.stderr}`);
+      if (!item.pass) assert.match(result.stderr, /unreviewed Windows write authority/u);
+      assert.equal(fs.readFileSync(file, 'utf8'), 'unchanged');
+    }
+  });
+}
+
+for (const inherited of [false, true]) for (const channel of ['GITHUB_ENV', 'GITHUB_PATH', 'credential-tool']) for (const rights of ['AppendData', 'ReadData']) {
+  test(`F3 whole caller rejects append before dispatch: ${inherited ? 'inherited ' : ''}${channel}/${rights}`, { skip: process.platform !== 'win32' }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-writer-caller-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+    const tool = path.join(root, 'fixed-tool.ps1'), marker = path.join(root, 'tool-marker');
+    const toolSource = `[IO.File]::WriteAllText(${quote(marker)}, 'reached')\nthrow 'fixture dispatch reached'\n`;
+    fs.writeFileSync(tool, toolSource);
+    const channels = runnerChannelFiles(root);
+    const env = { ...process.env, RUNNER_TEMP: root, GITHUB_ENV: channels.env, GITHUB_PATH: channels.path };
+    for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
+    for (const name of ['GITHUB_ENV', 'GITHUB_PATH']) fs.writeFileSync(env[name], '');
+    const helper = channel === 'credential-tool' ? 'Test-CheckoutCredentials.ps1' : 'Initialize-CiToolchain.ps1';
+    const source = read(helper).replace("Join-Path ([Environment]::SystemDirectory) 'curl.exe'", quote(tool))
+      .replace("Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::ProgramFiles)) 'Git/cmd/git.exe'", quote(tool));
+    fs.writeFileSync(path.join(scripts, helper), source);
+    fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+    fs.writeFileSync(path.join(work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    const target = channel === 'credential-tool' ? tool : env[channel];
+    const wrapper = path.join(root, 'caller.ps1');
+    fs.writeFileSync(wrapper, `$ErrorActionPreference = 'Stop'\n${aclOverlay(target, rights, false, false, { inherited })}\n` +
+      `${inherited ? `[void](Get-Acl -LiteralPath ${quote(target)})\n` : ''}` + `& ${quote(path.join(scripts, helper))}\n`);
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', wrapper], {
+      cwd: work, env, encoding: 'utf8', timeout: 15000, windowsHide: true,
+    });
+    assertCompletedProcess(result, `Windows whole caller ${inherited ? 'inherited ' : ''}${channel}/${rights}`);
+    assert.equal(result.error, undefined); assert.notEqual(result.status, 0);
+    assert.equal(fs.existsSync(marker), rights === 'ReadData', result.stderr);
+    assert.match(result.stderr, rights === 'AppendData' ? /unreviewed Windows write authority/u : /fixture dispatch reached/u);
+    assert.equal(fs.readFileSync(env.GITHUB_ENV, 'utf8'), '');
+    assert.equal(fs.readFileSync(env.GITHUB_PATH, 'utf8'), '');
+    assert.equal(fs.readFileSync(tool, 'utf8'), toolSource);
+    assert.equal(fs.existsSync(path.join(root, 'styleguide-node')), false);
+  });
+}
+
+test('FQ49 Windows command-directory authority is checked by the whole initializer', { skip: process.platform !== 'win32', timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const walk = 'for ($objPathComponent = [IO.DirectoryInfo]::new($strCommandRoot); $null -ne $objPathComponent; $objPathComponent = $objPathComponent.Parent) {';
+  const oldWalk = walk.replace('$strCommandRoot', '$strRunnerRoot');
+  const mutant = foundationOnce(original, walk, oldWalk);
+  assert.equal(mutant.replace(oldWalk, walk), original, 'Only the immediate command-directory coverage is removed');
+  const cases = [
+    { name: 'valid real directory', pass: true },
+    { name: 'creation-only', rights: 'CreateDirectories', pass: true },
+    { name: 'inherit-only', rights: 'WriteData', inheritOnly: true, pass: true },
+    { name: 'untrusted owner', rights: 'ReadData', owner: true, pass: false },
+    { name: 'create files', rights: 'CreateFiles', pass: false },
+    { name: 'delete children', rights: 'DeleteSubdirectoriesAndFiles', pass: false },
+    { name: 'change permissions', rights: 'ChangePermissions', pass: false },
+  ];
+  for (const item of cases) {
+    const f = fixture(t), scripts = path.join(f.work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+    const commandRoot = path.dirname(f.channels.path), queryLog = path.join(f.root, 'fq49-acl-queries');
+    const curl = path.join(f.root, 'fq49-curl.ps1'), curlMarker = path.join(f.root, 'fq49-curl-dispatch');
+    const credentialMarker = path.join(f.root, 'fq49-credential-dispatch');
+    const curlSource = `[IO.File]::WriteAllText(${quote(curlMarker)}, 'reached')\nthrow 'FQ49 controlled capability boundary'\n`;
+    fs.writeFileSync(curl, curlSource);
+    fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'),
+      `[IO.File]::WriteAllText(${quote(credentialMarker)}, 'unexpected')\nthrow 'FQ49 unexpected credential work'\n`);
+    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+    for (const role of ['path', 'env']) fs.writeFileSync(f.channels[role], `unchanged-${role}\n`);
+    const actualDescriptor = new Map([commandRoot, f.root, ...Object.values(f.channels)].map(file => [file, fs.statSync(file)]));
+    // Only the immediate parent's descriptor is overlaid in memory. All other
+    // ACL queries reach the real Windows provider; no supplied ACL is changed.
+    let overlay = item.rights ? aclOverlay(commandRoot, item.rights, false, item.inheritOnly)
+      : '\nfunction Get-Acl {\n    param([string] $LiteralPath)\n    return Microsoft.PowerShell.Security\\Get-Acl -LiteralPath $LiteralPath\n}\n';
+    if (item.owner) overlay = foundationOnce(overlay, '$acl.SetOwner($owner)',
+      "$acl.SetOwner([Security.Principal.SecurityIdentifier]::new('S-1-1-0'))");
+    overlay = foundationOnce(overlay, '    param([string] $LiteralPath)',
+      `    param([string] $LiteralPath)\n    [IO.File]::AppendAllText(${quote(queryLog)}, $LiteralPath + [Environment]::NewLine)`);
+    for (const weakened of item.pass ? [false] : [false, true]) {
+      if (fs.existsSync(queryLog)) fs.unlinkSync(queryLog);
+      if (fs.existsSync(curlMarker)) fs.unlinkSync(curlMarker);
+      const source = foundationOnce(weakened ? mutant : original,
+        "Join-Path ([Environment]::SystemDirectory) 'curl.exe'", quote(curl));
+      const target = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(target, source);
+      const result = f.run(`${overlay}\n& ${quote(target)}`);
+      assert.notEqual(result.status, 0, 'Every admitted fixture stops at the controlled capability boundary');
+      const reached = item.pass || weakened;
+      assert.equal(fs.existsSync(curlMarker), reached, `${item.name}: ${result.stdout}${result.stderr}`);
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+      assert.match(diagnostic, reached ? /FQ49 controlled capability boundary/u
+        : item.owner ? /unreviewed Windows path owner/u : /unreviewed Windows write authority/u);
+      const queries = fs.readFileSync(queryLog, 'utf8').trim().split(/\r?\n/u).map(file => path.normalize(file).toLowerCase());
+      assert.equal(queries.includes(path.normalize(commandRoot).toLowerCase()), !weakened);
+      if (reached) {
+        for (let ancestor = f.root; ; ancestor = path.dirname(ancestor)) {
+          assert.ok(queries.includes(path.normalize(ancestor).toLowerCase()), `Retained ancestor coverage: ${ancestor}`);
+          if (ancestor === path.dirname(ancestor)) break;
+        }
+        for (const file of Object.values(f.channels)) assert.ok(queries.includes(path.normalize(file).toLowerCase()));
+      }
+      assert.equal(fs.existsSync(credentialMarker), false);
+      assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+      assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+      assert.deepEqual(f.calls(), []);
+      for (const role of ['path', 'env']) {
+        assert.equal(fs.readFileSync(f.channels[role], 'utf8'), `unchanged-${role}\n`);
+        const handle = fs.openSync(f.channels[role], 'r+'); fs.closeSync(handle);
+      }
+      assert.equal(fs.readFileSync(curl, 'utf8'), curlSource);
+      for (const [file, before] of actualDescriptor) {
+        const after = fs.statSync(file); assert.equal(after.dev, before.dev); assert.equal(after.ino, before.ino);
+      }
+    }
+  }
+});
+
+test('F4 compatibility documentation matches actual parameter ownership', () => {
+  const rows = read('scripts-README.md').split('\n').filter(line => line.startsWith('| `'));
+  const owners = rows.filter(line => line.includes('IncludeRecoveryCompatibility'));
+  assert.equal(owners.length, 1);
+  assert.ok(owners[0].startsWith('| `Initialize-CiToolchain.ps1`'));
+  assert.match(read('Initialize-CiToolchain.ps1'), /param\([\s\S]*?\[switch\] \$IncludeRecoveryCompatibility[\s\S]*?\n\)/u);
+  assert.match(read('Test-StyleGuideArtifacts.ps1'), /\nparam\(\)/u);
+  assert.equal(rows.find(line => line.startsWith('| `Test-StyleGuideArtifacts.ps1`')).includes('IncludeRecoveryCompatibility'), false);
+});
+
+// F10-F14 close the selected R5/R5E/A04 foundation controls. All source changes
+// below are disposable fixture adaptations or one-guard mutation witnesses.
+function foundationOnce(source, anchor, replacement) {
+  assert.equal(source.split(anchor).length, 2, `One exact fixture anchor is required: ${anchor}`);
+  return source.replace(anchor, replacement);
+}
+
+// A finite USTAR producer avoids creating a device/FIFO in the fixture namespace.
+// GNU tar/xz and the actual initializer remain the archive consumers.
+function foundationTar(entries) {
+  const blocks = [];
+  for (const { name, data = Buffer.alloc(0), type = '0', target = '', mode = 0o755 } of entries) {
+    assert.ok(Buffer.byteLength(name) < 100 && Buffer.byteLength(target) < 100);
+    assert.ok(data.length <= 32768);
+    const header = Buffer.alloc(512);
+    const text = (offset, value, length) => { assert.ok(Buffer.byteLength(value) <= length); header.write(value, offset, length, 'ascii'); };
+    const octal = (offset, value, length) => text(offset, value.toString(8).padStart(length - 1, '0') + '\0', length);
+    text(0, name, 100); octal(100, mode, 8); octal(108, 1000, 8); octal(116, 1000, 8);
+    octal(124, data.length, 12); octal(136, 0, 12); header.fill(32, 148, 156);
+    text(156, type, 1); text(157, target, 100); text(257, 'ustar\0', 6); text(263, '00', 2);
+    octal(329, type === '3' ? 1 : 0, 8); octal(337, type === '3' ? 3 : 0, 8);
+    const checksum = header.reduce((total, value) => total + value, 0);
+    text(148, checksum.toString(8).padStart(6, '0') + '\0 ', 8);
+    blocks.push(header, data, Buffer.alloc((512 - data.length % 512) % 512));
+  }
+  blocks.push(Buffer.alloc(1024));
+  const bytes = Buffer.concat(blocks);
+  assert.ok(bytes.length <= 65536, 'Synthetic archives are finite, not stress data.');
+  return bytes;
+}
+
+function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mode = '', compatibility = false,
+  installs = false, dependencySwitches = installs ? ['WorkflowDependencies', 'InstructionDependencies'] : [],
+  pinChange = pin => pin, extraEnv = {} } = {}) {
+  const f = fixture(t, 'repository space and Unicode Ω'), scripts = path.join(f.work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const runner = path.join(f.root, 'runner space and Unicode Ω'); fs.mkdirSync(runner, { mode: 0o700 });
+  Object.assign(f.channels, runnerChannelFiles(runner));
+  const sentinel = path.join(runner, 'outside-sentinel'); fs.writeFileSync(sentinel, 'unchanged');
+  for (const folder of [f.work, scripts]) {
+    fs.writeFileSync(path.join(folder, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    fs.writeFileSync(path.join(folder, 'package-lock.json'), '{}');
+  }
+  fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
+    .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+  const archives = {}, pin = runtimePin('a'.repeat(64));
+  for (const [role, version, npm] of [['preferred', '24.18.1', '11.16.0'],
+    ...(compatibility ? [['recoveryCompatibility', '22.23.3', '10.9.9']] : [])]) {
+    const release = `node-v${version}-linux-x64`, archive = path.join(f.root, `${role}.tar.xz`);
+    const node = `#!${process.execPath}
+const fs=require('node:fs'), {spawnSync}=require('node:child_process'), args=process.argv.slice(2), role=${JSON.stringify(role)};
+fs.appendFileSync(process.env.TEST_LOG,JSON.stringify([role,...args])+'\\n');
+if(args.includes('--version') && process.env.TEST_MODE==='interrupted-child') {
+const child=spawnSync('/bin/sh',['-c','kill -TERM $$'],{encoding:'utf8',timeout:2000});
+const record={status:child.status,signal:child.signal}; if(child.error) record.error={code:child.error.code,message:child.error.message};
+fs.writeFileSync(${JSON.stringify(path.join(f.root, 'interrupted-child.json'))},JSON.stringify(record),{flag:'wx'}); process.exit(143);
+}
+if(args.includes('--version')) console.log(args[0]?.endsWith('npm-cli.js')?${JSON.stringify(npm)}:${JSON.stringify('v' + version)});
+if(process.env.TEST_MODE?.startsWith('fq36-') && (args.includes('--preflight') || args.includes('ci'))) {
+console.log(args.includes('--preflight')?'FQ36 preflight record':'FQ36 install record');
+console.error(args.includes('--preflight')?'FQ36 preflight stderr':'FQ36 install stderr');
+if(process.env.TEST_MODE==='fq36-preflight-failure' && args.includes('--preflight')) process.exit(31);
+if(process.env.TEST_MODE==='fq36-install-failure' && args.includes('ci')) process.exit(37);
+}
+if(args.includes('--preflight') && process.env.TEST_MODE==='preflight') process.exit(31);
+if(args.includes('ci') && role==='recoveryCompatibility') process.exit(92);
+`;
+    const folders = ['', '/bin', '/lib', '/lib/node_modules', '/lib/node_modules/npm', '/lib/node_modules/npm/bin'];
+    const entries = folders.map(suffix => ({ name: release + suffix + '/', type: '5' }));
+    for (const [name, data, permissions] of [['bin/node', node, 0o755], ['lib/node_modules/npm/bin/npm-cli.js', 'fixture', 0o644],
+      ['lib/node_modules/npm/bin/npx-cli.js', 'fixture', 0o644], ['lib/node_modules/npm/package.json', JSON.stringify({ version: npm }), 0o644]]) {
+      entries.push({ name: `${release}/${name}`, data: Buffer.from(data), mode: permissions });
+    }
+    if (mode === 'device') entries.push({ name: `${release}/device`, type: '3' });
+    if (mode === 'entry-cap') for (let i = 0; i < 7; i++) entries.push({ name: `${release}/extra${i}`, data: Buffer.from('x') });
+    if (mode === 'byte-cap') entries.push({ name: `${release}/expansion`, data: Buffer.alloc(2048, 120), mode: 0o644 });
+    if (mode === 'escape-admission') entries.push({ name: `${release}/bin/npm`, type: '2', target: '../../../../outside-sentinel' });
+    const packed = assertCompletedProcess(spawnSync('/usr/bin/xz', ['-c', '-T1'],
+      { input: foundationTar(entries), timeout: 15000, maxBuffer: 1048576 }), 'F10-F14 finite xz producer');
+    assert.equal(packed.status, 0, packed.stderr?.toString()); fs.writeFileSync(archive, packed.stdout);
+    archives[role] = archive;
+    const digest = createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+    if (role === 'preferred') pin.preferred.linuxX64Sha256 = ['digest-gate', 'extraction-order'].includes(mode) ? 'a'.repeat(64) : digest;
+    else pin.recoveryCompatibility.linuxX64Sha256 = digest;
+  }
+  fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), JSON.stringify(pinChange(pin)));
+  const curl = path.join(f.root, 'curl');
+  fs.writeFileSync(curl, `#!${process.execPath}
+const fs=require('node:fs'),path=require('node:path'),args=process.argv.slice(2),archives=${JSON.stringify(archives)};
+${fq40CurlQueryStub}
+const role=args.at(-1).includes('/v22.23.3/')?'recoveryCompatibility':'preferred';
+fs.appendFileSync(process.env.TEST_LOG,JSON.stringify(['curl',role,...args])+'\\n');
+if(process.env.TEST_MODE==='fq40-native63-'+role) process.exit(63);
+fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
+if(process.env.TEST_MODE==='write-refusal') fs.chmodSync(path.join(process.env.RUNNER_TEMP,role==='preferred'?'styleguide-node/preferred':'styleguide-node/recoveryCompatibility'),0o500);
+if(process.env.TEST_MODE==='native-status') process.exit(77);
+`, { mode: 0o700 });
+  const tar = path.join(f.root, 'tar');
+  fs.writeFileSync(tar, `#!${process.execPath}
+const fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:child_process'),args=process.argv.slice(2);
+const kind=args[0]==='-tvf'?'list':'extract',role=path.basename(args[1]).replace(/\\.tar\\.xz$/,'');
+fs.appendFileSync(${JSON.stringify(f.log)},JSON.stringify(['tar',role,kind,...args])+'\\n');
+if(kind==='extract' && ${JSON.stringify(mode)}==='native-extraction') process.exit(37);
+const result=spawnSync('/usr/bin/tar',args,{stdio:'inherit',timeout:20000});
+const record={status:result.status,signal:result.signal}; if(result.error) record.error={code:result.error.code,message:result.error.message};
+fs.writeFileSync(path.join(${JSON.stringify(f.root)},'tar-'+role+'-'+kind+'.json'),JSON.stringify(record),{flag:'wx'});
+if(result.error || result.signal || !Number.isInteger(result.status)) process.exit(98);
+if(kind==='extract' && result.status===0 && ${JSON.stringify(mode)}==='truncated-extraction') fs.truncateSync(path.join(args[args.indexOf('-C')+1],'node-v24.18.1-linux-x64/bin/node'),1);
+process.exit(result.status);
+`, { mode: 0o700 });
+  source = source.replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar);
+  const script = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, source);
+  const env = { RUNNER_TEMP: runner, TEST_MODE: mode, ...extraEnv };
+  for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
+  const capturedOutput = path.join(f.root, 'captured-output.json');
+  assert.ok(dependencySwitches.every(value => ['WorkflowDependencies', 'InstructionDependencies'].includes(value)));
+  return { ...f, runner, sentinel, scripts, script, env, source, archives,
+    capturedOutput,
+    run({ captureOutput = false } = {}) {
+      const command = `& ${quote(script)}${dependencySwitches.map(value => ` -${value}`).join('')}${compatibility ? ' -IncludeRecoveryCompatibility' : ''}`;
+      this.result = f.run(captureOutput ? `$arrFq36Result = @(${command}); [IO.File]::WriteAllText(${quote(capturedOutput)}, (ConvertTo-Json -InputObject $arrFq36Result -Compress))` : command, env);
+      return this.result;
+    } };
+}
+
+test('FQ36 dependency logs stay outside the initializer success result', { skip: !linux, timeout: 180000 }, t => {
+  for (const dependencySwitches of [[], ['WorkflowDependencies'], ['InstructionDependencies'], ['WorkflowDependencies', 'InstructionDependencies']]) {
+    const f = foundationFixture(t, { dependencySwitches, mode: 'fq36-success' });
+    assertCompletedProcess(f.run({ captureOutput: true }), 'FQ36 success');
+    assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+    assert.deepEqual(JSON.parse(fs.readFileSync(f.capturedOutput, 'utf8')), ['Reviewed runtime setup completed.']);
+    assert.equal((f.result.stdout.match(/FQ36 preflight record/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stdout.match(/FQ36 install record/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stderr.match(/FQ36 preflight stderr/gu) ?? []).length, dependencySwitches.length);
+    assert.equal((f.result.stderr.match(/FQ36 install stderr/gu) ?? []).length, dependencySwitches.length);
+    assert.equal(f.calls().filter(row => row.includes('ci')).length, dependencySwitches.length);
+  }
+  for (const mode of ['fq36-preflight-failure', 'fq36-install-failure']) {
+    const f = foundationFixture(t, { installs: true, mode });
+    f.run({ captureOutput: true }); foundationNoPublication(f);
+    assert.equal(fs.existsSync(f.capturedOutput), false);
+    assert.match(f.result.stderr, mode === 'fq36-preflight-failure' ? /preflight failed before installation/ : /Locked installation failed: 37/);
+    assert.equal(f.calls().filter(row => row.includes('ci')).length, mode === 'fq36-preflight-failure' ? 0 : 1);
+  }
+  const source = read('Initialize-CiToolchain.ps1');
+  const route = ' |\n            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }';
+  assert.equal(source.split(route).length, 3, 'Both dependency commands must have a stdout route.');
+  const mutant = foundationFixture(t, { source: source.replaceAll(route, ''), installs: true, mode: 'fq36-success' });
+  assertCompletedProcess(mutant.run({ captureOutput: true }), 'FQ36 route-removal control');
+  assert.equal(mutant.result.status, 0, mutant.result.stdout + mutant.result.stderr);
+  assert.deepEqual(JSON.parse(fs.readFileSync(mutant.capturedOutput, 'utf8')),
+    ['FQ36 preflight record', 'FQ36 install record', 'FQ36 preflight record', 'FQ36 install record', 'Reviewed runtime setup completed.']);
+});
+
+function applyRunnerEnvironment(records, environment) {
+  for (const line of records.split('\n').filter(Boolean)) {
+    const separator = line.indexOf('=');
+    assert.ok(separator > 0, 'Expected one-line NAME=VALUE runner records.');
+    environment[line.slice(0, separator)] = line.slice(separator + 1);
+  }
+  return environment;
+}
+
+// Extract the real publication checks, before either runner channel can be used.
+// This proves record construction on both platforms, not complete Windows setup.
+test('FQ35 actual recovery records reject line breaks before runner channel use', { timeout: 30000 }, () => {
+  const source = read('Initialize-CiToolchain.ps1').replaceAll('\r\n', '\n');
+  const start = '    $arrRunnerRecords = @(';
+  const end = '    $null = Assert-OrdinaryPath $env:GITHUB_PATH';
+  assert.equal(source.split(start).length, 2);
+  assert.equal(source.split(end).length, 2);
+  const boundary = source.slice(source.indexOf(start), source.indexOf(end));
+  assert.equal(boundary.includes('.Write('), false);
+  const cases = [{ name: 'off', node: null, accepted: true },
+    { name: 'on', node: 'synthetic-verified-node', accepted: true },
+    { name: 'LF', node: 'synthetic\nnode', accepted: false },
+    { name: 'CRLF', node: 'synthetic\r\nnode', accepted: false }];
+  const script = `$ErrorActionPreference='Stop'
+Set-StrictMode -Version Latest
+$env:npm_config_userconfig='synthetic-user-config'
+$env:npm_config_globalconfig='synthetic-global-config'
+$hashtablePreferredRuntime=@{Bin='synthetic-preferred-bin'}
+$cases=ConvertFrom-Json -InputObject ${quote(JSON.stringify(cases))}
+$results=@(foreach($case in $cases) {
+    $hashtableCompatibilityRuntime=if($null -eq $case.node) { $null } else { @{Node=$case.node} }
+    $channelBoundaryReached=$false
+    try {
+${boundary}
+        $channelBoundaryReached=$true
+        [ordered]@{name=$case.name; accepted=$true; channelBoundaryReached=$channelBoundaryReached; records=@($arrRunnerRecords)}
+    } catch {
+        if($_.Exception.Message -cne 'toolchain: invalid runner record') { throw }
+        [ordered]@{name=$case.name; accepted=$false; channelBoundaryReached=$channelBoundaryReached}
+    }
+})
+ConvertTo-Json -InputObject $results -Depth 5 -Compress
+`;
+  const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+    { encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true }), 'FQ35 publication boundary');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  const rows = JSON.parse(result.stdout);
+  assert.equal(rows.length, cases.length);
+  for (const [index, row] of rows.entries()) {
+    const expected = cases[index];
+    assert.equal(row.name, expected.name);
+    assert.equal(row.accepted, expected.accepted);
+    assert.equal(row.channelBoundaryReached, expected.accepted);
+    if (expected.accepted) {
+      assert.deepEqual(row.records.filter(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22=')),
+        [`STYLEGUIDE_RECOVERY_NODE22=${expected.node ?? ''}`]);
+      const environment = { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', FQ35_UNRELATED: 'preserved' };
+      applyRunnerEnvironment(row.records.join('\n'), environment);
+      assert.equal(environment.STYLEGUIDE_RECOVERY_NODE22, expected.node ?? '');
+      assert.equal(environment.FQ35_UNRELATED, 'preserved');
+      assert.equal(row.records.some(line => /^NODE_OPTIONS=/iu.test(line)), false);
+    }
+  }
+});
+
+// Finite LF test model of SetEnvFileCommand and EnvFileKeyValuePairs in
+// https://github.com/actions/runner/blob/main/src/Runner.Worker/FileCommandManager.cs
+// This is not a native runner test or a complete parser/platform implementation.
+function fq37RunnerModel(text, environment) {
+  assert.ok(Buffer.byteLength(text) <= 16384);
+  const lines = text.split('\n'), blocked = [];
+  assert.ok(lines.length <= 64);
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    if (line === '') continue;
+    const equal = line.indexOf('='), heredoc = line.indexOf('<<');
+    let name, value;
+    if (equal >= 0 && (heredoc < 0 || equal < heredoc)) {
+      name = line.slice(0, equal); value = line.slice(equal + 1);
+    } else {
+      assert.ok(heredoc > 0, 'Expected a supported fixture record.');
+      name = line.slice(0, heredoc);
+      const delimiter = line.slice(heredoc + 2), body = [];
+      assert.ok(delimiter.length > 0);
+      while (++index < lines.length && lines[index] !== delimiter) body.push(lines[index]);
+      assert.ok(index < lines.length, 'Expected the fixture delimiter.');
+      value = body.join('\n');
+    }
+    assert.ok(name.length > 0);
+    if (name.toUpperCase() === 'NODE_OPTIONS') blocked.push(name);
+    else environment[name] = value;
+  }
+  return { environment, blocked };
+}
+
+test('FQ37 runner model refuses blocked keys before assignment and permits recovery clearing', () => {
+  for (const record of ['NODE_OPTIONS=\n', 'NODE_OPTIONS=--no-warnings\n',
+    'NoDe_OpTiOnS=\n', 'NODE_OPTIONS<<END\nEND\n',
+    'nOdE_OpTiOnS<<END\n--no-warnings\nEND\n']) {
+    const environment = { NODE_OPTIONS: 'inherited-selector', STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', UNRELATED: 'preserved' };
+    const result = fq37RunnerModel(record + 'STYLEGUIDE_RECOVERY_NODE22=\n', environment);
+    assert.equal(result.blocked.length, 1);
+    assert.equal(result.blocked[0].toUpperCase(), 'NODE_OPTIONS');
+    assert.deepEqual(result.environment, { NODE_OPTIONS: 'inherited-selector', STYLEGUIDE_RECOVERY_NODE22: '', UNRELATED: 'preserved' });
+  }
+});
+
+test('FQ35 recovery selection follows successful off and on setup across fresh roots', { skip: !linux, timeout: 180000 }, t => {
+  const job = { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified', FQ35_UNRELATED: 'preserved' };
+  for (const compatibility of [false, false, true, false]) {
+    const f = foundationFixture(t, { compatibility, extraEnv: { STYLEGUIDE_RECOVERY_NODE22: job.STYLEGUIDE_RECOVERY_NODE22 } });
+    assertCompletedProcess(f.run(), 'FQ35 successful setup');
+    assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+    const records = fs.readFileSync(f.channels.env, 'utf8');
+    const recovery = records.split('\n').filter(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22='));
+    const expected = compatibility ? path.join(f.runner, 'styleguide-node/recoveryCompatibility/node-v22.23.3-linux-x64/bin/node') : '';
+    assert.deepEqual(recovery, [`STYLEGUIDE_RECOVERY_NODE22=${expected}`]);
+    assert.doesNotMatch(records, /^NODE_OPTIONS=/gimu, 'The runner blocks NODE_OPTIONS even when its value is empty.');
+    assert.match(records, /^NODE_PATH=$/gmu);
+    applyRunnerEnvironment(records, job);
+    assert.equal(job.STYLEGUIDE_RECOVERY_NODE22, expected);
+    assert.equal(job.FQ35_UNRELATED, 'preserved');
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8').includes('recoveryCompatibility'), false);
+  }
+});
+
+test('FQ35 and FQ37 runner-record controls detect omissions and preserve failed handoffs', { skip: !linux, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const clearRecovery = "    } else {\n        $arrRunnerRecords += 'STYLEGUIDE_RECOVERY_NODE22='\n    }";
+  const stale = foundationFixture(t, { source: foundationOnce(original, clearRecovery, '    }'),
+    extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
+  assertCompletedProcess(stale.run(), 'FQ35 omitted recovery reset control');
+  assert.equal(stale.result.status, 0, stale.result.stdout + stale.result.stderr);
+  const staleRecords = fs.readFileSync(stale.channels.env, 'utf8');
+  assert.doesNotMatch(staleRecords, /^STYLEGUIDE_RECOVERY_NODE22=/mu);
+  assert.equal(applyRunnerEnvironment(staleRecords, { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' }).STYLEGUIDE_RECOVERY_NODE22, 'stale-unverified');
+  const blocked = foundationFixture(t, { source: foundationOnce(original, "        'NODE_PATH=')", "        'NODE_OPTIONS=', 'NODE_PATH=')") });
+  assertCompletedProcess(blocked.run(), 'FQ37 restored blocked record control');
+  assert.equal(blocked.result.status, 0, blocked.result.stdout + blocked.result.stderr);
+  assert.match(fs.readFileSync(blocked.channels.env, 'utf8'), /^NODE_OPTIONS=$/mu);
+  const failed = foundationFixture(t, { installs: true, mode: 'fq36-preflight-failure', extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
+  const priorEnvironment = 'FQ35_UNRELATED=preserved\nSTYLEGUIDE_RECOVERY_NODE22=stale-unverified\n';
+  fs.writeFileSync(failed.channels.env, priorEnvironment);
+  assertCompletedProcess(failed.run(), 'FQ35 failed setup');
+  assert.notEqual(failed.result.status, 0, failed.result.stdout + failed.result.stderr);
+  assert.match(failed.result.stderr, /preflight failed before installation/);
+  assert.doesNotMatch(failed.result.stdout, /Reviewed runtime setup completed/);
+  assert.equal(fs.readFileSync(failed.channels.env, 'utf8'), priorEnvironment);
+  assert.equal(fs.readFileSync(failed.channels.path, 'utf8'), '');
+  assert.equal(fs.existsSync(path.join(failed.runner, 'styleguide-node')), false);
+  assert.equal(fs.readFileSync(failed.sentinel, 'utf8'), 'unchanged');
+});
+
+function foundationNoPublication(f, { partial = false, retained = false } = {}) {
+  assertCompletedProcess(f.result, 'F10-F14 ordinary initializer');
+  assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
+  assert.doesNotMatch(f.result.stdout, /Reviewed runtime setup completed/);
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  if (!partial) assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
+  assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node')), retained);
+  assert.equal(fs.readFileSync(f.sentinel, 'utf8'), 'unchanged');
+}
+
+function foundationTarNative(f, role, kind, status) {
+  const record = JSON.parse(fs.readFileSync(path.join(f.root, `tar-${role}-${kind}.json`), 'utf8'));
+  assertCompletedProcess(record, `Actual GNU tar ${role}/${kind}`); assert.equal(record.status, status);
+}
+
+
+// These constructors retain the actual channel admission, held-open and write bodies.
+// They exercise only the channel boundary; whole-initializer evidence is separate.
+function fq46ChannelParts(source) {
+  const between = (start, end) => {
+    assert.equal(source.split(start).length, 2, `FQ46 unique start: ${start}`);
+    const offset = source.indexOf(start), finish = source.indexOf(end, offset);
+    assert.ok(finish > offset, `FQ46 end: ${end}`);
+    return source.slice(offset, finish);
+  };
+  return {
+    definitions: between('function Assert-OrdinaryPath {', 'function Assert-JsonMember {'),
+    admission: between('$strRunnerRoot = Assert-OrdinaryPath', '\nif ($IsWindows) {\n    for ($objPathComponent'),
+    opening: between('    $objPathChannel = [IO.File]::Open', '    New-PrivateDirectory $strNodeRoot'),
+    publication: between('    $null = Assert-OrdinaryPath $env:GITHUB_PATH', '    $env:PATH = $hashtablePreferredRuntime.Bin'),
+  };
+}
+
+function fq46ChannelFixture(t) {
+  const f = fixture(t, 'checkout space and Unicode Ω');
+  for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], `prior-${name}\n`);
+  function run(source = read('Initialize-CiToolchain.ps1'), { beforeOpen = '', afterOpen = '' } = {}) {
+    const body = fq46ChannelParts(source);
+    return f.run(`${body.definitions}
+$strRepositoryRoot = Assert-OrdinaryPath -Path ${quote(f.work)} -Directory
+${body.admission}
+$objPathChannel = $null
+$objEnvironmentChannel = $null
+try {
+${beforeOpen}
+${body.opening}
+    Write-Output 'FQ46 held channels admitted'
+${afterOpen}
+    $arrRunnerRecords = @('FQ46_RESULT=admitted')
+    $hashtablePreferredRuntime = @{ Bin = 'fq46-bin' }
+${body.publication}
+    Write-Output 'FQ46 channels published'
+} finally {
+    foreach ($objChannel in @($objPathChannel, $objEnvironmentChannel)) {
+        if ($null -ne $objChannel) { $objChannel.Dispose() }
+    }
+}
+`);
+  }
+  return { ...f, run };
+}
+
+function assertFq46Refusal(f, result, diagnostic, held = false) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' '), diagnostic);
+  assert.doesNotMatch(result.stdout, /FQ46 channels published/u);
+  assert.equal(result.stdout.includes('FQ46 held channels admitted'), held, result.stdout);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+  assert.deepEqual(f.calls(), []);
+}
+
+const fq46ContainmentPredicate = 'if (-not [string]::Equals([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($strChannelPath)), $strCommandRoot, $objPathComparison)) {';
+const fq46Supported = linux || process.platform === 'win32';
+test('FQ46 channel files append through held native identities', { skip: !fq46Supported, timeout: 60000 }, t => {
+  for (const empty of [false, true]) {
+    const f = fq46ChannelFixture(t);
+    if (empty) for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
+    const identities = Object.fromEntries(Object.entries(f.channels).map(([name, file]) => [name, fs.statSync(file)]));
+    const result = f.run(); assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /FQ46 channels published/u);
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8'), (empty ? '' : 'prior-path\n') + 'fq46-bin\n');
+    assert.equal(fs.readFileSync(f.channels.env, 'utf8'), (empty ? '' : 'prior-env\n') + 'FQ46_RESULT=admitted\n');
+    for (const [name, file] of Object.entries(f.channels)) {
+      const actual = fs.statSync(file); assert.equal(actual.nlink, 1);
+      assert.equal(actual.dev, identities[name].dev); assert.equal(actual.ino, identities[name].ino);
+      const descriptor = fs.openSync(file, 'r+'); fs.closeSync(descriptor);
+    }
+  }
+});
+
+test('FQ46 outside channel paths are refused with causal containment controls', { skip: !fq46Supported, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const mutant = foundationOnce(original, fq46ContainmentPredicate, 'if ($false) {');
+  for (const role of ['path', 'env']) for (const location of ['checkout', 'profile', 'temporary', 'prefix-sibling', 'nested']) {
+    const f = fq46ChannelFixture(t);
+    const folder = location === 'checkout' ? f.work : location === 'profile' ? path.join(f.root, 'profile')
+      : location === 'temporary' ? f.root : path.join(f.root, location === 'nested' ? '_runner_file_commands/nested' : '_runner_file_commands-extra');
+    fs.mkdirSync(folder, { recursive: true });
+    const outside = path.join(folder, 'outside-sentinel'); fs.writeFileSync(outside, 'outside must survive\n');
+    const other = f.channels[role === 'path' ? 'env' : 'path']; const otherBytes = fs.readFileSync(other);
+    f.channels[role] = outside;
+    const refused = f.run(); assertFq46Refusal(f, refused, /Runner channels must be direct files/u);
+    assert.equal(fs.readFileSync(outside, 'utf8'), 'outside must survive\n'); assert.deepEqual(fs.readFileSync(other), otherBytes);
+    const admitted = f.run(mutant); assert.equal(admitted.status, 0, admitted.stdout + admitted.stderr);
+    assert.equal(fs.readFileSync(outside, 'utf8'), 'outside must survive\n' + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    assert.throws(() => assertFq46Refusal(f, admitted, /Runner channels must be direct files/u), assert.AssertionError);
+  }
+});
+
+test('FQ46 single-channel hard links to unrelated files are refused', { skip: !fq46Supported, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const mutant = foundationOnce(foundationOnce(original, 'if (links != 1)', 'if (links == uint.MaxValue)'),
+    'if (standard.NumberOfLinks != 1)', 'if (standard.NumberOfLinks == uint.MaxValue)');
+  for (const role of ['path', 'env']) for (const location of ['checkout', 'runner']) {
+    const f = fq46ChannelFixture(t), sentinel = path.join(location === 'checkout' ? f.work : f.root, 'unrelated-sentinel');
+    fs.writeFileSync(sentinel, 'unrelated must survive\n'); fs.unlinkSync(f.channels[role]); fs.linkSync(sentinel, f.channels[role]);
+    const first = fs.statSync(sentinel), second = fs.statSync(f.channels[role]);
+    assert.equal(first.nlink, 2); assert.equal(second.nlink, 2); assert.equal(first.dev, second.dev); assert.equal(first.ino, second.ino);
+    const other = f.channels[role === 'path' ? 'env' : 'path']; const otherBytes = fs.readFileSync(other);
+    const refused = f.run(); assertFq46Refusal(f, refused, /Runner channel must have exactly one hard link/u);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unrelated must survive\n'); assert.deepEqual(fs.readFileSync(other), otherBytes);
+    const admitted = f.run(mutant); assert.equal(admitted.status, 0, admitted.stdout + admitted.stderr);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unrelated must survive\n' + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    assert.throws(() => assertFq46Refusal(f, admitted, /Runner channel must have exactly one hard link/u), assert.AssertionError);
+  }
+});
+
+test('FQ46 channel type, missing-file and native-query failures close admission', { skip: !fq46Supported, timeout: 180000 }, t => {
+  for (const role of ['path', 'env']) for (const kind of ['missing', 'directory', 'linked-parent']) {
+    const f = fq46ChannelFixture(t), before = Object.fromEntries(Object.entries(f.channels).map(([key, file]) => [key, fs.readFileSync(file)]));
+    if (kind === 'missing') fs.unlinkSync(f.channels[role]);
+    else if (kind === 'directory') { fs.unlinkSync(f.channels[role]); fs.mkdirSync(f.channels[role]); }
+    else {
+      const target = path.join(f.root, 'linked-target'); fs.mkdirSync(target); fs.writeFileSync(path.join(target, role), before[role]);
+      const link = path.join(f.root, '_runner_file_commands', 'linked'); fs.symlinkSync(target, link, linux ? 'dir' : 'junction');
+      f.channels[role] = path.join(link, role);
+    }
+    const result = f.run(); assertFq46Refusal(f, result, kind === 'linked-parent' ? /linked path/u : /path|item|file|exist/iu);
+    assert.deepEqual(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path']), before[role === 'path' ? 'env' : 'path']);
+  }
+  const original = read('Initialize-CiToolchain.ps1'), f = fq46ChannelFixture(t);
+  const broken = linux ? foundationOnce(original, 'NativeLibrary.GetExport(module, "statx")', 'NativeLibrary.GetExport(module, "FQ46MissingStatx")')
+    : foundationOnce(original, 'GetStandard(handle, 1, out standard, 24)', 'GetStandard(handle, 2147483647, out standard, 24)');
+  assertFq46Refusal(f, f.run(broken), linux ? /FQ46MissingStatx/u : /Exception|parameter|function/iu);
+  const control = f.run(); assert.equal(control.status, 0, control.stdout + control.stderr);
+});
+
+test('FQ46 actual opened identities must match their admission samples', { skip: !fq46Supported, timeout: 120000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const start = '    if ((Get-RunnerChannelIdentity -Path $env:GITHUB_PATH -Stream $objPathChannel)';
+  const offset = original.indexOf(start), end = original.indexOf('    New-PrivateDirectory $strNodeRoot', offset);
+  assert.ok(offset > 0 && end > offset); const guard = original.slice(offset, end);
+  const mutant = foundationOnce(original, guard, '');
+  for (const role of ['path', 'env']) for (const weakened of [false, true]) {
+    const f = fq46ChannelFixture(t), variable = role === 'path' ? '$env:GITHUB_PATH' : '$env:GITHUB_ENV';
+    const retained = path.join(f.root, `retained-${role}`);
+    const result = f.run(weakened ? mutant : original, { beforeOpen: `
+    Move-Item -LiteralPath ${variable} -Destination ${quote(retained)}
+    [IO.File]::WriteAllText(${variable}, 'replacement must survive', [Text.UTF8Encoding]::new($false))
+` });
+    assertFq46Refusal(f, result, weakened ? /identity changed before publication/u : /identity changed while opening/u, weakened);
+    assert.equal(fs.readFileSync(f.channels[role], 'utf8'), 'replacement must survive');
+    assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n`);
+    assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), `prior-${role === 'path' ? 'env' : 'path'}\n`);
+    const descriptor = fs.openSync(f.channels[role], 'r+'); fs.closeSync(descriptor);
+  }
+});
+
+test('FQ46 Linux publication rechecks held links and path identity before either append', { skip: !linux, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const start = '    if ((Get-OwnedPathIdentity -Path $strCommandRoot -Directory)';
+  const offset = original.indexOf(start), end = original.indexOf('    # A partial channel write', offset);
+  assert.ok(offset > 0 && end > offset); const mutant = foundationOnce(original, original.slice(offset, end), '');
+  for (const role of ['path', 'env']) for (const kind of ['new-link', 'replacement']) for (const weakened of [false, true]) {
+    const f = fq46ChannelFixture(t), variable = role === 'path' ? '$env:GITHUB_PATH' : '$env:GITHUB_ENV';
+    const retained = path.join(f.root, `after-admission-${role}`);
+    const afterOpen = kind === 'new-link' ? `
+    & ${quote(process.execPath)} -e ${quote("require('node:fs').linkSync(process.argv[1],process.argv[2])")} ${variable} ${quote(retained)}
+    if ($LASTEXITCODE -ne 0) { throw 'FQ46 fixture hard-link creation failed' }
+` : `
+    Move-Item -LiteralPath ${variable} -Destination ${quote(retained)}
+    [IO.File]::WriteAllText(${variable}, 'replacement must survive', [Text.UTF8Encoding]::new($false))
+`;
+    const result = f.run(weakened ? mutant : original, { afterOpen });
+    const old = fs.statSync(retained);
+    if (kind === 'new-link') {
+      const current = fs.statSync(f.channels[role]); assert.equal(current.nlink, 2); assert.equal(old.nlink, 2);
+      assert.equal(current.dev, old.dev); assert.equal(current.ino, old.ino);
+    } else assert.notEqual(fs.statSync(f.channels[role]).ino, old.ino);
+    if (weakened) {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n` + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    } else {
+      assertFq46Refusal(f, result, kind === 'new-link' ? /exactly one hard link/u : /identity changed before publication/u, true);
+      assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n`);
+      assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), `prior-${role === 'path' ? 'env' : 'path'}\n`);
+    }
+    if (kind === 'replacement') assert.equal(fs.readFileSync(f.channels[role], 'utf8'), 'replacement must survive');
+  }
+});
+
+test('FQ46 Linux incomplete native channel metadata is refused', { skip: !linux, timeout: 90000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  for (const missing of [1, 4, 256]) {
+    const f = fq46ChannelFixture(t);
+    const source = foundationOnce(original, 'uint mask = unchecked((uint)Marshal.ReadInt32(buffer, 0));',
+      `uint mask = unchecked((uint)Marshal.ReadInt32(buffer, 0)) & ~${missing}u;`);
+    assertFq46Refusal(f, f.run(source), /metadata is incomplete/u);
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8'), 'prior-path\n');
+    assert.equal(fs.readFileSync(f.channels.env, 'utf8'), 'prior-env\n');
+  }
+});
+
+test('FQ46 Linux whole initializer confines channels before acquisition', { skip: !linux, timeout: 300000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const control = foundationFixture(t); control.run(); assert.equal(control.result.status, 0, control.result.stdout + control.result.stderr);
+  for (const role of ['path', 'env']) for (const kind of ['outside', 'hardlink']) for (const weakened of [false, true]) {
+    let source = original;
+    if (weakened) source = kind === 'outside' ? foundationOnce(source, fq46ContainmentPredicate, 'if ($false) {')
+      : foundationOnce(source, 'if (links != 1)', 'if (links == uint.MaxValue)');
+    const f = foundationFixture(t, { source }), sentinel = path.join(f.work, 'unrelated-channel-target');
+    fs.writeFileSync(sentinel, 'sentinel\n');
+    if (kind === 'outside') f.channels[role] = sentinel;
+    else { fs.unlinkSync(f.channels[role]); fs.linkSync(sentinel, f.channels[role]); assert.equal(fs.statSync(sentinel).nlink, 2); }
+    f.run();
+    if (weakened) {
+      assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+      assert.ok(fs.readFileSync(sentinel, 'utf8').startsWith('sentinel\n'));
+      assert.ok(fs.readFileSync(sentinel).length > Buffer.byteLength('sentinel\n'));
+      assert.equal(f.calls().some(row => row[0] === 'curl'), true);
+    } else {
+      assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
+      assert.match(f.result.stderr, kind === 'outside' ? /Runner channels must be direct files/u : /exactly one hard link/u);
+      assert.equal(fs.readFileSync(sentinel, 'utf8'), 'sentinel\n');
+      assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), '');
+      assert.deepEqual(f.calls(), []); assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node')), false);
+    }
+  }
+});
+
+
+function fq48InitializerFixture(t, transform = source => source) {
+  const f = fixture(t), scripts = path.join(f.work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+  const marker = path.join(f.root, 'fq48-credential-dispatch');
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+  fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+  fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'), `
+$strFixtureMarker = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(${quote(marker)})
+[IO.File]::WriteAllText($strFixtureMarker, 'credential sentinel', [Text.UTF8Encoding]::new($false))
+throw 'FQ48 deliberate credential sentinel'
+`);
+  const script = path.join(scripts, 'Initialize-CiToolchain.ps1');
+  fs.writeFileSync(script, transform(read('Initialize-CiToolchain.ps1'), f));
+  for (const role of ['path', 'env']) fs.writeFileSync(f.channels[role], '');
+  return { ...f, script, marker, run: () => f.run(`& ${quote(script)}`, { USER: 'untrusted-name', LOGNAME: 'untrusted-name' }) };
+}
+
+function assertFq48BeforeWork(f, result, diagnostic) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(stripVTControlCharacters(result.stderr).replace(/\s+/gu, ' '), diagnostic);
+  assert.equal(fs.existsSync(f.marker), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  for (const role of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[role], 'utf8'), '');
+  assert.deepEqual(f.calls(), []);
+}
+
+test('FQ48 Linux effective UID guard refuses zero before credential work', { skip: !linux, timeout: 90000 }, t => {
+  const call = 'return [StyleGuide.RuntimeNativeApi]::ReadEffectiveUid($strNativeLibraryPath)';
+  for (const uid of [0, 1, 4294967295]) {
+    const f = fq48InitializerFixture(t, source => foundationOnce(source, call, `return [uint32]${uid}`));
+    const result = f.run();
+    if (uid === 0) assertFq48BeforeWork(f, result, /Linux extraction requires a nonzero effective UID/u);
+    else {
+      assert.notEqual(result.status, 0); assert.match(result.stderr, /FQ48 deliberate credential sentinel/u);
+      assert.equal(fs.readFileSync(f.marker, 'utf8'), 'credential sentinel');
+      assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+      for (const role of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[role], 'utf8'), '');
+    }
+  }
+  const mutant = fq48InitializerFixture(t, source => foundationOnce(
+    foundationOnce(source, call, 'return [uint32]0'), '} elseif ((Get-LinuxEffectiveUserId) -eq 0) {', '} elseif ($false) {'));
+  const result = mutant.run(); assert.notEqual(result.status, 0); assert.match(result.stderr, /FQ48 deliberate credential sentinel/u);
+  assert.equal(fs.readFileSync(mutant.marker, 'utf8'), 'credential sentinel');
+  assert.throws(() => assertFq48BeforeWork(mutant, result, /Linux extraction requires a nonzero effective UID/u), assert.AssertionError);
+});
+
+test('FQ48 Linux live effective UID binding uses the admitted runtime', { skip: !linux, timeout: 60000 }, t => {
+  const f = fixture(t), definitions = fq46ChannelParts(read('Initialize-CiToolchain.ps1')).definitions;
+  const observer = assertCompletedProcess(spawnSync('/usr/bin/id', ['-u'], {
+    encoding: 'utf8', timeout: 15000, maxBuffer: 4096,
+  }), 'FQ48 independent effective-UID observer');
+  assert.equal(observer.status, 0, observer.stderr); assert.match(observer.stdout, /^(?:0|[1-9][0-9]*)\n$/u);
+  const result = f.run(`${definitions}
+$uintFirstUserId = Get-LinuxEffectiveUserId
+$uintSecondUserId = Get-LinuxEffectiveUserId
+if ($uintFirstUserId -isnot [uint32] -or $uintSecondUserId -isnot [uint32]) { throw 'FQ48 wrong UID return type' }
+Write-Output ('FQ48 native UID: {0},{1}' -f $uintFirstUserId, $uintSecondUserId)
+`);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.equal(result.stdout.trim(), `FQ48 native UID: ${observer.stdout.trim()},${observer.stdout.trim()}`);
+});
+
+test('FQ48 Linux UID library and export failures stop before credential work', { skip: !linux, timeout: 120000 }, t => {
+  const good = fq48InitializerFixture(t), positive = good.run();
+  assert.notEqual(positive.status, 0); assert.match(positive.stderr, /FQ48 deliberate credential sentinel/u);
+  assert.equal(fs.readFileSync(good.marker, 'utf8'), 'credential sentinel');
+  for (const kind of ['export', 'missing-library', 'linked-library']) {
+    const f = fq48InitializerFixture(t, (source, fixture) => {
+      if (kind === 'export') return foundationOnce(source, 'NativeLibrary.GetExport(module, "SystemNative_GetEUid")',
+        'NativeLibrary.GetExport(module, "FQ48MissingUidExport")');
+      const start = source.indexOf('function Get-LinuxEffectiveUserId {'), end = source.indexOf('function Assert-JsonMember {', start);
+      assert.ok(start > 0 && end > start); const body = source.slice(start, end);
+      const library = path.join(fixture.root, 'fq48-library.so');
+      const replacement = kind === 'missing-library' ? quote(library) : `(Join-Path $PSHOME 'libSystem.Native.so')`;
+      let changed = foundationOnce(body, "Assert-OrdinaryPath (Join-Path $PSHOME 'libSystem.Native.so')",
+        `Assert-OrdinaryPath ${kind === 'linked-library' ? quote(library) : replacement}`);
+      if (kind === 'linked-library') changed = foundationOnce(changed, "    if (-not $IsLinux)",
+        `    $strFixtureLink = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(${quote(library)})\n` +
+        `    [void]([IO.File]::CreateSymbolicLink($strFixtureLink, (Join-Path $PSHOME 'libSystem.Native.so')))\n    if (-not $IsLinux)`);
+      return foundationOnce(source, body, changed);
+    });
+    assertFq48BeforeWork(f, f.run(), kind === 'export' ? /FQ48MissingUidExport/u : kind === 'linked-library' ? /linked path/u : /path|exist|item/iu);
+  }
+});
+
+for (const mode of ['occupied-file', 'linked-ancestor', 'hardlink-channels', 'native-extraction',
+  'write-refusal', 'truncated-extraction', 'partial-channel', 'interrupted-child']) {
+  test(`F10 ordinary filesystem control: ${mode}`, { skip: !linux, timeout: 90000 }, t => {
+    const original = read('Initialize-CiToolchain.ps1'); let source = original;
+    if (mode === 'partial-channel') source = foundationOnce(source,
+      '$objEnvironmentChannel.Write($arrEnvironmentBytes, 0, $arrEnvironmentBytes.Length)',
+      "$objEnvironmentChannel.Write($arrEnvironmentBytes, 0, 9); $objEnvironmentChannel.Flush($true); throw [IO.IOException]::new('F10 injected failure after actual partial channel write')");
+    const f = foundationFixture(t, { source, mode, compatibility: mode === 'partial-channel' });
+    if (mode === 'occupied-file') fs.writeFileSync(path.join(f.runner, 'styleguide-node'), 'occupied must survive');
+    if (mode === 'linked-ancestor') { fs.symlinkSync('runner space and Unicode Ω', path.join(f.root, 'linked-ancestor'), 'dir'); f.env.RUNNER_TEMP = path.join(f.root, 'linked-ancestor'); }
+    if (mode === 'hardlink-channels') {
+      fs.unlinkSync(f.channels.env); fs.linkSync(f.channels.path, f.channels.env);
+      const first = fs.lstatSync(f.channels.path), second = fs.lstatSync(f.channels.env);
+      assert.equal(first.nlink, 2); assert.equal(second.nlink, 2); assert.equal(first.dev, second.dev); assert.equal(first.ino, second.ino);
+    }
+    f.run(); foundationNoPublication(f, { partial: mode === 'partial-channel', retained: mode === 'occupied-file' });
+    if (mode === 'occupied-file') { assert.match(f.result.stderr, /staging destination already exists/); assert.equal(fs.readFileSync(path.join(f.runner, 'styleguide-node'), 'utf8'), 'occupied must survive'); }
+    if (mode === 'linked-ancestor') assert.match(f.result.stderr, /linked path/);
+    if (['occupied-file', 'linked-ancestor', 'hardlink-channels'].includes(mode)) assert.equal(f.calls().some(row => row[0] === 'curl'), false);
+    if (mode === 'native-extraction') { foundationTarNative(f, 'preferred', 'list', 0); assert.match(f.result.stderr, /Runtime extraction failed: 37/); }
+    if (mode === 'write-refusal') { foundationTarNative(f, 'preferred', 'list', 0); foundationTarNative(f, 'preferred', 'extract', 2); assert.match(f.result.stderr, /Runtime extraction failed: 2/); }
+    if (mode === 'truncated-extraction') { foundationTarNative(f, 'preferred', 'extract', 0); assert.match(f.result.stderr, /extracted file size changed/); }
+    if (mode === 'partial-channel') { assert.match(f.result.stderr, /F10 injected failure after actual partial channel write/); assert.equal(fs.readFileSync(f.channels.env, 'utf8'), 'npm_confi'); assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node/recoveryCompatibility')), false); }
+    if (mode === 'interrupted-child') { const child = JSON.parse(fs.readFileSync(path.join(f.root, 'interrupted-child.json'), 'utf8')); assert.deepEqual(child, { status: null, signal: 'SIGTERM' }); assert.match(f.result.stderr, /installed Node version is incorrect/); }
+    assert.equal(f.calls().some(row => row.includes('ci')), false);
+    if (!['partial-channel', 'interrupted-child'].includes(mode)) assert.equal(f.calls().some(row => row[0] === 'preferred'), false);
+    assert.equal(read('Initialize-CiToolchain.ps1'), original);
+  });
+}
+
+for (const mode of ['junction-ancestor', 'hardlink-channels']) {
+  test(`F10 Windows filesystem boundary: ${mode}`, { skip: process.platform !== 'win32', timeout: 60000 }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-f10-')); t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const source = read('Initialize-CiToolchain.ps1');
+    const start = source.indexOf('function Assert-OrdinaryPath'), end = source.indexOf('function Get-OwnedPathIdentity');
+    assert.ok(start > 0 && end > start);
+    const opens = "$objPathChannel = [IO.File]::Open($env:GITHUB_PATH, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)\n    $objEnvironmentChannel = [IO.File]::Open($env:GITHUB_ENV, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)";
+    assert.equal(source.split(opens).length, 2);
+    const file = path.join(root, 'path'), environment = path.join(root, 'env'), target = path.join(root, 'target');
+    fs.writeFileSync(file, ''); fs.writeFileSync(environment, ''); fs.mkdirSync(target); fs.writeFileSync(path.join(target, 'channel'), 'sentinel');
+    const script = path.join(root, 'boundary.ps1'); fs.writeFileSync(script, `$ErrorActionPreference='Stop'\n${source.slice(start, end)}
+$null=Assert-OrdinaryPath $env:GITHUB_PATH
+$null=Assert-OrdinaryPath $env:GITHUB_ENV
+$objPathChannel=$null; $objEnvironmentChannel=$null
+try { ${opens}; Write-Output 'F10 boundary admitted' }
+finally { foreach($objChannel in @($objPathChannel,$objEnvironmentChannel)) { if($null -ne $objChannel) { $objChannel.Dispose() } } }
+`);
+    const invoke = env => assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script],
+      { env: { ...process.env, ...env }, encoding: 'utf8', timeout: 15000, windowsHide: true }), `F10 Windows ${mode}`);
+    const good = invoke({ GITHUB_PATH: file, GITHUB_ENV: environment }); assert.equal(good.status, 0, good.stderr); assert.match(good.stdout, /boundary admitted/);
+    let selected = file;
+    if (mode === 'junction-ancestor') { const link = path.join(root, 'junction'); fs.symlinkSync(target, link, 'junction'); selected = path.join(link, 'channel'); }
+    else {
+      fs.unlinkSync(environment); fs.linkSync(file, environment);
+      const first = fs.lstatSync(file), second = fs.lstatSync(environment);
+      assert.equal(first.nlink, 2); assert.equal(second.nlink, 2); assert.equal(first.dev, second.dev); assert.equal(first.ino, second.ino);
+    }
+    const bad = invoke({ GITHUB_PATH: selected, GITHUB_ENV: environment }); assert.notEqual(bad.status, 0, bad.stderr); assert.doesNotMatch(bad.stdout, /boundary admitted/);
+    if (mode === 'junction-ancestor') assert.match(bad.stderr, /linked path/);
+    assert.equal(fs.readFileSync(path.join(target, 'channel'), 'utf8'), 'sentinel'); assert.equal(fs.readFileSync(file, 'utf8'), '');
+  });
+}
+
+// The maintained test uses a self-contained archive; fixed GNU tar/xz still
+// exercise the real extraction boundary. Official downloads are verified separately.
+for (const mode of ['device', 'entry-cap', 'byte-cap', 'hostile-selectors-and-path-xz']) {
+  test(`F11 actual tar boundary: ${mode}`, { skip: !linux, timeout: mode.startsWith('hostile') ? 90000 : 60000 }, t => {
+    let source = read('Initialize-CiToolchain.ps1');
+    if (mode.endsWith('-cap')) {
+      const cap = '$objArchiveMembers.Count -gt 50000 -or $intExpandedBytes -gt 1073741824'; assert.equal(source.split(cap).length, 3);
+      source = source.replaceAll(cap, mode === 'entry-cap' ? '$objArchiveMembers.Count -gt 16 -or $intExpandedBytes -gt 1073741824' : '$objArchiveMembers.Count -gt 50000 -or $intExpandedBytes -gt 1024');
+    }
+    const hostile = mode.startsWith('hostile'), f = foundationFixture(t, { source, mode });
+    if (hostile) {
+      const fake = path.join(f.root, 'fake-bin'); fs.mkdirSync(fake);
+      const marker = path.join(f.root, 'selector-marker'), xzMarker = path.join(f.root, 'xz-marker');
+      const checkpoint = path.join(f.root, 'checkpoint'); fs.writeFileSync(checkpoint, `#!${process.execPath}\nrequire('node:fs').writeFileSync(${JSON.stringify(marker)},'unexpected');\n`, { mode: 0o700 });
+      fs.writeFileSync(path.join(fake, 'xz'), `#!${process.execPath}\nrequire('node:fs').writeFileSync(${JSON.stringify(xzMarker)},'unexpected'); process.exit(37);\n`, { mode: 0o700 });
+      Object.assign(f.env, { PATH: fake + path.delimiter + process.env.PATH,
+        TAR_OPTIONS: `--checkpoint=1 --checkpoint-action=exec=${checkpoint}`, XZ_DEFAULTS: '--fixture-invalid', XZ_OPT: '--fixture-invalid' });
+      f.run(); assert.equal(f.result.status, 0, f.result.stderr); foundationTarNative(f, 'preferred', 'list', 0); foundationTarNative(f, 'preferred', 'extract', 0);
+      assert.match(f.result.stdout, /Verified preferred Node 24\.18\.1\/npm 11\.16\.0 linux-x64 SHA256/);
+      const ownership = fs.readFileSync(path.join(f.runner, 'styleguide-node/.owner'));
+      assert.equal(ownership.length, 32); assert.match(ownership.toString('utf8'), /^[0-9a-f]{32}$/u);
+      for (const name of ['npm-user.config', 'npm-global.config']) {
+        assert.equal(fs.readFileSync(path.join(f.runner, 'styleguide-node', name)).length, 0);
+      }
+      const readyBytes = fs.readFileSync(path.join(f.runner, 'styleguide-node/ready.json'));
+      const ready = JSON.parse(readyBytes.toString('utf8'));
+      assert.deepEqual(ready, { node: '24.18.1', npm: '11.16.0' });
+      assert.deepEqual(readyBytes, Buffer.from(JSON.stringify(ready), 'utf8'));
+      assert.equal(fs.existsSync(marker), false); assert.equal(fs.existsSync(xzMarker), false);
+      assert.equal(fs.readFileSync(f.channels.path, 'utf8'), path.join(f.runner, 'styleguide-node/preferred/node-v24.18.1-linux-x64/bin') + '\n');
+      assert.ok(f.runner.includes(' ') && f.runner.includes('Ω'));
+      assert.equal(fs.readFileSync(f.sentinel, 'utf8'), 'unchanged');
+    } else {
+      f.run(); foundationNoPublication(f); assert.match(f.result.stderr, mode === 'device' ? /unsupported GNU tar member record/ : /archive extraction limit exceeded/);
+      assert.equal(f.calls().some(row => row[0] === 'tar' && row[2] === 'extract'), false);
+      assert.equal(f.calls().some(row => row[0] === 'preferred' || row.includes('ci')), false);
+    }
+  });
+}
+
+function foundationMutation(source, mode) {
+  const digest = `    if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne $Digest) {
+        throw "The runtime archive digest is incorrect for $strDownloadAddress. Check package.json engines.node and .github/workflows/ci-toolchain.json $Role. Verify the official release checksum before changing the declaration."
+    }
+`;
+  if (mode === 'digest-gate') return foundationOnce(source, digest, '');
+  if (mode === 'extraction-order') return foundationOnce(source, digest + '    Expand-ReviewedArchive $strArchive $strDestinationPath $strReleaseRoot', '    Expand-ReviewedArchive $strArchive $strDestinationPath $strReleaseRoot\n' + digest.trimEnd());
+  if (mode === 'role-admission') return foundationOnce(source, "$objPin.recoveryCompatibility.node -cne '22.23.3'", '$false');
+  if (mode === 'platform-admission') return foundationOnce(source,
+    '[Runtime.InteropServices.Architecture]::Arm64 -ne [Runtime.InteropServices.Architecture]::X64', '$false');
+  if (mode === 'path-node') return foundationOnce(source, '$arrNodeVersionOutput = @(& $strNodePath --version)', '$arrNodeVersionOutput = @(& node --version)');
+  if (mode === 'path-npm') return foundationOnce(source, '$arrNpmVersionOutput = @(& $strNodePath $strNpmScriptPath --version)', '$arrNpmVersionOutput = @(& npm --version)');
+  if (mode === 'credential-bypass') return foundationOnce(source, '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"', '');
+  if (mode === 'node22-install') return foundationOnce(source, '& $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci', '& $hashtableCompatibilityRuntime.Node $hashtableCompatibilityRuntime.Npm --prefix $strInstallRoot ci');
+  if (mode === 'escape-admission') return foundationOnce(source, '        Assert-MemberTree $objArchiveMembers $ReleaseRoot\n        $objExtractionProcess =', '        $objExtractionProcess =');
+  if (mode === 'native-status') return foundationOnce(source,
+    '    if ($LASTEXITCODE -ne 0) {\n        throw "Runtime download failed: $LASTEXITCODE ($Role/$strPlatform)"\n    }\n', '');
+  assert.equal(mode, 'preflight-order');
+  const preflight = `        & $hashtablePreferredRuntime.Node --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Package and workflow preflight failed before installation.'
+        }
+`;
+  const install = `        & $hashtablePreferredRuntime.Node $hashtablePreferredRuntime.Npm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true |
+            ForEach-Object { Write-Information -MessageData $_ -InformationAction Continue }
+        if ($LASTEXITCODE -ne 0) {
+            throw "Locked installation failed: $LASTEXITCODE"
+        }
+`;
+  return foundationOnce(source, preflight + install, install + preflight);
+}
+
+async function foundationCurlCell(t, kind, mutation = '') {
+  const f = fixture(t, 'transport repository space and Unicode Ω'), scripts = path.join(f.work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const payload = Buffer.from('exact recovered fixture bytes'), requests = [], sockets = new Set();
+  const server = kind === 'tls-stall' ? createConnectionServer(socket => {
+    const record = { at: performance.now(), connection: true }; requests.push(record); sockets.add(socket);
+    socket.on('error', error => { record.error = error.code; assert.ok(['ECONNRESET', 'EPIPE'].includes(error.code), error.message); });
+    socket.on('close', () => sockets.delete(socket));
+  }) : createServer((req, res) => {
+    requests.push({ at: performance.now(), url: req.url, header: req.headers['x-fixture-ambient'] });
+    if (kind === 'partial-recovery' && requests.length === 1) { res.writeHead(200, { 'Content-Length': 100 }); res.write('partial'); return; }
+    if (kind === 'transfer-bound') return;
+    if (kind === 'retry-start-bound') { res.writeHead(503, { 'Retry-After': '600' }); res.end('retry admission must refuse'); return; }
+    if (kind === 'retry-count') { res.writeHead(503); res.end('retry class unchanged'); return; }
+    res.end(payload);
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => { for (const socket of sockets) socket.destroy(); if (server.closeAllConnections) server.closeAllConnections(); server.close(); });
+  const endpoint = `${kind === 'tls-stall' ? 'https' : 'http'}://127.0.0.1:${server.address().port}`;
+  fs.writeFileSync(path.join(f.root, '.curlrc'), `header = "X-Fixture-Ambient: dummy"\nurl = "${endpoint}/ambient"\n`);
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+  fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), JSON.stringify(runtimePin(createHash('sha256').update(payload).digest('hex'))));
+  fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'), read('Test-CheckoutCredentials.ps1')
+    .replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+  const witness = path.join(f.root, 'curl-result.json'), argumentsFile = path.join(f.root, 'curl-arguments.json'), curl = path.join(f.root, 'curl');
+  const mode = kind === 'tls-stall' || kind === 'transfer-bound' ? 'stall'
+    : kind === 'retry-start-bound' ? 'retry-after-number' : kind === 'retry-count' ? 'exhaustion' : 'transient';
+  fs.writeFileSync(curl, `#!${process.execPath}
+const fs=require('node:fs'),{spawnSync}=require('node:child_process'),args=process.argv.slice(2);
+if(JSON.stringify(args)===JSON.stringify(['--disable','--version']) || JSON.stringify(args)===JSON.stringify(['--disable','--help','all'])) {
+const query=spawnSync('/usr/bin/curl',args,{stdio:'inherit',timeout:15000});
+if(query.error || query.signal || !Number.isInteger(query.status)) process.exit(98);
+process.exit(query.status);
+}
+fs.writeFileSync(${JSON.stringify(argumentsFile)},JSON.stringify(args),{flag:'wx'});
+const clock=(flag,value)=>{const index=args.indexOf(flag);if(index>=0)args[index+1]=value;};
+clock('--connect-timeout','1');clock('--max-time',${JSON.stringify(kind === 'tls-stall' ? '3' : '1')});
+${kind === 'tls-stall' ? '' : "clock('--proto','=http');clock('--proto-redir','=http');"}
+args[args.length-1]=${JSON.stringify(endpoint + '/archive')};
+const started=performance.now(),result=spawnSync('/usr/bin/curl',args,{stdio:'inherit',timeout:16000,env:{...process.env,NO_PROXY:'127.0.0.1',no_proxy:'127.0.0.1'}});
+const record={mode:${JSON.stringify(mode)},command:'/usr/bin/curl',status:result.status,signal:result.signal};
+if(result.error)record.error={name:result.error.name,message:result.error.message,code:result.error.code,syscall:result.error.syscall,stack:result.error.stack};
+fs.writeFileSync(${JSON.stringify(witness)},JSON.stringify(record),{flag:'wx',mode:0o600});
+fs.writeFileSync(${JSON.stringify(path.join(f.root, 'curl-elapsed.json'))},JSON.stringify(performance.now()-started),{flag:'wx'});
+if(result.error)process.exit(98);process.exit(result.status??97);
+`, { mode: 0o700 });
+  const tar = path.join(f.root, 'tar'); fs.writeFileSync(tar, `#!/bin/sh\nprintf listed > '${f.root}/tar-marker'\nexit 23\n`, { mode: 0o700 });
+  const original = read('Initialize-CiToolchain.ps1'); let source = original;
+  const mutations = { 'connect-bound': ['--connect-timeout 20 ', ''], 'transfer-bound': ['--max-time 180 ', ''],
+    'retry-start-bound': ['--retry-max-time 300 ', ''], 'retry-count': ['--retry 2 ', '--retry 3 '], 'first-disable': ['    & $strCurlPath --disable --silent ', '    & $strCurlPath --silent '] };
+  if (mutation) { assert.ok(Object.hasOwn(mutations, mutation)); source = foundationOnce(source, ...mutations[mutation]); }
+  const script = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, source.replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar));
+  for (const file of ['path', 'env']) fs.writeFileSync(f.channels[file], '');
+  const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env, CURL_HOME: f.root, TEST_LOG: f.log, TEST_MODE: '' };
+  for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
+  const result = await new Promise((resolve, reject) => {
+    const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], { cwd: f.work, env, windowsHide: true });
+    let stdout = '', stderr = '', expired = false;
+    const watchdog = setTimeout(() => { expired = true; child.kill('SIGKILL'); }, 25000);
+    child.stdout.on('data', bytes => stdout += bytes); child.stderr.on('data', bytes => stderr += bytes);
+    child.on('error', error => { clearTimeout(watchdog); reject(error); });
+    child.on('close', (status, signal) => { clearTimeout(watchdog); resolve({ stdout, stderr, status, signal, expired }); });
+  });
+  assert.equal(result.expired, false, 'The outer watchdog is always failure.'); assertCompletedProcess(result, 'F12/F14 ordinary PowerShell'); assert.notEqual(result.status, 0);
+  assert.equal(fs.readFileSync(env.GITHUB_PATH, 'utf8'), ''); assert.equal(fs.readFileSync(env.GITHUB_ENV, 'utf8'), '');
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false, result.stdout + result.stderr);
+  assert.equal(read('Initialize-CiToolchain.ps1'), original);
+  return { ...f, result, requests, witness, mode,
+    arguments: JSON.parse(fs.readFileSync(argumentsFile, 'utf8')),
+    elapsed: JSON.parse(fs.readFileSync(path.join(f.root, 'curl-elapsed.json'), 'utf8')),
+    raw: JSON.parse(fs.readFileSync(witness, 'utf8')) };
+}
+
+function foundationCurlOracle(f, kind) {
+  const expected = { '--connect-timeout': '20', '--max-time': '180', '--retry': '2', '--retry-max-time': '300', '--proto': '=https', '--proto-redir': '=https', '--max-filesize': '67108864' };
+  assert.equal(f.arguments[0], '--disable');
+  assert.equal(f.arguments.filter(value => value === '--max-filesize').length, 1);
+  for (const [flag, value] of Object.entries(expected)) { const index = f.arguments.indexOf(flag); assert.ok(index >= 0); assert.equal(f.arguments[index + 1], value); }
+  readCurlResultWitness(f.witness, f.mode, `F12/F14 ${kind}`);
+  if (kind === 'tls-stall') { assert.ok(f.elapsed < 9000, 'Connect1 must bound TLS before the larger max3 attempt budget'); assert.equal(f.requests.length, 3); assert.equal(fs.existsSync(path.join(f.root, 'tar-marker')), false); }
+  else if (kind === 'partial-recovery') { assert.equal(f.requests.length, 2); assert.equal(fs.existsSync(path.join(f.root, 'tar-marker')), true); assert.match(f.result.stderr, /archive listing failed: 23/); }
+  else if (kind === 'retry-start-bound') assert.equal(f.requests.length, 1);
+  else if (kind === 'retry-count') assert.equal(f.requests.length, 3);
+  assert.equal(f.requests.some(row => row.url === '/ambient' || row.header), false, 'No curlrc header or extra URL');
+}
+
+for (const kind of ['tls-stall', 'partial-recovery']) {
+  test(`F12 ordinary actual curl boundary: ${kind}`, { skip: !linux, timeout: 60000 }, async t => {
+    foundationCurlOracle(await foundationCurlCell(t, kind), kind);
+  });
+}
+
+for (const mutation of ['connect-bound', 'transfer-bound', 'retry-start-bound', 'retry-count', 'first-disable']) {
+  test(`F14 selected curl mutation witness: ${mutation}`, { skip: !linux, timeout: 90000 }, async t => {
+    const kind = mutation === 'connect-bound' ? 'tls-stall' : mutation;
+    const good = await foundationCurlCell(t, kind); foundationCurlOracle(good, kind);
+    const bad = await foundationCurlCell(t, kind, mutation);
+    if (['transfer-bound', 'retry-start-bound'].includes(mutation)) {
+      // These exact private mutants exceed the inner fixture watchdog. Preserve
+      // its raw incomplete result; do not count mapped98 as product refusal.
+      assert.equal(bad.raw.error?.code, 'ETIMEDOUT'); assert.equal(bad.raw.status, null);
+      assert.equal(bad.raw.signal, 'SIGTERM'); assert.match(bad.result.stderr, /Runtime download failed: 98/);
+      assert.throws(() => readCurlResultWitness(bad.witness, bad.mode, 'Known timer mutant watchdog'), assert.AssertionError);
+    } else {
+      readCurlResultWitness(bad.witness, bad.mode, `Completed curl mutant ${mutation}`);
+      if (mutation === 'connect-bound') { assert.ok(bad.elapsed >= 9000); assert.equal(bad.requests.length, 3); }
+      if (mutation === 'retry-count') assert.equal(bad.requests.length, 4);
+      if (mutation === 'first-disable') assert.ok(bad.requests.some(row => row.url === '/ambient' || row.header));
+    }
+    assert.throws(() => foundationCurlOracle(bad, kind), assert.AssertionError);
+    t.diagnostic(`${mutation}: observed actual-curl discriminator; unchanged admission oracle rejects the private mutant.`);
+  });
+}
+
+for (const mode of ['digest-gate', 'extraction-order', 'role-admission', 'platform-admission', 'path-node',
+  'path-npm', 'credential-bypass', 'preflight-order', 'node22-install', 'escape-admission', 'native-status']) {
+  test(`F13 selected product mutation witness: ${mode}`, { skip: !linux, timeout: 180000 }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    let baseline = original;
+    // Fixture state makes an unsupported architecture reachable on this x64 host;
+    // the selected mutation removes only the actual architecture refusal guard.
+    if (mode === 'platform-admission') baseline = foundationOnce(baseline,
+      '[Runtime.InteropServices.RuntimeInformation]::OSArchitecture', '[Runtime.InteropServices.Architecture]::Arm64');
+    const mutated = foundationMutation(baseline, mode);
+    const build = source => {
+      const f = foundationFixture(t, { source, mode: mode === 'preflight-order' ? 'preflight' : mode,
+        compatibility: mode === 'node22-install', installs: ['preflight-order', 'node22-install'].includes(mode),
+        pinChange: pin => mode === 'role-admission' ? { ...pin, recoveryCompatibility: { ...pin.recoveryCompatibility, node: '22.23.4' } } : pin,
+        extraEnv: mode === 'credential-bypass' ? { GH_TOKEN: 'dummy-never-publish' } : {} });
+      if (mode.startsWith('path-')) {
+        const bin = path.join(f.root, 'fake-bin'); fs.mkdirSync(bin);
+        for (const executable of ['node', 'npm']) fs.writeFileSync(path.join(bin, executable), `#!${process.execPath}\nrequire('node:fs').appendFileSync(${JSON.stringify(f.log)},JSON.stringify(['PATH-${executable}'])+'\\n'); process.exit(37);\n`, { mode: 0o700 });
+        f.env.PATH = bin + path.delimiter + process.env.PATH;
+      }
+      return f;
+    };
+    const good = build(baseline); good.run();
+    const oracle = f => {
+      if (['digest-gate', 'extraction-order'].includes(mode)) { assert.equal(f.calls().some(row => row[0] === 'tar'), false, 'Digest refusal must precede all archive dispatch'); foundationNoPublication(f); assert.match(f.result.stderr, /archive digest is incorrect/); }
+      else if (['role-admission', 'platform-admission', 'credential-bypass'].includes(mode)) {
+        assert.equal(f.calls().some(row => row[0] === 'curl'), false, 'Admission/credential refusal must precede curl'); foundationNoPublication(f);
+        const cause = { 'role-admission': /reviewed runtime declaration is invalid/, 'platform-admission': /requires native Linux or Windows x64/,
+          'credential-bypass': /a token was projected into a code job/ }; assert.match(f.result.stderr, cause[mode]);
+      }
+      else if (mode.startsWith('path-')) { assert.equal(f.calls().some(row => row[0].startsWith('PATH-')), false, 'Only absolute acquired tools may run'); assert.equal(f.result.status, 0, f.result.stderr); }
+      else if (mode === 'preflight-order') { assert.equal(f.calls().some(row => row.includes('ci')), false, 'Failed preflight must precede all installs'); foundationNoPublication(f); assert.match(f.result.stderr, /preflight failed before installation/); }
+      else if (mode === 'node22-install') { assert.equal(f.calls().some(row => row[0] === 'recoveryCompatibility' && row.includes('ci')), false, 'No ordinary Node22 install'); assert.equal(f.result.status, 0, f.result.stderr); }
+      else if (mode === 'escape-admission') { assert.equal(f.calls().some(row => row[0] === 'tar' && row[2] === 'extract'), false, 'Escaping member must be refused before extraction'); foundationNoPublication(f); assert.match(f.result.stderr, /escaping archive link/); }
+      else { foundationNoPublication(f); assert.match(f.result.stderr, /Runtime download failed: 77/); assert.equal(f.calls().some(row => row[0] === 'tar'), false); }
+    };
+    oracle(good);
+    const bad = build(mutated); bad.run();
+    const refusing = ['extraction-order', 'path-node', 'path-npm', 'preflight-order', 'node22-install'];
+    assert.equal(bad.result.status, refusing.includes(mode) ? 1 : 0, bad.result.stdout + bad.result.stderr);
+    const primary = { 'extraction-order': /archive digest is incorrect/, 'path-node': /installed Node version is incorrect/,
+      'path-npm': /installed npm version is incorrect/, 'preflight-order': /preflight failed before installation/, 'node22-install': /Locked installation failed: 92/ };
+    if (Object.hasOwn(primary, mode)) assert.match(bad.result.stderr, primary[mode]);
+    // A fixture/setup error is not a successful mutation witness: prove its
+    // selected changed phase before asking the original oracle to reject it.
+    if (['digest-gate', 'extraction-order', 'native-status'].includes(mode)) assert.ok(bad.calls().some(row => row[0] === 'tar'));
+    if (['role-admission', 'platform-admission', 'credential-bypass'].includes(mode)) assert.ok(bad.calls().some(row => row[0] === 'curl'));
+    if (mode.startsWith('path-')) assert.ok(bad.calls().some(row => row[0] === `PATH-${mode.slice(5)}`));
+    if (mode === 'preflight-order') assert.ok(bad.calls().some(row => row.includes('ci')));
+    if (mode === 'node22-install') assert.ok(bad.calls().some(row => row[0] === 'recoveryCompatibility' && row.includes('ci')));
+    if (mode === 'escape-admission') { assert.equal(bad.result.status, 0, bad.result.stderr); assert.equal(fs.readlinkSync(path.join(bad.runner, 'styleguide-node/preferred/node-v24.18.1-linux-x64/bin/npm')), '../../../../outside-sentinel'); }
+    assert.throws(() => oracle(bad), assert.AssertionError);
+    assert.equal(fs.readFileSync(bad.sentinel, 'utf8'), 'unchanged'); assert.equal(read('Initialize-CiToolchain.ps1'), original);
+    assert.equal((good.result.stdout + good.result.stderr + bad.result.stdout + bad.result.stderr).includes('dummy-never-publish'), false);
+    t.diagnostic(`${mode}: baseline oracle accepts; observed changed phase makes the same oracle reject the private mutant.`);
+  });
+}
+
+// Selected FQ40 controls use the actual shared capability and acquisition bodies.
+// Native boundary cells isolate download/digest/extraction ordering; they do not
+// impersonate a whole Windows installer or native hosted runner.
+function fq40Region(source, start, end) {
+  assert.equal(source.split(start).length, 2, start);
+  const at = source.indexOf(start), stop = source.indexOf(end, at);
+  assert.ok(stop > at, end);
+  return source.slice(at, stop);
+}
+function fq40Constant(source, value = 8192) {
+  const declaration = source.match(/^New-Variable -Name intMaximumRuntimeArchiveBytes -Value 67108864 -Option Constant -WhatIf:\$false -Confirm:\$false$/mu)?.[0];
+  assert.ok(declaration, 'The script-owned production cap must be exactly 67108864.');
+  assert.equal(source.split(declaration).length, 2);
+  return declaration.replace('-Value 67108864 ', `-Value ${value} `);
+}
+function fq40PostSizeOracle(f, role) {
+  assertCompletedProcess(f.result, `FQ40 ordinary ${role} filesize refusal`);
+  assert.notEqual(f.result.status, 0);
+  assert.match(stripVTControlCharacters(f.result.stderr), /compressed runtime archive exceeds the fixed size limit/u);
+  assert.equal(fs.existsSync(f.fq40HashMarker), false, 'Size refusal must precede hashing the completed archive.');
+  assert.equal(f.calls().some(row => row[0] === 'tar' && row[1] === role), false, 'Size refusal must precede even archive listing.');
+  foundationNoPublication(f);
+}
+test('FQ40 shared fixed archive cap and capability call ordering', () => {
+  const source = read('Initialize-CiToolchain.ps1');
+  fq40Constant(source);
+  const installer = fq40Region(source, 'function Install-ReviewedRuntime {', 'if ((-not $IsLinux');
+  assert.equal(installer.split('--max-filesize $intMaximumRuntimeArchiveBytes').length, 2);
+  const ordinary = installer.indexOf('$null = Assert-OrdinaryPath $strArchive');
+  const size = installer.indexOf('(Get-Item -LiteralPath $strArchive -Force -ErrorAction Stop).Length -gt $intMaximumRuntimeArchiveBytes');
+  assert.ok(ordinary < size && size < installer.indexOf('(Get-FileHash -LiteralPath $strArchive'));
+  const windows = source.indexOf('    Assert-CurlCapability -Path $strCurlPath -Windows');
+  assert.ok(windows > 0 && windows < source.indexOf('& "$PSScriptRoot/Test-CheckoutCredentials.ps1"'));
+  const linuxCall = source.indexOf('        Assert-CurlCapability -Path $strCurlPath');
+  const ownedTry = source.indexOf('$objEnvironmentChannel = $null\ntry {');
+  assert.ok(ownedTry >= 0 && linuxCall > ownedTry);
+  const sanitation = source.indexOf("    Remove-Item Env:STYLEGUIDE_RECOVERY_NODE22, Env:NODE_OPTIONS, Env:NODE_PATH");
+  assert.ok(sanitation >= 0 && linuxCall > sanitation);
+  assert.ok(linuxCall < source.indexOf('$hashtablePreferredRuntime = Install-ReviewedRuntime'));
+});
+test('FQ40 capability matrix rejects unsupported queries and causal gate omissions', { timeout: 90000 }, t => {
+  const source = read('Initialize-CiToolchain.ps1');
+  const actual = fq40Region(source, 'function Assert-CurlCapability {', 'function Install-ReviewedRuntime {');
+  const options = ['disable', 'silent', 'show-error', 'fail', 'location', 'proto', 'proto-redir',
+    'tlsv1.2', 'connect-timeout', 'max-time', 'max-filesize', 'retry', 'retry-max-time', 'output'];
+  const version = (curl = '8.5.0', lib = curl) => [`curl ${curl} (fixture) libcurl/${lib} OpenSSL/3.0.0`, 'Protocols: https', 'Features: SSL'];
+  const help = options.map(flag => ` --${flag} fixture`);
+  const item = (name, output, pass = false, extra = {}) => ({ name, version: output, help, pass, windows: false, versionExit: 0, helpExit: 0, ...extra });
+  const cases = [
+    item('minimum Linux', version(), true), item('newer Linux', version('8.21.0'), true),
+    item('later Linux major', version('9.0.0'), true),
+    item('minimum Windows policy', version(), true, { windows: true }),
+    item('newer Windows policy', version('8.21.0'), true, { windows: true }),
+    item('Windows major9', version('9.0.0'), false, { windows: true }),
+    item('Windows old8.4', version('8.4.0'), false, { windows: true }),
+    ...['7.88.1', '8.3.0', '8.4.0'].map(value => item(`old curl ${value}`, version(value, '8.5.0'))),
+    item('old library', version('8.5.0', '8.4.0')),
+    item('both old8.4', version('8.4.0')),
+    item('missing library', ['curl 8.5.0 (fixture)', 'Protocols: https', 'Features: SSL']),
+    item('malformed library', version().map((line, i) => i ? line : line.replace('libcurl/8.5.0', 'libcurl/8.5.bad'))),
+    item('duplicate curl', version().map((line, i) => i ? line : line + ' curl 8.5.0')),
+    item('duplicate library', version().map((line, i) => i ? line : line + ' libcurl/8.5.0')),
+    item('wrong first line', ['fixture', ...version()]),
+    item('no HTTPS', [version()[0], 'Protocols: http', 'Features: SSL']),
+    item('no SSL', [version()[0], 'Protocols: https', 'Features: IPv6']),
+    item('duplicate protocols', [...version(), 'Protocols: https']),
+    item('duplicate features', [...version(), 'Features: SSL']),
+    item('version query failure', version(), false, { versionExit: 17 }),
+    item('help query failure', version(), false, { helpExit: 19 }),
+    ...options.map(flag => item(`missing option ${flag}`, version(), false, { help: help.filter(line => !line.startsWith(` --${flag} `)) })),
+  ];
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-curl-capabilities-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const caseFile = path.join(root, 'case.json'), queryLog = path.join(root, 'queries.jsonl'), tool = path.join(root, 'curl.ps1');
+  fs.writeFileSync(tool, `$Arguments=@($args)
+$case=Get-Content -LiteralPath ${quote(caseFile)} -Raw | ConvertFrom-Json
+[IO.File]::AppendAllText(${quote(queryLog)}, (ConvertTo-Json -InputObject @($Arguments) -Compress)+[Environment]::NewLine)
+if(($Arguments -join '|') -ceq '--disable|--version') { $case.version; exit $case.versionExit }
+if(($Arguments -join '|') -ceq '--disable|--help|all') { $case.help; exit $case.helpExit }
+throw 'fixture: unreviewed capability query'
+`);
+  const run = body => {
+    const script = `Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$PSNativeCommandUseErrorActionPreference=$false
+${body}
+$cases=ConvertFrom-Json -InputObject ${quote(JSON.stringify(cases))}
+$rows=@(foreach($case in $cases) {
+ [IO.File]::WriteAllText(${quote(caseFile)}, (ConvertTo-Json -InputObject $case -Depth 6 -Compress))
+ try { Assert-CurlCapability -Path ${quote(tool)} -Windows:([bool]$case.windows) 6>$null; $accepted=$true }
+ catch { $accepted=$false }
+ [ordered]@{name=$case.name; accepted=$accepted}
+})
+ConvertTo-Json -InputObject $rows -Compress
+`;
+    const scriptFile = path.join(root, 'matrix.ps1'); fs.writeFileSync(scriptFile, script);
+    const result = assertCompletedProcess(spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', scriptFile],
+      { encoding: 'utf8', timeout: 15000, maxBuffer: 256 * 1024, windowsHide: true }), 'FQ40 actual capability matrix');
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const rows = JSON.parse(result.stdout); assert.equal(rows.length, cases.length);
+    return rows;
+  };
+  const oracle = rows => rows.forEach((row, index) => {
+    assert.equal(row.name, cases[index].name); assert.equal(row.accepted, cases[index].pass, row.name);
+  });
+  oracle(run(actual));
+  for (const [label, old, replacement] of [
+    ['minimum curl', "$objCurlVersion -lt [version]'8.5.0'", '$false'],
+    ['minimum library', "$objLibraryVersion -lt [version]'8.5.0'", '$false'],
+    ['Windows major', '($Windows -and $objCurlVersion.Major -ne 8)', '$false'],
+    ['max-filesize option', "'max-filesize', ", ''],
+  ]) {
+    const rows = run(foundationOnce(actual, old, replacement));
+    assert.throws(() => oracle(rows), assert.AssertionError, label);
+  }
+  const queries = fs.readFileSync(queryLog, 'utf8').trim().split('\n').map(line => JSON.parse(line));
+  assert.ok(queries.length > 0);
+  assert.ok(queries.every(args => JSON.stringify(args) === '["--disable","--version"]' || JSON.stringify(args) === '["--disable","--help","all"]'));
+});
+for (const role of ['preferred', 'recoveryCompatibility']) {
+  test(`FQ40 completed compressed-size guard precedes hash/listing: ${role}`, { skip: !linux, timeout: 90000 }, t => {
+    const original = read('Initialize-CiToolchain.ps1');
+    const declaration = fq40Constant(original, 8192);
+    const source = foundationOnce(original, fq40Constant(original, 67108864), declaration);
+    const guard = "    if ((Get-Item -LiteralPath $strArchive -Force -ErrorAction Stop).Length -gt $intMaximumRuntimeArchiveBytes) {\n" +
+      "        throw 'toolchain: compressed runtime archive exceeds the fixed size limit'\n    }\n";
+    const prepare = body => {
+      const f = foundationFixture(t, { source: body, compatibility: true });
+      const archive = f.archives[role], bytes = fs.readFileSync(archive);
+      assert.ok(bytes.length < 8192);
+      fs.appendFileSync(archive, Buffer.alloc(8193 - bytes.length, 120));
+      const pin = JSON.parse(fs.readFileSync(path.join(f.scripts, 'ci-toolchain.json')));
+      pin[role].linuxX64Sha256 = createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+      fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), JSON.stringify(pin));
+      f.fq40HashMarker = path.join(f.root, 'archive-hash-marker');
+      const watched = path.join(f.runner, 'styleguide-node', role + '.tar.xz');
+      const hashObserver = `function Get-FileHash {
+[CmdletBinding()] param([string] $LiteralPath, [string] $Algorithm='SHA256')
+if($LiteralPath -ceq ${quote(watched)}) { [IO.File]::WriteAllText(${quote(f.fq40HashMarker)},'reached') }
+Microsoft.PowerShell.Utility\\Get-FileHash @PSBoundParameters
+}
+`;
+      fs.writeFileSync(f.script, foundationOnce(fs.readFileSync(f.script, 'utf8'), 'function Install-ReviewedRuntime {', hashObserver + 'function Install-ReviewedRuntime {'));
+      f.run(); return f;
+    };
+    fq40PostSizeOracle(prepare(source), role);
+    const mutant = prepare(foundationOnce(source, guard, ''));
+    assertCompletedProcess(mutant.result, 'FQ40 post-size omission');
+    assert.equal(fs.existsSync(mutant.fq40HashMarker), true, 'Omission mutant must reach the real hash.');
+    assert.equal(mutant.calls().some(row => row[0] === 'tar' && row[1] === role), true, 'Matching-digest mutant must reach listing.');
+    assert.throws(() => fq40PostSizeOracle(mutant, role), assert.AssertionError);
+  });
+}
+test('FQ40 valid preferred and recovery archives retain the production-size argv', { skip: !linux }, t => {
+  const f = foundationFixture(t, { compatibility: true }); f.run();
+  assertCompletedProcess(f.result, 'FQ40 valid two-role archive'); assert.equal(f.result.status, 0, f.result.stderr);
+  const calls = f.calls().filter(row => row[0] === 'curl');
+  assert.deepEqual(calls.map(row => row[1]), ['preferred', 'recoveryCompatibility']);
+  for (const row of calls) { assert.equal(row.filter(value => value === '--max-filesize').length, 1); assert.equal(row[row.indexOf('--max-filesize') + 1], '67108864'); }
+});
+
+
+for (const role of ['preferred', 'recoveryCompatibility']) {
+  test(`FQ40 download63 retains whole-initializer cleanup and publication refusal: ${role}`, { skip: !linux }, t => {
+    const f = foundationFixture(t, { compatibility: true, mode: 'fq40-native63-' + role });
+    f.run(); assertCompletedProcess(f.result, 'FQ40 injected process63 cleanup');
+    assert.match(stripVTControlCharacters(f.result.stderr), new RegExp('Runtime download failed: 63 \\(' + role + '/linux-x64\\)', 'u'));
+    assert.equal(f.calls().some(row => row.includes('ci')), false);
+    assert.equal(f.calls().some(row => row[0] === 'tar' && row[1] === role), false);
+    foundationNoPublication(f);
+  });
+}
+
+// Actual curl native codes are not inferred from the PowerShell refusal status.
+async function fq40NativeBoundary(t, framing, length, mutation = '', productionHeader = false, role = 'preferred') {
+  const source = read('Initialize-CiToolchain.ps1'), cap = productionHeader ? 67108864 : 8192;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-curl-filesize-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const payload = Buffer.alloc(length, 120), requests = [], sockets = new Set();
+  const server = createServer((req, res) => {
+    requests.push(req.url); sockets.add(req.socket); req.socket.on('close', () => sockets.delete(req.socket));
+    res.on('error', error => assert.ok(['ECONNRESET', 'EPIPE'].includes(error.code), error.message));
+    if (framing === 'known' || framing === 'lying-high' || productionHeader) res.writeHead(200, { 'Content-Length': productionHeader ? cap + 1 : framing === 'lying-high' ? cap + 1 : length, Connection: 'close' });
+    if (framing === 'lying-low') res.writeHead(200, { 'Content-Length': 4, Connection: 'close' });
+    if (framing === 'partial') res.writeHead(200, { 'Content-Length': length + 20, Connection: 'close' });
+    if (framing === 'close') { res.useChunkedEncodingByDefault = false; res.writeHead(200, { Connection: 'close' }); }
+    if (framing === 'chunked') res.writeHead(200, { 'Transfer-Encoding': 'chunked' });
+    if (framing === 'chunked-misleading-length') res.writeHead(200, { 'Transfer-Encoding': 'chunked', 'Content-Length': 4 });
+    res.write(payload.subarray(0, Math.min(3, payload.length))); res.end(payload.subarray(3));
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.closeAllConnections(); server.close(); });
+  const endpoint = `http://127.0.0.1:${server.address().port}/archive`;
+  let body = fq40Region(source, 'function Install-ReviewedRuntime {', 'if ((-not $IsLinux');
+  body = foundationOnce(body, '$strDownloadAddress = "https://nodejs.org/dist/v$Version/$strReleaseRoot.$strArchiveSuffix"', `$strDownloadAddress = ${quote(endpoint)}`);
+  body = foundationOnce(body, "--proto '=https'", "--proto '=http'");
+  body = foundationOnce(body, "--proto-redir '=https'", "--proto-redir '=http'");
+  const constant = fq40Constant(source, mutation === 'raised-cap' ? 16384 : cap);
+  if (mutation === 'removed-flag') body = foundationOnce(body, '--max-filesize $intMaximumRuntimeArchiveBytes ', '');
+  if (mutation === 'zero-flag') body = foundationOnce(body, '--max-filesize $intMaximumRuntimeArchiveBytes ', '--max-filesize 0 ');
+  const resultFile = path.join(root, 'result.json'), marker = path.join(root, 'listing-marker'), scriptFile = path.join(root, 'boundary.ps1');
+  const digest = createHash('sha256').update(payload).digest('hex');
+  fs.writeFileSync(scriptFile, `Set-StrictMode -Version Latest
+$ErrorActionPreference='Stop'
+$PSNativeCommandUseErrorActionPreference=$false
+${constant}
+${fq40Region(source, 'function Assert-CurlCapability {', 'function Install-ReviewedRuntime {')}
+${body}
+function New-PrivateDirectory { param($Path,[switch]$Confirm,[switch]$WhatIf) [void][IO.Directory]::CreateDirectory($Path) }
+function Assert-OrdinaryPath { param($Path) if(-not [IO.File]::Exists($Path)){throw 'fixture: missing ordinary file'}; return $Path }
+function Expand-ReviewedArchive { param($Archive,$Destination,$Release) [IO.File]::WriteAllText(${quote(marker)},'reached'); throw 'fixture: digest verified before listing' }
+$strNodeRoot=${quote(root)}
+$strCurlPath=if($IsWindows){Join-Path ([Environment]::SystemDirectory) 'curl.exe'}else{'/usr/bin/curl'}
+Assert-CurlCapability -Path $strCurlPath -Windows:$IsWindows
+$message=''
+try { $null=Install-ReviewedRuntime -Role ${quote(role)} -Version ${quote(role === 'recoveryCompatibility' ? '22.23.3' : '24.18.1')} -NpmVersion ${quote(role === 'recoveryCompatibility' ? '10.9.9' : '11.16.0')} -Digest ${quote(digest)} }
+catch { $message=$_.Exception.Message }
+$archive=Join-Path $strNodeRoot (${quote(role)}+$(if($IsWindows){'.zip'}else{'.tar.xz'}))
+[IO.File]::WriteAllText(${quote(resultFile)}, (ConvertTo-Json -InputObject ([ordered]@{command=$strCurlPath; status=$LASTEXITCODE; bytes=$(if([IO.File]::Exists($archive)){(Get-Item -LiteralPath $archive).Length}else{0}); message=$message; listing=[IO.File]::Exists(${quote(marker)})}) -Compress))
+`);
+  const env = { ...process.env, HOME: root, TMPDIR: root, TEMP: root, TMP: root, CURL_HOME: root,
+    NO_PROXY: '127.0.0.1', no_proxy: '127.0.0.1', DOTNET_EnableDiagnostics: '0', POWERSHELL_DIAGNOSTICS_OPTOUT: '1' };
+  for (const name of ['NODE_OPTIONS', 'NODE_PATH', 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
+  const result = await new Promise((resolve, reject) => {
+    const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', scriptFile], { env, windowsHide: true });
+    let stdout = '', stderr = '', failedBound = false;
+    const timer = setTimeout(() => { failedBound = true; child.kill('SIGKILL'); }, 25000);
+    child.stdout.on('data', bytes => { stdout += bytes; if(Buffer.byteLength(stdout) + Buffer.byteLength(stderr) > 1048576) { failedBound = true; child.kill('SIGKILL'); } });
+    child.stderr.on('data', bytes => { stderr += bytes; if(Buffer.byteLength(stdout) + Buffer.byteLength(stderr) > 1048576) { failedBound = true; child.kill('SIGKILL'); } });
+    child.on('error', error => { clearTimeout(timer); reject(error); });
+    child.on('close', (status, signal) => { clearTimeout(timer); resolve({ stdout, stderr, status, signal, failedBound }); });
+  });
+  assert.equal(result.failedBound, false, 'FQ40 watchdog/output cap is always failure.');
+  assertCompletedProcess(result, 'FQ40 actual download boundary'); assert.equal(result.status, 0, result.stdout + result.stderr);
+  const raw = fs.readFileSync(resultFile); assert.ok(raw.length > 0 && raw.length <= 4096);
+  const observed = JSON.parse(raw);
+  assert.deepEqual(Object.keys(observed), ['command', 'status', 'bytes', 'message', 'listing']);
+  const expectedCommand = process.platform === 'win32'
+    ? path.join(process.env.SystemRoot, 'System32/curl.exe').replaceAll('/', '\\')
+    : '/usr/bin/curl';
+  if (process.platform === 'win32') {
+    assert.equal(observed.command.toLowerCase(), expectedCommand.toLowerCase());
+    const actualFile = fs.lstatSync(observed.command, { bigint: true });
+    const expectedFile = fs.lstatSync(expectedCommand, { bigint: true });
+    assert.equal(actualFile.isFile() && expectedFile.isFile(), true);
+    assert.equal(actualFile.dev, expectedFile.dev);
+    assert.ok(actualFile.ino > 0n);
+    assert.equal(actualFile.ino, expectedFile.ino);
+  } else assert.equal(observed.command, expectedCommand);
+  assert.equal(Number.isInteger(observed.status), true); assert.equal(Number.isInteger(observed.bytes), true);
+  assert.deepEqual(requests, ['/archive'], 'No default curlrc URL or automatic repeat is allowed.');
+  return { observed, cap, length };
+}
+function fq40NativeOracle(cell, framing, exceeds) {
+  const { observed, cap, length } = cell;
+  const expected = exceeds ? 63 : framing === 'partial' ? 18 : 0;
+  assert.equal(observed.status, expected, 'Actual curl native filesize/partial/success code must match.');
+  assert.ok(observed.bytes <= cap, 'Actual output must never exceed the admitted compressed cap.');
+  if (exceeds) { assert.match(observed.message, /Runtime download failed: 63/u); assert.equal(observed.listing, false); }
+  else if (framing === 'partial') { assert.match(observed.message, /Runtime download failed: 18/u); assert.equal(observed.listing, false); }
+  else if (framing === 'lying-low') { assert.equal(observed.bytes, 4); assert.match(observed.message, /archive digest is incorrect/u); assert.equal(observed.listing, false); }
+  else { assert.equal(observed.bytes, length); assert.equal(observed.listing, true, 'Only complete matching bytes may reach the isolated listing boundary.'); }
+}
+for (const framing of ['known', 'close', 'chunked']) for (const delta of [-1, 0, 1]) {
+  test(`FQ40 actual compressed-byte boundary: ${framing}/${delta}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    for (const role of linux ? ['preferred', 'recoveryCompatibility'] : ['preferred']) {
+      fq40NativeOracle(await fq40NativeBoundary(t, framing, 8192 + delta, '', false, role), framing, delta > 0);
+    }
+  });
+}
+for (const framing of ['lying-low', 'lying-high', 'partial']) {
+  test(`FQ40 actual compressed-byte framing refusal: ${framing}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    fq40NativeOracle(await fq40NativeBoundary(t, framing, framing === 'lying-low' ? 65536 : 16), framing, framing === 'lying-high');
+  });
+}
+test('FQ40 chunked body with misleading Content-Length remains bounded', { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+  const { observed, cap } = await fq40NativeBoundary(t, 'chunked-misleading-length', 8193);
+  assert.ok([8, 63].includes(observed.status), 'Require a completed curl framing or filesize refusal, not a transport failure.');
+  assert.ok(observed.bytes >= 0 && observed.bytes <= cap);
+  assert.match(observed.message, /^Runtime download failed: (?:8|63) \(preferred\/(?:win|linux)-x64\)$/u);
+  assert.equal(observed.listing, false, 'Mixed framing must not reach archive listing.');
+});
+test('FQ40 production compressed-byte cap refuses a declared oversized response', { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+  fq40NativeOracle(await fq40NativeBoundary(t, 'known', 1, '', true), 'known', true);
+});
+for (const mutation of ['removed-flag', 'zero-flag', 'raised-cap']) {
+  test(`FQ40 compressed-byte mutation witness: ${mutation}`, { skip: !linux && process.platform !== 'win32', timeout: 90000 }, async t => {
+    const good = await fq40NativeBoundary(t, 'chunked', 8193); fq40NativeOracle(good, 'chunked', true);
+    const bad = await fq40NativeBoundary(t, 'chunked', 8193, mutation);
+    assert.equal(bad.observed.status, 0, 'Weak native bound must complete as actual curl0, not a watchdog/native63.');
+    assert.equal(bad.observed.bytes, 8193);
+    assert.throws(() => fq40NativeOracle(bad, 'chunked', true), assert.AssertionError);
   });
 }

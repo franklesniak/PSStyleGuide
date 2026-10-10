@@ -16,19 +16,20 @@ const contract = readContract();
 await loadYamlBindings(contract);
 const clone = value => structuredClone(value);
 const step = (id, run) => ({ id, shell: 'pwsh', run });
+const clearNodeOptions = 'Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false';
 const codeJob = final => ({
   if: "github.event_name != 'push' || github.event.deleted != true",
   'runs-on': 'ubuntu-24.04', 'timeout-minutes': 30, permissions: {},
   steps: [step('acquire', "Write-Output 'bootstrap fixture'"),
     step('verify-checkout-credentials', './.github/workflows/Test-CheckoutCredentials.ps1'),
     ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies')]), final,
-    ...(final.id === 'lint' ? [step('audit', "& node ./.github/workflows/Check-NpmAudit.mjs --ci\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
+    ...(final.id === 'lint' ? [step('audit', clearNodeOptions + "\n& node ./.github/workflows/Check-NpmAudit.mjs --ci\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
 });
 const common = { name: 'Fixture', on: { push: null, pull_request: null }, permissions: {} };
 const fixtures = {
   'build.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'build.yml')), LIMITS).value,
   'markdownlint.yml': { ...clone(common), on: { ...clone(common.on), schedule: [{ cron: '17 6 * * 1' }] }, jobs: {
-    policy: codeJob(step('validate', "& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
+    policy: codeJob(step('validate', clearNodeOptions + "\n& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
     markdownlint: codeJob(step('lint', './.github/workflows/Invoke-MarkdownLint.ps1')),
   } },
 };
@@ -36,6 +37,21 @@ const fixtures = {
 test('valid small workflow interfaces; build requires no Node installation', () => {
   for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);
   assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 4);
+});
+
+test('FQ37 direct Node steps require exact sanitation and retain fixed command checks', () => {
+  const mutations = [run => run.replace(clearNodeOptions + '\n', ''),
+    run => run.replace(' -Confirm:$false', ''), run => run.replace(' -WhatIf:$false', ''),
+    run => run.replace(clearNodeOptions, clearNodeOptions + '; Write-Output injected'),
+    run => run.replace('& node ', '& node --inspect '), run => run.split('\n').slice(0, -1).join('\n')];
+  for (const [jobName, stepId] of [['policy', 'validate'], ['markdownlint', 'audit']]) {
+    for (const mutate of mutations) {
+      const value = clone(fixtures['markdownlint.yml']);
+      const candidate = value.jobs[jobName].steps.find(item => item.id === stepId);
+      candidate.run = mutate(candidate.run);
+      assert.throws(() => validateWorkflowObject('markdownlint.yml', value, contract), error => error.category === 'helper-call');
+    }
+  }
 });
 
 test('platform role mutations cannot supply their own policy expectations', () => {

@@ -472,15 +472,17 @@ function validateRunStep(step, id, expected) {
     return;
   }
   if (id === 'validate') {
-    if (lines.length !== 2) fail('helper-call');
-    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Validate-WorkflowPolicy.mjs', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml'], 'helper-call');
-    if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])Workflow policy validation failed\.\1\s*;?\s*\}$/u.test(lines[1])) fail('native-failure-check');
+    if (lines.length !== 3) fail('helper-call');
+    if (lines[0] !== 'Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false') fail('helper-call');
+    expectDeepEqual(helperCall(lines[1].replace(/;$/u, '')), ['node', './.github/workflows/Validate-WorkflowPolicy.mjs', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml'], 'helper-call');
+    if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])Workflow policy validation failed\.\1\s*;?\s*\}$/u.test(lines[2])) fail('native-failure-check');
     return;
   }
   if (id === 'audit') {
-    if (lines.length !== 2) fail('helper-call');
-    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs', '--ci'], 'helper-call');
-    if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])[A-Za-z0-9 .:-]+\1\s*;?\s*\}$/u.test(lines[1])) fail('native-failure-check');
+    if (lines.length !== 3) fail('helper-call');
+    if (lines[0] !== 'Remove-Item Env:NODE_OPTIONS -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false') fail('helper-call');
+    expectDeepEqual(helperCall(lines[1].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs', '--ci'], 'helper-call');
+    if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])[A-Za-z0-9 .:-]+\1\s*;?\s*\}$/u.test(lines[2])) fail('native-failure-check');
     return;
   }
   if (lines.length !== 1) fail('helper-call');

@@ -1,3 +1,12 @@
 {
-  "linuxX64Sha256": "d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0"
+  "schemaVersion": 2,
+  "preferred": {
+    "linuxX64Sha256": "d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0",
+    "windowsX64Sha256": "ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765"
+  },
+  "recoveryCompatibility": {
+    "node": "22.23.3",
+    "npm": "10.9.9",
+    "linuxX64Sha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de"
+  }
 }
