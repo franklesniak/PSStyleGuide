@@ -3,7 +3,7 @@
 # Verifies that the anonymous checkout retained no credentials.
 #
 # .DESCRIPTION
-# Requires PowerShell 7.3 or later for the retained helper APIs. Callers must omit GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR, GIT_ASKPASS and SSH_ASKPASS, including empty values. Rejects any effective core.askPass key, including empty, included and worktree configuration. Remove these variables and unset the key in its supplying configuration before retrying. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no local helper or persisted HTTP authorization, and no effective external configuration. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
+# Requires PowerShell 7.3 or later for the retained helper APIs. Callers must omit GIT_DIR, GIT_WORK_TREE, GIT_COMMON_DIR, GIT_CONFIG, GIT_ASKPASS and SSH_ASKPASS, including empty values. Rejects any effective core.askPass key, including empty, included and worktree configuration. Remove these variables and unset the key in its supplying configuration before retrying. Rejects projected tokens and external command configuration. Excludes user/system Git configuration and prompts. Uses resolved Git to require exactly one expected credential-free origin, no effective credential helper or HTTP extra-header key, and no effective external configuration. Reads only NUL-framed scope/key pairs, including active includes and worktree configuration. Key values are not requested. Malformed framing and unknown scopes throw. Windows requires exactly PowerShell 7.6.5, the reviewed native x64 host, Git version, trusted ACLs, and private empty configuration outside the checkout. Refusals and unexpected native statuses throw. Failed Windows cleanup deletes only proved private configuration or warns and retains uncertain staging. Changes this process Git environment and native error-mapping preference.
 #
 # .EXAMPLE
 # & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
@@ -24,7 +24,7 @@
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
 # The workflow must initialize the required host, checkout, and runner environment.
-# Version: 1.0.20261009.0
+# Version: 1.0.20261010.0
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param()
@@ -253,6 +253,10 @@ foreach ($strRepositorySelector in @('GIT_DIR', 'GIT_WORK_TREE', 'GIT_COMMON_DIR
     }
 }
 
+if (Test-Path -LiteralPath 'Env:GIT_CONFIG') {
+    throw 'credential-policy: GIT_CONFIG is not allowed'
+}
+
 foreach ($strAskPassSelector in @('GIT_ASKPASS', 'SSH_ASKPASS')) {
     if (Test-Path -LiteralPath ('Env:' + $strAskPassSelector)) {
         throw 'credential-policy: askpass environment variables are not allowed'
@@ -274,11 +278,8 @@ if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
     -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
     throw 'credential-policy: a token was projected into a code job'
 }
-# git config exits 1 when a queried key is absent, which is the secure
-# expected state this step asserts. If the runner enables native-command
-# error mapping, that accepted status would terminate the step before the
-# explicit capture below runs, so it is disabled the same way
-# markdownlint.yml disables it.
+# Capture every native status explicitly. Unexpected query statuses must reach
+# the fixed credential-policy refusal instead of native error mapping.
 if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
     $PSNativeCommandUseErrorActionPreference = $false
 }
@@ -346,30 +347,47 @@ try {
     if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
         throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'
     }
-    $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)
-    $intHelperExit = $LASTEXITCODE
-    $global:LASTEXITCODE = 0
-    if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {
-        throw 'credential-policy: a local credential helper is configured'
+    $arrEffectiveConfiguration = @(& $strGitPath config --null --includes --show-scope --name-only --list 2>$null)
+    $intEffectiveConfigurationExit = $LASTEXITCODE
+    if ($intEffectiveConfigurationExit -ne 0) {
+        throw 'credential-policy: effective Git configuration could not be read'
     }
-    $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\..*\.extraheader$')
-    $intAuthorizationExit = $LASTEXITCODE
-    $global:LASTEXITCODE = 0
-    if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {
-        throw 'credential-policy: persisted HTTP authorization is configured'
+    # Native output capture splits line endings. Rejoin before parsing NUL
+    # framing; line-like text inside a subsection must never become a record.
+    $strEffectiveConfiguration = $arrEffectiveConfiguration -join "`n"
+    if ([string]::IsNullOrEmpty($strEffectiveConfiguration) -or -not $strEffectiveConfiguration.EndsWith([string][char]0, [StringComparison]::Ordinal)) {
+        throw 'credential-policy: effective Git configuration framing is invalid'
     }
-
-    $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)
-    $intEffectiveConfigExit = $LASTEXITCODE
-    if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object {
-        $_ -cmatch '^(system|global)\s'
-    }).Count -ne 0) {
-        throw 'credential-policy: external Git configuration was not excluded'
+    $arrConfigurationFields = $strEffectiveConfiguration.Split([char]0)
+    if (($arrConfigurationFields.Count - 1) % 2 -ne 0) {
+        throw 'credential-policy: effective Git configuration framing is invalid'
     }
-    if (@($arrEffectiveConfig | Where-Object {
-        $_ -match '\A\S+[ \t]+core\.askpass\z'
-    }).Count -ne 0) {
-        throw 'credential-policy: effective core.askPass is not allowed'
+    for ($intConfigurationField = 0; $intConfigurationField -lt $arrConfigurationFields.Count - 1; $intConfigurationField += 2) {
+        $strConfigurationScope = $arrConfigurationFields[$intConfigurationField]
+        $strConfigurationKey = $arrConfigurationFields[$intConfigurationField + 1]
+        if ($strConfigurationScope -cnotin @('system', 'global', 'local', 'worktree', 'command') -or
+            [string]::IsNullOrEmpty($strConfigurationKey)) {
+            throw 'credential-policy: effective Git configuration framing is invalid'
+        }
+        if ($strConfigurationScope -cin @('system', 'global')) {
+            throw 'credential-policy: external Git configuration was not excluded'
+        }
+        if ([string]::Equals($strConfigurationKey, 'core.askpass', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'credential-policy: effective core.askPass is not allowed'
+        }
+        $intFirstSeparator = $strConfigurationKey.IndexOf('.')
+        $intLastSeparator = $strConfigurationKey.LastIndexOf('.')
+        if ($intFirstSeparator -le 0 -or $intLastSeparator -eq $strConfigurationKey.Length - 1) {
+            throw 'credential-policy: effective Git configuration framing is invalid'
+        }
+        $strConfigurationSection = $strConfigurationKey.Substring(0, $intFirstSeparator)
+        $strConfigurationVariable = $strConfigurationKey.Substring($intLastSeparator + 1)
+        if ([string]::Equals($strConfigurationSection, 'credential', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'helper', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'credential-policy: effective credential helpers are not allowed'
+        }
+        if ([string]::Equals($strConfigurationSection, 'http', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'extraheader', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'credential-policy: effective HTTP extra headers are not allowed'
+        }
     }
     $boolCredentialSuccess = $true
 } finally {

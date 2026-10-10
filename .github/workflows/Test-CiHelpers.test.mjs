@@ -566,10 +566,18 @@ for (const [mode, status] of [['', 0], ['module-failure', 7]]) {
   });
 }
 
+// Match the runner's direct-child command-file layout without creating the files.
+function runnerChannelFiles(root) {
+  const directory = path.join(root, '_runner_file_commands');
+  fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
+  return { path: path.join(directory, 'path'), env: path.join(directory, 'env') };
+}
+
 function fixture(t, workDirectoryName = 'work') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-ci-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const work = path.join(root, workDirectoryName); fs.mkdirSync(work);
+  const channels = runnerChannelFiles(root);
   const log = path.join(root, 'calls');
   const git = path.join(root, 'git');
   fs.writeFileSync(git, `#!${process.execPath}
@@ -591,6 +599,7 @@ if (args.includes('rev-parse')) {
 }
 if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/PSStyleGuide');
 if (args.includes('config') && (args.includes('--get-all') || args.includes('--get-regexp'))) process.exit(1);
+if (args.includes('config') && args.includes('--null') && args.includes('--list')) process.stdout.write('local\\0core.repositoryformatversion\\0');
 `, { mode: 0o700 });
   function run(source, env = {}) {
     const script = path.join(root, 'case.ps1');
@@ -599,11 +608,11 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
     const environment = { ...process.env, GITHUB_SERVER_URL: 'https://github.com',
       GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,
       TEST_REVISION: head, TEST_LOG: log, TEST_MODE: '', RUNNER_TEMP: root,
-      GITHUB_PATH: path.join(root, 'path'), GITHUB_ENV: path.join(root, 'env'), ...env };
+      GITHUB_PATH: channels.path, GITHUB_ENV: channels.env, ...env };
     // Explicit undefined overrides delete only named keys from this private child map.
     for (const [name, value] of Object.entries(env)) if (value === undefined) delete environment[name];
     for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
-      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) {
+      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG']) {
       if (!Object.hasOwn(env, name)) delete environment[name];
     }
     if (source.includes('Initialize-CiToolchain.ps1')) for (const name of ['GITHUB_PATH', 'GITHUB_ENV']) {
@@ -614,7 +623,7 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
     }), `PowerShell fixture ${script}`);
   }
   const calls = () => fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
-  return { root, work, git, log, run, calls };
+  return { root, work, git, log, channels, run, calls };
 }
 
 for (const [file, job] of [['build.yml', artifactVerifier],
@@ -1544,8 +1553,8 @@ for (const setupWorkflowName of ['copilot-setup-steps.yml', 'copilot-code-review
       if (mode === 'version-failure') assert.match(result.stderr, /version command exited 29/);
       if (['version-empty', 'version-multiline'].includes(mode)) assert.match(result.stderr, /exactly one line/);
       if (mode === 'version-wrong') assert.match(result.stderr, /identity is wrong/);
-      if (mode) assert.equal(fs.existsSync(path.join(f.root, 'path')), false);
-      else assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
+      if (mode) assert.equal(fs.existsSync(f.channels.path), false);
+      else assert.equal(fs.readFileSync(f.channels.path, 'utf8'), `${path.join(f.root, 'agent-validation-node/bin')}\n`);
     });
   }
 
@@ -2708,8 +2717,8 @@ function assertOrdinaryFailureCleanup(f) {
   assert.equal(f.result.error, undefined);
   assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
   assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false, f.result.stdout + f.result.stderr);
-  assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), '');
-  assert.equal(fs.readFileSync(path.join(f.root, 'env'), 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
 }
 
 function assertNoOrdinaryDispatch(f) {
@@ -3001,8 +3010,8 @@ function assertRetainedCleanup(f, mode) {
   assert.match(f.result.stderr, /Runtime download failed: 99/u);
   assert.match(f.result.stdout, /Runtime cleanup could not prove completion/u);
   assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), true);
-  assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), '');
-  assert.equal(fs.readFileSync(path.join(f.root, 'env'), 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
   assert.equal(fs.readFileSync(path.join(f.root, 'outside/sentinel'), 'utf8'), 'outside must survive');
   if (mode === 'directory-replace') {
     assert.equal(fs.readFileSync(path.join(f.root, 'styleguide-node/replacement-sentinel'), 'utf8'), 'replacement must survive');
@@ -3077,15 +3086,15 @@ test('F6 missing Linux identity export stops before curl and retains uncertain s
   const original = read('Initialize-CiToolchain.ps1'), anchor = 'NativeLibrary.GetExport(module, "GetInodeData")';
   assert.equal(original.split(anchor).length, 2);
   const f = ordinaryDeclarationFixture(t, JSON.stringify(runtimePin('a'.repeat(64))),
-    original.replace(anchor, 'NativeLibrary.GetExport(module, "F6MissingExport")'));
+    original.replace(anchor, 'NativeLibrary.GetExport(module, path.EndsWith("styleguide-node", StringComparison.Ordinal) ? "F6MissingExport" : "GetInodeData")'));
   assert.equal(f.result.error, undefined);
   assert.notEqual(f.result.status, 0);
   assert.deepEqual(f.dispatches, []);
   assert.match(f.result.stderr, /F6MissingExport/u);
   assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), true);
   assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node/.owner')), false);
-  assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), '');
-  assert.equal(fs.readFileSync(path.join(f.root, 'env'), 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
 });
 
 test('F6 native object identity survives writes and distinguishes copied replacements', {
@@ -3196,7 +3205,7 @@ try {
     }
     assert.equal(read(helper), helperSource, `${helper}: source must remain unchanged`);
   }
-  const channels = ['path', 'env'].map(channel => path.join(f.root, channel));
+  const channels = ['path', 'env'].map(channel => f.channels[channel]);
   for (const channel of channels) {
     assert.equal(fs.existsSync(channel), false, 'The helper controls begin with unpublished channels.');
     fs.writeFileSync(channel, '', { flag: 'wx' });
@@ -3314,8 +3323,8 @@ process.exit(result.status ?? 97);
     fs.writeFileSync(tar, `#!/bin/sh\nprintf listed > '${f.root}/tar-marker'\nexit 23\n`, { mode: 0o700 });
     const initializer = path.join(workflows, 'Initialize-CiToolchain.ps1');
     fs.writeFileSync(initializer, read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar));
-    for (const channel of ['path', 'env']) fs.writeFileSync(path.join(f.root, channel), '');
-    const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: path.join(f.root, 'path'), GITHUB_ENV: path.join(f.root, 'env'),
+    for (const channel of ['path', 'env']) fs.writeFileSync(f.channels[channel], '');
+    const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env,
       CURL_HOME: f.root, TEST_LOG: f.log, TEST_MODE: '' };
     for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
     const started = performance.now();
@@ -3412,7 +3421,7 @@ fs.copyFileSync(archives[role],args[args.indexOf('--output')+1]);
     assert.equal(fs.readFileSync(path.join(f.root, 'outside-sentinel'), 'utf8'), 'unchanged');
     const calls = f.calls();
     assert.equal(calls.some(row => row[0] === 'recoveryCompatibility' && row.includes('ci')), false);
-    const environment = fs.readFileSync(path.join(f.root, 'env'), 'utf8'), publishedPath = fs.readFileSync(path.join(f.root, 'path'), 'utf8');
+    const environment = fs.readFileSync(f.channels.env, 'utf8'), publishedPath = fs.readFileSync(f.channels.path, 'utf8');
     if (mode === 'success') {
       const compatibility = environment.split('\n').find(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22='));
       assert.equal(compatibility, `STYLEGUIDE_RECOVERY_NODE22=${path.join(f.root, 'styleguide-node/recoveryCompatibility/node-v22.23.3-linux-x64/bin/node')}`);
@@ -3453,8 +3462,12 @@ if ($IsWindows) {
     }
 }
 if ($args -contains 'get-url') { 'https://github.com/franklesniak/PSStyleGuide' }
-elseif ($args -contains '--get-all' -or $args -contains '--get-regexp') { $global:LASTEXITCODE = 1 }
-elseif ($args -notcontains '--list') { throw 'R3 unexpected Git dispatch' }
+elseif ($args -contains '--list' -and $args -contains '--null' -and $args -contains '--includes') {
+    if (Test-Path Env:FQ47_QUERY_FILE) { [IO.File]::ReadAllText($env:FQ47_QUERY_FILE) }
+    else { 'local' + [char]0 + 'core.repositoryformatversion' + [char]0 }
+    if ($env:FQ47_QUERY_FAILURE -eq '1') { $global:LASTEXITCODE = 27 }
+}
+else { throw 'R3 unexpected Git dispatch' }
 `);
   let source = read('Test-CheckoutCredentials.ps1');
   if (!nativeGit) {
@@ -3467,14 +3480,14 @@ elseif ($args -notcontains '--list') { throw 'R3 unexpected Git dispatch' }
   fs.writeFileSync(script, source);
   function run(overrides = {}, target = script, cwd = f.work) {
     const env = { ...process.env, RUNNER_TEMP: f.root, TEST_LOG: f.log,
-      GITHUB_PATH: path.join(f.root, 'path'), GITHUB_ENV: path.join(f.root, 'env') };
+      GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env };
     const removed = [...r3GitSelectors, ...fq45AskpassNames, 'GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
-      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL'];
+      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG'];
     const canonical = name => process.platform === 'win32' ? name.toUpperCase() : name;
     for (const key of Object.keys(env)) if (removed.includes(canonical(key))) delete env[key];
     Object.assign(env, overrides);
     const expected = new Map(Object.entries(overrides).map(([name, value]) => [canonical(name), value]));
-    const checks = [...new Set([...r3GitSelectors, ...fq45AskpassNames, ...Object.keys(overrides)])].map(name => {
+    const checks = [...new Set([...r3GitSelectors, ...fq45AskpassNames, 'GIT_CONFIG', ...Object.keys(overrides)])].map(name => {
       const present = expected.has(canonical(name));
       return `$arrNames = @([Environment]::GetEnvironmentVariables().Keys | Where-Object {
     [string]::Equals([string]$_, ${quote(name)}, ${process.platform === 'win32' ? '[StringComparison]::OrdinalIgnoreCase' : '[StringComparison]::Ordinal'})
@@ -3531,7 +3544,7 @@ test('R3 credential selectors: native platform name casing', { skip: !linux && p
     else {
       assert.equal(result.status, 0, result.stdout + result.stderr);
       assert.match(result.stdout, /R3 helper completed/u);
-      assert.equal(f.calls().length, 4, 'Linux lowercase names are unrelated to the uppercase Git selectors');
+      assert.equal(f.calls().length, 2, 'Linux lowercase names are unrelated to the uppercase Git selectors');
     }
   }
 });
@@ -3548,7 +3561,7 @@ test('R3 credential selectors: each guard-name removal reaches Git', { skip: !li
     const result = f.run({ [name]: 'r3-selector-private-value' });
     assert.equal(result.status, 0, result.stdout + result.stderr);
     assert.match(result.stdout, /R3 helper completed/u);
-    assert.equal(f.calls().length, process.platform === 'win32' ? 5 : 4);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 3 : 2);
     assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
   }
 });
@@ -3601,7 +3614,7 @@ test('FQ45 credential askpass: native platform name casing', { skip: !linux && p
     else {
       assert.equal(result.status, 0, result.stdout + result.stderr);
       assert.match(result.stdout, /R3 helper completed/u);
-      assert.equal(f.calls().length, 4, 'Linux mixed-case names are unrelated to Git askpass environment names');
+      assert.equal(f.calls().length, 2, 'Linux mixed-case names are unrelated to Git askpass environment names');
     }
     assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
   }
@@ -3619,7 +3632,7 @@ test('FQ45 credential askpass: each guard-name removal defeats the refusal oracl
     const result = f.run({ [name]: 'fq45-private-askpass-value' });
     assert.equal(result.status, 0, result.stdout + result.stderr);
     assert.match(result.stdout, /R3 helper completed/u);
-    assert.equal(f.calls().length, process.platform === 'win32' ? 5 : 4);
+    assert.equal(f.calls().length, process.platform === 'win32' ? 3 : 2);
     assert.equal(f.calls().some(args => args.includes('--show-scope')), true);
     assert.throws(() => assertFq45AskpassRefusal(f, result), assert.AssertionError,
       'The actual-helper refusal oracle must reject each weakened guard');
@@ -3627,11 +3640,9 @@ test('FQ45 credential askpass: each guard-name removal defeats the refusal oracl
 });
 
 test('FQ45 credential askpass: effective real Git config and guard-removal control', { skip: !linux && process.platform !== 'win32' }, t => {
-  const guard = String.raw`    if (@($arrEffectiveConfig | Where-Object {
-        $_ -match '\A\S+[ \t]+core\.askpass\z'
-    }).Count -ne 0) {
-        throw 'credential-policy: effective core.askPass is not allowed'
-    }
+  const guard = String.raw`        if ([string]::Equals($strConfigurationKey, 'core.askpass', [StringComparison]::OrdinalIgnoreCase)) {
+            throw 'credential-policy: effective core.askPass is not allowed'
+        }
 `;
   // Similar keys are permitted; the guard matches the effective key, not a prefix.
   const positive = r3NativeCredentialRepository(t);
@@ -3675,7 +3686,7 @@ test('FQ45 credential askpass: effective real Git config and guard-removal contr
     assertRefusal(f.run({}, f.script, cwd));
     assert.equal(f.source.split(guard).length, 2, 'The effective-key guard must occur exactly once');
     const mutant = f.source.replace(guard, '');
-    assert.equal(mutant.replace('    $boolCredentialSuccess = $true', guard + '    $boolCredentialSuccess = $true'), f.source,
+    assert.equal(mutant.replace("        $intFirstSeparator = $strConfigurationKey.IndexOf('.')", guard + "        $intFirstSeparator = $strConfigurationKey.IndexOf('.')"), f.source,
       'The config mutant removes only the effective-key refusal');
     const mutantPath = path.join(f.scripts, 'fq45-core-mutant.ps1'); fs.writeFileSync(mutantPath, mutant);
     const result = f.run({}, mutantPath, cwd);
@@ -3686,20 +3697,69 @@ test('FQ45 credential askpass: effective real Git config and guard-removal contr
   }
 });
 
+const fq47Supported = linux || process.platform === 'win32';
+const fq47HelperDiagnostic = 'credential-policy: effective credential helpers are not allowed';
+const fq47HeaderDiagnostic = 'credential-policy: effective HTTP extra headers are not allowed';
+const fq47SelectorDiagnostic = 'credential-policy: GIT_CONFIG is not allowed';
+const fq47Forms = [
+  { section: 'credential', variable: 'helper', diagnostic: fq47HelperDiagnostic },
+  { section: 'credential "https://fq47.invalid/private-context"', variable: 'helper', diagnostic: fq47HelperDiagnostic },
+  { section: 'http', variable: 'extraHeader', diagnostic: fq47HeaderDiagnostic },
+  { section: 'http "https://fq47.invalid/private-context"', variable: 'extraHeader', diagnostic: fq47HeaderDiagnostic },
+];
+function fq47Configure(f, setting, scope = 'local') {
+  const local = path.join(f.metadata, 'config');
+  if (scope === 'local') fs.writeFileSync(local, f.baseConfig + setting);
+  else if (scope === 'included') {
+    fs.writeFileSync(path.join(f.metadata, 'fq47.config'), setting);
+    fs.writeFileSync(local, f.baseConfig + '[include]\npath = fq47.config\n');
+  } else {
+    assert.equal(scope, 'worktree');
+    fs.writeFileSync(path.join(f.admin, 'config.worktree'), setting);
+    fs.writeFileSync(local, f.baseConfig.replace('repositoryformatversion = 0', 'repositoryformatversion = 1')
+      + '[extensions]\nworktreeConfig = true\n');
+  }
+  return scope === 'worktree' ? f.linked : f.work;
+}
+function assertFq47Refusal(f, result, diagnostic) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  const message = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+  assert.ok(message.includes(diagnostic), message);
+  assert.doesNotMatch(result.stdout, /R3 helper completed/u);
+  for (const secret of ['fq47-private-value', 'fq47.invalid/private-context', 'fq47-private-row']) {
+    assert.equal((result.stdout + result.stderr).includes(secret), false, 'No config values, keys or raw rows in diagnostics');
+  }
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+}
+function fq47Mutant(f, oldText, newText) {
+  assert.equal(f.source.split(oldText).length, 2, 'One actual source anchor');
+  const offset = f.source.indexOf(oldText);
+  const source = f.source.replace(oldText, newText);
+  assert.equal(source.slice(0, offset) + oldText + source.slice(offset + newText.length), f.source,
+    'One reversible source mutation at the selected span');
+  const target = path.join(f.scripts, 'fq47-mutant.ps1'); fs.writeFileSync(target, source);
+  return target;
+}
+
 for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) {
-  for (const family of ['R3 credential selectors', 'FQ45 credential askpass']) {
+  for (const family of ['R3 credential selectors', 'FQ45 credential askpass', 'FQ47 effective credentials']) {
     test(`${family}: real helper refuses through ${caller}`, { skip: !linux && process.platform !== 'win32' }, t => {
       const cases = family === 'R3 credential selectors' ? [{ GIT_COMMON_DIR: 'r3-selector-private-value' }]
-        : [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
+        : family === 'FQ47 effective credentials' ? [{}, {}] : [1, 2, 3].map(mask => Object.fromEntries(fq45AskpassNames.filter((_, index) => mask & (1 << index))
           .map(name => [name, 'fq45-private-askpass-value'])));
-      for (const env of cases) {
-        const f = r3CredentialFixture(t), curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
+      for (const [caseIndex, env] of cases.entries()) {
+        const f = family === 'FQ47 effective credentials' ? r3NativeCredentialRepository(t) : r3CredentialFixture(t);
+        const cwd = family === 'FQ47 effective credentials'
+          ? fq47Configure(f, caseIndex === 0 ? '[credential]\nhelper = fq47-private-value\n' : '[http]\nextraHeader = fq47-private-value\n',
+            caseIndex === 0 ? 'included' : 'worktree') : f.work;
+        const curlLog = path.join(f.root, 'curl-calls'), curl = path.join(f.root, 'r3-curl.ps1');
         let source = read(caller);
         const helperCall = '& "$PSScriptRoot/Test-CheckoutCredentials.ps1"';
         assert.equal(source.split(helperCall).length, 2, 'The real credential helper call must remain exactly once');
         fs.writeFileSync(path.join(f.work, 'package.json'), fs.readFileSync(path.join(directory, '../../package.json')));
         fs.writeFileSync(path.join(f.scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
-        for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
+        for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
         fs.writeFileSync(curl, `
     [IO.File]::AppendAllText(${quote(curlLog)}, ((ConvertTo-Json -InputObject @($args) -Compress) + [Environment]::NewLine))
     $global:LASTEXITCODE = 0
@@ -3719,18 +3779,146 @@ for (const caller of ['Initialize-CiToolchain.ps1', 'Invoke-MarkdownLint.ps1']) 
           }
         }
         const target = path.join(f.scripts, caller); fs.writeFileSync(target, source);
-        const result = f.run(env, target);
+        const result = f.run(env, target, cwd);
         if (family === 'R3 credential selectors') assertR3SelectorRefusal(f, result);
-        else assertFq45AskpassRefusal(f, result);
+        else if (family === 'FQ45 credential askpass') assertFq45AskpassRefusal(f, result);
+        else assertFq47Refusal(f, result, caseIndex === 0 ? fq47HelperDiagnostic : fq47HeaderDiagnostic);
         assert.equal((result.stdout + result.stderr).includes('fq45-private-askpass-value'), false);
         const curlCalls = fs.existsSync(curlLog) ? fs.readFileSync(curlLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
         assert.deepEqual(curlCalls, caller === 'Initialize-CiToolchain.ps1' && process.platform === 'win32'
           ? [['--disable', '--version'], ['--disable', '--help', 'all']] : []);
-        for (const name of ['path', 'env']) assert.equal(fs.readFileSync(path.join(f.root, name), 'utf8'), '');
+        for (const name of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[name], 'utf8'), '');
       }
     });
   }
 }
+
+test('FQ47 effective credentials: real Git generic and URL keys across three sources', { skip: !fq47Supported }, t => {
+  for (const form of fq47Forms) for (const scope of ['local', 'included', 'worktree']) for (const value of ['', 'fq47-private-value']) {
+    const f = r3NativeCredentialRepository(t);
+    const cwd = fq47Configure(f, `[${form.section}]\n${form.variable} = ${value}\n`, scope);
+    const files = [path.join(f.metadata, 'config'), ...(scope === 'included' ? [path.join(f.metadata, 'fq47.config')] : []),
+      ...(scope === 'worktree' ? [path.join(f.admin, 'config.worktree')] : [])];
+    const before = files.map(file => fs.readFileSync(file));
+    assertFq47Refusal(f, f.run({}, f.script, cwd), form.diagnostic);
+    assert.deepEqual(f.calls(), [], 'The rejection uses qualified real Git');
+    files.forEach((file, index) => assert.deepEqual(fs.readFileSync(file), before[index]));
+    // One representative per form makes omission of either generic or URL keys causal.
+    if (scope === 'local' && value !== '') {
+      const old = form.diagnostic === fq47HelperDiagnostic
+        ? "[string]::Equals($strConfigurationSection, 'credential', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'helper', [StringComparison]::OrdinalIgnoreCase)"
+        : "[string]::Equals($strConfigurationSection, 'http', [StringComparison]::OrdinalIgnoreCase) -and [string]::Equals($strConfigurationVariable, 'extraheader', [StringComparison]::OrdinalIgnoreCase)";
+      const target = fq47Mutant(f, old, "$strConfigurationSection -ieq 'fq47-disabled-family'");
+      const result = f.run({}, target, cwd);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.throws(() => assertFq47Refusal(f, result, form.diagnostic), assert.AssertionError);
+    }
+  }
+});
+
+test('FQ47 effective credentials: includes, worktrees and query mutations', { skip: !fq47Supported }, t => {
+  for (const scope of ['included', 'worktree']) {
+    const f = r3NativeCredentialRepository(t), cwd = fq47Configure(f, '[credential]\nhelper = fq47-private-value\n', scope);
+    assertFq47Refusal(f, f.run({}, f.script, cwd), fq47HelperDiagnostic);
+    const target = scope === 'included' ? fq47Mutant(f, '--null --includes --show-scope', '--null --no-includes --show-scope')
+      : fq47Mutant(f, '--null --includes --show-scope', '--local --null --includes --show-scope');
+    const result = f.run({}, target, cwd);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.throws(() => assertFq47Refusal(f, result, fq47HelperDiagnostic), assert.AssertionError);
+  }
+  for (const mode of ['active', 'inactive', 'nested']) {
+    const f = r3NativeCredentialRepository(t), local = path.join(f.metadata, 'config');
+    fs.writeFileSync(path.join(f.metadata, 'fq47.config'), '[http]\nextraHeader = fq47-private-value\n');
+    if (mode === 'nested') {
+      fs.writeFileSync(path.join(f.metadata, 'outer.config'), '[include]\npath = fq47.config\n');
+      fs.writeFileSync(local, f.baseConfig + '[include]\npath = outer.config\n');
+    } else {
+      const condition = mode === 'active' ? f.metadata.replaceAll('\\', '/') : '/fq47-nonexistent-directory/';
+      fs.writeFileSync(local, f.baseConfig + `[includeIf "gitdir:${condition}"]\npath = fq47.config\n`);
+    }
+    const result = f.run();
+    if (mode === 'inactive') assert.equal(result.status, 0, result.stdout + result.stderr);
+    else assertFq47Refusal(f, result, fq47HeaderDiagnostic);
+  }
+});
+
+test('FQ47 effective credentials: case, resets and opaque subsection framing', { skip: !fq47Supported }, t => {
+  const contexts = ['https://fq47.invalid/private-context', 'fq47-private-row\rglobal\tcore.repositoryformatversion',
+    'fq47-private-row\tlocal\tcore.askpass', 'quoted\\"part\\\\tail', 'literal\\n\\tpart'];
+  for (const section of ['CrEdEnTiAl', 'hTtP']) for (const context of contexts) {
+    const f = r3NativeCredentialRepository(t), helper = section.toLowerCase() === 'credential';
+    const variable = helper ? 'hElPeR' : 'eXtRaHeAdEr';
+    fq47Configure(f, `[${section} "${context}"]\n${variable} = fq47-private-value\n${variable} =\n`);
+    assertFq47Refusal(f, f.run(), helper ? fq47HelperDiagnostic : fq47HeaderDiagnostic);
+  }
+  const f = r3NativeCredentialRepository(t);
+  const setting = '[credential]\nhelperExtra = benign\n[http]\nextraHeaderExtra = benign\n'
+    + '[other]\nhelper = benign\nextraHeader = benign\n[credential "fq47-private-row\rglobal\tcore.askpass"]\nhelperExtra = benign\n'
+    + '[http "fq47-private-row\tlocal\tcredential.helper"]\nextraHeaderExtra = benign\n';
+  fq47Configure(f, setting);
+  const positive = f.run(); assert.equal(positive.status, 0, positive.stdout + positive.stderr);
+  const mutantFixture = r3NativeCredentialRepository(t);
+  fq47Configure(mutantFixture, setting);
+  const broad = fq47Mutant(mutantFixture, "[string]::Equals($strConfigurationVariable, 'helper', [StringComparison]::OrdinalIgnoreCase)", "$strConfigurationVariable -ilike 'helper*'");
+  assertFq47Refusal(mutantFixture, mutantFixture.run({}, broad), fq47HelperDiagnostic);
+  const invalid = r3NativeCredentialRepository(t);
+  fq47Configure(invalid, '[credential "fq47-private-row\ninvalid"]\nhelper = fq47-private-value\n');
+  assertFq47Refusal(invalid, invalid.run(), 'credential-policy: unable to resolve exactly one origin URL');
+});
+
+test('FQ47 effective credentials: line truncation loses a real Git subsection refusal', { skip: !fq47Supported }, t => {
+  const f = r3NativeCredentialRepository(t);
+  fq47Configure(f, '[credential "fq47-private-row\rcontinued"]\nhelper = fq47-private-value\n');
+  assertFq47Refusal(f, f.run(), fq47HelperDiagnostic);
+  const target = fq47Mutant(f, '$strConfigurationKey = $arrConfigurationFields[$intConfigurationField + 1]',
+    '$strConfigurationKey = $arrConfigurationFields[$intConfigurationField + 1].Split([char]10)[0]');
+  const result = f.run({}, target);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.throws(() => assertFq47Refusal(f, result, fq47HelperDiagnostic), assert.AssertionError);
+});
+
+test('FQ47 effective credentials: malformed native framing and statuses refuse without disclosure', { skip: !fq47Supported }, t => {
+  const cases = ['', 'local', 'local\0core.repositoryformatversion\0fq47-private-row', 'local\0core.repositoryformatversion', 'local\0', 'local\0core.repositoryformatversion\0worktree\0',
+    '\0credential.helper\0', 'unknown\0fq47-private-row.helper\0', 'local\0\0', 'local\0fq47-private-row\0',
+    'local\0fq47-private-row.\0', 'Local\0core.repositoryformatversion\0'];
+  for (const body of cases) {
+    const f = r3CredentialFixture(t), file = path.join(f.root, 'query-output'); fs.writeFileSync(file, body);
+    assertFq47Refusal(f, f.run({ FQ47_QUERY_FILE: file }), 'credential-policy: effective Git configuration framing is invalid');
+    if (body === 'local\0core.repositoryformatversion\0fq47-private-row') {
+      const target = fq47Mutant(f, '-not $strEffectiveConfiguration.EndsWith([string][char]0, [StringComparison]::Ordinal)', '$false');
+      const result = f.run({ FQ47_QUERY_FILE: file }, target);
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.throws(() => assertFq47Refusal(f, result, 'credential-policy: effective Git configuration framing is invalid'), assert.AssertionError);
+    }
+  }
+  for (const scope of ['global', 'system']) {
+    const f = r3CredentialFixture(t), file = path.join(f.root, 'query-output');
+    fs.writeFileSync(file, `${scope}\0fq47-private-row.key\0`);
+    assertFq47Refusal(f, f.run({ FQ47_QUERY_FILE: file }), 'credential-policy: external Git configuration was not excluded');
+  }
+  const f = r3CredentialFixture(t);
+  assertFq47Refusal(f, f.run({ FQ47_QUERY_FAILURE: '1' }), 'credential-policy: effective Git configuration could not be read');
+});
+
+test('FQ47 effective credentials: config-only selectors refuse before Git with a causal real Git control', { skip: !fq47Supported }, t => {
+  for (const value of ['', 'fq47-private-value']) {
+    const f = r3CredentialFixture(t);
+    assertR3EarlyCredentialRefusal(f, f.run({ GIT_CONFIG: value }), fq47SelectorDiagnostic);
+  }
+  const f = r3NativeCredentialRepository(t);
+  fq47Configure(f, '[credential]\nhelper = fq47-private-value\n', 'included');
+  const alternate = path.join(f.root, 'alternate.config'); fs.writeFileSync(alternate, '');
+  assertR3EarlyCredentialRefusal(f, f.run({ GIT_CONFIG: alternate }), fq47SelectorDiagnostic);
+  assertFq47Refusal(f, f.run(), fq47HelperDiagnostic);
+  // Empty output independently fails framing. A valid benign alternate stream
+  // proves why the selector guard is required even with the framing guard intact.
+  fs.writeFileSync(alternate, '[core]\nrepositoryformatversion = 0\n');
+  const target = fq47Mutant(f, "if (Test-Path -LiteralPath 'Env:GIT_CONFIG')", "if ($false)");
+  const result = f.run({ GIT_CONFIG: alternate }, target);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.throws(() => assertR3EarlyCredentialRefusal(f, result, fq47SelectorDiagnostic), assert.AssertionError);
+  assert.equal(fs.readFileSync(alternate, 'utf8'), '[core]\nrepositoryformatversion = 0\n');
+});
 
 // Windows fixtures must run with TEMP/TMP under the qualified private runner
 // root. An untrusted parent DACL is a real prerequisite failure, not a skip-pass.
@@ -3762,11 +3950,11 @@ if ($objConfig -isnot [IO.FileInfo] -or ($objConfig.Attributes -band [IO.FileAtt
 }
 if ($args -contains 'get-url') {
     if ($env:B1_MODE -eq 'origin') { 'https://github.com/other/repository' } else { 'https://github.com/franklesniak/PSStyleGuide' }
-} elseif ($args -contains '--get-all' -or $args -contains '--get-regexp') {
-    $global:LASTEXITCODE = 1
-    if (($env:B1_MODE -eq 'helper' -and $args -contains '--get-all') -or ($env:B1_MODE -eq 'header' -and $args -contains '--get-regexp')) { $global:LASTEXITCODE = 0; 'fixture-key' }
-} elseif ($args -contains '--list') {
-    if ($env:B1_MODE -eq 'global-scope') { "global\tfixture" }
+} elseif ($args -contains '--list' -and $args -contains '--null' -and $args -contains '--includes') {
+    if ($env:B1_MODE -eq 'global-scope') { 'global' + [char]0 + 'core.repositoryformatversion' + [char]0 }
+    elseif ($env:B1_MODE -eq 'helper') { 'local' + [char]0 + 'credential.helper' + [char]0 }
+    elseif ($env:B1_MODE -eq 'header') { 'local' + [char]0 + 'http.extraheader' + [char]0 }
+    else { 'local' + [char]0 + 'core.repositoryformatversion' + [char]0 }
     if ($env:B1_MODE -eq 'native-failure') { $global:LASTEXITCODE = 27 }
 }
 `);
@@ -3789,7 +3977,7 @@ if ($args -contains 'get-url') {
     const script = path.join(scripts, 'Test-CheckoutCredentials.ps1'); fs.writeFileSync(script, source);
     const env = { ...process.env, RUNNER_TEMP: root, B1_LOG: log, B1_MODE: mode };
     for (const key of Object.keys(env)) {
-      if (['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL'].includes(key.toUpperCase())) delete env[key];
+      if (['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG'].includes(key.toUpperCase())) delete env[key];
     }
     const inheritedConfig = path.join(root, 'inherited.config');
     const inheritedContents = '[fixture]\n    unexpected = inherited\n';
@@ -3807,10 +3995,10 @@ if ($args -contains 'get-url') {
     assert.equal(result.status === 0, success, result.stderr);
     assert.equal((result.stdout + result.stderr).includes('fixture-secret'), false);
     const calls = fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse) : [];
-    const expectedCalls = { clean: 5, 'inherited-config': 5,
+    const expectedCalls = { clean: 3, 'inherited-config': 3,
       'missing-config': 2, 'outside-config': 2, 'directory-config': 2, 'nonempty-config': 2,
       'wrong-version': 1, 'missing-fixed': 0,
-      origin: 2, helper: 3, header: 4, 'global-scope': 5, 'native-failure': 5, token: 0 };
+      origin: 2, helper: 3, header: 3, 'global-scope': 3, 'native-failure': 3, token: 0 };
     assert.equal(calls.length, expectedCalls[mode], `Git call sequence stopped at the wrong phase: ${mode}`);
     if (Object.hasOwn(configMutations, mode)) {
       assert.equal(fs.readFileSync(mutationMarker, 'utf8'), 'mutated');
@@ -4018,7 +4206,8 @@ for (const inherited of [false, true]) for (const channel of ['GITHUB_ENV', 'GIT
     const tool = path.join(root, 'fixed-tool.ps1'), marker = path.join(root, 'tool-marker');
     const toolSource = `[IO.File]::WriteAllText(${quote(marker)}, 'reached')\nthrow 'fixture dispatch reached'\n`;
     fs.writeFileSync(tool, toolSource);
-    const env = { ...process.env, RUNNER_TEMP: root, GITHUB_ENV: path.join(root, 'env'), GITHUB_PATH: path.join(root, 'path') };
+    const channels = runnerChannelFiles(root);
+    const env = { ...process.env, RUNNER_TEMP: root, GITHUB_ENV: channels.env, GITHUB_PATH: channels.path };
     for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[name];
     for (const name of ['GITHUB_ENV', 'GITHUB_PATH']) fs.writeFileSync(env[name], '');
     const helper = channel === 'credential-tool' ? 'Test-CheckoutCredentials.ps1' : 'Initialize-CiToolchain.ps1';
@@ -4044,6 +4233,80 @@ for (const inherited of [false, true]) for (const channel of ['GITHUB_ENV', 'GIT
     assert.equal(fs.existsSync(path.join(root, 'styleguide-node')), false);
   });
 }
+
+test('FQ49 Windows command-directory authority is checked by the whole initializer', { skip: process.platform !== 'win32', timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const walk = 'for ($objPathComponent = [IO.DirectoryInfo]::new($strCommandRoot); $null -ne $objPathComponent; $objPathComponent = $objPathComponent.Parent) {';
+  const oldWalk = walk.replace('$strCommandRoot', '$strRunnerRoot');
+  const mutant = foundationOnce(original, walk, oldWalk);
+  assert.equal(mutant.replace(oldWalk, walk), original, 'Only the immediate command-directory coverage is removed');
+  const cases = [
+    { name: 'valid real directory', pass: true },
+    { name: 'creation-only', rights: 'CreateDirectories', pass: true },
+    { name: 'inherit-only', rights: 'WriteData', inheritOnly: true, pass: true },
+    { name: 'untrusted owner', rights: 'ReadData', owner: true, pass: false },
+    { name: 'create files', rights: 'CreateFiles', pass: false },
+    { name: 'delete children', rights: 'DeleteSubdirectoriesAndFiles', pass: false },
+    { name: 'change permissions', rights: 'ChangePermissions', pass: false },
+  ];
+  for (const item of cases) {
+    const f = fixture(t), scripts = path.join(f.work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+    const commandRoot = path.dirname(f.channels.path), queryLog = path.join(f.root, 'fq49-acl-queries');
+    const curl = path.join(f.root, 'fq49-curl.ps1'), curlMarker = path.join(f.root, 'fq49-curl-dispatch');
+    const credentialMarker = path.join(f.root, 'fq49-credential-dispatch');
+    const curlSource = `[IO.File]::WriteAllText(${quote(curlMarker)}, 'reached')\nthrow 'FQ49 controlled capability boundary'\n`;
+    fs.writeFileSync(curl, curlSource);
+    fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'),
+      `[IO.File]::WriteAllText(${quote(credentialMarker)}, 'unexpected')\nthrow 'FQ49 unexpected credential work'\n`);
+    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+    fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+    for (const role of ['path', 'env']) fs.writeFileSync(f.channels[role], `unchanged-${role}\n`);
+    const actualDescriptor = new Map([commandRoot, f.root, ...Object.values(f.channels)].map(file => [file, fs.statSync(file)]));
+    // Only the immediate parent's descriptor is overlaid in memory. All other
+    // ACL queries reach the real Windows provider; no supplied ACL is changed.
+    let overlay = item.rights ? aclOverlay(commandRoot, item.rights, false, item.inheritOnly)
+      : '\nfunction Get-Acl {\n    param([string] $LiteralPath)\n    return Microsoft.PowerShell.Security\\Get-Acl -LiteralPath $LiteralPath\n}\n';
+    if (item.owner) overlay = foundationOnce(overlay, '$acl.SetOwner($owner)',
+      "$acl.SetOwner([Security.Principal.SecurityIdentifier]::new('S-1-1-0'))");
+    overlay = foundationOnce(overlay, '    param([string] $LiteralPath)',
+      `    param([string] $LiteralPath)\n    [IO.File]::AppendAllText(${quote(queryLog)}, $LiteralPath + [Environment]::NewLine)`);
+    for (const weakened of item.pass ? [false] : [false, true]) {
+      if (fs.existsSync(queryLog)) fs.unlinkSync(queryLog);
+      if (fs.existsSync(curlMarker)) fs.unlinkSync(curlMarker);
+      const source = foundationOnce(weakened ? mutant : original,
+        "Join-Path ([Environment]::SystemDirectory) 'curl.exe'", quote(curl));
+      const target = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(target, source);
+      const result = f.run(`${overlay}\n& ${quote(target)}`);
+      assert.notEqual(result.status, 0, 'Every admitted fixture stops at the controlled capability boundary');
+      const reached = item.pass || weakened;
+      assert.equal(fs.existsSync(curlMarker), reached, `${item.name}: ${result.stdout}${result.stderr}`);
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' ');
+      assert.match(diagnostic, reached ? /FQ49 controlled capability boundary/u
+        : item.owner ? /unreviewed Windows path owner/u : /unreviewed Windows write authority/u);
+      const queries = fs.readFileSync(queryLog, 'utf8').trim().split(/\r?\n/u).map(file => path.normalize(file).toLowerCase());
+      assert.equal(queries.includes(path.normalize(commandRoot).toLowerCase()), !weakened);
+      if (reached) {
+        for (let ancestor = f.root; ; ancestor = path.dirname(ancestor)) {
+          assert.ok(queries.includes(path.normalize(ancestor).toLowerCase()), `Retained ancestor coverage: ${ancestor}`);
+          if (ancestor === path.dirname(ancestor)) break;
+        }
+        for (const file of Object.values(f.channels)) assert.ok(queries.includes(path.normalize(file).toLowerCase()));
+      }
+      assert.equal(fs.existsSync(credentialMarker), false);
+      assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+      assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+      assert.deepEqual(f.calls(), []);
+      for (const role of ['path', 'env']) {
+        assert.equal(fs.readFileSync(f.channels[role], 'utf8'), `unchanged-${role}\n`);
+        const handle = fs.openSync(f.channels[role], 'r+'); fs.closeSync(handle);
+      }
+      assert.equal(fs.readFileSync(curl, 'utf8'), curlSource);
+      for (const [file, before] of actualDescriptor) {
+        const after = fs.statSync(file); assert.equal(after.dev, before.dev); assert.equal(after.ino, before.ino);
+      }
+    }
+  }
+});
 
 test('F4 compatibility documentation matches actual parameter ownership', () => {
   const rows = read('scripts-README.md').split('\n').filter(line => line.startsWith('| `'));
@@ -4092,6 +4355,7 @@ function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mod
   const f = fixture(t, 'repository space and Unicode Ω'), scripts = path.join(f.work, '.github/workflows');
   fs.mkdirSync(scripts, { recursive: true });
   const runner = path.join(f.root, 'runner space and Unicode Ω'); fs.mkdirSync(runner, { mode: 0o700 });
+  Object.assign(f.channels, runnerChannelFiles(runner));
   const sentinel = path.join(runner, 'outside-sentinel'); fs.writeFileSync(sentinel, 'unchanged');
   for (const folder of [f.work, scripts]) {
     fs.writeFileSync(path.join(folder, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
@@ -4167,7 +4431,7 @@ process.exit(result.status);
   source = source.replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar);
   const script = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, source);
   const env = { RUNNER_TEMP: runner, TEST_MODE: mode, ...extraEnv };
-  for (const name of ['path', 'env']) fs.writeFileSync(path.join(f.root, name), '');
+  for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
   const capturedOutput = path.join(f.root, 'captured-output.json');
   assert.ok(dependencySwitches.every(value => ['WorkflowDependencies', 'InstructionDependencies'].includes(value)));
   return { ...f, runner, sentinel, scripts, script, env, source, archives,
@@ -4321,7 +4585,7 @@ test('FQ35 recovery selection follows successful off and on setup across fresh r
     const f = foundationFixture(t, { compatibility, extraEnv: { STYLEGUIDE_RECOVERY_NODE22: job.STYLEGUIDE_RECOVERY_NODE22 } });
     assertCompletedProcess(f.run(), 'FQ35 successful setup');
     assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
-    const records = fs.readFileSync(path.join(f.root, 'env'), 'utf8');
+    const records = fs.readFileSync(f.channels.env, 'utf8');
     const recovery = records.split('\n').filter(line => line.startsWith('STYLEGUIDE_RECOVERY_NODE22='));
     const expected = compatibility ? path.join(f.runner, 'styleguide-node/recoveryCompatibility/node-v22.23.3-linux-x64/bin/node') : '';
     assert.deepEqual(recovery, [`STYLEGUIDE_RECOVERY_NODE22=${expected}`]);
@@ -4330,7 +4594,7 @@ test('FQ35 recovery selection follows successful off and on setup across fresh r
     applyRunnerEnvironment(records, job);
     assert.equal(job.STYLEGUIDE_RECOVERY_NODE22, expected);
     assert.equal(job.FQ35_UNRELATED, 'preserved');
-    assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8').includes('recoveryCompatibility'), false);
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8').includes('recoveryCompatibility'), false);
   }
 });
 
@@ -4341,22 +4605,22 @@ test('FQ35 and FQ37 runner-record controls detect omissions and preserve failed 
     extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
   assertCompletedProcess(stale.run(), 'FQ35 omitted recovery reset control');
   assert.equal(stale.result.status, 0, stale.result.stdout + stale.result.stderr);
-  const staleRecords = fs.readFileSync(path.join(stale.root, 'env'), 'utf8');
+  const staleRecords = fs.readFileSync(stale.channels.env, 'utf8');
   assert.doesNotMatch(staleRecords, /^STYLEGUIDE_RECOVERY_NODE22=/mu);
   assert.equal(applyRunnerEnvironment(staleRecords, { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' }).STYLEGUIDE_RECOVERY_NODE22, 'stale-unverified');
   const blocked = foundationFixture(t, { source: foundationOnce(original, "        'NODE_PATH=')", "        'NODE_OPTIONS=', 'NODE_PATH=')") });
   assertCompletedProcess(blocked.run(), 'FQ37 restored blocked record control');
   assert.equal(blocked.result.status, 0, blocked.result.stdout + blocked.result.stderr);
-  assert.match(fs.readFileSync(path.join(blocked.root, 'env'), 'utf8'), /^NODE_OPTIONS=$/mu);
+  assert.match(fs.readFileSync(blocked.channels.env, 'utf8'), /^NODE_OPTIONS=$/mu);
   const failed = foundationFixture(t, { installs: true, mode: 'fq36-preflight-failure', extraEnv: { STYLEGUIDE_RECOVERY_NODE22: 'stale-unverified' } });
   const priorEnvironment = 'FQ35_UNRELATED=preserved\nSTYLEGUIDE_RECOVERY_NODE22=stale-unverified\n';
-  fs.writeFileSync(path.join(failed.root, 'env'), priorEnvironment);
+  fs.writeFileSync(failed.channels.env, priorEnvironment);
   assertCompletedProcess(failed.run(), 'FQ35 failed setup');
   assert.notEqual(failed.result.status, 0, failed.result.stdout + failed.result.stderr);
   assert.match(failed.result.stderr, /preflight failed before installation/);
   assert.doesNotMatch(failed.result.stdout, /Reviewed runtime setup completed/);
-  assert.equal(fs.readFileSync(path.join(failed.root, 'env'), 'utf8'), priorEnvironment);
-  assert.equal(fs.readFileSync(path.join(failed.root, 'path'), 'utf8'), '');
+  assert.equal(fs.readFileSync(failed.channels.env, 'utf8'), priorEnvironment);
+  assert.equal(fs.readFileSync(failed.channels.path, 'utf8'), '');
   assert.equal(fs.existsSync(path.join(failed.runner, 'styleguide-node')), false);
   assert.equal(fs.readFileSync(failed.sentinel, 'utf8'), 'unchanged');
 });
@@ -4365,8 +4629,8 @@ function foundationNoPublication(f, { partial = false, retained = false } = {}) 
   assertCompletedProcess(f.result, 'F10-F14 ordinary initializer');
   assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
   assert.doesNotMatch(f.result.stdout, /Reviewed runtime setup completed/);
-  assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), '');
-  if (!partial) assert.equal(fs.readFileSync(path.join(f.root, 'env'), 'utf8'), '');
+  assert.equal(fs.readFileSync(f.channels.path, 'utf8'), '');
+  if (!partial) assert.equal(fs.readFileSync(f.channels.env, 'utf8'), '');
   assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node')), retained);
   assert.equal(fs.readFileSync(f.sentinel, 'utf8'), 'unchanged');
 }
@@ -4375,6 +4639,317 @@ function foundationTarNative(f, role, kind, status) {
   const record = JSON.parse(fs.readFileSync(path.join(f.root, `tar-${role}-${kind}.json`), 'utf8'));
   assertCompletedProcess(record, `Actual GNU tar ${role}/${kind}`); assert.equal(record.status, status);
 }
+
+
+// These constructors retain the actual channel admission, held-open and write bodies.
+// They exercise only the channel boundary; whole-initializer evidence is separate.
+function fq46ChannelParts(source) {
+  const between = (start, end) => {
+    assert.equal(source.split(start).length, 2, `FQ46 unique start: ${start}`);
+    const offset = source.indexOf(start), finish = source.indexOf(end, offset);
+    assert.ok(finish > offset, `FQ46 end: ${end}`);
+    return source.slice(offset, finish);
+  };
+  return {
+    definitions: between('function Assert-OrdinaryPath {', 'function Assert-JsonMember {'),
+    admission: between('$strRunnerRoot = Assert-OrdinaryPath', '\nif ($IsWindows) {\n    for ($objPathComponent'),
+    opening: between('    $objPathChannel = [IO.File]::Open', '    New-PrivateDirectory $strNodeRoot'),
+    publication: between('    $null = Assert-OrdinaryPath $env:GITHUB_PATH', '    $env:PATH = $hashtablePreferredRuntime.Bin'),
+  };
+}
+
+function fq46ChannelFixture(t) {
+  const f = fixture(t, 'checkout space and Unicode Ω');
+  for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], `prior-${name}\n`);
+  function run(source = read('Initialize-CiToolchain.ps1'), { beforeOpen = '', afterOpen = '' } = {}) {
+    const body = fq46ChannelParts(source);
+    return f.run(`${body.definitions}
+$strRepositoryRoot = Assert-OrdinaryPath -Path ${quote(f.work)} -Directory
+${body.admission}
+$objPathChannel = $null
+$objEnvironmentChannel = $null
+try {
+${beforeOpen}
+${body.opening}
+    Write-Output 'FQ46 held channels admitted'
+${afterOpen}
+    $arrRunnerRecords = @('FQ46_RESULT=admitted')
+    $hashtablePreferredRuntime = @{ Bin = 'fq46-bin' }
+${body.publication}
+    Write-Output 'FQ46 channels published'
+} finally {
+    foreach ($objChannel in @($objPathChannel, $objEnvironmentChannel)) {
+        if ($null -ne $objChannel) { $objChannel.Dispose() }
+    }
+}
+`);
+  }
+  return { ...f, run };
+}
+
+function assertFq46Refusal(f, result, diagnostic, held = false) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ').replace(/\s+/gu, ' '), diagnostic);
+  assert.doesNotMatch(result.stdout, /FQ46 channels published/u);
+  assert.equal(result.stdout.includes('FQ46 held channels admitted'), held, result.stdout);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+  assert.deepEqual(f.calls(), []);
+}
+
+const fq46ContainmentPredicate = 'if (-not [string]::Equals([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($strChannelPath)), $strCommandRoot, $objPathComparison)) {';
+const fq46Supported = linux || process.platform === 'win32';
+test('FQ46 channel files append through held native identities', { skip: !fq46Supported, timeout: 60000 }, t => {
+  for (const empty of [false, true]) {
+    const f = fq46ChannelFixture(t);
+    if (empty) for (const name of ['path', 'env']) fs.writeFileSync(f.channels[name], '');
+    const identities = Object.fromEntries(Object.entries(f.channels).map(([name, file]) => [name, fs.statSync(file)]));
+    const result = f.run(); assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.match(result.stdout, /FQ46 channels published/u);
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8'), (empty ? '' : 'prior-path\n') + 'fq46-bin\n');
+    assert.equal(fs.readFileSync(f.channels.env, 'utf8'), (empty ? '' : 'prior-env\n') + 'FQ46_RESULT=admitted\n');
+    for (const [name, file] of Object.entries(f.channels)) {
+      const actual = fs.statSync(file); assert.equal(actual.nlink, 1);
+      assert.equal(actual.dev, identities[name].dev); assert.equal(actual.ino, identities[name].ino);
+      const descriptor = fs.openSync(file, 'r+'); fs.closeSync(descriptor);
+    }
+  }
+});
+
+test('FQ46 outside channel paths are refused with causal containment controls', { skip: !fq46Supported, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const mutant = foundationOnce(original, fq46ContainmentPredicate, 'if ($false) {');
+  for (const role of ['path', 'env']) for (const location of ['checkout', 'profile', 'temporary', 'prefix-sibling', 'nested']) {
+    const f = fq46ChannelFixture(t);
+    const folder = location === 'checkout' ? f.work : location === 'profile' ? path.join(f.root, 'profile')
+      : location === 'temporary' ? f.root : path.join(f.root, location === 'nested' ? '_runner_file_commands/nested' : '_runner_file_commands-extra');
+    fs.mkdirSync(folder, { recursive: true });
+    const outside = path.join(folder, 'outside-sentinel'); fs.writeFileSync(outside, 'outside must survive\n');
+    const other = f.channels[role === 'path' ? 'env' : 'path']; const otherBytes = fs.readFileSync(other);
+    f.channels[role] = outside;
+    const refused = f.run(); assertFq46Refusal(f, refused, /Runner channels must be direct files/u);
+    assert.equal(fs.readFileSync(outside, 'utf8'), 'outside must survive\n'); assert.deepEqual(fs.readFileSync(other), otherBytes);
+    const admitted = f.run(mutant); assert.equal(admitted.status, 0, admitted.stdout + admitted.stderr);
+    assert.equal(fs.readFileSync(outside, 'utf8'), 'outside must survive\n' + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    assert.throws(() => assertFq46Refusal(f, admitted, /Runner channels must be direct files/u), assert.AssertionError);
+  }
+});
+
+test('FQ46 single-channel hard links to unrelated files are refused', { skip: !fq46Supported, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const mutant = foundationOnce(foundationOnce(original, 'if (links != 1)', 'if (links == uint.MaxValue)'),
+    'if (standard.NumberOfLinks != 1)', 'if (standard.NumberOfLinks == uint.MaxValue)');
+  for (const role of ['path', 'env']) for (const location of ['checkout', 'runner']) {
+    const f = fq46ChannelFixture(t), sentinel = path.join(location === 'checkout' ? f.work : f.root, 'unrelated-sentinel');
+    fs.writeFileSync(sentinel, 'unrelated must survive\n'); fs.unlinkSync(f.channels[role]); fs.linkSync(sentinel, f.channels[role]);
+    const first = fs.statSync(sentinel), second = fs.statSync(f.channels[role]);
+    assert.equal(first.nlink, 2); assert.equal(second.nlink, 2); assert.equal(first.dev, second.dev); assert.equal(first.ino, second.ino);
+    const other = f.channels[role === 'path' ? 'env' : 'path']; const otherBytes = fs.readFileSync(other);
+    const refused = f.run(); assertFq46Refusal(f, refused, /Runner channel must have exactly one hard link/u);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unrelated must survive\n'); assert.deepEqual(fs.readFileSync(other), otherBytes);
+    const admitted = f.run(mutant); assert.equal(admitted.status, 0, admitted.stdout + admitted.stderr);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unrelated must survive\n' + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    assert.throws(() => assertFq46Refusal(f, admitted, /Runner channel must have exactly one hard link/u), assert.AssertionError);
+  }
+});
+
+test('FQ46 channel type, missing-file and native-query failures close admission', { skip: !fq46Supported, timeout: 180000 }, t => {
+  for (const role of ['path', 'env']) for (const kind of ['missing', 'directory', 'linked-parent']) {
+    const f = fq46ChannelFixture(t), before = Object.fromEntries(Object.entries(f.channels).map(([key, file]) => [key, fs.readFileSync(file)]));
+    if (kind === 'missing') fs.unlinkSync(f.channels[role]);
+    else if (kind === 'directory') { fs.unlinkSync(f.channels[role]); fs.mkdirSync(f.channels[role]); }
+    else {
+      const target = path.join(f.root, 'linked-target'); fs.mkdirSync(target); fs.writeFileSync(path.join(target, role), before[role]);
+      const link = path.join(f.root, '_runner_file_commands', 'linked'); fs.symlinkSync(target, link, linux ? 'dir' : 'junction');
+      f.channels[role] = path.join(link, role);
+    }
+    const result = f.run(); assertFq46Refusal(f, result, kind === 'linked-parent' ? /linked path/u : /path|item|file|exist/iu);
+    assert.deepEqual(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path']), before[role === 'path' ? 'env' : 'path']);
+  }
+  const original = read('Initialize-CiToolchain.ps1'), f = fq46ChannelFixture(t);
+  const broken = linux ? foundationOnce(original, 'NativeLibrary.GetExport(module, "statx")', 'NativeLibrary.GetExport(module, "FQ46MissingStatx")')
+    : foundationOnce(original, 'GetStandard(handle, 1, out standard, 24)', 'GetStandard(handle, 2147483647, out standard, 24)');
+  assertFq46Refusal(f, f.run(broken), linux ? /FQ46MissingStatx/u : /Exception|parameter|function/iu);
+  const control = f.run(); assert.equal(control.status, 0, control.stdout + control.stderr);
+});
+
+test('FQ46 actual opened identities must match their admission samples', { skip: !fq46Supported, timeout: 120000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const start = '    if ((Get-RunnerChannelIdentity -Path $env:GITHUB_PATH -Stream $objPathChannel)';
+  const offset = original.indexOf(start), end = original.indexOf('    New-PrivateDirectory $strNodeRoot', offset);
+  assert.ok(offset > 0 && end > offset); const guard = original.slice(offset, end);
+  const mutant = foundationOnce(original, guard, '');
+  for (const role of ['path', 'env']) for (const weakened of [false, true]) {
+    const f = fq46ChannelFixture(t), variable = role === 'path' ? '$env:GITHUB_PATH' : '$env:GITHUB_ENV';
+    const retained = path.join(f.root, `retained-${role}`);
+    const result = f.run(weakened ? mutant : original, { beforeOpen: `
+    Move-Item -LiteralPath ${variable} -Destination ${quote(retained)}
+    [IO.File]::WriteAllText(${variable}, 'replacement must survive', [Text.UTF8Encoding]::new($false))
+` });
+    assertFq46Refusal(f, result, weakened ? /identity changed before publication/u : /identity changed while opening/u, weakened);
+    assert.equal(fs.readFileSync(f.channels[role], 'utf8'), 'replacement must survive');
+    assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n`);
+    assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), `prior-${role === 'path' ? 'env' : 'path'}\n`);
+    const descriptor = fs.openSync(f.channels[role], 'r+'); fs.closeSync(descriptor);
+  }
+});
+
+test('FQ46 Linux publication rechecks held links and path identity before either append', { skip: !linux, timeout: 180000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const start = '    if ((Get-OwnedPathIdentity -Path $strCommandRoot -Directory)';
+  const offset = original.indexOf(start), end = original.indexOf('    # A partial channel write', offset);
+  assert.ok(offset > 0 && end > offset); const mutant = foundationOnce(original, original.slice(offset, end), '');
+  for (const role of ['path', 'env']) for (const kind of ['new-link', 'replacement']) for (const weakened of [false, true]) {
+    const f = fq46ChannelFixture(t), variable = role === 'path' ? '$env:GITHUB_PATH' : '$env:GITHUB_ENV';
+    const retained = path.join(f.root, `after-admission-${role}`);
+    const afterOpen = kind === 'new-link' ? `
+    & ${quote(process.execPath)} -e ${quote("require('node:fs').linkSync(process.argv[1],process.argv[2])")} ${variable} ${quote(retained)}
+    if ($LASTEXITCODE -ne 0) { throw 'FQ46 fixture hard-link creation failed' }
+` : `
+    Move-Item -LiteralPath ${variable} -Destination ${quote(retained)}
+    [IO.File]::WriteAllText(${variable}, 'replacement must survive', [Text.UTF8Encoding]::new($false))
+`;
+    const result = f.run(weakened ? mutant : original, { afterOpen });
+    const old = fs.statSync(retained);
+    if (kind === 'new-link') {
+      const current = fs.statSync(f.channels[role]); assert.equal(current.nlink, 2); assert.equal(old.nlink, 2);
+      assert.equal(current.dev, old.dev); assert.equal(current.ino, old.ino);
+    } else assert.notEqual(fs.statSync(f.channels[role]).ino, old.ino);
+    if (weakened) {
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n` + (role === 'path' ? 'fq46-bin\n' : 'FQ46_RESULT=admitted\n'));
+    } else {
+      assertFq46Refusal(f, result, kind === 'new-link' ? /exactly one hard link/u : /identity changed before publication/u, true);
+      assert.equal(fs.readFileSync(retained, 'utf8'), `prior-${role}\n`);
+      assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), `prior-${role === 'path' ? 'env' : 'path'}\n`);
+    }
+    if (kind === 'replacement') assert.equal(fs.readFileSync(f.channels[role], 'utf8'), 'replacement must survive');
+  }
+});
+
+test('FQ46 Linux incomplete native channel metadata is refused', { skip: !linux, timeout: 90000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  for (const missing of [1, 4, 256]) {
+    const f = fq46ChannelFixture(t);
+    const source = foundationOnce(original, 'uint mask = unchecked((uint)Marshal.ReadInt32(buffer, 0));',
+      `uint mask = unchecked((uint)Marshal.ReadInt32(buffer, 0)) & ~${missing}u;`);
+    assertFq46Refusal(f, f.run(source), /metadata is incomplete/u);
+    assert.equal(fs.readFileSync(f.channels.path, 'utf8'), 'prior-path\n');
+    assert.equal(fs.readFileSync(f.channels.env, 'utf8'), 'prior-env\n');
+  }
+});
+
+test('FQ46 Linux whole initializer confines channels before acquisition', { skip: !linux, timeout: 300000 }, t => {
+  const original = read('Initialize-CiToolchain.ps1');
+  const control = foundationFixture(t); control.run(); assert.equal(control.result.status, 0, control.result.stdout + control.result.stderr);
+  for (const role of ['path', 'env']) for (const kind of ['outside', 'hardlink']) for (const weakened of [false, true]) {
+    let source = original;
+    if (weakened) source = kind === 'outside' ? foundationOnce(source, fq46ContainmentPredicate, 'if ($false) {')
+      : foundationOnce(source, 'if (links != 1)', 'if (links == uint.MaxValue)');
+    const f = foundationFixture(t, { source }), sentinel = path.join(f.work, 'unrelated-channel-target');
+    fs.writeFileSync(sentinel, 'sentinel\n');
+    if (kind === 'outside') f.channels[role] = sentinel;
+    else { fs.unlinkSync(f.channels[role]); fs.linkSync(sentinel, f.channels[role]); assert.equal(fs.statSync(sentinel).nlink, 2); }
+    f.run();
+    if (weakened) {
+      assert.equal(f.result.status, 0, f.result.stdout + f.result.stderr);
+      assert.ok(fs.readFileSync(sentinel, 'utf8').startsWith('sentinel\n'));
+      assert.ok(fs.readFileSync(sentinel).length > Buffer.byteLength('sentinel\n'));
+      assert.equal(f.calls().some(row => row[0] === 'curl'), true);
+    } else {
+      assert.notEqual(f.result.status, 0, f.result.stdout + f.result.stderr);
+      assert.match(f.result.stderr, kind === 'outside' ? /Runner channels must be direct files/u : /exactly one hard link/u);
+      assert.equal(fs.readFileSync(sentinel, 'utf8'), 'sentinel\n');
+      assert.equal(fs.readFileSync(f.channels[role === 'path' ? 'env' : 'path'], 'utf8'), '');
+      assert.deepEqual(f.calls(), []); assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node')), false);
+    }
+  }
+});
+
+
+function fq48InitializerFixture(t, transform = source => source) {
+  const f = fixture(t), scripts = path.join(f.work, '.github/workflows'); fs.mkdirSync(scripts, { recursive: true });
+  const marker = path.join(f.root, 'fq48-credential-dispatch');
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: '24.18.1', npm: '11.16.0' } }));
+  fs.writeFileSync(path.join(scripts, 'ci-toolchain.json'), read('ci-toolchain.json'));
+  fs.writeFileSync(path.join(scripts, 'Test-CheckoutCredentials.ps1'), `
+$strFixtureMarker = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(${quote(marker)})
+[IO.File]::WriteAllText($strFixtureMarker, 'credential sentinel', [Text.UTF8Encoding]::new($false))
+throw 'FQ48 deliberate credential sentinel'
+`);
+  const script = path.join(scripts, 'Initialize-CiToolchain.ps1');
+  fs.writeFileSync(script, transform(read('Initialize-CiToolchain.ps1'), f));
+  for (const role of ['path', 'env']) fs.writeFileSync(f.channels[role], '');
+  return { ...f, script, marker, run: () => f.run(`& ${quote(script)}`, { USER: 'untrusted-name', LOGNAME: 'untrusted-name' }) };
+}
+
+function assertFq48BeforeWork(f, result, diagnostic) {
+  assert.notEqual(result.status, 0, result.stdout + result.stderr);
+  assert.match(stripVTControlCharacters(result.stderr).replace(/\s+/gu, ' '), diagnostic);
+  assert.equal(fs.existsSync(f.marker), false);
+  assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+  assert.equal(fs.readdirSync(f.root).some(name => name.startsWith('styleguide-git-')), false);
+  for (const role of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[role], 'utf8'), '');
+  assert.deepEqual(f.calls(), []);
+}
+
+test('FQ48 Linux effective UID guard refuses zero before credential work', { skip: !linux, timeout: 90000 }, t => {
+  const call = 'return [StyleGuide.RuntimeNativeApi]::ReadEffectiveUid($strNativeLibraryPath)';
+  for (const uid of [0, 1, 4294967295]) {
+    const f = fq48InitializerFixture(t, source => foundationOnce(source, call, `return [uint32]${uid}`));
+    const result = f.run();
+    if (uid === 0) assertFq48BeforeWork(f, result, /Linux extraction requires a nonzero effective UID/u);
+    else {
+      assert.notEqual(result.status, 0); assert.match(result.stderr, /FQ48 deliberate credential sentinel/u);
+      assert.equal(fs.readFileSync(f.marker, 'utf8'), 'credential sentinel');
+      assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
+      for (const role of ['path', 'env']) assert.equal(fs.readFileSync(f.channels[role], 'utf8'), '');
+    }
+  }
+  const mutant = fq48InitializerFixture(t, source => foundationOnce(
+    foundationOnce(source, call, 'return [uint32]0'), '} elseif ((Get-LinuxEffectiveUserId) -eq 0) {', '} elseif ($false) {'));
+  const result = mutant.run(); assert.notEqual(result.status, 0); assert.match(result.stderr, /FQ48 deliberate credential sentinel/u);
+  assert.equal(fs.readFileSync(mutant.marker, 'utf8'), 'credential sentinel');
+  assert.throws(() => assertFq48BeforeWork(mutant, result, /Linux extraction requires a nonzero effective UID/u), assert.AssertionError);
+});
+
+test('FQ48 Linux live effective UID binding uses the admitted runtime', { skip: !linux, timeout: 60000 }, t => {
+  const f = fixture(t), definitions = fq46ChannelParts(read('Initialize-CiToolchain.ps1')).definitions;
+  const observer = assertCompletedProcess(spawnSync('/usr/bin/id', ['-u'], {
+    encoding: 'utf8', timeout: 15000, maxBuffer: 4096,
+  }), 'FQ48 independent effective-UID observer');
+  assert.equal(observer.status, 0, observer.stderr); assert.match(observer.stdout, /^(?:0|[1-9][0-9]*)\n$/u);
+  const result = f.run(`${definitions}
+$uintFirstUserId = Get-LinuxEffectiveUserId
+$uintSecondUserId = Get-LinuxEffectiveUserId
+if ($uintFirstUserId -isnot [uint32] -or $uintSecondUserId -isnot [uint32]) { throw 'FQ48 wrong UID return type' }
+Write-Output ('FQ48 native UID: {0},{1}' -f $uintFirstUserId, $uintSecondUserId)
+`);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.equal(result.stdout.trim(), `FQ48 native UID: ${observer.stdout.trim()},${observer.stdout.trim()}`);
+});
+
+test('FQ48 Linux UID library and export failures stop before credential work', { skip: !linux, timeout: 120000 }, t => {
+  const good = fq48InitializerFixture(t), positive = good.run();
+  assert.notEqual(positive.status, 0); assert.match(positive.stderr, /FQ48 deliberate credential sentinel/u);
+  assert.equal(fs.readFileSync(good.marker, 'utf8'), 'credential sentinel');
+  for (const kind of ['export', 'missing-library', 'linked-library']) {
+    const f = fq48InitializerFixture(t, (source, fixture) => {
+      if (kind === 'export') return foundationOnce(source, 'NativeLibrary.GetExport(module, "SystemNative_GetEUid")',
+        'NativeLibrary.GetExport(module, "FQ48MissingUidExport")');
+      const start = source.indexOf('function Get-LinuxEffectiveUserId {'), end = source.indexOf('function Assert-JsonMember {', start);
+      assert.ok(start > 0 && end > start); const body = source.slice(start, end);
+      const library = path.join(fixture.root, 'fq48-library.so');
+      const replacement = kind === 'missing-library' ? quote(library) : `(Join-Path $PSHOME 'libSystem.Native.so')`;
+      let changed = foundationOnce(body, "Assert-OrdinaryPath (Join-Path $PSHOME 'libSystem.Native.so')",
+        `Assert-OrdinaryPath ${kind === 'linked-library' ? quote(library) : replacement}`);
+      if (kind === 'linked-library') changed = foundationOnce(changed, "    if (-not $IsLinux)",
+        `    $strFixtureLink = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(${quote(library)})\n` +
+        `    [void]([IO.File]::CreateSymbolicLink($strFixtureLink, (Join-Path $PSHOME 'libSystem.Native.so')))\n    if (-not $IsLinux)`);
+      return foundationOnce(source, body, changed);
+    });
+    assertFq48BeforeWork(f, f.run(), kind === 'export' ? /FQ48MissingUidExport/u : kind === 'linked-library' ? /linked path/u : /path|exist|item/iu);
+  }
+});
 
 for (const mode of ['occupied-file', 'linked-ancestor', 'hardlink-channels', 'native-extraction',
   'write-refusal', 'truncated-extraction', 'partial-channel', 'interrupted-child']) {
@@ -4387,8 +4962,8 @@ for (const mode of ['occupied-file', 'linked-ancestor', 'hardlink-channels', 'na
     if (mode === 'occupied-file') fs.writeFileSync(path.join(f.runner, 'styleguide-node'), 'occupied must survive');
     if (mode === 'linked-ancestor') { fs.symlinkSync('runner space and Unicode Ω', path.join(f.root, 'linked-ancestor'), 'dir'); f.env.RUNNER_TEMP = path.join(f.root, 'linked-ancestor'); }
     if (mode === 'hardlink-channels') {
-      fs.unlinkSync(path.join(f.root, 'env')); fs.linkSync(path.join(f.root, 'path'), path.join(f.root, 'env'));
-      const first = fs.lstatSync(path.join(f.root, 'path')), second = fs.lstatSync(path.join(f.root, 'env'));
+      fs.unlinkSync(f.channels.env); fs.linkSync(f.channels.path, f.channels.env);
+      const first = fs.lstatSync(f.channels.path), second = fs.lstatSync(f.channels.env);
       assert.equal(first.nlink, 2); assert.equal(second.nlink, 2); assert.equal(first.dev, second.dev); assert.equal(first.ino, second.ino);
     }
     f.run(); foundationNoPublication(f, { partial: mode === 'partial-channel', retained: mode === 'occupied-file' });
@@ -4398,7 +4973,7 @@ for (const mode of ['occupied-file', 'linked-ancestor', 'hardlink-channels', 'na
     if (mode === 'native-extraction') { foundationTarNative(f, 'preferred', 'list', 0); assert.match(f.result.stderr, /Runtime extraction failed: 37/); }
     if (mode === 'write-refusal') { foundationTarNative(f, 'preferred', 'list', 0); foundationTarNative(f, 'preferred', 'extract', 2); assert.match(f.result.stderr, /Runtime extraction failed: 2/); }
     if (mode === 'truncated-extraction') { foundationTarNative(f, 'preferred', 'extract', 0); assert.match(f.result.stderr, /extracted file size changed/); }
-    if (mode === 'partial-channel') { assert.match(f.result.stderr, /F10 injected failure after actual partial channel write/); assert.equal(fs.readFileSync(path.join(f.root, 'env'), 'utf8'), 'npm_confi'); assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node/recoveryCompatibility')), false); }
+    if (mode === 'partial-channel') { assert.match(f.result.stderr, /F10 injected failure after actual partial channel write/); assert.equal(fs.readFileSync(f.channels.env, 'utf8'), 'npm_confi'); assert.equal(fs.existsSync(path.join(f.runner, 'styleguide-node/recoveryCompatibility')), false); }
     if (mode === 'interrupted-child') { const child = JSON.parse(fs.readFileSync(path.join(f.root, 'interrupted-child.json'), 'utf8')); assert.deepEqual(child, { status: null, signal: 'SIGTERM' }); assert.match(f.result.stderr, /installed Node version is incorrect/); }
     assert.equal(f.calls().some(row => row.includes('ci')), false);
     if (!['partial-channel', 'interrupted-child'].includes(mode)) assert.equal(f.calls().some(row => row[0] === 'preferred'), false);
@@ -4468,7 +5043,7 @@ for (const mode of ['device', 'entry-cap', 'byte-cap', 'hostile-selectors-and-pa
       assert.deepEqual(ready, { node: '24.18.1', npm: '11.16.0' });
       assert.deepEqual(readyBytes, Buffer.from(JSON.stringify(ready), 'utf8'));
       assert.equal(fs.existsSync(marker), false); assert.equal(fs.existsSync(xzMarker), false);
-      assert.equal(fs.readFileSync(path.join(f.root, 'path'), 'utf8'), path.join(f.runner, 'styleguide-node/preferred/node-v24.18.1-linux-x64/bin') + '\n');
+      assert.equal(fs.readFileSync(f.channels.path, 'utf8'), path.join(f.runner, 'styleguide-node/preferred/node-v24.18.1-linux-x64/bin') + '\n');
       assert.ok(f.runner.includes(' ') && f.runner.includes('Ω'));
       assert.equal(fs.readFileSync(f.sentinel, 'utf8'), 'unchanged');
     } else {
@@ -4564,8 +5139,8 @@ if(result.error)process.exit(98);process.exit(result.status??97);
     'retry-start-bound': ['--retry-max-time 300 ', ''], 'retry-count': ['--retry 2 ', '--retry 3 '], 'first-disable': ['    & $strCurlPath --disable --silent ', '    & $strCurlPath --silent '] };
   if (mutation) { assert.ok(Object.hasOwn(mutations, mutation)); source = foundationOnce(source, ...mutations[mutation]); }
   const script = path.join(scripts, 'Initialize-CiToolchain.ps1'); fs.writeFileSync(script, source.replaceAll('/usr/bin/curl', curl).replaceAll('/usr/bin/tar', tar));
-  for (const file of ['path', 'env']) fs.writeFileSync(path.join(f.root, file), '');
-  const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: path.join(f.root, 'path'), GITHUB_ENV: path.join(f.root, 'env'), CURL_HOME: f.root, TEST_LOG: f.log, TEST_MODE: '' };
+  for (const file of ['path', 'env']) fs.writeFileSync(f.channels[file], '');
+  const env = { ...process.env, RUNNER_TEMP: f.root, GITHUB_PATH: f.channels.path, GITHUB_ENV: f.channels.env, CURL_HOME: f.root, TEST_LOG: f.log, TEST_MODE: '' };
   for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
   const result = await new Promise((resolve, reject) => {
     const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], { cwd: f.work, env, windowsHide: true });

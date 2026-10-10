@@ -17,7 +17,7 @@
 # .EXAMPLE
 # & "$PSScriptRoot/Initialize-CiToolchain.ps1" -WorkflowDependencies -InstructionDependencies
 #
-# # Internal workflow example: verifies the preferred runtime and both locked roots. The runner must supply RUNNER_TEMP, GITHUB_PATH, and GITHUB_ENV outside the checkout.
+# # Internal workflow example: verifies the preferred runtime and both locked roots. The runner must supply an ordinary RUNNER_TEMP outside the checkout and two distinct single-link command files directly in its _runner_file_commands directory.
 #
 # .EXAMPLE
 # & "$PSScriptRoot/Initialize-CiToolchain.ps1" -IncludeRecoveryCompatibility
@@ -33,7 +33,7 @@
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
 # The workflow must initialize the required host, checkout, and runner environment.
-# Version: 1.0.20261009.0
+# Version: 1.0.20261010.0
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
 param(
@@ -247,6 +247,251 @@ namespace StyleGuide {
     $null = Assert-OrdinaryPath $Path -Directory:$Directory
     return $strPathIdentity
 }
+function Get-RuntimeNativeApi {
+    # .SYNOPSIS
+    # Returns the internal native channel and effective-UID adapter type.
+    #
+    # .DESCRIPTION
+    # Defines the adapter once in this process. Windows queries ordinary single-link files by handle. Linux resolves statx and the live effective-UID export through the exact admitted runtime library supplied by each caller. Native failures throw without fallback. This does not isolate hostile code running with the same user token.
+    #
+    # .EXAMPLE
+    # $null = Get-RuntimeNativeApi
+    #
+    # # Loads the internal type before its methods are used.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # [type] The StyleGuide.RuntimeNativeApi type. Compilation errors throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API surface.
+    # Parameters and return shape may change without notice.
+    # No parameters are supported.
+    # Version: 1.0.20261010.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([type])]
+    param()
+    if (-not ('StyleGuide.RuntimeNativeApi' -as [type])) {
+        Add-Type -TypeDefinition @'
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+namespace StyleGuide {
+    public static class RuntimeNativeApi {
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl, SetLastError = true)]
+        private delegate int Statx(int descriptor, [MarshalAs(UnmanagedType.LPUTF8Str)] string path,
+            int flags, uint mask, IntPtr buffer);
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate uint EffectiveUid();
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FileId { public ulong Volume, Low, High; }
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FileAttributes { public uint Attributes, Tag; }
+        [StructLayout(LayoutKind.Sequential)]
+        private struct FileStandard {
+            public long AllocationSize, EndOfFile;
+            public uint NumberOfLinks;
+            public byte DeletePending, Directory;
+        }
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        private static extern SafeFileHandle CreateFileW(string path, uint access, uint share,
+            IntPtr security, uint disposition, uint flags, IntPtr template);
+        [DllImport("kernel32.dll", EntryPoint = "GetFileInformationByHandleEx", ExactSpelling = true, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetId(SafeFileHandle handle, int informationClass, out FileId info, uint size);
+        [DllImport("kernel32.dll", EntryPoint = "GetFileInformationByHandleEx", ExactSpelling = true, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetAttributes(SafeFileHandle handle, int informationClass,
+            out FileAttributes info, uint size);
+        [DllImport("kernel32.dll", EntryPoint = "GetFileInformationByHandleEx", ExactSpelling = true, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool GetStandard(SafeFileHandle handle, int informationClass,
+            out FileStandard info, uint size);
+        public static uint ReadEffectiveUid(string library) {
+            IntPtr module = NativeLibrary.Load(library);
+            try {
+                var query = Marshal.GetDelegateForFunctionPointer<EffectiveUid>(
+                    NativeLibrary.GetExport(module, "SystemNative_GetEUid"));
+                return query();
+            } finally { NativeLibrary.Free(module); }
+        }
+        private static string ReadUnix(string library, int descriptor, string path, int flags) {
+            IntPtr module = NativeLibrary.Load(library);
+            IntPtr buffer = IntPtr.Zero;
+            try {
+                var query = Marshal.GetDelegateForFunctionPointer<Statx>(
+                    NativeLibrary.GetExport(module, "statx"));
+                // The Linux UAPI statx buffer is 256 bytes, including reserved fields.
+                buffer = Marshal.AllocHGlobal(256);
+                Marshal.Copy(new byte[256], 0, buffer, 256);
+                if (query(descriptor, path, flags, 0x105, buffer) != 0)
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                uint mask = unchecked((uint)Marshal.ReadInt32(buffer, 0));
+                uint links = unchecked((uint)Marshal.ReadInt32(buffer, 16));
+                ushort mode = unchecked((ushort)Marshal.ReadInt16(buffer, 28));
+                if ((mask & 0x105) != 0x105 || (mode & 0xf000) != 0x8000)
+                    throw new IOException("Runner channel metadata is incomplete or not an ordinary file.");
+                if (links != 1)
+                    throw new IOException("Runner channel must have exactly one hard link.");
+                ulong inode = unchecked((ulong)Marshal.ReadInt64(buffer, 32));
+                uint major = unchecked((uint)Marshal.ReadInt32(buffer, 136));
+                uint minor = unchecked((uint)Marshal.ReadInt32(buffer, 140));
+                return String.Format(CultureInfo.InvariantCulture, "unix:{0}:{1}:{2}", major, minor, inode);
+            } finally {
+                if (buffer != IntPtr.Zero) Marshal.FreeHGlobal(buffer);
+                NativeLibrary.Free(module);
+            }
+        }
+        public static string ReadUnixPath(string library, string path) {
+            // AT_FDCWD and AT_SYMLINK_NOFOLLOW; no data access or file creation.
+            return ReadUnix(library, -100, path, 0x100);
+        }
+        public static string ReadUnixHandle(string library, SafeFileHandle handle) {
+            bool retained = false;
+            try {
+                handle.DangerousAddRef(ref retained);
+                if (handle.IsInvalid || handle.IsClosed) throw new IOException("Runner channel handle is unavailable.");
+                // AT_EMPTY_PATH queries this held descriptor rather than resolving its pathname.
+                return ReadUnix(library, handle.DangerousGetHandle().ToInt32(), "", 0x1000);
+            } finally { if (retained) handle.DangerousRelease(); }
+        }
+        public static string ReadWindowsPath(string path) {
+            // Zero data access, OPEN_EXISTING and OPEN_REPARSE_POINT; do not open for writing.
+            using (var handle = CreateFileW(path, 0, 7, IntPtr.Zero, 3, 0x00200000, IntPtr.Zero)) {
+                if (handle.IsInvalid) throw new Win32Exception(Marshal.GetLastWin32Error());
+                return ReadWindowsHandle(handle);
+            }
+        }
+        public static string ReadWindowsHandle(SafeFileHandle handle) {
+            FileAttributes attributes;
+            if (!GetAttributes(handle, 9, out attributes, 8))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            FileStandard standard;
+            if (!GetStandard(handle, 1, out standard, 24))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            if ((attributes.Attributes & 0x410) != 0 || standard.Directory != 0 || standard.DeletePending != 0)
+                throw new IOException("Runner channel metadata is incomplete or not an ordinary file.");
+            if (standard.NumberOfLinks != 1)
+                throw new IOException("Runner channel must have exactly one hard link.");
+            FileId id;
+            if (!GetId(handle, 18, out id, 24))
+                throw new Win32Exception(Marshal.GetLastWin32Error());
+            return String.Format(CultureInfo.InvariantCulture, "windows:{0:x16}:{1:x16}{2:x16}",
+                id.Volume, id.High, id.Low);
+        }
+    }
+}
+'@
+    }
+    return ('StyleGuide.RuntimeNativeApi' -as [type])
+}
+
+
+function Get-RunnerChannelIdentity {
+    # .SYNOPSIS
+    # Reads an ordinary single-link runner channel identity.
+    #
+    # .DESCRIPTION
+    # Checks the concrete path before and after a native metadata query. Without Stream, reads metadata without write access. With Stream, queries its held handle. Native errors, non-regular files, and link counts other than one throw. The caller must compare the result with its admitted identity and validate directory membership.
+    #
+    # .PARAMETER Path
+    # Absolute existing channel path to validate.
+    #
+    # .PARAMETER Stream
+    # Optional open channel stream. Omit this parameter for a pathname sample.
+    #
+    # .EXAMPLE
+    # $strIdentity = Get-RunnerChannelIdentity -Path $env:GITHUB_PATH
+    #
+    # # Returns the file identity only when the channel has one link.
+    #
+    # .EXAMPLE
+    # $strIdentity = Get-RunnerChannelIdentity -Path $env:GITHUB_PATH -Stream $objPathChannel
+    #
+    # # Queries the held file instead of reopening its path for data access.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # [string] Native volume/file-ID or device-major/device-minor/inode identity. Refusals throw without an identity.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API surface.
+    # Parameters and return shape may change without notice.
+    # No positional parameters are supported.
+    # Version: 1.0.20261010.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory = $true)][ValidateNotNullOrEmpty()][string] $Path,
+        [Parameter()][IO.FileStream] $Stream
+    )
+    $strChannelPath = Assert-OrdinaryPath -Path $Path
+    $null = Get-RuntimeNativeApi
+    $strIdentity = if ($IsWindows) {
+        if ($null -eq $Stream) {
+            [StyleGuide.RuntimeNativeApi]::ReadWindowsPath($strChannelPath)
+        } else {
+            [StyleGuide.RuntimeNativeApi]::ReadWindowsHandle($Stream.SafeFileHandle)
+        }
+    } elseif ($IsLinux) {
+        $strNativeLibraryPath = Assert-OrdinaryPath (Join-Path $PSHOME 'libSystem.Native.so')
+        if ($null -eq $Stream) {
+            [StyleGuide.RuntimeNativeApi]::ReadUnixPath($strNativeLibraryPath, $strChannelPath)
+        } else {
+            [StyleGuide.RuntimeNativeApi]::ReadUnixHandle($strNativeLibraryPath, $Stream.SafeFileHandle)
+        }
+    } else {
+        throw 'Runner channel identity requires Linux or Windows.'
+    }
+    $null = Assert-OrdinaryPath -Path $strChannelPath
+    return $strIdentity
+}
+
+
+function Get-LinuxEffectiveUserId {
+    # .SYNOPSIS
+    # Returns this Linux process's current effective user ID.
+    #
+    # .DESCRIPTION
+    # Loads the dedicated live UID export from the ordinary native library in the admitted PowerShell runtime. Reads the effective UID on every call. Missing libraries or exports and native invocation failures throw without a name, cached-value, or executable fallback.
+    #
+    # .EXAMPLE
+    # $uintEffectiveUserId = Get-LinuxEffectiveUserId
+    #
+    # # Returns the live numeric effective UID on the admitted Linux host.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # [uint32] Current Linux effective UID. Zero identifies a privileged process. Failures throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API surface.
+    # Parameters and return shape may change without notice.
+    # No parameters are supported.
+    # Version: 1.0.20261010.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([uint32])]
+    param()
+    if (-not $IsLinux) { throw 'Effective UID admission requires Linux.' }
+    $strNativeLibraryPath = Assert-OrdinaryPath (Join-Path $PSHOME 'libSystem.Native.so')
+    $null = Get-RuntimeNativeApi
+    return [StyleGuide.RuntimeNativeApi]::ReadEffectiveUid($strNativeLibraryPath)
+}
+
+
 function Assert-JsonMember {
     # .SYNOPSIS
     # Rejects duplicate decoded JSON member names.
@@ -1202,13 +1447,29 @@ if ($strRunnerRoot.Equals($strRepositoryRoot, $objPathComparison) -or
     $strRunnerRoot.StartsWith($strRepositoryRoot + [IO.Path]::DirectorySeparatorChar, $objPathComparison)) {
     throw 'toolchain: staging root is inside the checkout'
 }
+$strCommandRoot = Assert-OrdinaryPath (Join-Path $strRunnerRoot '_runner_file_commands') -Directory
+if ($strCommandRoot.Equals($strRepositoryRoot, $objPathComparison) -or
+    $strCommandRoot.StartsWith($strRepositoryRoot + [IO.Path]::DirectorySeparatorChar, $objPathComparison)) {
+    throw 'Runner command directory must be outside the checkout.'
+}
+$strCommandRootIdentity = Get-OwnedPathIdentity -Path $strCommandRoot -Directory
 $null = Assert-OrdinaryPath $env:GITHUB_PATH
 $null = Assert-OrdinaryPath $env:GITHUB_ENV
+foreach ($strChannelPath in @($env:GITHUB_PATH, $env:GITHUB_ENV)) {
+    if (-not [string]::Equals([IO.Path]::GetDirectoryName([IO.Path]::GetFullPath($strChannelPath)), $strCommandRoot, $objPathComparison)) {
+        throw 'Runner channels must be direct files in RUNNER_TEMP/_runner_file_commands.'
+    }
+}
+$strPathChannelIdentity = Get-RunnerChannelIdentity -Path $env:GITHUB_PATH
+$strEnvironmentChannelIdentity = Get-RunnerChannelIdentity -Path $env:GITHUB_ENV
+if ($strPathChannelIdentity -ceq $strEnvironmentChannelIdentity) {
+    throw 'Runner channels must identify different files.'
+}
 if ([IO.Path]::GetFullPath($env:GITHUB_PATH).Equals([IO.Path]::GetFullPath($env:GITHUB_ENV), $objPathComparison)) {
     throw 'toolchain: runner communication files must be distinct'
 }
 if ($IsWindows) {
-    for ($objPathComponent = [IO.DirectoryInfo]::new($strRunnerRoot); $null -ne $objPathComponent; $objPathComponent = $objPathComponent.Parent) {
+    for ($objPathComponent = [IO.DirectoryInfo]::new($strCommandRoot); $null -ne $objPathComponent; $objPathComponent = $objPathComponent.Parent) {
         Assert-WindowsWriter $objPathComponent.FullName
     }
     Assert-WindowsWriter $env:GITHUB_PATH
@@ -1233,8 +1494,8 @@ if ($IsWindows) {
         Assert-WindowsWriter $objPathComponent.FullName
     }
     Assert-CurlCapability -Path $strCurlPath -Windows
-} elseif ([Environment]::UserName -ceq 'root') {
-    throw 'toolchain: Linux extraction requires a non-root account'
+} elseif ((Get-LinuxEffectiveUserId) -eq 0) {
+    throw 'toolchain: Linux extraction requires a nonzero effective UID'
 }
 & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
 foreach ($strRelativePath in @('.npmrc', '.github/.npmrc', '.github/workflows/.npmrc',
@@ -1253,6 +1514,10 @@ try {
     # Exclusive handles also refuse aliased communication files before download.
     $objPathChannel = [IO.File]::Open($env:GITHUB_PATH, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
     $objEnvironmentChannel = [IO.File]::Open($env:GITHUB_ENV, [IO.FileMode]::Open, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
+    if ((Get-RunnerChannelIdentity -Path $env:GITHUB_PATH -Stream $objPathChannel) -cne $strPathChannelIdentity -or
+        (Get-RunnerChannelIdentity -Path $env:GITHUB_ENV -Stream $objEnvironmentChannel) -cne $strEnvironmentChannelIdentity) {
+        throw 'Runner channel identity changed while opening its handle.'
+    }
     New-PrivateDirectory $strNodeRoot -Confirm:$false -WhatIf:$WhatIfPreference
     $strRootIdentity = Get-OwnedPathIdentity $strNodeRoot -Directory
     $strMarker = Join-Path $strNodeRoot '.owner'
@@ -1361,6 +1626,13 @@ try {
     }
     $null = Assert-OrdinaryPath $env:GITHUB_PATH
     $null = Assert-OrdinaryPath $env:GITHUB_ENV
+    if ((Get-OwnedPathIdentity -Path $strCommandRoot -Directory) -cne $strCommandRootIdentity -or
+        (Get-RunnerChannelIdentity -Path $env:GITHUB_PATH) -cne $strPathChannelIdentity -or
+        (Get-RunnerChannelIdentity -Path $env:GITHUB_ENV) -cne $strEnvironmentChannelIdentity -or
+        (Get-RunnerChannelIdentity -Path $env:GITHUB_PATH -Stream $objPathChannel) -cne $strPathChannelIdentity -or
+        (Get-RunnerChannelIdentity -Path $env:GITHUB_ENV -Stream $objEnvironmentChannel) -cne $strEnvironmentChannelIdentity) {
+        throw 'Runner command directory or channel identity changed before publication.'
+    }
     # A partial channel write fails the step. No downstream job may use its output.
     $objUtf8Encoding = [Text.UTF8Encoding]::new($false)
     $arrEnvironmentBytes = $objUtf8Encoding.GetBytes(($arrRunnerRecords -join "`n") + "`n")
