@@ -24,7 +24,7 @@
 # .NOTES
 # No positional parameters are supported. Use declared parameter names, if any.
 # The workflow must initialize the required host, checkout, and runner environment.
-# Version: 1.0.20261008.0
+# Version: 1.0.20261013.0
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
 param()

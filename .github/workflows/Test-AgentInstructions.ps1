@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.24.20261008.0
+# Version: 1.24.20261013.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -483,7 +483,7 @@ function Get-AgentSetupInputSpec {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; there are no parameters.
-    # Version: 1.3.20261008.0
+    # Version: 1.3.20261013.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param()

@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.15.20261008.0
+# Version: 1.15.20261013.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -3697,7 +3697,7 @@ function Assert-AgentSetupSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.4.20261008.0
+    # Version: 1.4.20261013.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
