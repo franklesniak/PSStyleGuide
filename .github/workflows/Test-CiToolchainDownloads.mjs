@@ -369,7 +369,7 @@ try {
   const attempts = ['transient', 'partial-recovery'].includes(mode) ? 2
     : ['tls-stall', 'stall', 'partial-stall', 'exhaustion'].includes(mode) ? 3 : 1;
   assert.equal(count, attempts); assert.ok(server.requests.every(row => row.url === '/archive' && row.ambient === null));
-  if (mode === 'tls-stall') assert.ok(transferred.elapsedMs < 10000, 'Connection cap must defeat three3-second attempt caps plus backoff.');
+  if (mode === 'tls-stall') assert.ok(transferred.elapsedMs < 10000, 'Connection cap must defeat three 3-second attempt caps plus backoff.');
   for (const name of ['.curlrc', '_curlrc']) assert.equal(readBounded(path.join(root, name)).toString(), curlrc);
   const phases = phaseRows(phaseFile), role = roles.at(-1);
   assert.ok(phases.includes('channels-held'));

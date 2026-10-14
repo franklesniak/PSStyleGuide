@@ -4327,9 +4327,6 @@ function foundationOnce(source, anchor, replacement) {
   return source.replace(anchor, replacement);
 }
 
-// A finite USTAR producer avoids creating a device/FIFO in the fixture namespace.
-// GNU tar/xz and the actual initializer remain the archive consumers.
-
 function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mode = '', compatibility = false,
   installs = false, dependencySwitches = installs ? ['WorkflowDependencies', 'InstructionDependencies'] : [],
   pinChange = pin => pin, extraEnv = {} } = {}) {
