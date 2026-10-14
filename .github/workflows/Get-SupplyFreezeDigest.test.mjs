@@ -24,6 +24,43 @@ function replaceUniquePinDeclaration(strSource, strName, strValue) {
     + strSource.slice(intStart + strDeclaration.length);
 }
 
+function assertHistoricalManifestPins(strSource, objSupplyFreeze) {
+  const objHistoricalPins = {
+    REVIEWED_PACKAGE_SHA256: objSupplyFreeze.reviewedWorkingBytes.packageJson.sha256,
+    REVIEWED_LOCK_SHA256: objSupplyFreeze.reviewedWorkingBytes.packageLockJson.sha256,
+    // These are the reviewed working-byte blobs, not the different baseline blobs.
+    REVIEWED_PACKAGE_BLOB: '84bd0421fcf17984220a408e42c5e0523ef65be6',
+    REVIEWED_LOCK_BLOB: 'c3f949822315ec5ff4cc1028922c31d0186cf9cf',
+  };
+  for (const [strName, strExpected] of Object.entries(objHistoricalPins)) {
+    const expression = new RegExp(`const ${strName} = '([0-9a-f]+)';`, 'gu');
+    const arrMatches = Array.from(strSource.matchAll(expression));
+    assert.equal(arrMatches.length, 1,
+      `expected exactly one historical production literal for ${strName}; found ${arrMatches.length}`);
+    assert.equal(arrMatches[0][1], strExpected,
+      `${strName} must match the historical reviewed working-byte identity`);
+  }
+}
+
+test('HISTORICAL-MANIFEST-PINS: unmodified production literals match historical identities', () => {
+  const objSupplyFreeze = JSON.parse(readFileSync(join(workflow,
+    'historical-supply-profile.json'))).supplyFreeze;
+  assert.doesNotThrow(() => assertHistoricalManifestPins(source, objSupplyFreeze));
+  for (const [strName, intLength] of [
+    ['REVIEWED_PACKAGE_SHA256', 64], ['REVIEWED_LOCK_SHA256', 64],
+    ['REVIEWED_PACKAGE_BLOB', 40], ['REVIEWED_LOCK_BLOB', 40],
+  ]) {
+    const strChanged = replaceUniquePinDeclaration(source, strName, '0'.repeat(intLength));
+    assert.throws(() => assertHistoricalManifestPins(strChanged, objSupplyFreeze),
+      new RegExp(`${strName} must match the historical reviewed working-byte identity`, 'u'));
+  }
+  const strDeclaration = source.match(/const REVIEWED_PACKAGE_SHA256 = '[0-9a-f]+';/u)[0];
+  assert.throws(() => assertHistoricalManifestPins(source.replace(strDeclaration, ''), objSupplyFreeze),
+    /expected exactly one historical production literal.*found 0/u);
+  assert.throws(() => assertHistoricalManifestPins(`${source}\n${strDeclaration}`, objSupplyFreeze),
+    /expected exactly one historical production literal.*found 2/u);
+});
+
 test('SYNTHETIC-PIN-TRANSFORM: require exactly one declaration and preserve all other bytes', () => {
   const strName = 'REVIEWED_PACKAGE_SHA256';
   const strValue = 'b'.repeat(64);
@@ -2316,6 +2353,7 @@ test('LINUX: current historical-pin refusal, synthetic manifest control, and ref
       // remaining Linux property cases can reach their independent guards.
       // The comparison/refusal code and historical profile stay byte-identical;
       // this fixture is not historical installed-byte evidence or a policy pass.
+      assertHistoricalManifestPins(source, contract.supplyFreeze);
       const packageBytesForFixture = readFileSync(join(fixture, 'package.json'));
       const lockBytesForFixture = readFileSync(join(fixture, 'package-lock.json'));
       const gitBlobForFixture = (bytes) => createHash('sha1')
