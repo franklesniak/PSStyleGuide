@@ -454,7 +454,17 @@ export async function main(args = process.argv.slice(2)) {
   return verifySuite(result, process.platform);
 }
 
-if (import.meta.main) {
+// Prefer loader identity; retain direct-call detection on runtimes without this property.
+const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {
+  if (!process.argv[1]) return false;
+  try {
+    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (isMain) {
   main().then(result => {
     const output = JSON.stringify(result);
     assert.ok(Buffer.byteLength(output) <= 1048576, 'Completed suite output exceeds its one-MiB bound.');

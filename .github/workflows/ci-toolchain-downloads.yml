@@ -18,187 +18,193 @@ jobs:
         id: acquire
         shell: pwsh
         run: |
-          [CmdletBinding()]
-          [OutputType([void])]
-          param()
+          function Invoke-NativeDownloadAcquisition {
+              [CmdletBinding()]
+              [OutputType([void])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $PSNativeCommandUseErrorActionPreference = $false
-              if (-not $IsLinux) {
-                  throw 'Native linux workflow requires its expected operating system.'
-              }
-              if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
-                  $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
-                  throw 'Unexpected acquisition repository.'
-              }
-              foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
-                      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
-                      'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
-                  if ([Environment]::GetEnvironmentVariable($strName)) {
-                      throw 'Unexpected credentials or external Git configuration.'
+              try {
+                  $ErrorActionPreference = 'Stop'
+                  $PSNativeCommandUseErrorActionPreference = $false
+                  if (-not $IsLinux) {
+                      throw 'Native linux workflow requires its expected operating system.'
                   }
-              }
-              $env:GIT_CONFIG_NOSYSTEM = '1'
-              $env:GIT_CONFIG_GLOBAL = '/dev/null'
-              $env:GIT_TERMINAL_PROMPT = '0'
-              $env:GIT_NO_REPLACE_OBJECTS = '1'
-              $strRevision = $env:GITHUB_SHA
-              if ($strRevision -cnotmatch '^[0-9a-f]{40}$') {
-                  throw 'A full commit hash is required.'
-              }
-              if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
-                  throw 'The acquisition workspace must be empty.'
-              }
-              & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'git init failed.'
-              }
-              & /usr/bin/git config --local core.autocrlf false
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Git byte-preserving checkout configuration failed.'
-              }
-              & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'git remote add failed.'
-              }
-              for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
-                  & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
-                  if ($LASTEXITCODE -eq 0) {
-                      break
+                  if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
+                      $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
+                      throw 'Unexpected acquisition repository.'
                   }
-                  if ($intAttempt -eq 3) {
-                      throw 'Exact revision fetch failed after three attempts.'
+                  foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+                          'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
+                          'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
+                      if ([Environment]::GetEnvironmentVariable($strName)) {
+                          throw 'Unexpected credentials or external Git configuration.'
+                      }
                   }
-                  Start-Sleep -Seconds 2
+                  $env:GIT_CONFIG_NOSYSTEM = '1'
+                  $env:GIT_CONFIG_GLOBAL = '/dev/null'
+                  $env:GIT_TERMINAL_PROMPT = '0'
+                  $env:GIT_NO_REPLACE_OBJECTS = '1'
+                  $strRevision = $env:GITHUB_SHA
+                  if ($strRevision -cnotmatch '^[0-9a-f]{40}$') {
+                      throw 'A full commit hash is required.'
+                  }
+                  if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+                      throw 'The acquisition workspace must be empty.'
+                  }
+                  & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'git init failed.'
+                  }
+                  & /usr/bin/git config --local core.autocrlf false
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Git byte-preserving checkout configuration failed.'
+                  }
+                  & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'git remote add failed.'
+                  }
+                  for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+                      & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
+                      if ($LASTEXITCODE -eq 0) {
+                          break
+                      }
+                      if ($intAttempt -eq 3) {
+                          throw 'Exact revision fetch failed after three attempts.'
+                      }
+                      Start-Sleep -Seconds 2
+                  }
+                  $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
+                  if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) {
+                      throw 'Fetched commit mismatch.'
+                  }
+                  & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Exact checkout failed.'
+                  }
+                  $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'
+                  if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) {
+                      throw 'Checked-out commit mismatch.'
+                  }
+              } catch {
+                  Write-Debug -Message 'A04 linux acquire failed.'
+                  throw
               }
-              $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
-              if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) {
-                  throw 'Fetched commit mismatch.'
-              }
-              & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Exact checkout failed.'
-              }
-              $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'
-              if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) {
-                  throw 'Checked-out commit mismatch.'
-              }
-          } catch {
-              Write-Debug -Message 'A04 linux acquire failed.'
-              throw
           }
+          Invoke-NativeDownloadAcquisition
       - name: Prepare a private native PowerShell host
         id: host
         shell: pwsh
         timeout-minutes: 10
         run: |
-          [CmdletBinding()]
-          [OutputType([void])]
-          param()
+          function Initialize-NativeDownloadHost {
+              [CmdletBinding()]
+              [OutputType([void])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $PSNativeCommandUseErrorActionPreference = $false
-              if (-not $IsLinux) {
-                  throw 'Native linux workflow requires its expected operating system.'
-              }
-              $objOutputProvider = $null
-              $objOutputDrive = $null
-              $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                  $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
-              if ($objOutputProvider.Name -cne 'FileSystem') {
-                  throw 'Native result output must use the filesystem provider.'
-              }
-              $objOutputStream = $null
               try {
-                  $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
-              } finally {
-                  if ($null -ne $objOutputStream) {
-                      $objOutputStream.Dispose()
+                  $ErrorActionPreference = 'Stop'
+                  $PSNativeCommandUseErrorActionPreference = $false
+                  if (-not $IsLinux) {
+                      throw 'Native linux workflow requires its expected operating system.'
                   }
-              }
-              $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
-              if (Test-Path -LiteralPath $strRoot) {
-                  throw 'Occupied native test namespace.'
-              }
-              [void][IO.Directory]::CreateDirectory($strRoot)
-              if ($IsWindows) {
-                  $objUser = [Security.Principal.WindowsIdentity]::GetCurrent().User
-                  $objAccessControl = [Security.AccessControl.DirectorySecurity]::new()
-                  $objAccessControl.SetOwner($objUser)
-                  $objAccessControl.SetAccessRuleProtection($true, $false)
-                  foreach ($objSecurityIdentifier in @($objUser, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'), [Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))) {
-                      [void]$objAccessControl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($objSecurityIdentifier, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'))
+                  $objOutputProvider = $null
+                  $objOutputDrive = $null
+                  $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                      $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
+                  if ($objOutputProvider.Name -cne 'FileSystem') {
+                      throw 'Native result output must use the filesystem provider.'
                   }
-                  Set-Acl -LiteralPath $strRoot -AclObject $objAccessControl -Confirm:$false -WhatIf:$false
-                  $strZipArchivePath = Join-Path $strRoot 'PowerShell-7.6.5-win-x64.zip'
-                  $strCurl = Join-Path ([Environment]::SystemDirectory) 'curl.exe'
-                  & $strCurl --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 --retry 2 --retry-max-time 300 --max-filesize 106319290 --output $strZipArchivePath 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'
-                  if ($LASTEXITCODE -ne 0) {
-                      throw 'PowerShell bootstrap download failed.'
-                  }
-                  $objZipArchiveFile = Get-Item -LiteralPath $strZipArchivePath -Force
-                  if ($objZipArchiveFile.Length -ne 106319290 -or ($objZipArchiveFile.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
-                      (Get-FileHash -LiteralPath $strZipArchivePath -Algorithm SHA256).Hash.ToLowerInvariant() -cne '32eb8f6cdce08f86e987d625a2733e54ac3e289ae7e1621b14c0b5bcec2434ea') {
-                      throw 'PowerShell bootstrap identity mismatch.'
-                  }
-                  $strHostRoot = Join-Path $strRoot 'powershell'
-                  $objZipArchive = [IO.Compression.ZipFile]::OpenRead($strZipArchivePath)
+                  $objOutputStream = $null
                   try {
-                      if ($objZipArchive.Entries.Count -gt 20000) {
-                          throw 'PowerShell bootstrap entry bound.'
+                      $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
+                  } finally {
+                      if ($null -ne $objOutputStream) {
+                          $objOutputStream.Dispose()
                       }
-                      $objMemberNames = [Collections.Generic.Dictionary[string, bool]]::new([StringComparer]::OrdinalIgnoreCase)
-                      [long]$intExpanded = 0
-                      foreach ($objEntry in $objZipArchive.Entries) {
-                          $strName = $objEntry.FullName
-                          $intExpanded += $objEntry.Length
-                          if ($intExpanded -gt 1073741824 -or $strName -match '[\\:\x00-\x1f]' -or $strName.StartsWith('/') -or
-                              ($objEntry.ExternalAttributes -band 1024) -ne 0 -or (($objEntry.ExternalAttributes -shr 16) -band 61440) -eq 40960) {
-                              throw 'Unsafe PowerShell bootstrap member.'
-                          }
-                          $strKey = $strName.TrimEnd('/')
-                          $arrParts = $strKey.Split('/')
-                          if ($arrParts.Count -eq 0 -or @($arrParts | Where-Object {
-                                      $_ -in @('', '.', '..') -or $_ -match '[. ]$' -or $_ -match '^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)'
-                                  }).Count -ne 0 -or $objMemberNames.ContainsKey($strKey)) {
-                              throw 'Aliased PowerShell bootstrap member.'
-                          }
-                          $objMemberNames.Add($strKey, $strName.EndsWith('/'))
+                  }
+                  $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
+                  if (Test-Path -LiteralPath $strRoot) {
+                      throw 'Occupied native test namespace.'
+                  }
+                  [void][IO.Directory]::CreateDirectory($strRoot)
+                  if ($IsWindows) {
+                      $objUser = [Security.Principal.WindowsIdentity]::GetCurrent().User
+                      $objAccessControl = [Security.AccessControl.DirectorySecurity]::new()
+                      $objAccessControl.SetOwner($objUser)
+                      $objAccessControl.SetAccessRuleProtection($true, $false)
+                      foreach ($objSecurityIdentifier in @($objUser, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'), [Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))) {
+                          [void]$objAccessControl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($objSecurityIdentifier, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'))
                       }
-                      foreach ($strKey in $objMemberNames.Keys) {
-                          $strParent = $strKey
-                          while ($strParent.Contains('/')) {
-                              $strParent = $strParent.Substring(0, $strParent.LastIndexOf('/'))
-                              if ($objMemberNames.ContainsKey($strParent) -and -not $objMemberNames[$strParent]) {
-                                  throw 'Bootstrap file/directory collision.'
+                      Set-Acl -LiteralPath $strRoot -AclObject $objAccessControl -Confirm:$false -WhatIf:$false
+                      $strZipArchivePath = Join-Path $strRoot 'PowerShell-7.6.5-win-x64.zip'
+                      $strCurl = Join-Path ([Environment]::SystemDirectory) 'curl.exe'
+                      & $strCurl --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 --retry 2 --retry-max-time 300 --max-filesize 106319290 --output $strZipArchivePath 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'
+                      if ($LASTEXITCODE -ne 0) {
+                          throw 'PowerShell bootstrap download failed.'
+                      }
+                      $objZipArchiveFile = Get-Item -LiteralPath $strZipArchivePath -Force
+                      if ($objZipArchiveFile.Length -ne 106319290 -or ($objZipArchiveFile.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+                          (Get-FileHash -LiteralPath $strZipArchivePath -Algorithm SHA256).Hash.ToLowerInvariant() -cne '32eb8f6cdce08f86e987d625a2733e54ac3e289ae7e1621b14c0b5bcec2434ea') {
+                          throw 'PowerShell bootstrap identity mismatch.'
+                      }
+                      $strHostRoot = Join-Path $strRoot 'powershell'
+                      $objZipArchive = [IO.Compression.ZipFile]::OpenRead($strZipArchivePath)
+                      try {
+                          if ($objZipArchive.Entries.Count -gt 20000) {
+                              throw 'PowerShell bootstrap entry bound.'
+                          }
+                          $objMemberNames = [Collections.Generic.Dictionary[string, bool]]::new([StringComparer]::OrdinalIgnoreCase)
+                          [long]$intExpanded = 0
+                          foreach ($objEntry in $objZipArchive.Entries) {
+                              $strName = $objEntry.FullName
+                              $intExpanded += $objEntry.Length
+                              if ($intExpanded -gt 1073741824 -or $strName -match '[\\:\x00-\x1f]' -or $strName.StartsWith('/') -or
+                                  ($objEntry.ExternalAttributes -band 1024) -ne 0 -or (($objEntry.ExternalAttributes -shr 16) -band 61440) -eq 40960) {
+                                  throw 'Unsafe PowerShell bootstrap member.'
+                              }
+                              $strKey = $strName.TrimEnd('/')
+                              $arrParts = $strKey.Split('/')
+                              if ($arrParts.Count -eq 0 -or @($arrParts | Where-Object {
+                                          $_ -in @('', '.', '..') -or $_ -match '[. ]$' -or $_ -match '^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)'
+                                      }).Count -ne 0 -or $objMemberNames.ContainsKey($strKey)) {
+                                  throw 'Aliased PowerShell bootstrap member.'
+                              }
+                              $objMemberNames.Add($strKey, $strName.EndsWith('/'))
+                          }
+                          foreach ($strKey in $objMemberNames.Keys) {
+                              $strParent = $strKey
+                              while ($strParent.Contains('/')) {
+                                  $strParent = $strParent.Substring(0, $strParent.LastIndexOf('/'))
+                                  if ($objMemberNames.ContainsKey($strParent) -and -not $objMemberNames[$strParent]) {
+                                      throw 'Bootstrap file/directory collision.'
+                                  }
                               }
                           }
+                      } finally {
+                          $objZipArchive.Dispose()
                       }
-                  } finally {
-                      $objZipArchive.Dispose()
+                      [IO.Compression.ZipFile]::ExtractToDirectory($strZipArchivePath, $strHostRoot, $false)
+                      $strPowerShell = Join-Path $strHostRoot 'pwsh.exe'
+                      $arrVersion = @(& $strPowerShell -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()')
+                      if ($LASTEXITCODE -ne 0 -or $arrVersion.Count -ne 1 -or $arrVersion[0] -cne '7.6.5') {
+                          throw 'Private PowerShell version mismatch.'
+                      }
+                  } else {
+                      [IO.File]::SetUnixFileMode($strRoot, [IO.UnixFileMode]::UserRead -bor [IO.UnixFileMode]::UserWrite -bor [IO.UnixFileMode]::UserExecute)
+                      $strPowerShell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
                   }
-                  [IO.Compression.ZipFile]::ExtractToDirectory($strZipArchivePath, $strHostRoot, $false)
-                  $strPowerShell = Join-Path $strHostRoot 'pwsh.exe'
-                  $arrVersion = @(& $strPowerShell -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()')
-                  if ($LASTEXITCODE -ne 0 -or $arrVersion.Count -ne 1 -or $arrVersion[0] -cne '7.6.5') {
-                      throw 'Private PowerShell version mismatch.'
+                  foreach ($strValue in @($strRoot, $strPowerShell)) {
+                      if ($strValue -match '[\r\n]') {
+                          throw 'Invalid native test path.'
+                      }
                   }
-              } else {
-                  [IO.File]::SetUnixFileMode($strRoot, [IO.UnixFileMode]::UserRead -bor [IO.UnixFileMode]::UserWrite -bor [IO.UnixFileMode]::UserExecute)
-                  $strPowerShell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+                  [IO.File]::AppendAllText($strOutputPath, "root=$strRoot`npowershell=$strPowerShell`n", [Text.UTF8Encoding]::new($false))
+              } catch {
+                  Write-Debug -Message 'A04 linux host failed.'
+                  throw
               }
-              foreach ($strValue in @($strRoot, $strPowerShell)) {
-                  if ($strValue -match '[\r\n]') {
-                      throw 'Invalid native test path.'
-                  }
-              }
-              [IO.File]::AppendAllText($strOutputPath, "root=$strRoot`npowershell=$strPowerShell`n", [Text.UTF8Encoding]::new($false))
-          } catch {
-              Write-Debug -Message 'A04 linux host failed.'
-              throw
           }
+          Initialize-NativeDownloadHost
       - name: Provision declared official archive inputs
         id: provision
         shell: pwsh
@@ -207,17 +213,18 @@ jobs:
           A04_ROOT: ${{ steps.host.outputs.root }}
           A04_POWERSHELL: ${{ steps.host.outputs.powershell }}
         run: |
-          [CmdletBinding()]
-          [OutputType([string])]
-          param()
+          function Initialize-NativeDownloadInputs {
+              [CmdletBinding()]
+              [OutputType([string])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              if (-not $IsLinux) {
-                  throw 'Native linux workflow requires its expected operating system.'
-              }
-              $strScript = Join-Path $env:A04_ROOT 'provision.ps1'
-              $strSource = @'
+              try {
+                  $ErrorActionPreference = 'Stop'
+                  if (-not $IsLinux) {
+                      throw 'Native linux workflow requires its expected operating system.'
+                  }
+                  $strScript = Join-Path $env:A04_ROOT 'provision.ps1'
+                  $strSource = @'
           [CmdletBinding()]
           [OutputType([string])]
           param()
@@ -311,15 +318,17 @@ jobs:
               throw
           }
           '@
-              [IO.File]::WriteAllText($strScript, $strSource, [Text.UTF8Encoding]::new($false))
-              & $env:A04_POWERSHELL -NoLogo -NoProfile -NonInteractive -File $strScript
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Native provisioning child failed.'
+                  [IO.File]::WriteAllText($strScript, $strSource, [Text.UTF8Encoding]::new($false))
+                  & $env:A04_POWERSHELL -NoLogo -NoProfile -NonInteractive -File $strScript
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Native provisioning child failed.'
+                  }
+              } catch {
+                  Write-Debug -Message 'A04 linux provision failed.'
+                  throw
               }
-          } catch {
-              Write-Debug -Message 'A04 linux provision failed.'
-              throw
           }
+          Initialize-NativeDownloadInputs
       - name: Run every native case for this platform
         id: native
         shell: pwsh
@@ -330,67 +339,70 @@ jobs:
           A04_ARCHIVES: ${{ steps.provision.outputs.archives }}
           A04_NODE: ${{ steps.provision.outputs.node }}
         run: |
-          [CmdletBinding()]
-          [OutputType([string])]
-          param()
+          function Invoke-NativeDownloadTests {
+              [CmdletBinding()]
+              [OutputType([string])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $PSNativeCommandUseErrorActionPreference = $false
-              if (-not $IsLinux) {
-                  throw 'Native linux workflow requires its expected operating system.'
-              }
-              $objOutputProvider = $null
-              $objOutputDrive = $null
-              $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                  $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
-              if ($objOutputProvider.Name -cne 'FileSystem') {
-                  throw 'Native result output must use the filesystem provider.'
-              }
-              $objOutputStream = $null
               try {
-                  $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
-              } finally {
-                  if ($null -ne $objOutputStream) {
-                      $objOutputStream.Dispose()
+                  $ErrorActionPreference = 'Stop'
+                  $PSNativeCommandUseErrorActionPreference = $false
+                  if (-not $IsLinux) {
+                      throw 'Native linux workflow requires its expected operating system.'
                   }
+                  $objOutputProvider = $null
+                  $objOutputDrive = $null
+                  $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                      $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
+                  if ($objOutputProvider.Name -cne 'FileSystem') {
+                      throw 'Native result output must use the filesystem provider.'
+                  }
+                  $objOutputStream = $null
+                  try {
+                      $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
+                  } finally {
+                      if ($null -ne $objOutputStream) {
+                          $objOutputStream.Dispose()
+                      }
+                  }
+                  Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
+                  $env:TEMP = $env:A04_ROOT
+                  $env:TMP = $env:A04_ROOT
+                  $env:TMPDIR = $env:A04_ROOT
+                  & $env:A04_NODE --test .github/workflows/Test-CiToolchainDownloads.test.mjs
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Native fixture contract tests failed.'
+                  }
+                  $arrOutput = @(& $env:A04_NODE .github/workflows/Test-CiToolchainDownloads.mjs --archive-directory $env:A04_ARCHIVES --powershell $env:A04_POWERSHELL)
+                  if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 1 -or $arrOutput[0].Length -gt 1048576) {
+                      throw 'Native suite did not produce one bounded completed result.'
+                  }
+                  $objResult = ConvertFrom-Json -InputObject $arrOutput[0]
+                  $strPlatform = if ($IsWindows) {
+                      'win32'
+                  } else {
+                      'linux'
+                  }
+                  $intCases = if ($IsWindows) {
+                      10
+                  } else {
+                      5
+                  }
+                  if ($objResult.schema -cne 'StyleGuide.NativeDownloadResult.v1' -or $objResult.platform -cne $strPlatform -or
+                      $objResult.passed -ne $intCases -or $objResult.failed -ne 0 -or $objResult.skipped -ne 0 -or
+                      $objResult.cases.Count -ne $intCases -or @($objResult.cases | Where-Object {
+                              -not $_.passed -or -not $_.cleanup
+                          }).Count -ne 0) {
+                      throw 'Incomplete native platform proof.'
+                  }
+                  Write-Output $arrOutput[0]
+                  [IO.File]::AppendAllText($strOutputPath, "passed=$intCases`nrevision=$env:GITHUB_SHA`n", [Text.UTF8Encoding]::new($false))
+              } catch {
+                  Write-Debug -Message 'A04 linux native failed.'
+                  throw
               }
-              Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
-              $env:TEMP = $env:A04_ROOT
-              $env:TMP = $env:A04_ROOT
-              $env:TMPDIR = $env:A04_ROOT
-              & $env:A04_NODE --test .github/workflows/Test-CiToolchainDownloads.test.mjs
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Native fixture contract tests failed.'
-              }
-              $arrOutput = @(& $env:A04_NODE .github/workflows/Test-CiToolchainDownloads.mjs --archive-directory $env:A04_ARCHIVES --powershell $env:A04_POWERSHELL)
-              if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 1 -or $arrOutput[0].Length -gt 1048576) {
-                  throw 'Native suite did not produce one bounded completed result.'
-              }
-              $objResult = ConvertFrom-Json -InputObject $arrOutput[0]
-              $strPlatform = if ($IsWindows) {
-                  'win32'
-              } else {
-                  'linux'
-              }
-              $intCases = if ($IsWindows) {
-                  10
-              } else {
-                  5
-              }
-              if ($objResult.schema -cne 'StyleGuide.NativeDownloadResult.v1' -or $objResult.platform -cne $strPlatform -or
-                  $objResult.passed -ne $intCases -or $objResult.failed -ne 0 -or $objResult.skipped -ne 0 -or
-                  $objResult.cases.Count -ne $intCases -or @($objResult.cases | Where-Object {
-                          -not $_.passed -or -not $_.cleanup
-                      }).Count -ne 0) {
-                  throw 'Incomplete native platform proof.'
-              }
-              Write-Output $arrOutput[0]
-              [IO.File]::AppendAllText($strOutputPath, "passed=$intCases`nrevision=$env:GITHUB_SHA`n", [Text.UTF8Encoding]::new($false))
-          } catch {
-              Write-Debug -Message 'A04 linux native failed.'
-              throw
           }
+          Invoke-NativeDownloadTests
   native_windows:
     if: github.event_name != 'push' || github.event.deleted != true
     runs-on: windows-2025
@@ -404,232 +416,238 @@ jobs:
         id: acquire
         shell: pwsh
         run: |
-          [CmdletBinding()]
-          [OutputType([void])]
-          param()
+          function Invoke-NativeDownloadAcquisition {
+              [CmdletBinding()]
+              [OutputType([void])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              if (-not $IsWindows) {
-                  throw 'Native windows workflow requires its expected operating system.'
-              }
-              if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
-                  $PSNativeCommandUseErrorActionPreference = $false
-              }
-              if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
-                  $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
-                  throw 'Unexpected acquisition repository.'
-              }
-              foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
-                      'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
-                      'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
-                  if ([Environment]::GetEnvironmentVariable($strName)) {
-                      throw 'Unexpected credentials or external Git configuration.'
+              try {
+                  $ErrorActionPreference = 'Stop'
+                  if (-not $IsWindows) {
+                      throw 'Native windows workflow requires its expected operating system.'
                   }
-              }
-              $strGitPath = 'C:\Program Files\Git\bin\git.exe'
-              if (-not [IO.File]::Exists($strGitPath)) {
-                  throw 'The fixed hosted Git application is unavailable.'
-              }
-              $strRevision = $env:GITHUB_SHA
-              if ($strRevision -cnotmatch '^[0-9a-f]{40}$') {
-                  throw 'A full commit hash is required.'
-              }
-              if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
-                  throw 'The acquisition workspace must be empty.'
-              }
-              $strNeutralRoot = Join-Path -Path $env:RUNNER_TEMP -ChildPath ('download-test-git-' + [Guid]::NewGuid().ToString('N'))
-              $strNeutralRoot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($strNeutralRoot)
-              [void][IO.Directory]::CreateDirectory($strNeutralRoot)
-              $strNeutralConfigurationPath = Join-Path -Path $strNeutralRoot -ChildPath 'empty.config'
-              $strNeutralHooks = Join-Path -Path $strNeutralRoot -ChildPath 'hooks'
-              [void][IO.Directory]::CreateDirectory($strNeutralHooks)
-              [IO.File]::WriteAllText($strNeutralConfigurationPath, '', (New-Object Text.UTF8Encoding($false)))
-              $env:GIT_CONFIG_NOSYSTEM = '1'
-              $env:GIT_CONFIG_GLOBAL = $strNeutralConfigurationPath
-              $env:GIT_TERMINAL_PROMPT = '0'
-              $env:GIT_NO_REPLACE_OBJECTS = '1'
-              & $strGitPath -c "core.hooksPath=$strNeutralHooks" -c core.autocrlf=false init --quiet .
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'git init failed.'
-              }
-              & $strGitPath config --local core.hooksPath $strNeutralHooks
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Git hook exclusion failed.'
-              }
-              & $strGitPath config --local core.autocrlf false
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Git byte-preserving checkout configuration failed.'
-              }
-              & $strGitPath remote add origin 'https://github.com/franklesniak/PSStyleGuide'
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'git remote add failed.'
-              }
-              for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
-                  & $strGitPath -c credential.helper= -c http.extraheader= fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
-                  if ($LASTEXITCODE -eq 0) {
-                      break
+                  if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+                      $PSNativeCommandUseErrorActionPreference = $false
                   }
-                  if ($intAttempt -eq 3) {
-                      throw 'Exact revision fetch failed after three attempts.'
+                  if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
+                      $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
+                      throw 'Unexpected acquisition repository.'
                   }
-                  Start-Sleep -Seconds 2
-              }
-              $arrFetched = @(& $strGitPath rev-parse --verify 'FETCH_HEAD^{commit}')
-              if ($LASTEXITCODE -ne 0 -or $arrFetched.Count -ne 1 -or $arrFetched[0] -cne $strRevision) {
-                  throw 'Fetched commit mismatch.'
-              }
-              & $strGitPath checkout --quiet --detach $strRevision
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Exact checkout failed.'
-              }
-              $arrHead = @(& $strGitPath rev-parse --verify 'HEAD^{commit}')
-              if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $strRevision) {
-                  throw 'Checked-out commit mismatch.'
-              }
-              # Recheck actual post-checkout state before running any repository child.
-              foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS')) {
-                  if ([Environment]::GetEnvironmentVariable($strName)) {
-                      throw 'credential-policy: unexpected credentials or command configuration'
+                  foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+                          'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
+                          'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
+                      if ([Environment]::GetEnvironmentVariable($strName)) {
+                          throw 'Unexpected credentials or external Git configuration.'
+                      }
                   }
-              }
-              $arrOrigin = @(& $strGitPath remote get-url --all origin)
-              if ($LASTEXITCODE -ne 0 -or $arrOrigin.Count -ne 1 -or
-                  $arrOrigin[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
-                  throw 'credential-policy: origin is not the exact credential-free repository'
-              }
-              foreach ($strPattern in @('^credential\..*', '^http\..*extraheader$', '^include(if\..*)?\.path$')) {
-                  $arrForbidden = @(& $strGitPath config --local --includes --name-only --get-regexp $strPattern)
-                  $intConfigurationExitCode = $LASTEXITCODE
-                  if ($intConfigurationExitCode -ne 1 -or $arrForbidden.Count -ne 0) {
-                      throw 'credential-policy: persisted credentials or configuration include'
+                  $strGitPath = 'C:\Program Files\Git\bin\git.exe'
+                  if (-not [IO.File]::Exists($strGitPath)) {
+                      throw 'The fixed hosted Git application is unavailable.'
                   }
-                  $global:LASTEXITCODE = 0
-              }
-              $arrEffective = @(& $strGitPath config --includes --show-origin --show-scope --name-only --list)
-              if ($LASTEXITCODE -ne 0 -or $arrEffective.Count -eq 0) {
-                  throw 'credential-policy: effective configuration query failed'
-              }
-              foreach ($strEntry in $arrEffective) {
-                  if ($strEntry -cnotmatch '^local\s+file:\.git/config\s+[^\s]+$') {
-                      throw 'credential-policy: unexpected configuration source'
+                  $strRevision = $env:GITHUB_SHA
+                  if ($strRevision -cnotmatch '^[0-9a-f]{40}$') {
+                      throw 'A full commit hash is required.'
                   }
+                  if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+                      throw 'The acquisition workspace must be empty.'
+                  }
+                  $strNeutralRoot = Join-Path -Path $env:RUNNER_TEMP -ChildPath ('download-test-git-' + [Guid]::NewGuid().ToString('N'))
+                  $strNeutralRoot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($strNeutralRoot)
+                  [void][IO.Directory]::CreateDirectory($strNeutralRoot)
+                  $strNeutralConfigurationPath = Join-Path -Path $strNeutralRoot -ChildPath 'empty.config'
+                  $strNeutralHooks = Join-Path -Path $strNeutralRoot -ChildPath 'hooks'
+                  [void][IO.Directory]::CreateDirectory($strNeutralHooks)
+                  [IO.File]::WriteAllText($strNeutralConfigurationPath, '', (New-Object Text.UTF8Encoding($false)))
+                  $env:GIT_CONFIG_NOSYSTEM = '1'
+                  $env:GIT_CONFIG_GLOBAL = $strNeutralConfigurationPath
+                  $env:GIT_TERMINAL_PROMPT = '0'
+                  $env:GIT_NO_REPLACE_OBJECTS = '1'
+                  & $strGitPath -c "core.hooksPath=$strNeutralHooks" -c core.autocrlf=false init --quiet .
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'git init failed.'
+                  }
+                  & $strGitPath config --local core.hooksPath $strNeutralHooks
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Git hook exclusion failed.'
+                  }
+                  & $strGitPath config --local core.autocrlf false
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Git byte-preserving checkout configuration failed.'
+                  }
+                  & $strGitPath remote add origin 'https://github.com/franklesniak/PSStyleGuide'
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'git remote add failed.'
+                  }
+                  for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+                      & $strGitPath -c credential.helper= -c http.extraheader= fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
+                      if ($LASTEXITCODE -eq 0) {
+                          break
+                      }
+                      if ($intAttempt -eq 3) {
+                          throw 'Exact revision fetch failed after three attempts.'
+                      }
+                      Start-Sleep -Seconds 2
+                  }
+                  $arrFetched = @(& $strGitPath rev-parse --verify 'FETCH_HEAD^{commit}')
+                  if ($LASTEXITCODE -ne 0 -or $arrFetched.Count -ne 1 -or $arrFetched[0] -cne $strRevision) {
+                      throw 'Fetched commit mismatch.'
+                  }
+                  & $strGitPath checkout --quiet --detach $strRevision
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Exact checkout failed.'
+                  }
+                  $arrHead = @(& $strGitPath rev-parse --verify 'HEAD^{commit}')
+                  if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $strRevision) {
+                      throw 'Checked-out commit mismatch.'
+                  }
+                  # Recheck actual post-checkout state before running any repository child.
+                  foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS')) {
+                      if ([Environment]::GetEnvironmentVariable($strName)) {
+                          throw 'credential-policy: unexpected credentials or command configuration'
+                      }
+                  }
+                  $arrOrigin = @(& $strGitPath remote get-url --all origin)
+                  if ($LASTEXITCODE -ne 0 -or $arrOrigin.Count -ne 1 -or
+                      $arrOrigin[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
+                      throw 'credential-policy: origin is not the exact credential-free repository'
+                  }
+                  foreach ($strPattern in @('^credential\..*', '^http\..*extraheader$', '^include(if\..*)?\.path$')) {
+                      $arrForbidden = @(& $strGitPath config --local --includes --name-only --get-regexp $strPattern)
+                      $intConfigurationExitCode = $LASTEXITCODE
+                      if ($intConfigurationExitCode -ne 1 -or $arrForbidden.Count -ne 0) {
+                          throw 'credential-policy: persisted credentials or configuration include'
+                      }
+                      $global:LASTEXITCODE = 0
+                  }
+                  $arrEffective = @(& $strGitPath config --includes --show-origin --show-scope --name-only --list)
+                  if ($LASTEXITCODE -ne 0 -or $arrEffective.Count -eq 0) {
+                      throw 'credential-policy: effective configuration query failed'
+                  }
+                  foreach ($strEntry in $arrEffective) {
+                      if ($strEntry -cnotmatch '^local\s+file:\.git/config\s+[^\s]+$') {
+                          throw 'credential-policy: unexpected configuration source'
+                      }
+                  }
+              } catch {
+                  Write-Debug -Message 'A04 windows acquire failed.'
+                  throw
               }
-          } catch {
-              Write-Debug -Message 'A04 windows acquire failed.'
-              throw
           }
+          Invoke-NativeDownloadAcquisition
       - name: Prepare a private native PowerShell host
         id: host
         shell: pwsh
         timeout-minutes: 10
         run: |
-          [CmdletBinding()]
-          [OutputType([void])]
-          param()
+          function Initialize-NativeDownloadHost {
+              [CmdletBinding()]
+              [OutputType([void])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $PSNativeCommandUseErrorActionPreference = $false
-              if (-not $IsWindows) {
-                  throw 'Native windows workflow requires its expected operating system.'
-              }
-              $objOutputProvider = $null
-              $objOutputDrive = $null
-              $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                  $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
-              if ($objOutputProvider.Name -cne 'FileSystem') {
-                  throw 'Native result output must use the filesystem provider.'
-              }
-              $objOutputStream = $null
               try {
-                  $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
-              } finally {
-                  if ($null -ne $objOutputStream) {
-                      $objOutputStream.Dispose()
+                  $ErrorActionPreference = 'Stop'
+                  $PSNativeCommandUseErrorActionPreference = $false
+                  if (-not $IsWindows) {
+                      throw 'Native windows workflow requires its expected operating system.'
                   }
-              }
-              $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
-              if (Test-Path -LiteralPath $strRoot) {
-                  throw 'Occupied native test namespace.'
-              }
-              [void][IO.Directory]::CreateDirectory($strRoot)
-              if ($IsWindows) {
-                  $objUser = [Security.Principal.WindowsIdentity]::GetCurrent().User
-                  $objAccessControl = [Security.AccessControl.DirectorySecurity]::new()
-                  $objAccessControl.SetOwner($objUser)
-                  $objAccessControl.SetAccessRuleProtection($true, $false)
-                  foreach ($objSecurityIdentifier in @($objUser, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'), [Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))) {
-                      [void]$objAccessControl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($objSecurityIdentifier, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'))
+                  $objOutputProvider = $null
+                  $objOutputDrive = $null
+                  $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                      $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
+                  if ($objOutputProvider.Name -cne 'FileSystem') {
+                      throw 'Native result output must use the filesystem provider.'
                   }
-                  Set-Acl -LiteralPath $strRoot -AclObject $objAccessControl -Confirm:$false -WhatIf:$false
-                  $strZipArchivePath = Join-Path $strRoot 'PowerShell-7.6.5-win-x64.zip'
-                  $strCurl = Join-Path ([Environment]::SystemDirectory) 'curl.exe'
-                  & $strCurl --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 --retry 2 --retry-max-time 300 --max-filesize 106319290 --output $strZipArchivePath 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'
-                  if ($LASTEXITCODE -ne 0) {
-                      throw 'PowerShell bootstrap download failed.'
-                  }
-                  $objZipArchiveFile = Get-Item -LiteralPath $strZipArchivePath -Force
-                  if ($objZipArchiveFile.Length -ne 106319290 -or ($objZipArchiveFile.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
-                      (Get-FileHash -LiteralPath $strZipArchivePath -Algorithm SHA256).Hash.ToLowerInvariant() -cne '32eb8f6cdce08f86e987d625a2733e54ac3e289ae7e1621b14c0b5bcec2434ea') {
-                      throw 'PowerShell bootstrap identity mismatch.'
-                  }
-                  $strHostRoot = Join-Path $strRoot 'powershell'
-                  $objZipArchive = [IO.Compression.ZipFile]::OpenRead($strZipArchivePath)
+                  $objOutputStream = $null
                   try {
-                      if ($objZipArchive.Entries.Count -gt 20000) {
-                          throw 'PowerShell bootstrap entry bound.'
+                      $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
+                  } finally {
+                      if ($null -ne $objOutputStream) {
+                          $objOutputStream.Dispose()
                       }
-                      $objMemberNames = [Collections.Generic.Dictionary[string, bool]]::new([StringComparer]::OrdinalIgnoreCase)
-                      [long]$intExpanded = 0
-                      foreach ($objEntry in $objZipArchive.Entries) {
-                          $strName = $objEntry.FullName
-                          $intExpanded += $objEntry.Length
-                          if ($intExpanded -gt 1073741824 -or $strName -match '[\\:\x00-\x1f]' -or $strName.StartsWith('/') -or
-                              ($objEntry.ExternalAttributes -band 1024) -ne 0 -or (($objEntry.ExternalAttributes -shr 16) -band 61440) -eq 40960) {
-                              throw 'Unsafe PowerShell bootstrap member.'
-                          }
-                          $strKey = $strName.TrimEnd('/')
-                          $arrParts = $strKey.Split('/')
-                          if ($arrParts.Count -eq 0 -or @($arrParts | Where-Object {
-                                      $_ -in @('', '.', '..') -or $_ -match '[. ]$' -or $_ -match '^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)'
-                                  }).Count -ne 0 -or $objMemberNames.ContainsKey($strKey)) {
-                              throw 'Aliased PowerShell bootstrap member.'
-                          }
-                          $objMemberNames.Add($strKey, $strName.EndsWith('/'))
+                  }
+                  $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
+                  if (Test-Path -LiteralPath $strRoot) {
+                      throw 'Occupied native test namespace.'
+                  }
+                  [void][IO.Directory]::CreateDirectory($strRoot)
+                  if ($IsWindows) {
+                      $objUser = [Security.Principal.WindowsIdentity]::GetCurrent().User
+                      $objAccessControl = [Security.AccessControl.DirectorySecurity]::new()
+                      $objAccessControl.SetOwner($objUser)
+                      $objAccessControl.SetAccessRuleProtection($true, $false)
+                      foreach ($objSecurityIdentifier in @($objUser, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'), [Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))) {
+                          [void]$objAccessControl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($objSecurityIdentifier, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'))
                       }
-                      foreach ($strKey in $objMemberNames.Keys) {
-                          $strParent = $strKey
-                          while ($strParent.Contains('/')) {
-                              $strParent = $strParent.Substring(0, $strParent.LastIndexOf('/'))
-                              if ($objMemberNames.ContainsKey($strParent) -and -not $objMemberNames[$strParent]) {
-                                  throw 'Bootstrap file/directory collision.'
+                      Set-Acl -LiteralPath $strRoot -AclObject $objAccessControl -Confirm:$false -WhatIf:$false
+                      $strZipArchivePath = Join-Path $strRoot 'PowerShell-7.6.5-win-x64.zip'
+                      $strCurl = Join-Path ([Environment]::SystemDirectory) 'curl.exe'
+                      & $strCurl --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 --retry 2 --retry-max-time 300 --max-filesize 106319290 --output $strZipArchivePath 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'
+                      if ($LASTEXITCODE -ne 0) {
+                          throw 'PowerShell bootstrap download failed.'
+                      }
+                      $objZipArchiveFile = Get-Item -LiteralPath $strZipArchivePath -Force
+                      if ($objZipArchiveFile.Length -ne 106319290 -or ($objZipArchiveFile.Attributes -band [IO.FileAttributes]::ReparsePoint) -or
+                          (Get-FileHash -LiteralPath $strZipArchivePath -Algorithm SHA256).Hash.ToLowerInvariant() -cne '32eb8f6cdce08f86e987d625a2733e54ac3e289ae7e1621b14c0b5bcec2434ea') {
+                          throw 'PowerShell bootstrap identity mismatch.'
+                      }
+                      $strHostRoot = Join-Path $strRoot 'powershell'
+                      $objZipArchive = [IO.Compression.ZipFile]::OpenRead($strZipArchivePath)
+                      try {
+                          if ($objZipArchive.Entries.Count -gt 20000) {
+                              throw 'PowerShell bootstrap entry bound.'
+                          }
+                          $objMemberNames = [Collections.Generic.Dictionary[string, bool]]::new([StringComparer]::OrdinalIgnoreCase)
+                          [long]$intExpanded = 0
+                          foreach ($objEntry in $objZipArchive.Entries) {
+                              $strName = $objEntry.FullName
+                              $intExpanded += $objEntry.Length
+                              if ($intExpanded -gt 1073741824 -or $strName -match '[\\:\x00-\x1f]' -or $strName.StartsWith('/') -or
+                                  ($objEntry.ExternalAttributes -band 1024) -ne 0 -or (($objEntry.ExternalAttributes -shr 16) -band 61440) -eq 40960) {
+                                  throw 'Unsafe PowerShell bootstrap member.'
+                              }
+                              $strKey = $strName.TrimEnd('/')
+                              $arrParts = $strKey.Split('/')
+                              if ($arrParts.Count -eq 0 -or @($arrParts | Where-Object {
+                                          $_ -in @('', '.', '..') -or $_ -match '[. ]$' -or $_ -match '^(?i:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)'
+                                      }).Count -ne 0 -or $objMemberNames.ContainsKey($strKey)) {
+                                  throw 'Aliased PowerShell bootstrap member.'
+                              }
+                              $objMemberNames.Add($strKey, $strName.EndsWith('/'))
+                          }
+                          foreach ($strKey in $objMemberNames.Keys) {
+                              $strParent = $strKey
+                              while ($strParent.Contains('/')) {
+                                  $strParent = $strParent.Substring(0, $strParent.LastIndexOf('/'))
+                                  if ($objMemberNames.ContainsKey($strParent) -and -not $objMemberNames[$strParent]) {
+                                      throw 'Bootstrap file/directory collision.'
+                                  }
                               }
                           }
+                      } finally {
+                          $objZipArchive.Dispose()
                       }
-                  } finally {
-                      $objZipArchive.Dispose()
+                      [IO.Compression.ZipFile]::ExtractToDirectory($strZipArchivePath, $strHostRoot, $false)
+                      $strPowerShell = Join-Path $strHostRoot 'pwsh.exe'
+                      $arrVersion = @(& $strPowerShell -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()')
+                      if ($LASTEXITCODE -ne 0 -or $arrVersion.Count -ne 1 -or $arrVersion[0] -cne '7.6.5') {
+                          throw 'Private PowerShell version mismatch.'
+                      }
+                  } else {
+                      [IO.File]::SetUnixFileMode($strRoot, [IO.UnixFileMode]::UserRead -bor [IO.UnixFileMode]::UserWrite -bor [IO.UnixFileMode]::UserExecute)
+                      $strPowerShell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
                   }
-                  [IO.Compression.ZipFile]::ExtractToDirectory($strZipArchivePath, $strHostRoot, $false)
-                  $strPowerShell = Join-Path $strHostRoot 'pwsh.exe'
-                  $arrVersion = @(& $strPowerShell -NoLogo -NoProfile -NonInteractive -Command '$PSVersionTable.PSVersion.ToString()')
-                  if ($LASTEXITCODE -ne 0 -or $arrVersion.Count -ne 1 -or $arrVersion[0] -cne '7.6.5') {
-                      throw 'Private PowerShell version mismatch.'
+                  foreach ($strValue in @($strRoot, $strPowerShell)) {
+                      if ($strValue -match '[\r\n]') {
+                          throw 'Invalid native test path.'
+                      }
                   }
-              } else {
-                  [IO.File]::SetUnixFileMode($strRoot, [IO.UnixFileMode]::UserRead -bor [IO.UnixFileMode]::UserWrite -bor [IO.UnixFileMode]::UserExecute)
-                  $strPowerShell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+                  [IO.File]::AppendAllText($strOutputPath, "root=$strRoot`npowershell=$strPowerShell`n", [Text.UTF8Encoding]::new($false))
+              } catch {
+                  Write-Debug -Message 'A04 windows host failed.'
+                  throw
               }
-              foreach ($strValue in @($strRoot, $strPowerShell)) {
-                  if ($strValue -match '[\r\n]') {
-                      throw 'Invalid native test path.'
-                  }
-              }
-              [IO.File]::AppendAllText($strOutputPath, "root=$strRoot`npowershell=$strPowerShell`n", [Text.UTF8Encoding]::new($false))
-          } catch {
-              Write-Debug -Message 'A04 windows host failed.'
-              throw
           }
+          Initialize-NativeDownloadHost
       - name: Provision declared official archive inputs
         id: provision
         shell: pwsh
@@ -638,17 +656,18 @@ jobs:
           A04_ROOT: ${{ steps.host.outputs.root }}
           A04_POWERSHELL: ${{ steps.host.outputs.powershell }}
         run: |
-          [CmdletBinding()]
-          [OutputType([string])]
-          param()
+          function Initialize-NativeDownloadInputs {
+              [CmdletBinding()]
+              [OutputType([string])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              if (-not $IsWindows) {
-                  throw 'Native windows workflow requires its expected operating system.'
-              }
-              $strScript = Join-Path $env:A04_ROOT 'provision.ps1'
-              $strSource = @'
+              try {
+                  $ErrorActionPreference = 'Stop'
+                  if (-not $IsWindows) {
+                      throw 'Native windows workflow requires its expected operating system.'
+                  }
+                  $strScript = Join-Path $env:A04_ROOT 'provision.ps1'
+                  $strSource = @'
           [CmdletBinding()]
           [OutputType([string])]
           param()
@@ -742,15 +761,17 @@ jobs:
               throw
           }
           '@
-              [IO.File]::WriteAllText($strScript, $strSource, [Text.UTF8Encoding]::new($false))
-              & $env:A04_POWERSHELL -NoLogo -NoProfile -NonInteractive -File $strScript
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Native provisioning child failed.'
+                  [IO.File]::WriteAllText($strScript, $strSource, [Text.UTF8Encoding]::new($false))
+                  & $env:A04_POWERSHELL -NoLogo -NoProfile -NonInteractive -File $strScript
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Native provisioning child failed.'
+                  }
+              } catch {
+                  Write-Debug -Message 'A04 windows provision failed.'
+                  throw
               }
-          } catch {
-              Write-Debug -Message 'A04 windows provision failed.'
-              throw
           }
+          Initialize-NativeDownloadInputs
       - name: Run every native case for this platform
         id: native
         shell: pwsh
@@ -761,67 +782,70 @@ jobs:
           A04_ARCHIVES: ${{ steps.provision.outputs.archives }}
           A04_NODE: ${{ steps.provision.outputs.node }}
         run: |
-          [CmdletBinding()]
-          [OutputType([string])]
-          param()
+          function Invoke-NativeDownloadTests {
+              [CmdletBinding()]
+              [OutputType([string])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $PSNativeCommandUseErrorActionPreference = $false
-              if (-not $IsWindows) {
-                  throw 'Native windows workflow requires its expected operating system.'
-              }
-              $objOutputProvider = $null
-              $objOutputDrive = $null
-              $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
-                  $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
-              if ($objOutputProvider.Name -cne 'FileSystem') {
-                  throw 'Native result output must use the filesystem provider.'
-              }
-              $objOutputStream = $null
               try {
-                  $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
-              } finally {
-                  if ($null -ne $objOutputStream) {
-                      $objOutputStream.Dispose()
+                  $ErrorActionPreference = 'Stop'
+                  $PSNativeCommandUseErrorActionPreference = $false
+                  if (-not $IsWindows) {
+                      throw 'Native windows workflow requires its expected operating system.'
                   }
+                  $objOutputProvider = $null
+                  $objOutputDrive = $null
+                  $strOutputPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                      $env:GITHUB_OUTPUT, [ref]$objOutputProvider, [ref]$objOutputDrive)
+                  if ($objOutputProvider.Name -cne 'FileSystem') {
+                      throw 'Native result output must use the filesystem provider.'
+                  }
+                  $objOutputStream = $null
+                  try {
+                      $objOutputStream = [IO.File]::Open($strOutputPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
+                  } finally {
+                      if ($null -ne $objOutputStream) {
+                          $objOutputStream.Dispose()
+                      }
+                  }
+                  Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
+                  $env:TEMP = $env:A04_ROOT
+                  $env:TMP = $env:A04_ROOT
+                  $env:TMPDIR = $env:A04_ROOT
+                  & $env:A04_NODE --test .github/workflows/Test-CiToolchainDownloads.test.mjs
+                  if ($LASTEXITCODE -ne 0) {
+                      throw 'Native fixture contract tests failed.'
+                  }
+                  $arrOutput = @(& $env:A04_NODE .github/workflows/Test-CiToolchainDownloads.mjs --archive-directory $env:A04_ARCHIVES --powershell $env:A04_POWERSHELL)
+                  if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 1 -or $arrOutput[0].Length -gt 1048576) {
+                      throw 'Native suite did not produce one bounded completed result.'
+                  }
+                  $objResult = ConvertFrom-Json -InputObject $arrOutput[0]
+                  $strPlatform = if ($IsWindows) {
+                      'win32'
+                  } else {
+                      'linux'
+                  }
+                  $intCases = if ($IsWindows) {
+                      10
+                  } else {
+                      5
+                  }
+                  if ($objResult.schema -cne 'StyleGuide.NativeDownloadResult.v1' -or $objResult.platform -cne $strPlatform -or
+                      $objResult.passed -ne $intCases -or $objResult.failed -ne 0 -or $objResult.skipped -ne 0 -or
+                      $objResult.cases.Count -ne $intCases -or @($objResult.cases | Where-Object {
+                              -not $_.passed -or -not $_.cleanup
+                          }).Count -ne 0) {
+                      throw 'Incomplete native platform proof.'
+                  }
+                  Write-Output $arrOutput[0]
+                  [IO.File]::AppendAllText($strOutputPath, "passed=$intCases`nrevision=$env:GITHUB_SHA`n", [Text.UTF8Encoding]::new($false))
+              } catch {
+                  Write-Debug -Message 'A04 windows native failed.'
+                  throw
               }
-              Remove-Item Env:NODE_OPTIONS, Env:NODE_PATH -ErrorAction SilentlyContinue -Confirm:$false -WhatIf:$false
-              $env:TEMP = $env:A04_ROOT
-              $env:TMP = $env:A04_ROOT
-              $env:TMPDIR = $env:A04_ROOT
-              & $env:A04_NODE --test .github/workflows/Test-CiToolchainDownloads.test.mjs
-              if ($LASTEXITCODE -ne 0) {
-                  throw 'Native fixture contract tests failed.'
-              }
-              $arrOutput = @(& $env:A04_NODE .github/workflows/Test-CiToolchainDownloads.mjs --archive-directory $env:A04_ARCHIVES --powershell $env:A04_POWERSHELL)
-              if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 1 -or $arrOutput[0].Length -gt 1048576) {
-                  throw 'Native suite did not produce one bounded completed result.'
-              }
-              $objResult = ConvertFrom-Json -InputObject $arrOutput[0]
-              $strPlatform = if ($IsWindows) {
-                  'win32'
-              } else {
-                  'linux'
-              }
-              $intCases = if ($IsWindows) {
-                  10
-              } else {
-                  5
-              }
-              if ($objResult.schema -cne 'StyleGuide.NativeDownloadResult.v1' -or $objResult.platform -cne $strPlatform -or
-                  $objResult.passed -ne $intCases -or $objResult.failed -ne 0 -or $objResult.skipped -ne 0 -or
-                  $objResult.cases.Count -ne $intCases -or @($objResult.cases | Where-Object {
-                          -not $_.passed -or -not $_.cleanup
-                      }).Count -ne 0) {
-                  throw 'Incomplete native platform proof.'
-              }
-              Write-Output $arrOutput[0]
-              [IO.File]::AppendAllText($strOutputPath, "passed=$intCases`nrevision=$env:GITHUB_SHA`n", [Text.UTF8Encoding]::new($false))
-          } catch {
-              Write-Debug -Message 'A04 windows native failed.'
-              throw
           }
+          Invoke-NativeDownloadTests
   native_downloads:
     if: always() && (github.event_name != 'push' || github.event.deleted != true)
     needs: [native_linux, native_windows]
@@ -835,29 +859,32 @@ jobs:
         env:
           PLATFORM_RESULTS: ${{ toJSON(needs) }}
         run: |
-          [CmdletBinding()]
-          [OutputType([void])]
-          param()
+          function Confirm-NativeDownloadResults {
+              [CmdletBinding()]
+              [OutputType([void])]
+              param()
 
-          try {
-              $ErrorActionPreference = 'Stop'
-              $objResults = ConvertFrom-Json -InputObject $env:PLATFORM_RESULTS
-              if (@($objResults.PSObject.Properties).Count -ne 2) {
-                  throw 'Missing native platform.'
-              }
-              foreach ($strPlatform in @('linux', 'windows')) {
-                  $objResult = $objResults.PSObject.Properties['native_' + $strPlatform].Value
-                  $intCases = if ($strPlatform -ceq 'windows') {
-                      10
-                  } else {
-                      5
+              try {
+                  $ErrorActionPreference = 'Stop'
+                  $objResults = ConvertFrom-Json -InputObject $env:PLATFORM_RESULTS
+                  if (@($objResults.PSObject.Properties).Count -ne 2) {
+                      throw 'Missing native platform.'
                   }
-                  if ($objResult.result -cne 'success' -or $objResult.outputs.revision -cne $env:GITHUB_SHA -or
-                      $objResult.outputs.passed -cne [string]$intCases) {
-                      throw 'Required native platform did not pass completely.'
+                  foreach ($strPlatform in @('linux', 'windows')) {
+                      $objResult = $objResults.PSObject.Properties['native_' + $strPlatform].Value
+                      $intCases = if ($strPlatform -ceq 'windows') {
+                          10
+                      } else {
+                          5
+                      }
+                      if ($objResult.result -cne 'success' -or $objResult.outputs.revision -cne $env:GITHUB_SHA -or
+                          $objResult.outputs.passed -cne [string]$intCases) {
+                          throw 'Required native platform did not pass completely.'
+                      }
                   }
+              } catch {
+                  Write-Debug -Message 'A04 require-platforms failed.'
+                  throw
               }
-          } catch {
-              Write-Debug -Message 'A04 require-platforms failed.'
-              throw
           }
+          Confirm-NativeDownloadResults
