@@ -1338,7 +1338,7 @@ function supplyFreezeTupleDigestOrRefuse(objValue) {
     return sha256(canonicalize(objValue));
   } catch {
     process.stderr.write(
-      'supply-freeze: P1 historical assertions could not be compared safely; refusing.\n' +
+      'supply-freeze: historical profile assertions could not be compared safely; refusing.\n' +
       '  source content, comparison details, and local paths are withheld.\n' +
       '  nothing is recorded.\n');
     process.exit(17);
@@ -4355,15 +4355,15 @@ function snapshotOrRefuse(strPath) {
 function snapshotContractOrRefuse(strPath) {
   const refuseInitialContractRead = (objError) => {
     process.stderr.write(
-      'supply-freeze: refusing to record an unreadable P1 contract.\n' +
-      '  P1 contract        path/name withheld; could not be read\n' +
+      'supply-freeze: refusing to record an unreadable historical profile contract.\n' +
+      '  historical profile contract        path/name withheld; could not be read\n' +
       formatErrorLocation(objError, strPath) +
-      '  the reviewed P1 contract must be a readable, regular, singly linked file\n' +
+      '  the reviewed historical profile contract must be a readable, regular, singly linked file\n' +
       '  owned by this recording user before anything is recorded.\n');
   };
   try {
     return readViaVerifiedDescriptor(strPath, 17, refuseInitialContractRead,
-      { exit: 17, what: 'P1 contract', holdable: true });
+      { exit: 17, what: 'historical profile contract', holdable: true });
   } catch (objError) {
     // readViaVerifiedDescriptor translates every native descriptor-operation
     // failure. This boundary preserves the initial-contract fallback for an
@@ -4375,10 +4375,10 @@ function snapshotContractOrRefuse(strPath) {
 
 function readContractOrRefuse(strPath) {
   try {
-    return readOrRefuse(strPath, { exit: 3, what: 'P1 contract', holdable: true });
+    return readOrRefuse(strPath, { exit: 3, what: 'historical profile contract', holdable: true });
   } catch (objError) {
     process.stderr.write(
-      'supply-freeze: the P1 contract became unreadable during recording; refusing.\n' +
+      'supply-freeze: the historical profile contract became unreadable during recording; refusing.\n' +
       formatErrorLocation(objError, strPath));
     process.exit(3);
   }
@@ -4400,13 +4400,13 @@ const strContractPath = join(strWorkflowDirectory, 'historical-supply-profile.js
 const objContractBefore = snapshotContractOrRefuse(strContractPath);
 function contractIdentityOrRefuse() {
   try { return lstatSync(strContractPath, { bigint: true }); } catch {
-    process.stderr.write('supply-freeze: P1 contract became unreadable during recording; refusing.\n');
+    process.stderr.write('supply-freeze: historical profile contract became unreadable during recording; refusing.\n');
     process.exit(3);
   }
 }
 const objContractIdentityBefore = contractIdentityOrRefuse();
 const objContract = parseNpmJsonOrRefuse(
-  decodeUtf8ExactlyOrRefuse(objContractBefore, 'P1 contract', 17), 'P1 contract', 17);
+  decodeUtf8ExactlyOrRefuse(objContractBefore, 'historical profile contract', 17), 'historical profile contract', 17);
 // Task131 F131-1. JSON.parse accepts every JSON root, including null. Reading
 // supplyFreeze before checking that root used to throw a TypeError at native
 // exit 1 and expose a local script path, bypassing the fixed exit-17 contract
@@ -4414,10 +4414,10 @@ const objContract = parseNpmJsonOrRefuse(
 // diagnostic behavior, so the generic JSON parser must remain root-neutral.
 if (!isPlainObject(objContract)) {
   process.stderr.write(
-    'supply-freeze: the P1 contract root has an unexpected response schema; refusing.\n' +
+    'supply-freeze: the historical profile contract root has an unexpected response schema; refusing.\n' +
     '  expected           JSON object\n' +
     '  source content, root value, parser details, and local paths are withheld.\n' +
-    '  the initial P1 contract must be an object before its assertions are read;\n' +
+    '  the initial historical profile contract must be an object before its assertions are read;\n' +
     '  nothing is recorded.\n');
   process.exit(17);
 }
@@ -4425,7 +4425,7 @@ const objSupplyFreeze = objContract.supplyFreeze;
 if (!isPlainObject(objSupplyFreeze)
   || supplyFreezeTupleDigestOrRefuse(objSupplyFreeze)
     !== '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362') {
-  process.stderr.write('supply-freeze: P1 historical assertions differ from the reviewed tuple; refusing.\n');
+  process.stderr.write('supply-freeze: historical profile assertions differ from the reviewed tuple; refusing.\n');
   process.exit(17);
 }
 
@@ -6505,7 +6505,7 @@ const objContractIdentityAfter = contractIdentityOrRefuse();
 if (!objContractBefore.equals(objContractAfter)
   || objContractIdentityBefore.ino !== objContractIdentityAfter.ino
   || objContractIdentityBefore.ctimeNs !== objContractIdentityAfter.ctimeNs) {
-  process.stderr.write('supply-freeze: P1 contract changed during recording; refusing.\n');
+  process.stderr.write('supply-freeze: historical profile contract changed during recording; refusing.\n');
   process.exit(3);
 }
 const { freezeRecord: boolComplete, notFreezeRecordBecause: arrIncompleteBecause,
