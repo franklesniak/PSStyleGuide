@@ -5462,7 +5462,8 @@ if (!boolAnyToolchain && !objRecord.matchesReviewedManifest) {
     `                     reviewed ${REVIEWED_LOCK_SHA256}\n` +
     `  package.json       blob     ${gitBlobId(objPackageBefore)}\n` +
     `                     reviewed ${REVIEWED_PACKAGE_BLOB}\n` +
-    '  a changed manifest needs a new reviewed freeze, not a digest against this one.\n');
+    '  These files do not match this historical profile. Use current locked-install and parser-integrity checks '
+      + 'for routine validation. A dependency change does not require a new historical profile.\n');
   process.exit(4);
 }
 

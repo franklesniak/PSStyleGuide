@@ -5,13 +5,13 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-09-30
+- **Last Updated:** 2026-10-14
 - **Scope:** Manual, read-only supply observation and separate historical provenance verification for issue 158. This method does not change the P1 schema or integrate a workflow gate.
 - **Related:** [Issue 158](https://github.com/franklesniak/PSStyleGuide/issues/158), [historical profile](../.github/workflows/historical-supply-profile.json), [recorder](../.github/workflows/Get-SupplyFreezeDigest.mjs), [focused tests](../.github/workflows/Get-SupplyFreezeDigest.test.mjs), [baseline decision](decisions/0002-accept-unverifiable-baseline-provenance.md)
 
 ## Meaning of a successful run
 
-This recorder is an optional manual diagnostic. It is not a routine CI, dependency-update or merge requirement. Its unchanged historical assertions now reside in `historical-supply-profile.json`, copied from accepted commit `91fd587f53de228792cd65c46bbd2c4e871a580d`. The active workflow policy does not use this file. Strict mode compares with the named historical profile. A current dependency change does not require a new historical profile. Use current locked-install and parser-integrity checks for routine validation. Run the deep diagnostic only when an installed-byte or historical-provenance question needs it.
+This recorder is an optional manual diagnostic. It is not a routine CI, dependency-update or merge requirement. Its unchanged historical assertions now reside in `historical-supply-profile.json`, copied from accepted commit `91fd587f53de228792cd65c46bbd2c4e871a580d`. The active workflow policy does not use this file. Strict mode compares with the named historical profile. Current package inputs normally differ from this frozen profile, so strict refusal is expected; `--no-audit` and `--any-toolchain` produce explicitly incomplete observations. A current dependency change does not require a new historical profile. Use current locked-install and parser-integrity checks for routine validation. Run the deep diagnostic only when an installed-byte or historical-provenance question needs it.
 
 The recorder copies the existing `supplyFreeze` object without changing its `P1-SUPPLY-FREEZE-v1` schema, field names, values, or types. It emits new measurements under `currentObservation`. The historical producer is Windows/x64; the current recorder supports Linux/x64. These are different events. A current Linux installation cannot reconstruct the historical Windows installation.
 
