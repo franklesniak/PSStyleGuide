@@ -13,6 +13,71 @@ const workflow = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(workflow, 'Get-SupplyFreezeDigest.mjs'), 'utf8');
 const sha = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
+function replaceUniquePinDeclaration(strSource, strName, strValue) {
+  const expression = new RegExp(`const ${strName} = '[0-9a-f]+';`, 'gu');
+  const arrMatches = Array.from(strSource.matchAll(expression));
+  assert.equal(arrMatches.length, 1,
+    `expected exactly one production literal for ${strName}; found ${arrMatches.length}`);
+  const [{ 0: strDeclaration, index: intStart }] = arrMatches;
+  const strReplacement = `const ${strName} = '${strValue}';`;
+  return strSource.slice(0, intStart) + strReplacement
+    + strSource.slice(intStart + strDeclaration.length);
+}
+
+function assertHistoricalManifestPins(strSource, objSupplyFreeze) {
+  const objHistoricalPins = {
+    REVIEWED_PACKAGE_SHA256: objSupplyFreeze.reviewedWorkingBytes.packageJson.sha256,
+    REVIEWED_LOCK_SHA256: objSupplyFreeze.reviewedWorkingBytes.packageLockJson.sha256,
+    // These are the reviewed working-byte blobs, not the different baseline blobs.
+    REVIEWED_PACKAGE_BLOB: '84bd0421fcf17984220a408e42c5e0523ef65be6',
+    REVIEWED_LOCK_BLOB: 'c3f949822315ec5ff4cc1028922c31d0186cf9cf',
+  };
+  for (const [strName, strExpected] of Object.entries(objHistoricalPins)) {
+    const expression = new RegExp(`const ${strName} = '([0-9a-f]+)';`, 'gu');
+    const arrMatches = Array.from(strSource.matchAll(expression));
+    assert.equal(arrMatches.length, 1,
+      `expected exactly one historical production literal for ${strName}; found ${arrMatches.length}`);
+    assert.equal(arrMatches[0][1], strExpected,
+      `${strName} must match the historical reviewed working-byte identity`);
+  }
+}
+
+test('HISTORICAL-MANIFEST-PINS: unmodified production literals match historical identities', () => {
+  const objSupplyFreeze = JSON.parse(readFileSync(join(workflow,
+    'historical-supply-profile.json'))).supplyFreeze;
+  assert.doesNotThrow(() => assertHistoricalManifestPins(source, objSupplyFreeze));
+  for (const [strName, intLength] of [
+    ['REVIEWED_PACKAGE_SHA256', 64], ['REVIEWED_LOCK_SHA256', 64],
+    ['REVIEWED_PACKAGE_BLOB', 40], ['REVIEWED_LOCK_BLOB', 40],
+  ]) {
+    const strChanged = replaceUniquePinDeclaration(source, strName, '0'.repeat(intLength));
+    assert.throws(() => assertHistoricalManifestPins(strChanged, objSupplyFreeze),
+      new RegExp(`${strName} must match the historical reviewed working-byte identity`, 'u'));
+  }
+  const strDeclaration = source.match(/const REVIEWED_PACKAGE_SHA256 = '[0-9a-f]+';/u)[0];
+  assert.throws(() => assertHistoricalManifestPins(source.replace(strDeclaration, ''), objSupplyFreeze),
+    /expected exactly one historical production literal.*found 0/u);
+  assert.throws(() => assertHistoricalManifestPins(`${source}\n${strDeclaration}`, objSupplyFreeze),
+    /expected exactly one historical production literal.*found 2/u);
+});
+
+test('SYNTHETIC-PIN-TRANSFORM: require exactly one declaration and preserve all other bytes', () => {
+  const strName = 'REVIEWED_PACKAGE_SHA256';
+  const strValue = 'b'.repeat(64);
+  const strDeclaration = `const ${strName} = '${'a'.repeat(64)}';`;
+  assert.throws(() => replaceUniquePinDeclaration('// no declaration', strName, strValue),
+    /expected exactly one production literal.*found 0/u);
+  const strSingle = `before\n${strDeclaration}\nafter`;
+  const intStart = strSingle.indexOf(strDeclaration);
+  const strExpected = strSingle.slice(0, intStart)
+    + `const ${strName} = '${strValue}';`
+    + strSingle.slice(intStart + strDeclaration.length);
+  assert.equal(replaceUniquePinDeclaration(strSingle, strName, strValue), strExpected);
+  assert.throws(() => replaceUniquePinDeclaration(
+    `${strDeclaration}\n${strDeclaration}`, strName, strValue),
+  /expected exactly one production literal.*found 2/u);
+});
+
 // Extract the production function, rather than duplicating its predicate in a
 // test-only implementation. Subprocess outcomes here are synthetic fixtures.
 const start = source.indexOf('function runNpmAllowingFailure(');
@@ -947,6 +1012,8 @@ test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by p
   strDiagnostic = '';
   objScenario = { stdout: Buffer.from(report), stderr: Buffer.alloc(0), status: 1, signal: null };
   assert.equal(auditFunction(runNpm)(['audit']), report);
+  assert.deepEqual(arrResults.at(-1),
+    { operation: 'audit', nativeExit: 1, signal: null, stderrLength: 0 });
 
   objScenario = { stdout: Buffer.from('{"problems":[]}'), stderr: Buffer.alloc(0),
     status: null, signal: 'SIGTERM' };
@@ -1451,6 +1518,12 @@ return {normalizeAudit, canonicalize, auditPackageDisplaySummary, renderAuditPac
   assert.equal(objSummary.directAdvisory.moderate, 0);
   assert.equal(objSummary.directAdvisory.unclassified, 0);
   assert.equal(objSummary.inheritedOnly.unclassified, 1);
+  assert.deepEqual(Object.keys(objSummary), ['directAdvisory', 'inheritedOnly']);
+  for (const objCounts of Object.values(objSummary)) {
+    assert.deepEqual(Object.keys(objCounts),
+      ['info', 'low', 'moderate', 'high', 'critical', 'unclassified']);
+    assert.ok(Object.values(objCounts).every(Number.isSafeInteger));
+  }
   const objChanged = structuredClone(objAudit);
   objChanged.vulnerabilities.TASK130_F16_VIA_KEY.via =
     ['TASK130_F16_DIFFERENT_INHERITED_SECRET'];
@@ -2227,7 +2300,7 @@ function fingerprint(root) {
     links: rows.filter((row) => row[4] === 'L').length };
 }
 
-test('LINUX: strict success, entire ignored tree preservation, and refusal properties',
+test('LINUX: current historical-pin refusal, synthetic manifest control, and refusal properties',
   { skip: process.platform !== 'linux' || process.arch !== 'x64' }, () => {
     const temporary = mkdtempSync(join(tmpdir(), 'p1-recorder-tests-'));
     const checkout = join(temporary, 'TASK131_F31_PRIVATE_PATH');
@@ -2265,28 +2338,66 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.equal(result.stdout, '');
     };
     try {
+      const objCurrentManifestRefusal = invoke([], {
+        npm_config_cache: join(checkout, 'forbidden-cache'),
+        npm_config_logs_dir: join(checkout, 'forbidden-logs'),
+        npm_config_timing: 'true',
+      });
+      refuse(objCurrentManifestRefusal, 4);
+      assert.match(objCurrentManifestRefusal.stderr,
+        /These files do not match this historical profile\. Use current locked-install and parser-integrity checks for routine validation\. A dependency change does not require a new historical profile\./);
+
+      // SYNTHETIC TEST FIXTURE ONLY: the unmodified production helper above
+      // refuses the current package bytes against its immutable historical pins.
+      // Rebind only the private copy's four manifest identity literals so the
+      // remaining Linux property cases can reach their independent guards.
+      // The comparison/refusal code and historical profile stay byte-identical;
+      // this fixture is not historical installed-byte evidence or a policy pass.
+      assertHistoricalManifestPins(source, contract.supplyFreeze);
+      const packageBytesForFixture = readFileSync(join(fixture, 'package.json'));
+      const lockBytesForFixture = readFileSync(join(fixture, 'package-lock.json'));
+      const gitBlobForFixture = (bytes) => createHash('sha1')
+        .update(`blob ${bytes.length}\0`).update(bytes).digest('hex');
+      const objSyntheticManifestPins = {
+        REVIEWED_PACKAGE_SHA256: sha(packageBytesForFixture),
+        REVIEWED_LOCK_SHA256: sha(lockBytesForFixture),
+        REVIEWED_PACKAGE_BLOB: gitBlobForFixture(packageBytesForFixture),
+        REVIEWED_LOCK_BLOB: gitBlobForFixture(lockBytesForFixture),
+      };
+      let strSyntheticRecorderSource = source;
+      for (const [name, value] of Object.entries(objSyntheticManifestPins)) {
+        strSyntheticRecorderSource = replaceUniquePinDeclaration(strSyntheticRecorderSource,
+          name, value);
+      }
+      assert.notEqual(strSyntheticRecorderSource, source);
+      writeFileSync(join(fixture, 'Get-SupplyFreezeDigest.mjs'), strSyntheticRecorderSource);
+
       const before = fingerprint(checkout);
-      const success = invoke([], {
+      const success = invoke(['--no-audit'], {
         npm_config_cache: join(checkout, 'forbidden-cache'),
         npm_config_logs_dir: join(checkout, 'forbidden-logs'),
         npm_config_timing: 'true',
       });
       assert.equal(success.status, 0, success.stderr);
       const result = JSON.parse(success.stdout);
-      assert.equal(result.currentObservation.complete, true);
-      assert.deepEqual(result.supplyFreeze, contract.supplyFreeze);
+      // Synthetic output-schema control only; these private temp pins are not historical-byte evidence.
       assert.deepEqual(result.provenance.verifiedCurrentBytes, ['supplyFreeze.reviewedWorkingBytes']);
+      assert.equal(result.currentObservation.complete, false);
+      assert.deepEqual(result.supplyFreeze, contract.supplyFreeze);
       assert.equal(result.currentObservation.toolchain.platform, 'linux');
       assert.equal(result.supplyFreeze.producer.platform, 'win32-x64');
-      assert.deepEqual(Object.keys(result.currentObservation.auditPackages),
-        ['directAdvisory', 'inheritedOnly']);
-      for (const objCause of Object.values(result.currentObservation.auditPackages)) {
-        assert.deepEqual(Object.keys(objCause),
-          ['info', 'low', 'moderate', 'high', 'critical', 'unclassified']);
-        assert.ok(Object.values(objCause).every(Number.isSafeInteger));
-      }
+      assert.match(result.currentObservation.installedTreeSha256, /^[0-9a-f]{64}$/u);
+      assert.equal(result.currentObservation.auditSha256, null);
+      assert.equal(result.currentObservation.auditCounts, null);
+      assert.equal(result.currentObservation.auditPackages, null);
+      assert.equal(Object.hasOwn(result.currentObservation, 'auditSha256'), true);
+      assert.equal(Object.hasOwn(result.currentObservation, 'auditCounts'), true);
+      assert.equal(Object.hasOwn(result.currentObservation, 'auditPackages'), true);
+      assert.equal(result.currentObservation.npmProcesses
+        .filter((item) => item.operation === 'ls').length, 1);
       assert.ok(result.currentObservation.npmProcesses.every((item) => item.signal === null
-        && (item.nativeExit === 0 || (item.operation === 'audit' && item.nativeExit === 1))));
+        && item.nativeExit === 0));
+      assert.equal(result.currentObservation.npmProcesses.some((item) => item.operation === 'audit'), false);
       assert.deepEqual(fingerprint(checkout), before);
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
@@ -2475,7 +2586,7 @@ const realpathSync = (strPath, ...arrArguments) => {
       const scrubbed = spawnSync('env', ['-u', 'NODE_OPTIONS', '-u', 'NODE_COMPILE_CACHE',
         '-u', 'NODE_V8_COVERAGE', '-u', 'NODE_REDIRECT_WARNINGS', '-u', 'NODE_DEBUG',
         '-u', 'NODE_DEBUG_NATIVE', 'NODE_DISABLE_COMPILE_CACHE=1',
-        process.execPath, join(fixture, 'Get-SupplyFreezeDigest.mjs'), '--json',
+        process.execPath, join(fixture, 'Get-SupplyFreezeDigest.mjs'), '--json', '--no-audit',
         `--cache-directory=${mkdtempSync(join(temporary, 'startup-cache-'))}`], {
         encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
         env: { ...process.env, NODE_OPTIONS: '--trace-warnings', NODE_COMPILE_CACHE: startupTargets[0],
@@ -2484,7 +2595,17 @@ const realpathSync = (strPath, ...arrArguments) => {
           NODE_DISABLE_COMPILE_CACHE: '0' },
       });
       assert.equal(scrubbed.status, 0, scrubbed.stderr);
-      assert.equal(JSON.parse(scrubbed.stdout).currentObservation.complete, true);
+      const objScrubbed = JSON.parse(scrubbed.stdout);
+      assert.equal(objScrubbed.currentObservation.complete, false);
+      assert.equal(objScrubbed.currentObservation.auditSha256, null);
+      assert.equal(objScrubbed.currentObservation.auditCounts, null);
+      assert.equal(objScrubbed.currentObservation.auditPackages, null);
+      assert.match(objScrubbed.currentObservation.installedTreeSha256, /^[0-9a-f]{64}$/u);
+      assert.equal(objScrubbed.currentObservation.npmProcesses
+        .filter((item) => item.operation === 'ls').length, 1);
+      assert.ok(objScrubbed.currentObservation.npmProcesses.every((item) => item.signal === null
+        && item.nativeExit === 0));
+      assert.equal(objScrubbed.currentObservation.npmProcesses.some((item) => item.operation === 'audit'), false);
       assert.ok(startupTargets.every((path) => !existsSync(path)));
       assert.deepEqual(fingerprint(checkout), before);
       refuse(invoke(['--no-audit'], { NODE_REDIRECT_WARNINGS: join(temporary, 'unsupported-warnings') }), 2);
@@ -2638,6 +2759,7 @@ const realpathSync = (strPath, ...arrArguments) => {
 
       const strPrivateRegistry =
         'https://TASK130_F29_PRIVATE_HOST:8443/TASK130_F29_PRIVATE_PATH?token=PRIVATE';
+      // Keep audit enabled: --no-audit skips registry validation, and this guard exits before audit runs.
       const registryFailure = invoke([], { NPM_CONFIG_REGISTRY: strPrivateRegistry });
       refuse(registryFailure, 9);
       assert.match(registryFailure.stderr,
