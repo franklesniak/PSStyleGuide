@@ -5,7 +5,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-10-13
+- **Last Updated:** 2026-10-14
 - **Scope:** Describes repository-owned workflow scripts, supported local entry points, setup, and Markdown lint behavior. It does not define repository-wide documentation policy.
 - **Related:** [Nested Markdown Linting Implementation Summary](MARKDOWN-LINTING-IMPLEMENTATION.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
@@ -31,6 +31,8 @@ This table lists the workflow tools and helpers in this directory. It excludes `
 | `NpmTools.mjs` | Installs both locked dependency graphs with isolated npm configuration and activates the retained hook. | `node .github/workflows/NpmTools.mjs install` |
 | `Test-AgentInstructions.ps1` | Validates governed instruction capacity, operative policy, final-state metadata, staged-input matching, and behavioral mutation controls. | `npm run test:agent-instructions` |
 | `Test-CheckoutCredentials.ps1` | Verifies the anonymous checkout's origin and credential policy. | Called by CI and shared helpers after anonymous acquisition; requires PowerShell 7.3 or later (exactly 7.6.5 on Windows), the expected origin, and credential-free Linux or supported Windows x64 runner context. |
+| `Test-CiToolchainDownloads.mjs` | Runs the ten Windows or five Linux whole-initializer download cases with explicit official archive inputs. | `node .github/workflows/Test-CiToolchainDownloads.mjs --archive-directory ABSOLUTE_ARCHIVE_DIRECTORY --powershell ABSOLUTE_POWERSHELL_EXECUTABLE` |
+| `CiToolchainDownloadFixtures.mjs` | Supplies bounded archive, process, argument and result helpers for the native download CLI and hermetic tests. | Imported by the test entry points; no standalone invocation. |
 | `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |
 | `Test-StyleGuideGenerator.ps1` | Exercises actual generation, golden bytes, publication, and focused composition and identity controls in disposable repositories. | Run directly in Windows PowerShell 5.1 or PowerShell 7. Hosted cells pass `-ExpectedHost WindowsPowerShell51`, `WindowsPowerShell7`, or `LinuxPowerShell7`; Linux requires native ext4 for source and scratch storage. |
 | `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |
@@ -46,6 +48,16 @@ The shared Linux CI helpers are `Initialize-CiToolchain.ps1`, `Test-CheckoutCred
 Run installer and audit tests with `node --test .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs`. See [dependency maintenance](../../docs/dependency-maintenance.md) for installation behavior, audit results and the `npm-risk-exceptions.json` record.
 
 The instruction entry point loads `Test-AgentInstructions.SelfTest.ps1` for `-SelfTest` and preserves `-RequireStagedInputMatch` for local staged checks. It also supports the accepted-base metadata finalization and classification modes and the separate proposed-policy diagnostic. Follow [governed document finalization](../../CONTRIBUTING.md#finalize-governed-document-metadata) for exact base/head requirements; a proposed-code check does not grant accepted-policy authority.
+
+## Native download tests
+
+The explicit native CLI requires the preferred Node version from root `package.json`, native x64 Windows or Linux, an absolute PowerShell executable, and an ordinary archive directory. Windows uses exactly PowerShell 7.6.5 and the declared preferred official Node ZIP. Linux uses reviewed PowerShell 7 and the declared official recovery Node 22 archive. Archive names, versions and SHA256 identities come from `package.json` and `ci-toolchain.json`; missing, aliased or wrong archives fail. The CLI never downloads missing inputs and has no skip switch. It preserves the complete initializer and credential helper in private fixture copies, changing only the unique download invocation and bounded phase observations. Production URLs and guards remain unchanged.
+
+Windows exercises connection and attempt caps, both Retry-After forms, transient and exhausted retries, partial-body recovery, short EOF and digest refusal. Successful Windows cases execute the official extracted runtime. Linux completes a controlled preferred runtime first, then exercises five recovery outcomes. Its successful recovery executes the official Node 22 runtime; the preferred runtime is explicitly controlled. The wrong-version case uses a finite controlled recovery archive with a matching private digest. No controlled archive is represented as vendor proof.
+
+`ci-toolchain-downloads.yml` provisions both platforms after an anonymous exact-revision checkout with empty permissions. Windows bootstraps the pinned official PowerShell 7.6.5 ZIP into private storage without changing the installed host or execution policy. The unchanged initializer acquires official Node archives; the workflow copies and rehashes the retained archive into a separate input directory. Both complete native platform results are required by `native_downloads`. Candidate execution uses ordinary push, pull-request and manual events. The existing policy command also validates this workflow, including the nine reviewed script identities in `workflow-policy-contract.json`. Changes to those scripts require a reviewed contract update.
+
+Run the independent hermetic contracts without vendor archives using `node --test .github/workflows/Test-CiToolchainDownloads.test.mjs`. They also load with the existing `Test-CiHelpers.test.mjs` suite. These checks establish fixture contracts, not native platform qualification. Native failures preserve their private fixture for diagnosis; successful cases require natural child exits, complete witnesses, exact final channel bytes and owned fixture cleanup. A watchdog interruption or missing native exit is never an expected product refusal.
 
 ## Outer and staged Markdown
 

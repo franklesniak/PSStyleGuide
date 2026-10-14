@@ -27,6 +27,7 @@ const selectorPaths = new Set([
     'npm-risk-exceptions.json', 'install-husky.mjs', 'lint-staged-markdown.mjs',
     'Validate-WorkflowPolicy.test.mjs',
     'Test-CiHelpers.test.mjs', 'Test-LocalValidation.test.mjs', 'Invoke-LockedPythonHook.ps1',
+    'CiToolchainDownloadFixtures.mjs', 'Test-CiToolchainDownloads.mjs', 'Test-CiToolchainDownloads.test.mjs',
   ].map(name => `.github/workflows/${name}`.toLowerCase()),
 ]);
 // Keep this accepted-code list aligned with actual loader changes. Adding a

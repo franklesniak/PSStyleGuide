@@ -40,5 +40,24 @@
         "archive": true
       }
     }
+  },
+  "nativeDownloads": {
+    "scriptSha256": {
+      "native_linux": {
+        "acquire": "21aa0589d50a679d46de6d8f5a988de26507ea0b5a20565cbc48343049db639d",
+        "host": "5d01277b54224aa10c15e6d173b5ad73ab3118a3d5ee66538f414647bfd6c5f2",
+        "provision": "7de0882ff9236c9b15e7d1b1e199c8ee7f17e8d222fa2666790721db54faf3e3",
+        "native": "03bde77da0f78e94ddd1e79744a24c989b8bd934d80892c23703bd290e0abf66"
+      },
+      "native_windows": {
+        "acquire": "7785580b730c33913a3a782aff08188fbc4156681b676523e90486615cb2d433",
+        "host": "426087ec124eefdbe1221937ce3e1590ebc035bc1175a5125779d50244d351d2",
+        "provision": "140e917779aa5e1f770bad8c6d177a4126c414660814eb807803edbb8f6300e9",
+        "native": "e74ea1f78333430fc762c4b448613af450a1fa9c96d6a00b1296d1219a479b9d"
+      },
+      "native_downloads": {
+        "require-platforms": "4a5b51d6591731dd5d0fe0e0ef7ea6969203a5dee1f0054895ac78f1895fd99a"
+      }
+    }
   }
 }

@@ -27,12 +27,33 @@ const codeJob = final => ({
 });
 const common = { name: 'Fixture', on: { push: null, pull_request: null }, permissions: {} };
 const fixtures = {
+  'ci-toolchain-downloads.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'ci-toolchain-downloads.yml')), LIMITS).value,
   'build.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'build.yml')), LIMITS).value,
   'markdownlint.yml': { ...clone(common), on: { ...clone(common.on), schedule: [{ cron: '17 6 * * 1' }] }, jobs: {
     policy: codeJob(step('validate', clearNodeOptions + "\n& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
     markdownlint: codeJob(step('lint', './.github/workflows/Invoke-MarkdownLint.ps1')),
   } },
 };
+
+test('native downloads policy: every platform script is pinned independently and cannot add skips', () => {
+  const file = 'ci-toolchain-downloads.yml';
+  for (const [job, body] of Object.entries(fixtures[file].jobs)) {
+    for (let index = 0; index < body.steps.length; index++) {
+      const changed = clone(fixtures[file]);
+      changed.jobs[job].steps[index].run += '\nexit 0\n';
+      assert.throws(() => validateWorkflowObject(file, changed, contract), error => error.category === 'native-download-script');
+    }
+  }
+  for (const [role, old, replacement] of [
+    ['host', '7.6.5', '7.5.0'], ['host', '32eb8f6c', '00000000'],
+    ['provision', '-IncludeRecoveryCompatibility', ''], ['native', '--archive-directory', '--skip'],
+    ['native', '$objResult.skipped -ne 0', '$false'], ['native', '$objResult.failed -ne 0', '$false'],
+  ]) {
+    const changed = clone(fixtures[file]), step = changed.jobs.native_windows.steps.find(value => value.id === role);
+    assert.ok(step.run.includes(old)); step.run = step.run.replaceAll(old, replacement);
+    assert.throws(() => validateWorkflowObject(file, changed, contract), error => error.category === 'native-download-script');
+  }
+});
 
 test('valid small workflow interfaces; build requires no Node installation', () => {
   for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);
@@ -290,7 +311,7 @@ test('candidate revision cannot replace accepted contract or execute candidate v
   git('init');
   git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
   git('config', 'core.hooksPath', path.join(fixture.temporary, 'no-hooks'));
-  git('add', 'package.json', 'package-lock.json', '.github/workflows/package.json', '.github/workflows/package-lock.json', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml');
+  git('add', 'package.json', 'package-lock.json', '.github/workflows/package.json', '.github/workflows/package-lock.json', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml', '.github/workflows/ci-toolchain-downloads.yml');
   git('commit', '-m', 'Fixture');
   const marker = path.join(fixture.temporary, 'candidate-executed');
   const acceptedModule = fs.readFileSync(path.join(fixture.destination, 'Validate-WorkflowPolicy.mjs'));
