@@ -565,20 +565,58 @@ jobs:
                           $objOutputStream.Dispose()
                       }
                   }
-                  $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
-                  if (Test-Path -LiteralPath $strRoot) {
-                      throw 'Occupied native test namespace.'
-                  }
-                  [void][IO.Directory]::CreateDirectory($strRoot)
                   if ($IsWindows) {
-                      $objUser = [Security.Principal.WindowsIdentity]::GetCurrent().User
-                      $objAccessControl = [Security.AccessControl.DirectorySecurity]::new()
-                      $objAccessControl.SetOwner($objUser)
-                      $objAccessControl.SetAccessRuleProtection($true, $false)
-                      foreach ($objSecurityIdentifier in @($objUser, [Security.Principal.SecurityIdentifier]::new('S-1-5-18'), [Security.Principal.SecurityIdentifier]::new('S-1-5-32-544'))) {
-                          [void]$objAccessControl.AddAccessRule([Security.AccessControl.FileSystemAccessRule]::new($objSecurityIdentifier, 'FullControl', 'ContainerInherit, ObjectInherit', 'None', 'Allow'))
+                      # Define only the three fixed top-level initializer helpers; never run its script body.
+                      $strInitializerSource = Join-Path (Get-Location).ProviderPath '.github/workflows/Initialize-CiToolchain.ps1'
+                      $arrInitializerTokens = $null
+                      $arrInitializerErrors = $null
+                      $objInitializerAst = [Management.Automation.Language.Parser]::ParseFile(
+                          $strInitializerSource, [ref]$arrInitializerTokens, [ref]$arrInitializerErrors)
+                      if ($arrInitializerErrors.Count -ne 0) {
+                          throw 'Initializer helper source failed parsing.'
                       }
-                      Set-Acl -LiteralPath $strRoot -AclObject $objAccessControl -Confirm:$false -WhatIf:$false
+                      $arrInitializerFunctions = @()
+                      foreach ($strFunctionName in @('Assert-OrdinaryPath', 'Assert-WindowsWriter', 'New-PrivateDirectory')) {
+                          $arrMatches = @($objInitializerAst.EndBlock.Statements | Where-Object {
+                                  $_ -is [Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -ieq $strFunctionName
+                              })
+                          if ($arrMatches.Count -ne 1 -or $arrMatches[0].Name -cne $strFunctionName -or
+                              $arrMatches[0].IsFilter -or $arrMatches[0].IsWorkflow) {
+                              throw 'Exact single top-level initializer helper required.'
+                          }
+                          $arrInitializerFunctions += $arrMatches[0]
+                      }
+                      foreach ($objDefinition in $arrInitializerFunctions) {
+                          . ([ScriptBlock]::Create($objDefinition.Extent.Text))
+                      }
+                      $strParent = [Environment]::GetFolderPath([Environment+SpecialFolder]::LocalApplicationData)
+                      if ([string]::IsNullOrWhiteSpace($strParent)) {
+                          throw 'Local application data folder is unavailable.'
+                      }
+                      $strParent = Assert-OrdinaryPath -Path $strParent -Directory
+                      for ($objAncestor = Get-Item -LiteralPath $strParent -Force -ErrorAction Stop; $null -ne $objAncestor; $objAncestor = $objAncestor.Parent) {
+                          Assert-WindowsWriter -Path $objAncestor.FullName
+                      }
+                      $strCheckout = Assert-OrdinaryPath -Path (Get-Location).ProviderPath -Directory
+                      $strRoot = Join-Path $strParent ('a04-' + [Guid]::NewGuid().ToString('N'))
+                      if ([string]::Equals($strRoot, $strCheckout, [StringComparison]::OrdinalIgnoreCase) -or
+                          $strRoot.StartsWith($strCheckout.TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+                          throw 'Native test staging must be outside the checkout.'
+                      }
+                      if (Test-Path -LiteralPath $strRoot) {
+                          throw 'Occupied native test namespace.'
+                      }
+                      New-PrivateDirectory -Path $strRoot -Confirm:$false -WhatIf:$false
+                      $strRoot = Assert-OrdinaryPath -Path $strRoot -Directory
+                      for ($objAncestor = Get-Item -LiteralPath $strRoot -Force -ErrorAction Stop; $null -ne $objAncestor; $objAncestor = $objAncestor.Parent) {
+                          Assert-WindowsWriter -Path $objAncestor.FullName
+                      }
+                      if (-not (Get-Acl -LiteralPath $strRoot).AreAccessRulesProtected) {
+                          throw 'Native test staging DACL is not protected.'
+                      }
+                      foreach ($strName in @('TEMP', 'TMP', 'TMPDIR')) {
+                          [Environment]::SetEnvironmentVariable($strName, $strRoot, [EnvironmentVariableTarget]::Process)
+                      }
                       $strZipArchivePath = Join-Path $strRoot 'PowerShell-7.6.5-win-x64.zip'
                       $strCurl = Join-Path ([Environment]::SystemDirectory) 'curl.exe'
                       & $strCurl --disable --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 --retry 2 --retry-max-time 300 --max-filesize 106319290 --output $strZipArchivePath 'https://github.com/PowerShell/PowerShell/releases/download/v7.6.5/PowerShell-7.6.5-win-x64.zip'
@@ -633,6 +671,11 @@ jobs:
                           throw 'Private PowerShell version mismatch.'
                       }
                   } else {
+                      $strRoot = Join-Path $env:RUNNER_TEMP ('a04-' + [Guid]::NewGuid().ToString('N'))
+                      if (Test-Path -LiteralPath $strRoot) {
+                          throw 'Occupied native test namespace.'
+                      }
+                      [void][IO.Directory]::CreateDirectory($strRoot)
                       [IO.File]::SetUnixFileMode($strRoot, [IO.UnixFileMode]::UserRead -bor [IO.UnixFileMode]::UserWrite -bor [IO.UnixFileMode]::UserExecute)
                       $strPowerShell = [Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
                   }
@@ -640,6 +683,24 @@ jobs:
                       if ($strValue -match '[\r\n]') {
                           throw 'Invalid native test path.'
                       }
+                  }
+                  if ($IsWindows) {
+                      $objEnvironmentProvider = $null
+                      $objEnvironmentDrive = $null
+                      $strEnvironmentPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+                          $env:GITHUB_ENV, [ref]$objEnvironmentProvider, [ref]$objEnvironmentDrive)
+                      if ($objEnvironmentProvider.Name -cne 'FileSystem') {
+                          throw 'Native temporary environment output must use the filesystem provider.'
+                      }
+                      $objEnvironmentStream = $null
+                      try {
+                          $objEnvironmentStream = [IO.File]::Open($strEnvironmentPath, [IO.FileMode]::Open, [IO.FileAccess]::Write, [IO.FileShare]::ReadWrite)
+                      } finally {
+                          if ($null -ne $objEnvironmentStream) {
+                              $objEnvironmentStream.Dispose()
+                          }
+                      }
+                      [IO.File]::AppendAllText($strEnvironmentPath, "TEMP=$strRoot`nTMP=$strRoot`nTMPDIR=$strRoot`n", [Text.UTF8Encoding]::new($false))
                   }
                   [IO.File]::AppendAllText($strOutputPath, "root=$strRoot`npowershell=$strPowerShell`n", [Text.UTF8Encoding]::new($false))
               } catch {

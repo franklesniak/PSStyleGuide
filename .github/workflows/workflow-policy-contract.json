@@ -51,7 +51,7 @@
       },
       "native_windows": {
         "acquire": "35efa9aef368317594894bca51524ab3245f97361be77c0c2f9075ec61c3f559",
-        "host": "1bab670a0497dae9a43c45bbd0971909aa590542c82cc0b426ecb973363d96b9",
+        "host": "8ce9c7da4d94b367ba75f696c4c4f3f6973923441e57fd5921f4fc691801f81c",
         "provision": "55f9a2fbec12d8b97ef298d79f212b2197f79d78de1d24a7e0e8652ede637960",
         "native": "dda832961923a6ddb73de5e70da95fa216abf4ebaed7797e707b8cddd178fd6d"
       },
