@@ -10,6 +10,59 @@ import { classifyInstructionMaintenance, readInstructionMaintenance } from './Cl
 const base = 'a'.repeat(40), head = 'b'.repeat(40);
 const classify = changedPaths => classifyInstructionMaintenance({ base, head, changedPaths });
 
+// Independent expected paths, including reserved artifacts: classification must
+// not depend on a path existing or an importer changing in the same revision.
+const recoveryPaths = [
+  '.github/workflows/Test-StateRecoveryPowerShell.ps1',
+  '.github/workflows/Confirm-StateMutation.mjs',
+  '.github/workflows/Inspect-TerraformState.mjs',
+  '.github/workflows/Review-TerraformStateDifference.mjs',
+  '.github/workflows/Resolve-TerraformStateAddress.mjs',
+  '.github/workflows/StateRecoveryCaseCatalog.json',
+  '.github/workflows/Prepare-TerraformStateRecovery.mjs',
+  '.github/workflows/native/StateRecoveryTerminal.cc',
+  '.github/workflows/native/Build-StateRecoveryTerminal.mjs',
+  '.github/workflows/collector-native/StateRecoveryCollector.cc',
+  '.github/workflows/collector-native/Build-StateRecoveryCollector.mjs',
+  '.github/workflows/windows-native/Build-StateRecoveryWindows.mjs',
+  '.github/workflows/native/StateRecoveryTerminalArtifacts.json',
+  '.github/workflows/native/StateRecoveryTerminal-linux-x64-napi8.node',
+  '.github/workflows/native/StateRecoveryTerminal-win32-x64-napi8.node',
+  '.github/workflows/collector-native/StateRecoveryCollectorArtifacts.json',
+  '.github/workflows/collector-native/StateRecoveryCollector-linux-x64-napi8-uv1.node',
+  '.github/workflows/windows-native/StateRecoveryWindowsArtifacts.json',
+  '.github/workflows/windows-native/StateRecoveryWindows-win32-x64-clr4.dll',
+];
+
+test('recovery closure: each standalone loader and reserved artifact requires maintenance', () => {
+  for (const file of recoveryPaths) {
+    for (const selected of [file, file.toUpperCase()]) {
+      for (const changedPaths of [[selected], ['README.md', selected, 'docs/example.md']]) {
+        assert.deepEqual(classify(changedPaths), {
+          base, head, policy: base, classification: 'maintenance_required', maintenancePaths: [selected],
+        }, selected);
+      }
+    }
+  }
+});
+
+test('recovery closure: unselected siblings, nested paths and artifact lookalikes remain ordinary', () => {
+  for (const file of recoveryPaths) {
+    const slash = file.lastIndexOf('/'), directory = file.slice(0, slash + 1), name = file.slice(slash + 1);
+    for (const near of [file + '.bak', 'examples/' + file, directory + 'Copy-' + name,
+      directory + 'nested/' + name, file.replace('.github/workflows/', '.github/actions/')]) {
+      assert.deepEqual(classify(['README.md', near]), {
+        base, head, policy: base, classification: 'ordinary', maintenancePaths: [],
+      }, near);
+    }
+  }
+  for (const near of ['.github/workflows/native/StateRecoveryTerminal-linux-arm64-napi8.node',
+    '.github/workflows/collector-native/StateRecoveryCollector-linux-x64-napi9-uv1.node',
+    '.github/workflows/windows-native/StateRecoveryWindows-win32-x64-clr5.dll']) {
+    assert.equal(classify([near]).classification, 'ordinary', near);
+  }
+});
+
 test('native downloads: independent loaders, case aliases and mixed additions require maintenance', () => {
   for (const name of ['CiToolchainDownloadFixtures.mjs', 'Test-CiToolchainDownloads.mjs', 'Test-CiToolchainDownloads.test.mjs', 'ci-toolchain-downloads.yml']) {
     const file = '.github/workflows/' + name;
@@ -316,7 +369,8 @@ test('real helper-only Git changes, removals and ambient redirection retain acce
       'requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1',
       '.github/workflows/Test-LocalValidation.test.mjs', '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
       '.github/workflows/Test-BlankLineExamples.ps1', '.github/workflows/Test-StateRecoveryExamples.mjs',
-      '.github/workflows/Classify-InstructionMaintenance.mjs']) {
+      '.github/workflows/Classify-InstructionMaintenance.mjs', ...recoveryPaths]) {
+      fs.mkdirSync(path.dirname(path.join(root, helper)), { recursive: true });
       fs.writeFileSync(path.join(root, helper),
         `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(marker)}, 'executed'); throw new Error('Untrusted candidate');\n`);
       git('add', '--', helper); git('commit', '--quiet', '-m', 'candidate helper');
@@ -351,6 +405,37 @@ test('real helper-only Git changes, removals and ambient redirection retain acce
       base: accepted, head: removed, policy: accepted,
       classification: 'maintenance_required', maintenancePaths: [wrapper],
     });
+    // A reserved artifact has no accepted-base file. Its alias-only addition is
+    // still selected; later deletion and rename retain the old selected path.
+    const reserved = '.github/workflows/windows-native/STATERECOVERYWINDOWS-WIN32-X64-CLR4.DLL';
+    fs.mkdirSync(path.dirname(path.join(root, reserved)), { recursive: true });
+    fs.writeFileSync(path.join(root, reserved), 'inert reserved artifact fixture\n');
+    fs.writeFileSync(path.join(root, 'README.md'), 'mixed ordinary change\n');
+    git('add', '.'); git('commit', '--quiet', '-m', 'mixed reserved alias');
+    const added = git('rev-parse', 'HEAD');
+    git('checkout', '--quiet', '--detach', accepted);
+    assert.equal(fs.existsSync(path.join(root, reserved)), false);
+    assert.deepEqual(readInstructionMaintenance(root, accepted, added), {
+      base: accepted, head: added, policy: accepted,
+      classification: 'maintenance_required', maintenancePaths: [reserved],
+    });
+    git('checkout', '--quiet', '--detach', added);
+    git('rm', '--', reserved); git('commit', '--quiet', '-m', 'delete reserved alias');
+    const deleted = git('rev-parse', 'HEAD');
+    git('checkout', '--quiet', '--detach', added);
+    assert.deepEqual(readInstructionMaintenance(root, added, deleted), {
+      base: added, head: deleted, policy: added,
+      classification: 'maintenance_required', maintenancePaths: [reserved],
+    });
+    git('mv', '--', reserved, 'unselected-artifact.txt');
+    git('commit', '--quiet', '-m', 'rename reserved alias outside selector');
+    const renamed = git('rev-parse', 'HEAD');
+    git('checkout', '--quiet', '--detach', added);
+    assert.deepEqual(readInstructionMaintenance(root, added, renamed), {
+      base: added, head: renamed, policy: added,
+      classification: 'maintenance_required', maintenancePaths: [reserved],
+    });
+    assert.equal(fs.existsSync(marker), false);
   } finally {
     assert.equal(path.dirname(root), os.tmpdir());
     assert.ok(path.basename(root).startsWith('instruction-shared-closure-'));

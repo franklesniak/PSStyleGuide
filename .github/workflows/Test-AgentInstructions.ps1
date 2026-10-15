@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.24.20261013.0
+# Version: 1.25.20261015.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -46,6 +46,7 @@ $intGitIgnoreMaximumInputBytes = 65536
 $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
+$intStyleGuideMaximumInputBytes = 524288
 $intGitPathListMaximumBytes = 1048576
 $intDocumentClassificationMaximumInputBytes = 32768
 $strPythonPrerequisite =
@@ -8923,7 +8924,7 @@ if ($arrGovernedInstructionInventoryFailures.Count -gt 0) {
 
 $arrGovernedMetadataDocuments += [pscustomobject]@{
     Path = 'STYLE_GUIDE.md'
-    MaximumBytes = 262144
+    MaximumBytes = $intStyleGuideMaximumInputBytes
     RequiresMetadata = $true
     RequiresVersion = $true
 }

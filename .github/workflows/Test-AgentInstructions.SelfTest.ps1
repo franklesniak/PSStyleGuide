@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.15.20261013.0
+# Version: 1.17.20261015.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -4403,6 +4403,116 @@ function Assert-AgentSetupSelfTest {
     }
 }
 
+function Assert-StyleGuideCapacitySelfTest {
+    # .SYNOPSIS
+    # Checks the exact guide role and complete bounded UTF-8 reads.
+    #
+    # .DESCRIPTION
+    # Uses the production catalog and stream reader. Independent byte fixtures
+    # cover the old cap, the observed recovery-guide size, the new cap and
+    # overflow. Other roles retain their original caps and generated exemption.
+    #
+    # .PARAMETER DocumentSpecs
+    # The complete governed-document catalog constructed by the validator.
+    #
+    # .EXAMPLE
+    # Assert-StyleGuideCapacitySelfTest -DocumentSpecs $arrGovernedMetadataDocuments
+    #
+    # # Throws if the role binding or any whole-input boundary changes.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [void] No output. Throws on a catalog, byte or refusal mismatch.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters and return shape can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.1.20261015.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][object[]] $DocumentSpecs)
+
+    $arrGuideSpecs = @($DocumentSpecs | Where-Object { $_.Path -ceq 'STYLE_GUIDE.md' })
+    if ($arrGuideSpecs.Count -ne 1 -or $arrGuideSpecs[0].MaximumBytes -ne 524288 -or
+        -not $arrGuideSpecs[0].RequiresMetadata -or -not $arrGuideSpecs[0].RequiresVersion) {
+        throw 'The canonical guide lacks its exact bounded metadata role.'
+    }
+    $hashtableExpectedCaps = @{
+        'AGENTS.md' = 32768
+        'CLAUDE.md' = 131072
+        '.github/copilot-instructions.md' = 131072
+        '.github/instructions/docs.instructions.md' = 131072
+        '.github/instructions/yaml.instructions.md' = 131072
+        'STYLE_GUIDE_RATIONALE.md' = 196608
+    }
+    foreach ($objDocumentSpec in $DocumentSpecs) {
+        if ($objDocumentSpec.Path -ceq 'STYLE_GUIDE.md') { continue }
+        if ($objDocumentSpec.Path -cin @('copilot-instructions.md', 'powershell.instructions.md',
+                'terraform.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+            throw 'A generated consumer entered the governed document catalog.'
+        }
+        $intExpectedCap = if ($hashtableExpectedCaps.ContainsKey($objDocumentSpec.Path)) {
+            $hashtableExpectedCaps[$objDocumentSpec.Path]
+        } else { 131072 }
+        if ($objDocumentSpec.MaximumBytes -ne $intExpectedCap) {
+            throw 'The guide capacity change altered another document role.'
+        }
+    }
+
+    $objEncoding = [Text.UTF8Encoding]::new($false, $true)
+    foreach ($intInputBytes in @(262144, 262145, 458620, 524288, 524289)) {
+        # U+00E9 occupies two bytes, so character-count admission is not equivalent.
+        $strExpected = [string][char]0x00E9 + ('g' * ($intInputBytes - 3)) + 'Z'
+        $arrExpectedBytes = $objEncoding.GetBytes($strExpected)
+        if ($arrExpectedBytes.Length -ne $intInputBytes) { throw 'The guide fixture has the wrong byte size.' }
+        $objStream = [IO.MemoryStream]::new($arrExpectedBytes, $false)
+        $boolRejected = $false
+        try {
+            if ($intInputBytes -gt 524288) {
+                Read-BoundedStreamData -Stream $objStream -MaximumBytes $arrGuideSpecs[0].MaximumBytes `
+                    -DisplayName 'Guide capacity fixture' | ForEach-Object { throw 'The guide capacity reader emitted overflow output.' }
+            } else {
+                $arrActualBytes = [byte[]]@(Read-BoundedStreamData -Stream $objStream `
+                        -MaximumBytes $arrGuideSpecs[0].MaximumBytes -DisplayName 'Guide capacity fixture')
+                $strActual = ConvertFrom-StrictUtf8Data -Bytes $arrActualBytes -DisplayName 'Guide capacity fixture'
+                if ($arrActualBytes.Length -ne $intInputBytes -or $strActual -cne $strExpected) {
+                    throw 'The guide capacity reader did not preserve the complete input.'
+                }
+            }
+        } catch [IO.InvalidDataException] {
+            if ($_.Exception.Message -cne 'Guide capacity fixture must not exceed 524288 bytes.') { throw }
+            $boolRejected = $true
+        } finally {
+            $objStream.Dispose()
+        }
+        if ($boolRejected -ne ($intInputBytes -gt 524288)) {
+            throw 'The guide capacity reader did not refuse overflow without output.'
+        }
+    }
+    foreach ($objOtherRole in @(
+            @{ Name = 'unrelated Markdown'; MaximumBytes = 131072 }
+            @{ Name = 'AGENTS'; MaximumBytes = 32768 }
+            @{ Name = 'rationale'; MaximumBytes = 196608 }
+        )) {
+        $objStream = [IO.MemoryStream]::new([byte[]]::new($objOtherRole.MaximumBytes + 1))
+        $boolRejected = $false
+        try {
+            $null = Read-BoundedStreamData -Stream $objStream -MaximumBytes $objOtherRole.MaximumBytes `
+                -DisplayName $objOtherRole.Name
+        } catch [IO.InvalidDataException] {
+            if ($_.Exception.Message -cne
+                ('{0} must not exceed {1} bytes.' -f $objOtherRole.Name, $objOtherRole.MaximumBytes)) { throw }
+            $boolRejected = $true
+        } finally {
+            $objStream.Dispose()
+        }
+        if (-not $boolRejected) { throw 'An unrelated role lost its bounded refusal.' }
+    }
+}
+
 function Assert-StagedInputSelfTest {
     # .SYNOPSIS
     # Tests staged matching against a real private Git index.
@@ -4426,7 +4536,7 @@ function Assert-StagedInputSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; there are no parameters.
-    # Version: 1.0.20261003.0
+    # Version: 1.1.20261015.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -4511,6 +4621,47 @@ function Assert-StagedInputSelfTest {
             $boolNativeRejected = $true
         }
         if (-not $boolNativeRejected) { throw 'A failed native staged query was accepted.' }
+
+        $arrGuideSpecs = @($arrGovernedMetadataDocuments | Where-Object { $_.Path -ceq 'STYLE_GUIDE.md' })
+        if ($arrGuideSpecs.Count -ne 1) { throw 'The guide reader fixture has no unique production role.' }
+        $strGuidePath = [IO.Path]::Combine($strFixtureRoot, 'STYLE_GUIDE.md')
+        foreach ($intInputBytes in @(262144, 262145, 458620, 524288, 524289)) {
+            $strExpected = [string][char]0x00E9 + ('g' * ($intInputBytes - 3)) + 'Z'
+            [IO.File]::WriteAllText($strGuidePath, $strExpected, $objEncoding)
+            & git -C $strFixtureRoot -c core.autocrlf=false add -- STYLE_GUIDE.md
+            if ($LASTEXITCODE -ne 0) { throw 'The private guide boundary could not be staged.' }
+            & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+                -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m guide-boundary
+            if ($LASTEXITCODE -ne 0) { throw 'The private guide boundary could not be committed.' }
+            foreach ($strReaderKind in @('local', 'staged', 'revision')) {
+                $boolRejected = $false
+                try {
+                    $strActual = if ($strReaderKind -ceq 'revision') {
+                        Read-GitRevisionText -RepositoryRootPath $strFixtureRoot -Revision HEAD `
+                            -RepositoryRelativePath 'STYLE_GUIDE.md' `
+                            -MaximumBytes $arrGuideSpecs[0].MaximumBytes -RequireRegularFile
+                    } else {
+                        $arrReadBytes = [byte[]]@(Read-RepositoryInputData -Path $strGuidePath `
+                                -RepositoryRootPath $strFixtureRoot -RepositoryRelativePath 'STYLE_GUIDE.md' `
+                                -DisplayName 'Guide repository fixture' -MaximumBytes $arrGuideSpecs[0].MaximumBytes `
+                                -RequireIndexContentMatch:($strReaderKind -ceq 'staged'))
+                        ConvertFrom-StrictUtf8Data -Bytes $arrReadBytes -DisplayName 'Guide repository fixture'
+                    }
+                    if ($strActual -cne $strExpected -or [Text.Encoding]::UTF8.GetByteCount($strActual) -ne $intInputBytes) {
+                        throw 'A repository guide reader lost complete byte content.'
+                    }
+                } catch [IO.InvalidDataException] {
+                    $strExpectedFailure = if ($strReaderKind -ceq 'revision') {
+                        'HEAD:STYLE_GUIDE.md must not exceed 524288 bytes.'
+                    } else { 'Guide repository fixture must not exceed 524288 bytes.' }
+                    if ($_.Exception.Message -cne $strExpectedFailure) { throw }
+                    $boolRejected = $true
+                }
+                if ($boolRejected -ne ($intInputBytes -gt 524288)) {
+                    throw 'A repository guide reader changed the exact byte boundary.'
+                }
+            }
+        }
     } finally {
         if ([IO.Path]::GetDirectoryName($strFixtureRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
             $strTemporaryRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) -or
@@ -4736,6 +4887,7 @@ Assert-MarkdownStringArrayContextSelfTest
 Assert-MarkdownParseReuseSelfTest
 Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
 
+Assert-StyleGuideCapacitySelfTest -DocumentSpecs $arrGovernedMetadataDocuments
 Assert-StagedInputSelfTest
 Assert-ApplicationRuntimeSelfTest
 Assert-GitRevisionTextSelfTest
