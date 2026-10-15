@@ -10,6 +10,18 @@ import { classifyInstructionMaintenance, readInstructionMaintenance } from './Cl
 const base = 'a'.repeat(40), head = 'b'.repeat(40);
 const classify = changedPaths => classifyInstructionMaintenance({ base, head, changedPaths });
 
+test('native downloads: independent loaders, case aliases and mixed additions require maintenance', () => {
+  for (const name of ['CiToolchainDownloadFixtures.mjs', 'Test-CiToolchainDownloads.mjs', 'Test-CiToolchainDownloads.test.mjs', 'ci-toolchain-downloads.yml']) {
+    const file = '.github/workflows/' + name;
+    for (const selected of [file, file.toUpperCase()]) {
+      assert.equal(classify([selected]).classification, 'maintenance_required');
+      const mixed = classify(['README.md', selected]);
+      assert.equal(mixed.classification, 'maintenance_required');
+      assert.deepEqual(mixed.maintenancePaths, [selected]);
+    }
+  }
+});
+
 test('push transition caller binds event endpoints and preserves proposed-code provenance', () => {
   const { parse } = createRequire(import.meta.url)('yaml');
   const workflow = parse(fs.readFileSync(new URL('./agent-instructions.yml', import.meta.url), 'utf8'));

@@ -10,6 +10,8 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { stripVTControlCharacters } from 'node:util';
 import test from 'node:test';
+import { foundationTar } from './CiToolchainDownloadFixtures.mjs';
+import './Test-CiToolchainDownloads.test.mjs';
 import { readContract } from './Validate-WorkflowPolicy.mjs';
 
 // These tests execute the actual loader/helper bodies with fixed external-tool
@@ -4323,30 +4325,6 @@ test('F4 compatibility documentation matches actual parameter ownership', () => 
 function foundationOnce(source, anchor, replacement) {
   assert.equal(source.split(anchor).length, 2, `One exact fixture anchor is required: ${anchor}`);
   return source.replace(anchor, replacement);
-}
-
-// A finite USTAR producer avoids creating a device/FIFO in the fixture namespace.
-// GNU tar/xz and the actual initializer remain the archive consumers.
-function foundationTar(entries) {
-  const blocks = [];
-  for (const { name, data = Buffer.alloc(0), type = '0', target = '', mode = 0o755 } of entries) {
-    assert.ok(Buffer.byteLength(name) < 100 && Buffer.byteLength(target) < 100);
-    assert.ok(data.length <= 32768);
-    const header = Buffer.alloc(512);
-    const text = (offset, value, length) => { assert.ok(Buffer.byteLength(value) <= length); header.write(value, offset, length, 'ascii'); };
-    const octal = (offset, value, length) => text(offset, value.toString(8).padStart(length - 1, '0') + '\0', length);
-    text(0, name, 100); octal(100, mode, 8); octal(108, 1000, 8); octal(116, 1000, 8);
-    octal(124, data.length, 12); octal(136, 0, 12); header.fill(32, 148, 156);
-    text(156, type, 1); text(157, target, 100); text(257, 'ustar\0', 6); text(263, '00', 2);
-    octal(329, type === '3' ? 1 : 0, 8); octal(337, type === '3' ? 3 : 0, 8);
-    const checksum = header.reduce((total, value) => total + value, 0);
-    text(148, checksum.toString(8).padStart(6, '0') + '\0 ', 8);
-    blocks.push(header, data, Buffer.alloc((512 - data.length % 512) % 512));
-  }
-  blocks.push(Buffer.alloc(1024));
-  const bytes = Buffer.concat(blocks);
-  assert.ok(bytes.length <= 65536, 'Synthetic archives are finite, not stress data.');
-  return bytes;
 }
 
 function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mode = '', compatibility = false,
