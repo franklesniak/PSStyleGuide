@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.16.20261015.0
+# Version: 1.17.20261015.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -4430,7 +4430,7 @@ function Assert-StyleGuideCapacitySelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters and return shape can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261015.0
+    # Version: 1.1.20261015.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][object[]] $DocumentSpecs)
@@ -4470,11 +4470,10 @@ function Assert-StyleGuideCapacitySelfTest {
         if ($arrExpectedBytes.Length -ne $intInputBytes) { throw 'The guide fixture has the wrong byte size.' }
         $objStream = [IO.MemoryStream]::new($arrExpectedBytes, $false)
         $boolRejected = $false
-        $listUnexpectedOutput = [Collections.Generic.List[object]]::new()
         try {
             if ($intInputBytes -gt 524288) {
                 Read-BoundedStreamData -Stream $objStream -MaximumBytes $arrGuideSpecs[0].MaximumBytes `
-                    -DisplayName 'Guide capacity fixture' | ForEach-Object { $listUnexpectedOutput.Add($_) }
+                    -DisplayName 'Guide capacity fixture' | ForEach-Object { throw 'The guide capacity reader emitted overflow output.' }
             } else {
                 $arrActualBytes = [byte[]]@(Read-BoundedStreamData -Stream $objStream `
                         -MaximumBytes $arrGuideSpecs[0].MaximumBytes -DisplayName 'Guide capacity fixture')
@@ -4489,7 +4488,7 @@ function Assert-StyleGuideCapacitySelfTest {
         } finally {
             $objStream.Dispose()
         }
-        if ($boolRejected -ne ($intInputBytes -gt 524288) -or $listUnexpectedOutput.Count -ne 0) {
+        if ($boolRejected -ne ($intInputBytes -gt 524288)) {
             throw 'The guide capacity reader did not refuse overflow without output.'
         }
     }

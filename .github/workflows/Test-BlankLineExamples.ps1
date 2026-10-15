@@ -12,7 +12,7 @@
 # System.String. Writes one success message when all semantic checks pass.
 #
 # .NOTES
-# Version: 1.0.20261001.0
+# Version: 1.1.20261015.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -262,8 +262,8 @@ function Assert-MutationRejected {
 $strRepositoryRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 $strGuidePath = Join-Path $strRepositoryRoot 'STYLE_GUIDE.md'
 $objGuideInfo = [IO.FileInfo]::new($strGuidePath)
-if (-not $objGuideInfo.Exists -or $objGuideInfo.Length -gt 262144) {
-    throw 'blank-line source: STYLE_GUIDE.md is missing or exceeds the 262144-byte read limit.'
+if (-not $objGuideInfo.Exists -or $objGuideInfo.Length -gt 524288) {
+    throw 'blank-line source: STYLE_GUIDE.md is missing or exceeds the 524288-byte read limit.'
 }
 $objUtf8Strict = [System.Text.UTF8Encoding]::new($false, $true)
 $strGuideContent = [IO.File]::ReadAllText($strGuidePath, $objUtf8Strict)
