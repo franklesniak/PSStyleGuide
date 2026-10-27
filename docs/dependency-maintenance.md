@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-13
+- **Last Updated:** 2026-10-27
 - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
 Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux/Windows x64 CI bootstrap verifies its preferred Node archive with `preferred.linuxX64Sha256` or `preferred.windowsX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:
@@ -39,7 +39,7 @@ The current [exception record](../.github/workflows/npm-risk-exceptions.json) is
 
 If a compatible repair is unavailable, prepare one scoped proposal with package root/name, advisory identifiers, node/version bounds, owner, reason, controls and UTC expiry. Existing approved bounds may cover fewer findings, but cannot cover a new advisory, node, version or package root. An unused expired record does not block a clean tree. A candidate cannot approve itself, and expiry never renews itself. New or expanded risk needs an authenticated owner decision and the existing independent review. The current implementation does not provide an exceptional merge route around a failing proposal check; resolve its actual required-check behavior before attempting such an admission. Do not bypass the ordinary check or invent a clean result.
 
-Markdown lint uses the `markdownlint` library for full outer files, exact staged contents and nested snippets. All use the workflow rules file. The root lint commands delegate to the workflow package. The full outer caller runs the existing `--outer` child with a two-minute deadline and a two-MiB output limit. The direct instruction parser and nested extraction stay on patched `markdown-it` 14.3.2. The CLI dependency chains and scoped parser override are removed; no risk exception replaces them.
+Markdown lint uses the `markdownlint` library for full outer files, exact staged contents and nested snippets. All use the workflow rules file. The root lint commands delegate to the workflow package. The full outer caller runs the existing `--outer` child with a two-minute deadline and a two-MiB output limit. The direct instruction parser and nested extraction use `markdown-it` 14.3.3 to address [GHSA-vfgh-jcmw-g37q](https://github.com/markdown-it/markdown-it/security/advisories/GHSA-vfgh-jcmw-g37q) and [GHSA-gfr2-rv44-r23c](https://github.com/markdown-it/markdown-it/security/advisories/GHSA-gfr2-rv44-r23c). The CLI dependency chains and scoped parser override are removed; no risk exception replaces them.
 
 Run `npm run lint:md`, `npm run lint:md:nested`, and `node --test .github/workflows/lint-markdown.test.mjs` after a lint-tool change. The staged hook checks the index, including nested snippets, even when the worktree differs. Full-file lint discovers hidden `.md`/`.mdc` paths, excludes dependency directories, and validates regular in-repository inputs before the API. An empty discovered set succeeds explicitly. A path whose resolved target escapes the repository or whose leaf is a symlink is a tooling failure.
 
