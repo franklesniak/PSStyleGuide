@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/franklesniak/PSStyleGuide#readme",
   "devDependencies": {
-    "glob": "13.0.6",
+    "glob": "14.0.2",
     "husky": "^9.1.7",
     "jsonc-parser": "3.3.1",
     "markdown-it": "14.3.3",
