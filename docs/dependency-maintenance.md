@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-11-02
+- **Last Updated:** 2026-11-03
 - **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
 Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. The Linux/Windows x64 CI bootstrap verifies its preferred Node archive with `preferred.linuxX64Sha256` or `preferred.windowsX64Sha256` in [ci-toolchain.json](../.github/workflows/ci-toolchain.json); the exact versions remain in root `package.json` `engines`. From the repository root, run:
@@ -43,7 +43,7 @@ Markdown lint uses the `markdownlint` library for full outer files, exact staged
 
 Run `npm run lint:md`, `npm run lint:md:nested`, and `node --test .github/workflows/lint-markdown.test.mjs` after a lint-tool change. The staged hook checks the index, including nested snippets, even when the worktree differs. Full-file lint discovers hidden `.md`/`.mdc` paths, excludes dependency directories, and validates regular in-repository inputs before the API. An empty discovered set succeeds explicitly. A path whose resolved target escapes the repository or whose leaf is a symlink is a tooling failure.
 
-File discovery uses `glob` 14.0.2 and a patched `minimatch` dependency to address [GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) and [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249). The former affects cancellation of filesystem traversal; the latter affects pattern preprocessing. The exact installed versions are in the workflow lockfile. The existing lint commands, fixed discovery patterns, hidden-file handling and configuration checks remain the supported interface.
+File discovery uses `glob` 14.0.2 and a patched `minimatch` dependency to address [GHSA-3g3m-2fjr-6pw4](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) and [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249). The former affects cancellation of filesystem traversal; the latter affects pattern preprocessing. The exact installed versions are in [`.github/workflows/package-lock.json`](../.github/workflows/package-lock.json). The existing lint commands, fixed discovery patterns, hidden-file handling and configuration checks remain the supported interface.
 
 The supported rules input is `.github/workflows/.markdownlint.jsonc`, with `.markdownlint.json` in that directory as a fallback. JSONC comments are supported. Put rule changes in that file. Alternate or per-directory repository configuration files, CLI2 option files, ignore files and `extends` are refused rather than silently skipped or merged. The API receives explicit parsed rules and named contents; ambient `markdownlint_` environment settings and home/system/ancestor rc selectors are not loaded. Literal filenames are data, including option-shaped or glob-metacharacter names. Introduced patterns cannot enter the removed braces expansion path. This does not provide atomic confinement against a competing filesystem writer.
 
