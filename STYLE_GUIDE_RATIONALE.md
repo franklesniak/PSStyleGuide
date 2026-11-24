@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-11-24
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -1824,6 +1824,20 @@ A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest.
 Downstream consumers often adopt a style guide or reusable workflow before they have created PowerShell tests. Some projects intentionally remove a `tests/` directory during early scaffolding, documentation-only work, or staged migrations. In those cases, a hard workflow failure from `Get-ChildItem` is mostly noise: it says the directory is absent, not that the code failed a test.
 
 A `Test-Path -LiteralPath ... -PathType Container` guard lets the workflow produce a clear "no test files" skip when the directory is absent. Restricting the guard to `Container` keeps the skip scoped to "the test root is a missing directory" — a bare `Test-Path` would also succeed when the configured path happens to resolve to a file (for example a mis-set `PESTER_TEST_ROOT` env var), silently converting a real misconfiguration into a clean skip. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers. `Get-ChildItem` with `-ErrorAction SilentlyContinue` is an alternative shape, but it is not equivalent: `SilentlyContinue` will also suppress non-existence-related errors such as permission or IO failures, converting genuine CI problems into a silent "no tests" skip. Preferring `Test-Path` followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` keeps the skip narrowly scoped to "directory is missing," while still surfacing real enumeration failures as workflow errors.
+
+### Asserting Query and Command Strings Sent to Mocks
+
+> For the normative rules, see [Asserting Query and Command Strings Sent to Mocks](STYLE_GUIDE.md#asserting-query-and-command-strings-sent-to-mocks) in the main guide.
+
+A mock supplies a controlled return value without sending the composed string through the real service's parser or semantic validation. A return-code or call-count assertion can therefore pass while the string itself is malformed. Positive structural assertions detect missing required clauses. A complementary negative assertion detects a known invalid construct that can coexist with the required clause; neither check replaces the other.
+
+Whitespace-tolerant structural patterns avoid coupling a test to formatting when formatting is not part of the contract. Case-sensitive checks matter for languages such as KQL. Whole-string equality is appropriate only when exact text is required. When using a filtered invocation count, an unfiltered total is also needed so an invalid extra call cannot disappear from the filtered result. Script-scoped capture makes the mock and assertion address the same per-test collection even when a caller-local variable has the same name. Each test initializes its own capture state to preserve isolation.
+
+These assertions establish what the code sent to the mock; they do not prove that the service accepts the string. Where practical, validate it through an integration test or an offline parser. This is a recommendation for additional evidence, not a requirement to use both validation methods for every test.
+
+#### Motivating case
+
+At [GloryRole issue #52](https://github.com/franklesniak/GloryRole/issues/52), the code at commit [`8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68`](https://github.com/franklesniak/GloryRole/commit/8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68) used `project-rename TimeGenerated = min_TimeGenerated` after `summarize arg_min(TimeGenerated, ...)`. The reported service response was `BadRequest` / `SEM0001` for an unresolved `min_TimeGenerated` column. Passing mocked Pester jobs did not show that the service accepted the query. The [Kusto `arg_min` reference](https://learn.microsoft.com/en-us/kusto/query/arg-min-aggregation-function) distinguishes the output column name from the source column expression; checking only for `arg_min` would still allow the invalid rename.
 
 ### Testing Strongly-Typed Array Properties
 
