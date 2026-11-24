@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-11-24
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -1773,6 +1773,16 @@ File paths also need host-aware formatting. GitHub Actions workflow commands sup
 Severity mapping should be explicit. GitHub Actions can represent warnings and errors; informational findings can be notices if the integration intentionally supports that mapping. Azure Pipelines `task.logissue` supports `type=error` and `type=warning`, so informational findings should remain plain output or be included in summaries or artifacts. PSScriptAnalyzer `ParseError` should map to an error or failure diagnostic.
 
 GitHub documents multiple annotation surfaces with different limits. Problem matchers document GitHub Actions display limits of 10 warning, 10 error, and 10 notice annotations per step, 50 annotations per job, and 50 annotations per run. The Checks API accepts a maximum of 50 annotations per API request and separately notes GitHub Actions warning/error per-step limits. Because analyzer output can exceed these display surfaces, annotations should complement plain output, summaries, or artifacts rather than replace them.
+
+### PSScriptAnalyzer Severity Filters and Parse Errors
+
+> For the normative rules, see [PSScriptAnalyzer Severity Filters and Parse Errors](STYLE_GUIDE.md#psscriptanalyzer-severity-filters-and-parse-errors) in the main guide.
+
+The guide describes source behavior observed in pinned PSScriptAnalyzer 1.24.0 and 1.25.0 revisions. In those versions, the effective severity selection controls whether relevant parser errors are returned as `ParseError`; `TypeNotFound` takes a separate `Information` path and analysis continues. This does not establish that all parse diagnostics disappear when a filter omits `ParseError`, or that every gate fails solely from the returned records. The failure claim is an inference about a gate that relies only on those records and has no independent parser signal.
+
+The rule-severity filter and the ParseError requirement protect different results. The engine checks a built-in rule's severity before running it, so enabling a rule does not guarantee that it runs when its severity is excluded. Command-line severity values are combined with settings values in the inspected source, which means a displayed settings omission alone does not establish effective omission. The proposed settings consistency rule is intentionally stricter: each enabled/configured rule in a settings file must have a listed severity unless the file has no severity filter. `PSProvideCommentHelp` is a concrete Information-severity example, not proof that every rule has an immutable severity.
+
+This rule is document guidance, not evidence that an actual CI gate parses every input or fails closed. The repository should test the committed settings and separately validate the analyzer records and failure signals that reach its gate. The source inspection is finite and version-specific; it is not a runtime test or a universal claim about every analyzer version.
 
 ### Running Pester Tests
 
