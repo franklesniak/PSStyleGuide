@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261124.0
+**Version:** 2.26.20261124.0
 
 ## Metadata
 
@@ -4009,7 +4009,7 @@ Pester dot-sources each file using its `PSPath`. Windows PowerShell 5.1 can expa
 
 An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." Catch only the documented missing-root condition and let other errors fail the step.
 
-The CI example assumes a trusted checkout and validates the relative root before discovery. It visits one directory at a time so it can apply exact segment exclusions before descent. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. This keeps the approved `FileInfo` list bound to the ordinary files in the selected tree, including hidden tests. It also refuses literal POSIX backslashes in eligible names before passing the paths to a PowerShell provider. The same list controls the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
+The CI example assumes a trusted checkout and validates the relative root before discovery. It checks each configured component against the names listed by its parent. Windows may accept a short alias for a different listed name, so a successful lookup alone does not establish ownership. The example visits one directory at a time to apply exact segment exclusions before descent. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. On Unix, it uses the filesystem provider's non-following `UnixStat.ItemType` to require a regular file. A `FileInfo` object can also describe a named pipe. The example refuses literal POSIX backslashes in eligible names before passing paths to a provider. The original ordinary file objects, including hidden files, control the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
 
 Before running tests, ensure a different Pester version is not already loaded, then import and verify Pester 6.2.0 explicitly:
 
@@ -4050,7 +4050,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 
 CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Require ordinary directories and test files in the owned tree. Treat a reparse-point directory or a matching reparse-point test file as a configuration failure. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -4119,14 +4119,28 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
         throw 'The checkout workspace must be an ordinary filesystem directory.'
     }
+    $objRootNameComparison = if ($boolWindowsPath) {
+        [System.StringComparison]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparison]::Ordinal
+    }
     foreach ($strRootSegment in $arrRootSegments) {
-        $strNextDirectory = Join-Path -Path $objPesterTestRoot.FullName -ChildPath $strRootSegment
+        $strParentDirectory = $objPesterTestRoot.FullName
+        $strNextDirectory = Join-Path -Path $strParentDirectory -ChildPath $strRootSegment
         try {
-            $objPesterTestRoot = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
+            $null = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
         } catch [System.Management.Automation.ItemNotFoundException] {
             Write-Output ("No Pester test root exists at '{0}'." -f $strNextDirectory)
             exit 0
         }
+        $arrListedRootEntries = @(
+            Get-ChildItem -LiteralPath $strParentDirectory -Force -ErrorAction Stop |
+                Where-Object { [string]::Equals($_.Name, $strRootSegment, $objRootNameComparison) }
+        )
+        if ($arrListedRootEntries.Count -ne 1 -or $arrListedRootEntries[0].Name -in $arrExcludedDirectories) {
+            throw ("The test root component must match one allowed listed name: '{0}'." -f $strNextDirectory)
+        }
+        $objPesterTestRoot = $arrListedRootEntries[0]
         if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
             throw ("The test root component is not an ordinary directory: '{0}'." -f $strNextDirectory)
         }
@@ -4154,6 +4168,9 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
                 if ($boolIsDirectory) {
                     $objDirectories.Push($objEntry)
                 } elseif ($objEntry -is [System.IO.FileInfo]) {
+                    if (-not $boolWindowsPath -and [string]($objEntry.UnixStat.ItemType) -cne 'File') {
+                        throw ("Cannot verify a regular owned Pester test file: '{0}'." -f $objEntry.Name)
+                    }
                     $objEntry
                 } else {
                     throw ("Cannot classify owned Pester test entry '{0}'." -f $objEntry.Name)
