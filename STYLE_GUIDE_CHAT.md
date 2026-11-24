@@ -5,7 +5,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.25.20261124.0
 
 ## Metadata
 
@@ -2808,9 +2808,9 @@ if ($null -eq $objInstalledPester) {
 Invoke-Pester -Path tests/ -Output Detailed
 ```
 
-CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable test-root value. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
+CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Exclude dependency and version-control directory segments such as `node_modules`, `.git`, `.svn`, and `.hg`; test each path segment instead of searching the full path for broad substrings. A root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design; a checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Require ordinary directories and test files in the owned tree. Treat a reparse-point directory or a matching reparse-point test file as a configuration failure. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -2855,36 +2855,75 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
         throw 'The loaded Pester 6.2.0 did not match an installed Pester 6.2.0 module.'
     }
 
-    $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
-    try {
-        $objPesterTestRoot = Get-Item -LiteralPath $strPesterTestRoot -Force -ErrorAction Stop
-    } catch [System.Management.Automation.ItemNotFoundException] {
-        Write-Output ("No Pester test root exists at '{0}'." -f $strPesterTestRoot)
-        exit 0
+    $strConfiguredRoot = $env:PESTER_TEST_ROOT
+    $boolWindowsPath = [System.IO.Path]::DirectorySeparatorChar -eq '\'
+    if ([string]::IsNullOrWhiteSpace($strConfiguredRoot) -or
+        [System.IO.Path]::IsPathRooted($strConfiguredRoot) -or
+        (-not $boolWindowsPath -and $strConfiguredRoot.Contains('\'))) {
+        throw 'PESTER_TEST_ROOT must name a relative checkout subdirectory.'
     }
 
-    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo]) {
-        throw ("The Pester test root is not a directory: '{0}'." -f $strPesterTestRoot)
+    $arrExcludedDirectories = @('node_modules', '.git', '.svn', '.hg')
+    $arrRootSegments = $strConfiguredRoot -split '[\\/]'
+    $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
+    foreach ($strRootSegment in $arrRootSegments) {
+        if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $strRootSegment -in @('.', '..') -or
+            $strRootSegment -in $arrExcludedDirectories -or $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
+            ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
+            throw 'PESTER_TEST_ROOT contains an invalid directory component.'
+        }
     }
 
+    $objPesterTestRoot = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
+    $objLinkAttribute = [System.IO.FileAttributes]::ReparsePoint
+    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+        throw 'The checkout workspace must be an ordinary filesystem directory.'
+    }
+    foreach ($strRootSegment in $arrRootSegments) {
+        $strNextDirectory = Join-Path -Path $objPesterTestRoot.FullName -ChildPath $strRootSegment
+        try {
+            $objPesterTestRoot = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
+        } catch [System.Management.Automation.ItemNotFoundException] {
+            Write-Output ("No Pester test root exists at '{0}'." -f $strNextDirectory)
+            exit 0
+        }
+        if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+            throw ("The test root component is not an ordinary directory: '{0}'." -f $strNextDirectory)
+        }
+    }
+
+    $objDirectories = New-Object -TypeName 'System.Collections.Generic.Stack[System.IO.DirectoryInfo]'
+    $objDirectories.Push($objPesterTestRoot)
     $arrPesterTestFiles = @(
-        Get-ChildItem -LiteralPath $strPesterTestRoot -Recurse -File -Force -ErrorAction Stop |
-            Where-Object {
-                $strRelativePath = $_.FullName.Substring($objPesterTestRoot.FullName.Length).TrimStart([char[]]@('\', '/'))
-                $arrPathSegments = $strRelativePath -split '[\\/]'
-                $boolExcludedSegment = $false
-                foreach ($strPathSegment in $arrPathSegments) {
-                    if ($strPathSegment -in @('node_modules', '.git', '.svn', '.hg')) {
-                        $boolExcludedSegment = $true
-                        break
-                    }
+        while ($objDirectories.Count -gt 0) {
+            $objDirectory = $objDirectories.Pop()
+            foreach ($objEntry in (Get-ChildItem -LiteralPath $objDirectory.FullName -Force -ErrorAction Stop)) {
+                $boolIsDirectory = $objEntry -is [System.IO.DirectoryInfo]
+                if ($boolIsDirectory -and $objEntry.Name -in $arrExcludedDirectories) {
+                    continue
                 }
-                (-not $boolExcludedSegment) -and $_.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+
+                $boolIsTestFile = $objEntry.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+                if (-not $boolIsDirectory -and -not $boolIsTestFile) {
+                    continue
+                }
+
+                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $objEntry.Name.Contains('\'))) {
+                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $objEntry.Name)
+                }
+                if ($boolIsDirectory) {
+                    $objDirectories.Push($objEntry)
+                } elseif ($objEntry -is [System.IO.FileInfo]) {
+                    $objEntry
+                } else {
+                    throw ("Cannot classify owned Pester test entry '{0}'." -f $objEntry.Name)
+                }
             }
+        }
     )
 
     if ($arrPesterTestFiles.Count -eq 0) {
-        Write-Output ("No owned Pester test files found under '{0}'." -f $strPesterTestRoot)
+        Write-Output ("No owned Pester test files found under '{0}'." -f $objPesterTestRoot.FullName)
         exit 0
     }
 

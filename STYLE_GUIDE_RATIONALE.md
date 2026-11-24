@@ -1822,7 +1822,7 @@ Pester dot-sources each file using its `PSPath`. Windows PowerShell 5.1 can expa
 
 An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." Catch only the documented missing-root condition and let other errors fail the step.
 
-Include hidden owned tests. Exclude dependency and version-control directories by path segment. A full-path substring filter can reject legitimate names that contain a reserved segment as part of a longer name. The same file list controls the skip decision and `Run.Container`, so preflight describes the files Pester executes. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
+The CI example assumes a trusted checkout and validates the relative root before discovery. It visits one directory at a time so it can apply exact segment exclusions before descent. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. This keeps the approved `FileInfo` list bound to the ordinary files in the selected tree, including hidden tests. It also refuses literal POSIX backslashes in eligible names before passing the paths to a PowerShell provider. The same list controls the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
 
 ### Mocking External Dependencies
 
