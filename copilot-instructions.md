@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.25.20261124.0
 
 ## Metadata
 
@@ -2704,12 +2704,12 @@ Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer 
 
 ### PSScriptAnalyzer Severity Filters and Parse Errors
 
-In PSScriptAnalyzer 1.24.0 and 1.25.0, the analyzer reports relevant parser failures as `ParseError` only when the effective severity selection is absent or includes `ParseError`. `TypeNotFound` can appear as `Information`, and analysis can continue. Verify the diagnostics and independent failure signals that make the actual gate fail.
+Apply these guide rules whenever their conditions are met, regardless of the PSScriptAnalyzer version in use. The explanations beside the examples describe analyzer behavior in versions 1.24.0 and 1.25.0.
 
 - A settings file or command that feeds a CI gate and filters by severity **MUST** name `ParseError`, unless the gate parses each input separately and fails on parse errors.
 - The repository **SHOULD** have a test that reads the committed settings and fails when the `Severity` filter leaves out `ParseError`.
 
-The following examples express the proposed settings-file policy. Their runtime-selection explanations assume no additional severity input changes the displayed selection. A command-line addition may change eligibility, but does not make a settings file that violates this proposed policy compliant. Including `ParseError` is not, by itself, proof that the actual gate fails closed or reports every parser-error category.
+Verify which diagnostics or independent failure signals make the actual gate fail. The example explanations assume the displayed effective severity selection.
 
 **Compliant:**
 
@@ -2723,7 +2723,7 @@ Severity = @('Error', 'Warning', 'ParseError')
 Severity = @('Error', 'Warning')
 ```
 
-In these versions, a built-in script rule is eligible only if the effective severity selection allows its declared severity. Settings cannot change a built-in rule's fixed severity. Other rule-selection conditions can still prevent an enabled rule from running.
+Settings cannot change a built-in rule's fixed severity. Inspect the actual rule metadata and configuration.
 
 - Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files.
 - The repository **SHOULD** have a test that reads the committed settings, gets the severity of each enabled rule with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
@@ -2746,7 +2746,9 @@ Rules = @{
 }
 ```
 
-In PSScriptAnalyzer 1.24.0 and 1.25.0, command-line `-Severity` values can add to the effective selection. Keep each settings file consistent even when a command-line value makes the rule eligible.
+Keep each settings file consistent even when a command-line severity value makes the rule eligible.
+
+<!-- rationale-anchor: rationale-for-psscriptanalyzer-severity-filters -->
 
 ---
 

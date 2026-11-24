@@ -1774,7 +1774,7 @@ Severity mapping should be explicit. GitHub Actions can represent warnings and e
 
 GitHub documents multiple annotation surfaces with different limits. Problem matchers document GitHub Actions display limits of 10 warning, 10 error, and 10 notice annotations per step, 50 annotations per job, and 50 annotations per run. The Checks API accepts a maximum of 50 annotations per API request and separately notes GitHub Actions warning/error per-step limits. Because analyzer output can exceed these display surfaces, annotations should complement plain output, summaries, or artifacts rather than replace them.
 
-### PSScriptAnalyzer Severity Filters and Parse Errors
+### Rationale for PSScriptAnalyzer Severity Filters
 
 > For the normative rules, see [PSScriptAnalyzer Severity Filters and Parse Errors](STYLE_GUIDE.md#psscriptanalyzer-severity-filters-and-parse-errors) in the main guide.
 
