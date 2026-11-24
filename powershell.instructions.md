@@ -2091,7 +2091,7 @@ When code compares strings for identity, deduplication, or lookup, and the compa
 - `-eq`, `-contains`, `-in`, and `switch` ignore letter case. Under normal globalization, `-ceq`, `-ccontains`, and `switch -CaseSensitive` are linguistic, not ordinal: a precomposed `é` (U+00E9) `-ceq` `e` + U+0301 returns `$true`. The `-ceq` expectation is an inference from [PowerShell 7.5 comparison semantics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.5) and [.NET linguistic equivalence](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons), not a claim of a new execution.
 - For an exact index, use a generic dictionary with `[System.StringComparer]::Ordinal`. For equality, use `[string]::Equals()` with `[System.StringComparison]::Ordinal`. Normalize or case-fold the values first when the rule requires it.
 
-Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
+The `-ceq` example uses invariant-culture linguistic comparison with globalization data enabled. Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
 
 This rule does not apply to configuration hashtables or splatting, where case-insensitive keys are intended.
 
@@ -2104,6 +2104,8 @@ $boolSame = [string]::Equals($strLeft, $strRight, [System.StringComparison]::Ord
 $hashtableIndex = @{}
 $boolSame = ($strLeft -ceq $strRight)
 ```
+
+The example uses `object` because it leaves the value schema open. Use the specific value type when it is known.
 
 ---
 
