@@ -7,7 +7,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20261124.0
+**Version:** 2.24.20261124.0
 
 ## Metadata
 
@@ -56,7 +56,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
-- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., `$strMessage`, `$intCount`, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use type-prefixed camelCase (e.g., `$strMessage`, `$intCount`). Spell out words in the descriptive part. Use technical acronyms only when a relevant specification, language, or official API uses them for that meaning → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -582,14 +582,14 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. The descriptive portion of each name—everything after the type prefix—**MUST** use fully spelled-out words, except for technical acronyms established for that meaning by the relevant specification, language, or official API.
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
 - **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
   - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
   - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
-- **Descriptive Name:** The name **MUST** be **fully spelled out**.
+- **Descriptive Name:** The **MUST** for spelled-out words applies to the part after the prefix. The **SHOULD NOT** for ad hoc prefixes applies to the prefix.
 
 **Examples:**
 
@@ -605,6 +605,40 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$objResult`
 - `$refLastKnownError`
 - `$versionPowerShell`
+
+#### Established Technical Acronyms in Local Names
+
+Use an acronym only when a relevant specification, language, or official API uses it for that meaning. Keep the existing type prefix. Apply these casing rules:
+
+- Capitalize both letters of a two-letter acronym, as in `$strIPAddress`. Do not mechanically capitalize every two-letter part of a compound.
+- Treat `Id` and `Ok` as words, as in `$strUserId` and `$boolIsOk`.
+- Use Pascal case for acronyms of three or more letters, as in `$strJson`, `$objFunctionAst`, `$hashtableSdk`, and `$boolEof`.
+- Preserve established spelling when referring to a command. Use `Start-AzureRmVM` and avoid recasing it as `Start-AzureRmVm`.
+- Team-only shorthand and ambiguous terms **MUST** be spelled out.
+
+```powershell
+# Compliant
+$strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
+$objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
+$hashtableSdk = Get-SdkSettings # SDK names a software development kit.
+$boolEof = $objReader.EndOfStream # EOF names the end-of-file condition.
+$strIPAddress = '192.0.2.10'
+$strUserId = 'user-123'
+$boolIsOk = $true
+$strTransfer = 'complete'
+
+# Non-Compliant
+$strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
+$objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
+$hashtableSDK = Get-SdkSettings # The development kit acronym takes the casing Sdk.
+$boolEOF = $objReader.EndOfStream # The end-of-file acronym takes the casing Eof.
+$strIpAddress = '192.0.2.10'
+$strUserID = 'user-123'
+$boolIsOK = $true
+$strXfr = 'complete'
+```
+
+<!-- RATIONALE: established-technical-acronyms-in-local-names -->
 
 <!-- rationale-anchor: local-variable-naming-defensive-design-philosophy -->
 
