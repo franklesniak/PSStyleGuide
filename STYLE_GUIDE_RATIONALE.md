@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-11-24
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -45,6 +45,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
   - [Comparison with Modern Alternatives](#comparison-with-modern-alternatives)
+  - [Cause-Specific Results in Non-Throwing Catches](#cause-specific-results-in-non-throwing-catches)
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
@@ -547,6 +548,14 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 | Anomaly reporting | `Write-Warning` | `Write-Warning` (same) |
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
+
+### Cause-Specific Results in Non-Throwing Catches
+
+> For the normative rule, see [Cause-Specific Results in Non-Throwing Catches](STYLE_GUIDE.md#cause-specific-results-in-non-throwing-catches) in the main guide.
+
+A non-throwing helper's result is part of its public contract. A cause-specific value such as `MissingItem` is truthful only when the caught error from the operation supports that cause. A broad catch that maps access denial or an I/O failure to `MissingItem` can send the caller toward the wrong repair. Match a typed exception or a command-specific documented identifier; keep the protected operation narrow when other calls could raise the same type. Do not parse localized message text or perform a second query to guess what the first failure meant.
+
+A generic failure result remains useful when callers do not need a finer distinction. It preserves the non-throwing contract without pretending that every exception has the same cause. Debug diagnostics can include a safe exception type, but they do not repair an inaccurate result. Avoid raw paths and other sensitive values in diagnostic output. PowerShell documents [typed catch behavior](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_try_catch_finally?view=powershell-7.5), and the [ItemNotFoundException API](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.itemnotfoundexception?view=powershellsdk-7.4.0) identifies the command-level not-found category used in the example.
 
 ---
 
