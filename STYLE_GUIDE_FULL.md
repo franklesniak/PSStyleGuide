@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20261001.0
+**Version:** 2.24.20261124.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-11-24
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -176,6 +176,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Code **MUST NOT** grow PowerShell arrays with `+=` inside accumulation loops; use `System.Collections.Generic.List[T]` when an in-memory collection is required → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** String comparisons for identity, deduplication, or lookup **MUST** use an explicit comparison when the comparison rule affects results; **MUST NOT** rely on PowerShell defaults. Preserve the intended-case-insensitivity exemption and use the exact-comparison examples and target-version conditions in [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity).
 
 ### Testing (Quick Reference)
 
@@ -2954,6 +2955,38 @@ $arrOutput = @()
 foreach ($objItem in $InputObject) {
     $arrOutput += $objItem
 }
+```
+
+---
+
+### String Comparison for Keys and Identity
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
+
+The comparison duty applies to all PowerShell versions in scope. Use syntax and APIs supported by the script's declared target. Constructs named below apply where available; this rule does not require an older target to provide newer constructs. The examples implement an exact comparison contract; they do not select the comparison contract for every consumer.
+
+When code compares strings for identity, deduplication, or lookup, and the comparison rule affects results (for example, persisted keys or security decisions), code **MUST** use an explicit comparison and **MUST NOT** rely on PowerShell defaults:
+
+- A hashtable literal (`@{}`) and `[ordered]@{}` ignore letter case in keys. PowerShell 7 uses an ordinal case-insensitive comparer; Windows PowerShell 5.1 uses a culture-aware comparer.
+- `-eq`, `-contains`, `-in`, and `switch` ignore letter case. Under normal globalization, `-ceq`, `-ccontains`, and `switch -CaseSensitive` are linguistic, not ordinal: a precomposed `é` (U+00E9) `-ceq` `e` + U+0301 returns `$true`. The `-ceq` expectation is an inference from [PowerShell 7.5 comparison semantics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.5) and [.NET linguistic equivalence](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons), not a claim of a new execution.
+- For an exact index, use a generic dictionary with `[System.StringComparer]::Ordinal`. For equality, use `[string]::Equals()` with `[System.StringComparison]::Ordinal`. Normalize or case-fold the values first when the rule requires it.
+
+Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
+
+This rule does not apply to configuration hashtables or splatting, where case-insensitive keys are intended.
+
+```powershell
+# Compliant (PowerShell 2 or later)
+$objIndex = New-Object 'System.Collections.Generic.Dictionary[string,object]' -ArgumentList ([System.StringComparer]::Ordinal)
+$boolSame = [string]::Equals($strLeft, $strRight, [System.StringComparison]::Ordinal)
+
+# Non-Compliant (the keys 'ABC' and 'abc' are one key)
+$hashtableIndex = @{}
+$boolSame = ($strLeft -ceq $strRight)
 ```
 
 ---
