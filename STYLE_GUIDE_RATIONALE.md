@@ -585,6 +585,16 @@ The strategy transforms potentially version-breaking operations (e.g., handling 
 
 ---
 
+### String Comparison for Keys and Identity
+
+> For the normative rule, see [String Comparison for Keys and Identity](STYLE_GUIDE.md#string-comparison-for-keys-and-identity) in the main guide.
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
+
 ### Type Conversion Safety Chain
 
 > For .NET interop patterns, see [.NET Interop Patterns: Safe and Documented](STYLE_GUIDE.md#net-interop-patterns-safe-and-documented) in the main guide.
@@ -1631,16 +1641,6 @@ Wrapping `List[T].Add()` in `[void](...)` is defensive consistency with the guid
 - **v1.0 compatible** → `[regex]` class exists in .NET 2.0
 - **Deterministic behavior** → no regex metacharacter interpretation
 - **No external dependencies** → pure .NET Framework
-
-### String Comparison for Keys and Identity
-
-> For the normative rule, see [String Comparison for Keys and Identity](STYLE_GUIDE.md#string-comparison-for-keys-and-identity) in the main guide.
-
-PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
-
-An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
-
-PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
 
 ### Primary Output: Integer Status Code via `return`
 
