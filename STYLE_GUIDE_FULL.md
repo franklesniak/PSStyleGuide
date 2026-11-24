@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20261124.0
+**Version:** 2.24.20261124.0
 
 ## Metadata
 
@@ -181,7 +181,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** New functions **SHOULD** have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
 - **[All]** Test files **MUST** use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
-- **[All]** Tests **MUST** use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
+- **[All]** Tests **MUST** use Pester 6.2.0 syntax (BeforeAll, Describe, Context, It) on Windows PowerShell 5.1 with .NET Framework 4.6.2+ or PowerShell 7.4+ → [Testing with Pester](#testing-with-pester)
 - **[All]** Tests **SHOULD** use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
 - **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** `Test-*` functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
@@ -191,10 +191,12 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
+- **[All]** Tests verifying mock invocations **MUST** use `Should -Invoke` or `Should -InvokeVerifiable`; `Assert-MockCalled` and `Assert-VerifiableMock` **MUST NOT** be used → [Mocking External Dependencies](#mocking-external-dependencies)
+- **[All]** For mock invocation counts, `-Times <N>` without `-Exactly` checks for at least N calls when N is positive. `-Times 0` checks for exactly zero. Use `-Exactly` when the contract requires an exact count → [Mocking External Dependencies](#mocking-external-dependencies)
 - **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
-- **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
+- **[All]** CI Pester discovery **MUST** use one explicit list of owned `*.Tests.ps1` files, including hidden files, for the no-tests decision and file-backed `Run.Container` entries. Only an absent test root or an empty owned list **MAY** skip → [Running Pester Tests](#running-pester-tests)
 
 ## Executive Summary: Author Profile
 
@@ -3344,7 +3346,7 @@ if ($DebugPreference -ne 'SilentlyContinue') {
 
 ## Testing with Pester
 
-**Pester 5.x** is required. Legacy 3.x/4.x patterns **MUST NOT** be used. Pester requires PowerShell 3.0+ to run, but scripts under test can target any version. See [pester.dev](https://pester.dev/).
+Tests **MUST** use Pester **6.2.0** as the documented and validated baseline. The test host **MUST** be Windows PowerShell **5.1 with .NET Framework 4.6.2 or later**, or PowerShell **7.4 or later**. Install and import Pester 6.2.0 explicitly before running tests. A different loaded Pester version **MUST** cause a clear failure. Scripts under test retain their own declared runtime targets. Later baseline changes require a reviewed guide and example update. See [pester.dev](https://pester.dev/).
 
 ---
 
@@ -3364,7 +3366,7 @@ repository/
 
 **Pester** is the standard testing framework for PowerShell, providing a domain-specific language for writing and executing tests. This section documents testing conventions that integrate with the coding standards in this guide. For comprehensive Pester documentation, see [pester.dev](https://pester.dev/).
 
-> **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
+> **Note:** The selected test host floor is Windows PowerShell 5.1 with .NET Framework 4.6.2 or later, or PowerShell 7.4 or later. This host requirement does not change the declared runtime targets of the scripts under test.
 
 - Test files **MUST** use `*.Tests.ps1` suffix
 - Test files **SHOULD** be in a `tests/` directory at the repository root
@@ -3372,9 +3374,9 @@ repository/
 
 ---
 
-### Pester 5.x Syntax Requirements
+### Pester 6.2.0 Syntax and Host Requirements
 
-Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT** be used.
+Tests **MUST** use Pester 6.2.0 syntax. Legacy Pester 3.x/4.x patterns **MUST NOT** be used.
 
 | Block | Purpose |
 | --- | --- |
@@ -3386,11 +3388,21 @@ Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT*
 | `It` | Defines an individual test case |
 | `Should` | Assertion cmdlet for validating expected outcomes |
 
-**Key Pester 5.x Changes:**
+The test host **MUST** be Windows PowerShell 5.1 with .NET Framework 4.6.2 or later, or PowerShell 7.4 or later. This compatibility floor applies to the test host; it does not change the declared runtime target of the scripts under test.
+
+Install Pester 6.2.0 with `Install-Module Pester -RequiredVersion 6.2.0 -Scope CurrentUser`. On Windows hosts affected by the documented Microsoft-to-community Pester publisher-certificate transition, use the Gallery's documented side-by-side installation with `-Force -SkipPublisherCheck -RequiredVersion 6.2.0 -Scope CurrentUser`. Limit this exception to that known transition. Do not suppress arbitrary certificate failures, remove the built-in module, or change machine-wide execution policy. Unaffected hosts need no publisher-check exception.
+
+Before running tests, import Pester with `Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop` and verify the loaded module identity and version. If a different Pester version is already loaded or the exact version cannot be imported, fail clearly; do not silently run another version. Verify installed and loaded module identities. A clean host, a preloaded Pester 5 module, a wrong version, and a fresh-process import are distinct compatibility cases.
+
+For Pester 6.2.0, each test file has its own runtime state. Put data needed during discovery in `BeforeDiscovery`; do not depend on another file's top-level discovery side effects. Null or empty `-ForEach`/`-TestCases` data fails by default. Use `AllowNullOrEmptyForEach` only for a justified test of an intentional empty case. Replace removed `Set-ItResult -Pending` uses with the intended Skip or Inconclusive result. Where relevant, `<...>` test names can contain expressions; escape literal delimiters according to the selected test-name form.
+
+Pester 6.2.0 permits multiple `BeforeAll`, `AfterAll`, `BeforeEach`, and `AfterEach` blocks. Setup follows written registration order; teardown reverses the corresponding within-scope order. Inspect each scope with duplicate blocks and merge them unless their ordering is deliberate; deliberately retained multiple blocks require ordering checks. Pester 6.2.0 inherits `BeforeContainer` configuration; explain `#pester:no-inherit` only when an example uses that inheritance. Parallel execution remains optional and is outside this baseline.
+
+**Pester 6.2.0 syntax:**
 
 - Use `BeforeAll` for dot-sourcing scripts (not at the file level outside blocks)
-- Discovery and Run phases are separate—code at the top level runs during discovery
-- Code **MUST** use `Should -Be`, `Should -BeExactly`, `Should -BeNullOrEmpty`, etc. (not legacy `Assert-*` patterns)
+- Discovery and Run phases are separate; code at the top level runs during discovery
+- Use supported `Should` assertions such as `Should -Be`, `Should -BeExactly`, and `Should -BeNullOrEmpty`; do not use legacy Pester 3.x/4.x `Assert-*` patterns
 
 ---
 
@@ -3537,7 +3549,7 @@ Tests that verify a *specific expected failure* are the inverse problem: their p
 
 #### How to capture the thrown exception for follow-up assertions
 
-`Should -Throw` on its own does not implicitly expose the thrown exception to subsequent statements, so any follow-up assertion against the exception needs an explicit capture mechanism. Pester 5 supports two idioms. The first is `Should -Throw -PassThru`, which evaluates the script block, asserts that it throws, and returns the thrown `ErrorRecord` as its output so it can be assigned to a variable and inspected—for example, `$errorRecord = { ... } | Should -Throw -PassThru; $errorRecord.Exception.Message | Should -Match '<pattern>'`. The second is the classic `try { ... } catch { $e = $_ }` pattern, in which the caught `$_` is an `ErrorRecord` whose `Exception` property exposes the same detail; a presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` followed by `$e.Exception.Message | Should -Match '<pattern>'` is safe because both assertions fail when `$e` is `$null`. Both idioms are acceptable; the critical constraint is that the follow-up assertions on the captured exception fail when the expected exception is absent or different. Assertions that satisfy this constraint include both positive predicates on exception detail (`Should -Match`, `Should -Be`, `Should -BeOfType`, etc.) and the presence guard `Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself — despite using `-Not`, the presence guard fails precisely in the absent-exception case and is therefore consistent with (and complementary to) the rule. What **MUST NOT** be used as the sole follow-up check is a negated predicate against exception **text** (e.g., `$e.Exception.Message | Should -Not -Match '<pattern>'`), because that assertion is silently satisfied by any exception whose message does not match — including unrelated exceptions and the absence of an exception altogether.
+`Should -Throw` on its own does not implicitly expose the thrown exception to subsequent statements, so any follow-up assertion against the exception needs an explicit capture mechanism. Pester 6.2.0 supports both capture patterns. The first is `Should -Throw -PassThru`, which evaluates the script block, asserts that it throws, and returns the thrown `ErrorRecord` as its output so it can be assigned to a variable and inspected—for example, `$errorRecord = { ... } | Should -Throw -PassThru; $errorRecord.Exception.Message | Should -Match '<pattern>'`. The second is the classic `try { ... } catch { $e = $_ }` pattern, in which the caught `$_` is an `ErrorRecord` whose `Exception` property exposes the same detail; a presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` followed by `$e.Exception.Message | Should -Match '<pattern>'` is safe because both assertions fail when `$e` is `$null`. Both idioms are acceptable; the critical constraint is that the follow-up assertions on the captured exception fail when the expected exception is absent or different. Assertions that satisfy this constraint include both positive predicates on exception detail (`Should -Match`, `Should -Be`, `Should -BeOfType`, etc.) and the presence guard `Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself — despite using `-Not`, the presence guard fails precisely in the absent-exception case and is therefore consistent with (and complementary to) the rule. What **MUST NOT** be used as the sole follow-up check is a negated predicate against exception **text** (e.g., `$e.Exception.Message | Should -Not -Match '<pattern>'`), because that assertion is silently satisfied by any exception whose message does not match — including unrelated exceptions and the absence of an exception altogether.
 
 #### Motivating case
 
@@ -3838,6 +3850,12 @@ $objCluster.Principals | Should -BeOfType [string[]]
 
 ### Mocking External Dependencies
 
+Pester deprecated `Assert-MockCalled` and `Assert-VerifiableMock` in the 5.0.0 release and removed them in 6.0.0. The supported 6.2.0 interfaces are `Should -Invoke` and `Should -InvokeVerifiable`; invocation checks remain optional when they do not add value. See the [Pester 5.0.0 release](https://github.com/pester/Pester/releases/tag/5.0.0) and [Pester 6.0.0 release](https://github.com/pester/Pester/releases/tag/6.0.0).
+
+For `Should -Invoke`, positive `-Times N` without `-Exactly` means at least N calls. Zero is intentionally different: `-Times 0` asserts that no calls occurred. When the exact count is part of the contract, use `-Exactly`. A `-ParameterFilter` can narrow which invocations count; it does not include invalid extra calls in that result. Pair a filtered count with an unfiltered total when both cardinality and valid arguments matter.
+
+A filtered mock miss does not imply that Pester will run the original command. A test that needs the original behavior must resolve and cache the real command before installing a mock, then add a deliberate default mock that invokes the cached command. This keeps fallback behavior explicit and avoids confusing it with a matching filtered mock.
+
 Use Pester's `Mock` command to isolate the function under test from external dependencies:
 
 ```powershell
@@ -3863,7 +3881,61 @@ Context "When external service is unavailable" {
 
 - Mock cmdlets and external commands that introduce dependencies (network, file system, cloud services)
 - Mock at the narrowest scope possible (prefer `Context`-level mocks over `Describe`-level)
-- Use `Assert-MockCalled` to verify expected interactions when appropriate
+- Invocation verification is optional when appropriate. When tests verify a mock invocation, they **MUST** use `Should -Invoke` (with `-ParameterFilter`, `-Times`, `-Exactly`, or `-Scope` as needed) or `Should -InvokeVerifiable`. `Assert-MockCalled` and `Assert-VerifiableMock` **MUST NOT** be used.
+- `Should -Invoke -Times <N>` without `-Exactly` checks for at least N calls when N is greater than zero. `-Times 0` means exactly zero calls. Use `-Exactly` when the exact count is part of the contract.
+- A parameter-filtered mock that does not match a call does not automatically invoke the original command. Add a default mock only when fallback is intended; cache the real command before mocking if that fallback invokes it.
+
+**Matching filtered mock and verification:**
+
+```powershell
+Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+    $LiteralPath -eq 'synthetic'
+}
+Get-Item -LiteralPath 'synthetic' | Should -Not -BeNullOrEmpty
+Should -Invoke Get-Item -Times 1 -Exactly -ParameterFilter {
+    $LiteralPath -eq 'synthetic'
+}
+```
+
+**Unmatched call and intentional default fallback:**
+
+```powershell
+Describe 'Get-Item mock fallback' {
+    BeforeAll {
+        $strFixturePath = Join-Path -Path $TestDrive -ChildPath 'fixture.txt'
+        Set-Content -LiteralPath $strFixturePath -Value 'fixture' -ErrorAction Stop
+    }
+
+    It 'Fails an unmatched call even when the target file exists' {
+        Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+            $LiteralPath -eq 'synthetic'
+        }
+
+        { Get-Item -LiteralPath $strFixturePath } | Should -Throw -ExpectedMessage '*[Nn]o mock*'
+        Should -Invoke Get-Item -Times 0 -ParameterFilter { $LiteralPath -eq 'synthetic' }
+    }
+
+    It 'Uses the default mock only when the filter does not match' {
+        $objGetItemCommand = Get-Command -Name Microsoft.PowerShell.Management\Get-Item -ErrorAction Stop
+        Mock Get-Item { & $objGetItemCommand -LiteralPath $LiteralPath }
+        Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+            $LiteralPath -eq 'synthetic'
+        }
+
+        (Get-Item -LiteralPath $strFixturePath).Name | Should -BeExactly 'fixture.txt'
+        (Get-Item -LiteralPath 'synthetic').Name | Should -BeExactly 'synthetic'
+        Should -Invoke Get-Item -Times 2 -Exactly
+    }
+}
+```
+
+**Verifiable mock alternative:**
+
+```powershell
+Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -Verifiable
+Get-Item -LiteralPath 'synthetic' | Should -Not -BeNullOrEmpty
+Should -InvokeVerifiable
+```
 
 ---
 
@@ -3893,6 +3965,12 @@ Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer 
 
 ### Running Pester Tests
 
+The framework version is part of the test contract. A repository can have several Pester versions installed or load a built-in version before its tests start, so installation alone does not prove which code ran. Import the required version and check the loaded module. A mismatched loaded version or failed import should stop the run with a clear error.
+
+On Windows PowerShell 5.1 and PowerShell 7.6.9 with Pester 6.2.0, installed-module enumeration reported the manifest path (`Pester.psd1`) and the loaded module reported the script-module path (`Pester.psm1`). Comparing those paths rejects a valid import. Verify that one loaded module has the required version and that its GUID and module directory match the same installed candidate.
+
+Pester 6.2.0's per-file discovery/run lifecycle makes discovery data local to each test file. `BeforeDiscovery` is the supported place for data required while Pester discovers parameterized tests. Runtime setup belongs in the appropriate setup block. When multiple setup or teardown blocks remain, written order and reverse teardown order are observable behavior and need a focused ordering check. These rules do not require parallel execution.
+
 **Basic invocation:**
 
 ```powershell
@@ -3911,16 +3989,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 Invoke-Pester -Path tests/Get-UserInfo.Tests.ps1
 ```
 
-**With configuration object (for CI/CD scenarios):**
-
-```powershell
-$objPesterConfig = New-PesterConfiguration
-$objPesterConfig.Run.Path = 'tests/'
-$objPesterConfig.Output.Verbosity = 'Detailed'
-$objPesterConfig.TestResult.Enabled = $true
-$objPesterConfig.TestResult.OutputPath = 'test-results.xml'
-Invoke-Pester -Configuration $objPesterConfig
-```
+For CI, the guide's configuration example combines exact file selection with detailed output, NUnit results, and a nonzero exit on failure.
 
 #### Why CI Pester discovery must be scoped to the project test root
 
@@ -3930,27 +3999,62 @@ Scoping discovery to `tests/` or to the project's documented test root converts 
 
 #### Why discovery and execution need a single test-root source of truth
 
-Pester discovery and Pester execution are two halves of one contract. If discovery scans `tests/` but the Pester configuration `Run.Path` later points at `.`, the workflow's preflight output no longer describes what Pester actually runs. The inverse is also risky: discovery can say test files exist in one directory while execution runs a narrower or entirely different directory and silently skips the files that justified the step.
+The preflight decision and Pester execution both depend on the exact owned file list. Scanning a different directory during execution can pick up unrelated tests or omit files from the list.
 
-A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest. The same value defines what "this project's tests" means for both the preflight check and the Pester configuration, so a later path change is made once instead of being duplicated across separate script fragments.
+In Pester 6.2.0, explicit `Run.Path` inputs and `New-PesterContainer -Path` pass through a finder that can omit hidden files. Creating a file container from each original `FileInfo` preserves its provider path and file-based setup, including relative paths. The parallel worker reconstructs path inputs, so this example runs the file containers sequentially and clears the other input lists. [Pinned file finder](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/Pester.RSpec.ps1#L15-L93) · [Container factory](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/csharp/Pester/ContainerInfo.cs#L7-L22) · [Parallel worker](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/functions/Pester.Parallel.ps1#L313-L322)
 
-#### Why missing test roots should skip cleanly
+Pester dot-sources each file using its `PSPath`. Windows PowerShell 5.1 can expand brackets in that path and invoke a different file. The example escapes the invocation string on that host, including literal backticks. The original `FileInfo`, its `FullName`, and the file's attributes remain intact. PowerShell 7.6.9 used the original provider path for the tested names. [Pinned file invocation](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/Pester.Runtime.ps1#L2571-L2600) · [Wildcard escaping fix](https://github.com/PowerShell/PowerShell/pull/25211)
 
-Downstream consumers often adopt a style guide or reusable workflow before they have created PowerShell tests. Some projects intentionally remove a `tests/` directory during early scaffolding, documentation-only work, or staged migrations. In those cases, a hard workflow failure from `Get-ChildItem` is mostly noise: it says the directory is absent, not that the code failed a test.
+#### Why discovery must fail closed
 
-A `Test-Path -LiteralPath ... -PathType Container` guard lets the workflow produce a clear "no test files" skip when the directory is absent. Restricting the guard to `Container` keeps the skip scoped to "the test root is a missing directory" — a bare `Test-Path` would also succeed when the configured path happens to resolve to a file (for example a mis-set `PESTER_TEST_ROOT` env var), silently converting a real misconfiguration into a clean skip. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers. `Get-ChildItem` with `-ErrorAction SilentlyContinue` is an alternative shape, but it is not equivalent: `SilentlyContinue` will also suppress non-existence-related errors such as permission or IO failures, converting genuine CI problems into a silent "no tests" skip. Preferring `Test-Path` followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` keeps the skip narrowly scoped to "directory is missing," while still surfacing real enumeration failures as workflow errors.
+An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." Catch only the documented missing-root condition and let other errors fail the step.
 
-For local developer runs, use the documented project test root directly:
+Include hidden owned tests. Exclude dependency and version-control directories by path segment. A full-path substring filter can reject legitimate names that contain a reserved segment as part of a longer name. The same file list controls the skip decision and `Run.Container`, so preflight describes the files Pester executes. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
+
+Before running tests, ensure a different Pester version is not already loaded, then import and verify Pester 6.2.0 explicitly:
 
 ```powershell
+$objConflictingPester = Get-Module -Name Pester |
+    Where-Object { $_.Version -ne [version]'6.2.0' } |
+    Select-Object -First 1
+if ($null -ne $objConflictingPester) {
+    throw ("Pester 6.2.0 is required; version {0} is already loaded." -f $objConflictingPester.Version)
+}
+
+$arrInstalledPesterModules = @(
+    Get-Module -Name Pester -ListAvailable |
+        Where-Object { $_.Version -eq [version]'6.2.0' }
+)
+if ($arrInstalledPesterModules.Count -eq 0) {
+    throw 'Pester 6.2.0 is not installed.'
+}
+
+Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop
+$arrLoadedPesterModules = @(Get-Module -Name Pester)
+if ($arrLoadedPesterModules.Count -ne 1 -or $arrLoadedPesterModules[0].Version -ne [version]'6.2.0') {
+    throw 'Pester 6.2.0 did not load.'
+}
+$objLoadedPester = $arrLoadedPesterModules[0]
+$objInstalledPester = $arrInstalledPesterModules |
+    Where-Object {
+        $_.Guid -eq $objLoadedPester.Guid -and
+        [string]::Equals($_.ModuleBase, $objLoadedPester.ModuleBase, [System.StringComparison]::Ordinal)
+    } |
+    Select-Object -First 1
+if ($null -eq $objInstalledPester) {
+    throw 'The loaded Pester 6.2.0 did not match an installed Pester 6.2.0 module.'
+}
+
 Invoke-Pester -Path tests/ -Output Detailed
 ```
 
-CI workflow runs often need a PowerShell `run:` step that performs both test discovery and Pester execution. In those steps, CI Pester discovery (`Get-ChildItem ... -Filter '*.Tests.ps1' -Recurse`) and execution (the Pester configuration `Run.Path`) **MUST** be scoped to the project-owned `tests/` tree or to the project's documented test root. They **MUST NOT** scan from the repository root, because root-level scanning can sweep up unrelated tests, including starter, sample, template, vendored, or dependency `*.Tests.ps1` files, and produce a misleading green test signal.
+CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable test-root value. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-The Pester configuration `Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
+Include hidden owned test files in the discovery list. Exclude dependency and version-control directory segments such as `node_modules`, `.git`, `.svn`, and `.hg`; test each path segment instead of searching the full path for broad substrings. A root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design; a checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
-The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath ... -PathType Container` so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error. Using `-PathType Container` keeps the skip scoped to "the test root is a missing directory"; a bare `Test-Path` would also succeed when the path resolves to a file (for example a mis-set `PESTER_TEST_ROOT`), masking a real misconfiguration as a clean skip. `Get-ChildItem ... -ErrorAction SilentlyContinue` **MAY** be used as an alternative, but it is **NOT** equivalent: `SilentlyContinue` also suppresses non-existence-related errors such as permission or IO failures, which can mask genuine CI problems as a clean skip. A `Test-Path` guard followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` is preferred.
+For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
+
+Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve supported `NUnitXml` test-result output and the supported coverage formats used by coverage examples. Do not add a coverage requirement to unrelated examples.
 
 **Compliant** (single env-var-driven test root for discovery and execution):
 
@@ -3960,23 +4064,94 @@ The discovery step **SHOULD** guard against a missing test root using `Test-Path
   env:
     PESTER_TEST_ROOT: tests
   run: |
-    $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
-    $arrPesterTestFiles = @()
-
-    if (Test-Path -LiteralPath $strPesterTestRoot -PathType Container) {
-        $arrPesterTestFiles = @(
-            Get-ChildItem -LiteralPath $strPesterTestRoot -Filter '*.Tests.ps1' -Recurse -File
-        )
+    $objConflictingPester = Get-Module -Name Pester |
+        Where-Object { $_.Version -ne [version]'6.2.0' } |
+        Select-Object -First 1
+    if ($null -ne $objConflictingPester) {
+        throw ("Pester 6.2.0 is required; version {0} is already loaded." -f $objConflictingPester.Version)
     }
 
-    if ($arrPesterTestFiles.Count -eq 0) {
-        Write-Output ("No Pester test files found under '{0}'." -f $strPesterTestRoot)
+    $arrInstalledPesterModules = @(
+        Get-Module -Name Pester -ListAvailable |
+            Where-Object { $_.Version -eq [version]'6.2.0' }
+    )
+    if ($arrInstalledPesterModules.Count -eq 0) {
+        throw 'Pester 6.2.0 is not installed.'
+    }
+
+    Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop
+    $arrLoadedPesterModules = @(Get-Module -Name Pester)
+    if ($arrLoadedPesterModules.Count -ne 1 -or $arrLoadedPesterModules[0].Version -ne [version]'6.2.0') {
+        throw 'Pester 6.2.0 did not load.'
+    }
+    $objLoadedPester = $arrLoadedPesterModules[0]
+    $objInstalledPester = $arrInstalledPesterModules |
+        Where-Object {
+            $_.Guid -eq $objLoadedPester.Guid -and
+            [string]::Equals($_.ModuleBase, $objLoadedPester.ModuleBase, [System.StringComparison]::Ordinal)
+        } |
+        Select-Object -First 1
+    if ($null -eq $objInstalledPester) {
+        throw 'The loaded Pester 6.2.0 did not match an installed Pester 6.2.0 module.'
+    }
+
+    $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
+    try {
+        $objPesterTestRoot = Get-Item -LiteralPath $strPesterTestRoot -Force -ErrorAction Stop
+    } catch [System.Management.Automation.ItemNotFoundException] {
+        Write-Output ("No Pester test root exists at '{0}'." -f $strPesterTestRoot)
         exit 0
     }
 
+    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo]) {
+        throw ("The Pester test root is not a directory: '{0}'." -f $strPesterTestRoot)
+    }
+
+    $arrPesterTestFiles = @(
+        Get-ChildItem -LiteralPath $strPesterTestRoot -Recurse -File -Force -ErrorAction Stop |
+            Where-Object {
+                $strRelativePath = $_.FullName.Substring($objPesterTestRoot.FullName.Length).TrimStart([char[]]@('\', '/'))
+                $arrPathSegments = $strRelativePath -split '[\\/]'
+                $boolExcludedSegment = $false
+                foreach ($strPathSegment in $arrPathSegments) {
+                    if ($strPathSegment -in @('node_modules', '.git', '.svn', '.hg')) {
+                        $boolExcludedSegment = $true
+                        break
+                    }
+                }
+                (-not $boolExcludedSegment) -and $_.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+            }
+    )
+
+    if ($arrPesterTestFiles.Count -eq 0) {
+        Write-Output ("No owned Pester test files found under '{0}'." -f $strPesterTestRoot)
+        exit 0
+    }
+
+    $arrPesterTestContainers = @(
+        foreach ($objPesterTestFile in $arrPesterTestFiles) {
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell 5.1 can expand wildcards when Pester invokes the file.
+                $objPesterTestFile.PSPath = $objPesterTestFile.PSPath -replace '([`*?\[\]])', '`$1'
+            }
+            $objPesterTestContainer = [Pester.ContainerInfo]::Create()
+            $objPesterTestContainer.Type = 'File'
+            $objPesterTestContainer.Item = $objPesterTestFile
+            $objPesterTestContainer
+        }
+    )
+
     $objPesterConfiguration = New-PesterConfiguration
-    $objPesterConfiguration.Run.Path = $strPesterTestRoot
+    $objPesterConfiguration.Run.Container = $arrPesterTestContainers
+    $objPesterConfiguration.Run.Path = @()
+    $objPesterConfiguration.Run.ScriptBlock = @()
+    $objPesterConfiguration.Run.Parallel = $false
+    $objPesterConfiguration.Run.RepoRoot = $env:GITHUB_WORKSPACE
+    $objPesterConfiguration.Run.Exit = $true
     $objPesterConfiguration.Output.Verbosity = 'Detailed'
+    $objPesterConfiguration.TestResult.Enabled = $true
+    $objPesterConfiguration.TestResult.OutputFormat = 'NUnitXml'
+    $objPesterConfiguration.TestResult.OutputPath = 'test-results.xml'
     Invoke-Pester -Configuration $objPesterConfiguration
 ```
 
