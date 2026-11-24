@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.25.20261124.0
 
 ## Metadata
 
@@ -615,7 +615,7 @@ Use an acronym only when a relevant specification, language, or official API use
 # Compliant
 $strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
 $objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
-$hashtableSdk = Get-SdkSettings # SDK names a software development kit.
+$hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
 $boolEof = $objReader.EndOfStream # EOF names the end-of-file condition.
 $strIPAddress = '192.0.2.10'
 $strUserId = 'user-123'
@@ -625,7 +625,7 @@ $strTransfer = 'complete'
 # Non-Compliant
 $strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
 $objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
-$hashtableSDK = Get-SdkSettings # The development kit acronym takes the casing Sdk.
+$hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
 $boolEOF = $objReader.EndOfStream # The end-of-file acronym takes the casing Eof.
 $strIpAddress = '192.0.2.10'
 $strUserID = 'user-123'
