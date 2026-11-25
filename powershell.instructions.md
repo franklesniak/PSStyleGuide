@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.24.20261125.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-25
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -1400,7 +1400,9 @@ Functions and scripts written in this "Modern Advanced" style **MUST** adhere to
 
 <!-- RATIONALE: diagnostic-purpose-and-operational-progress -->
 
-**Example of a Compliant Modern Function:**
+**Operational diagnostics excerpt:**
+
+Apply the [comment-based help requirements](#comment-based-help-structure-and-format) when you implement this pattern.
 
 ```powershell
 function Get-ModernData {
@@ -1440,6 +1442,37 @@ The operational example uses Verbose to report progress. On failure, Debug repor
 
 ```powershell
 function Test-NonBlankName {
+    # .SYNOPSIS
+    # Tests if a name contains a non-whitespace character.
+    #
+    # .DESCRIPTION
+    # Returns $false for a null, empty, or whitespace-only name.
+    # Otherwise, returns $true.
+    #
+    # .PARAMETER Name
+    # Name to test.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name ' example '
+    #
+    # # Returns $true because the name contains letters.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name '   '
+    #
+    # # Returns $false because the name contains only spaces.
+    #
+    # .INPUTS
+    # None. This function accepts no pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] $true for a name with a non-whitespace character.
+    # $false for a null, empty, or whitespace-only name.
+    #
+    # .NOTES
+    # Position 0 accepts Name.
+    #
+    # Version: 1.0.20261125.0
     [CmdletBinding()]
     [OutputType([bool])]
     param (
@@ -1771,16 +1804,18 @@ function Get-ResolvedItem {
 A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
 
 ```powershell
-# Non-throwing wrapper with documented contract
+# Wrapper with a documented conversion failure result
 function Convert-SafelyFromJson {
     # .SYNOPSIS
-    # Converts a JSON string to an object without throwing on invalid input.
+    # Converts a JSON string and handles conversion exceptions.
     #
     # .DESCRIPTION
-    # Attempts to convert a JSON string to an object. Invalid input returns
-    # $null and emits a Debug diagnostic. The caller's Debug preferences
-    # still apply, including settings that stop execution. Callers MUST
-    # check the return value.
+    # Null or empty input returns $null immediately. On successful
+    # conversion, this function writes the output from ConvertFrom-Json.
+    # If conversion throws, the function calls Write-Debug. If execution
+    # continues after that call, the function returns $null. The effective
+    # Debug preference can interrupt execution before that return.
+    # Callers MUST check the returned result before use.
     #
     # .PARAMETER JsonString
     # JSON string to convert.
@@ -1788,20 +1823,28 @@ function Convert-SafelyFromJson {
     # .EXAMPLE
     # $objResult = Convert-SafelyFromJson -JsonString '{"name":"example"}'
     #
-    # # $objResult is a converted object on success, or $null on failure.
+    # # $objResult holds the converted object for this input.
+    #
+    # .EXAMPLE
+    # $objResult = Convert-SafelyFromJson -JsonString '{'
+    #
+    # # With the default Debug preference, $objResult is $null.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [object] on success; $null on failure.
+    # [object] Output from ConvertFrom-Json on success. Concrete types
+    # and output count depend on the input and PowerShell edition.
+    # $null for null or empty input or when execution continues after a
+    # conversion exception and its Debug diagnostic.
     #
     # .NOTES
     # This function supports positional parameters:
     #
     #   Position 0: JsonString
     #
-    # Version: 1.0.20260517.0
+    # Version: 1.1.20261125.0
     [CmdletBinding()]
     [OutputType([object])]
     param (
