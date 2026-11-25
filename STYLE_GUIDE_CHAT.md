@@ -5,13 +5,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.26.20261124.0
+**Version:** 2.27.20261125.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-25
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -2810,7 +2810,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 
 CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -2863,12 +2863,20 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
         throw 'PESTER_TEST_ROOT must name a relative checkout subdirectory.'
     }
 
-    $arrExcludedDirectories = @('node_modules', '.git', '.svn', '.hg')
+    $objDirectoryNameComparer = if ($boolWindowsPath) {
+        [System.StringComparer]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparer]::Ordinal
+    }
+    $objExcludedDirectoryNames = New-Object -TypeName 'System.Collections.Generic.HashSet[string]' -ArgumentList $objDirectoryNameComparer
+    foreach ($strExcludedDirectoryName in @('.', '..', 'node_modules', '.git', '.svn', '.hg')) {
+        [void]$objExcludedDirectoryNames.Add($strExcludedDirectoryName)
+    }
     $arrRootSegments = $strConfiguredRoot -split '[\\/]'
     $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
     foreach ($strRootSegment in $arrRootSegments) {
-        if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $strRootSegment -in @('.', '..') -or
-            $strRootSegment -in $arrExcludedDirectories -or $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
+        if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $objExcludedDirectoryNames.Contains($strRootSegment) -or
+            $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
             ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
             throw 'PESTER_TEST_ROOT contains an invalid directory component.'
         }
@@ -2878,11 +2886,6 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     $objLinkAttribute = [System.IO.FileAttributes]::ReparsePoint
     if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
         throw 'The checkout workspace must be an ordinary filesystem directory.'
-    }
-    $objRootNameComparison = if ($boolWindowsPath) {
-        [System.StringComparison]::OrdinalIgnoreCase
-    } else {
-        [System.StringComparison]::Ordinal
     }
     foreach ($strRootSegment in $arrRootSegments) {
         $strParentDirectory = $objPesterTestRoot.FullName
@@ -2895,9 +2898,9 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
         }
         $arrListedRootEntries = @(
             Get-ChildItem -LiteralPath $strParentDirectory -Force -ErrorAction Stop |
-                Where-Object { [string]::Equals($_.Name, $strRootSegment, $objRootNameComparison) }
+                Where-Object { $objDirectoryNameComparer.Equals($_.Name, $strRootSegment) }
         )
-        if ($arrListedRootEntries.Count -ne 1 -or $arrListedRootEntries[0].Name -in $arrExcludedDirectories) {
+        if ($arrListedRootEntries.Count -ne 1 -or $objExcludedDirectoryNames.Contains($arrListedRootEntries[0].Name)) {
             throw ("The test root component must match one allowed listed name: '{0}'." -f $strNextDirectory)
         }
         $objPesterTestRoot = $arrListedRootEntries[0]
@@ -2913,7 +2916,7 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
             $objDirectory = $objDirectories.Pop()
             foreach ($objEntry in (Get-ChildItem -LiteralPath $objDirectory.FullName -Force -ErrorAction Stop)) {
                 $boolIsDirectory = $objEntry -is [System.IO.DirectoryInfo]
-                if ($boolIsDirectory -and $objEntry.Name -in $arrExcludedDirectories) {
+                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($objEntry.Name)) {
                     continue
                 }
 
