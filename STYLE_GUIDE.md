@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20261124.0
+**Version:** 2.23.20261124.1
 
 ## Metadata
 
@@ -332,7 +332,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
