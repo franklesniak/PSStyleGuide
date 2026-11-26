@@ -27,12 +27,108 @@ const codeJob = final => ({
 });
 const common = { name: 'Fixture', on: { push: null, pull_request: null }, permissions: {} };
 const fixtures = {
+  'ci-toolchain-downloads.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'ci-toolchain-downloads.yml')), LIMITS).value,
   'build.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'build.yml')), LIMITS).value,
   'markdownlint.yml': { ...clone(common), on: { ...clone(common.on), schedule: [{ cron: '17 6 * * 1' }] }, jobs: {
     policy: codeJob(step('validate', clearNodeOptions + "\n& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
     markdownlint: codeJob(step('lint', './.github/workflows/Invoke-MarkdownLint.ps1')),
   } },
 };
+
+test('native downloads policy: every platform script is pinned independently and cannot add skips', () => {
+  const file = 'ci-toolchain-downloads.yml';
+  for (const [job, body] of Object.entries(fixtures[file].jobs)) {
+    for (let index = 0; index < body.steps.length; index++) {
+      const changed = clone(fixtures[file]);
+      changed.jobs[job].steps[index].run += '\nexit 0\n';
+      assert.throws(() => validateWorkflowObject(file, changed, contract), error => error.category === 'native-download-script');
+    }
+  }
+  for (const [role, old, replacement] of [
+    ['host', '7.6.5', '7.5.0'], ['host', '32eb8f6c', '00000000'],
+    ['provision', '-IncludeRecoveryCompatibility', ''], ['native', '--archive-directory', '--skip'],
+    ['native', '$objResult.skipped -ne 0', '$false'], ['native', '$objResult.failed -ne 0', '$false'],
+  ]) {
+    const changed = clone(fixtures[file]), step = changed.jobs.native_windows.steps.find(value => value.id === role);
+    assert.ok(step.run.includes(old)); step.run = step.run.replaceAll(old, replacement);
+    assert.throws(() => validateWorkflowObject(file, changed, contract), error => error.category === 'native-download-script');
+  }
+});
+
+test('native downloads Windows host: fixed definitions load without initializer execution', () => {
+  const host = fixtures['ci-toolchain-downloads.yml'].jobs.native_windows.steps.find(value => value.id === 'host').run;
+  const start = host.indexOf('$strInitializerSource = '), end = host.indexOf('$strParent = [Environment]::GetFolderPath', start);
+  assert.ok(start >= 0 && end > start);
+  const selector = host.slice(start, end);
+  const names = ['Assert-OrdinaryPath', 'Assert-WindowsWriter', 'New-PrivateDirectory'];
+  const stub = "throw 'PREAMBLE MUST NOT RUN'\n" + names.map(name => `function ${name} { throw 'HELPER BODY MUST NOT RUN' }`).join('\n') +
+    "\nfunction Unselected-Helper { throw 'OTHER BODY' }\nthrow 'MAIN MUST NOT RUN'\n";
+  const cases = [
+    { name: 'actual', source: fs.readFileSync(path.join(directory, 'Initialize-CiToolchain.ps1'), 'utf8'), success: true },
+    { name: 'inert-unselected-statements', source: stub, success: true },
+    { name: 'missing', source: stub.replace("function New-PrivateDirectory { throw 'HELPER BODY MUST NOT RUN' }", ''), success: false },
+    { name: 'duplicate', source: stub + '\nfunction Assert-WindowsWriter { }', success: false },
+    { name: 'case-duplicate', source: stub + '\nfunction assert-windowswriter { }', success: false },
+    { name: 'wrong-case', source: stub.replace('function Assert-WindowsWriter', 'function assert-windowswriter'), success: false },
+    { name: 'filter', source: stub.replace('function Assert-WindowsWriter', 'filter Assert-WindowsWriter'), success: false },
+    { name: 'nested', source: stub.replace("function New-PrivateDirectory { throw 'HELPER BODY MUST NOT RUN' }", 'function Unrelated { function New-PrivateDirectory { } }'), success: false },
+    { name: 'malformed', source: stub + '\nfunction Broken {', success: false },
+  ];
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'a04-host-selection-'));
+  try {
+    for (const item of cases) {
+      item.root = path.join(temporary, item.name);
+      fs.mkdirSync(path.join(item.root, '.github', 'workflows'), { recursive: true });
+      fs.writeFileSync(path.join(item.root, '.github', 'workflows', 'Initialize-CiToolchain.ps1'), item.source);
+    }
+    fs.writeFileSync(path.join(temporary, 'data.json'), JSON.stringify({ selector, cases }));
+    const script = path.join(temporary, 'check.ps1');
+    fs.writeFileSync(script, String.raw`[CmdletBinding()]
+[OutputType([string])]
+param()
+$ErrorActionPreference = 'Stop'
+$data = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'data.json') -Raw | ConvertFrom-Json
+function Test-DefinitionSelection {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param($Case, $Data)
+    Push-Location -LiteralPath $Case.root
+    try {
+        $accepted = $false
+        try {
+            . ([ScriptBlock]::Create($Data.selector))
+            if ($arrInitializerFunctions.Count -ne 3) { throw 'Wrong definition count.' }
+            foreach ($definition in $arrInitializerFunctions) {
+                if ((Get-Command -Name $definition.Name -CommandType Function).ScriptBlock.Ast.Extent.Text -cne $definition.Extent.Text) {
+                    throw 'Definition body differs from the parsed source.'
+                }
+            }
+            if (Get-Command -Name Unselected-Helper -ErrorAction SilentlyContinue) { throw 'Unselected function loaded.' }
+            $accepted = $true
+        } catch {
+            if ($Case.success -or $_.Exception.Message -notin @('Initializer helper source failed parsing.', 'Exact single top-level initializer helper required.')) { throw }
+        }
+        if ($accepted -ne $Case.success) { throw 'Unexpected selector disposition.' }
+        return $Case.name
+    } finally { Pop-Location }
+}
+$results = @($data.cases | ForEach-Object { Test-DefinitionSelection $_ $data })
+ConvertTo-Json -InputObject $results -Compress
+`);
+    const env = { ...process.env };
+    for (const name of Object.keys(env)) if (/^(?:NODE_OPTIONS|NODE_PATH|PSExecutionPolicyPreference|PYTHON.*|GH_TOKEN|GITHUB_TOKEN|GIT_.*)$/iu.test(name)) delete env[name];
+    const result = spawnSync(process.platform === 'win32' ? 'pwsh.exe' : 'pwsh',
+      ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script],
+      { cwd: temporary, env, encoding: 'utf8', timeout: 30000, maxBuffer: 1048576, windowsHide: true });
+    assert.equal(result.error, undefined); assert.equal(result.signal, null);
+    assert.equal(result.status, 0, result.stderr); assert.equal(result.stderr, '');
+    assert.deepEqual(JSON.parse(result.stdout), cases.map(item => item.name));
+  } finally {
+    assert.equal(path.dirname(path.resolve(temporary)), path.resolve(os.tmpdir()));
+    assert.ok(path.basename(temporary).startsWith('a04-host-selection-'));
+    fs.rmSync(temporary, { recursive: true });
+  }
+});
 
 test('valid small workflow interfaces; build requires no Node installation', () => {
   for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);
@@ -290,7 +386,7 @@ test('candidate revision cannot replace accepted contract or execute candidate v
   git('init');
   git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
   git('config', 'core.hooksPath', path.join(fixture.temporary, 'no-hooks'));
-  git('add', 'package.json', 'package-lock.json', '.github/workflows/package.json', '.github/workflows/package-lock.json', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml');
+  git('add', 'package.json', 'package-lock.json', '.github/workflows/package.json', '.github/workflows/package-lock.json', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml', '.github/workflows/ci-toolchain-downloads.yml');
   git('commit', '-m', 'Fixture');
   const marker = path.join(fixture.temporary, 'candidate-executed');
   const acceptedModule = fs.readFileSync(path.join(fixture.destination, 'Validate-WorkflowPolicy.mjs'));

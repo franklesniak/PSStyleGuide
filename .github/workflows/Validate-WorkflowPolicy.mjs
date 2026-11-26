@@ -306,6 +306,7 @@ const PREFLIGHT_SCHEMA = 'StyleGuide.WorkflowPreflightResult.v1';
 const LIMITS = Object.freeze({ maximumWorkflowBytes: 131072, maximumJsonBytes: 524288, maximumNodes: 5000, maximumDepth: 32 });
 const FORBIDDEN_OBJECT_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
 const WORKFLOWS = ['build.yml', 'markdownlint.yml'];
+const NATIVE_DOWNLOAD_WORKFLOW = 'ci-toolchain-downloads.yml';
 
 function strictUtf8Text(bytes, category) {
   const text = bytes.toString('utf8');
@@ -358,7 +359,7 @@ function hasDuplicateJsonMember(text) {
 
 function readContract() {
   const contract = readJsonBytes(readOrdinaryFile(path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'), LIMITS.maximumJsonBytes, 'contract-file'), 'contract-json');
-  expectExactKeys(contract, ['schema', 'roles', 'parser', 'actions'], 'contract-shape');
+  expectExactKeys(contract, ['schema', 'roles', 'parser', 'actions', 'nativeDownloads'], 'contract-shape');
   if (contract.schema !== 'StyleGuide.WorkflowPolicyContract.v3') fail('contract-schema');
   expectExactKeys(contract.roles, ['artifactVerifier'], 'contract-roles');
   if (!['verify_generated_artifacts', 'verify'].includes(contract.roles.artifactVerifier)) fail('contract-roles');
@@ -371,6 +372,12 @@ function readContract() {
     const repository = name === 'checkout' ? 'actions/checkout' : 'actions/upload-artifact';
     if (!new RegExp('^' + repository + '@[0-9a-f]{40}$', 'u').test(action.uses)) fail('contract-action');
     if (!action.inputs || typeof action.inputs !== 'object' || Array.isArray(action.inputs)) fail('contract-action');
+  }
+  expectExactKeys(contract.nativeDownloads, ['scriptSha256'], 'contract-native-downloads');
+  expectExactKeys(contract.nativeDownloads.scriptSha256, ['native_linux', 'native_windows', 'native_downloads'], 'contract-native-downloads');
+  for (const [job, scripts] of Object.entries(contract.nativeDownloads.scriptSha256)) {
+    expectExactKeys(scripts, job === 'native_downloads' ? ['require-platforms'] : ['acquire', 'host', 'provision', 'native'], 'contract-native-downloads');
+    for (const hash of Object.values(scripts)) if (!/^[0-9a-f]{64}$/u.test(hash)) fail('contract-native-downloads');
   }
   return contract;
 }
@@ -489,7 +496,49 @@ function validateRunStep(step, id, expected) {
   expectDeepEqual(helperCall(lines[0]), expected, 'helper-call');
 }
 
+function validateNativeDownloads(workflow, contract) {
+  expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');
+  if (typeof workflow.name !== 'string' || !workflow.name.trim()) fail('workflow-name');
+  expectDeepEqual(workflow.on, { push: null, pull_request: null, workflow_dispatch: null }, 'workflow-events');
+  expectDeepEqual(workflow.permissions, {}, 'workflow-permissions');
+  const platforms = ['native_linux', 'native_windows'];
+  expectExactKeys(workflow.jobs, [...platforms, 'native_downloads'], 'native-download-jobs');
+  const live = "github.event_name != 'push' || github.event.deleted != true";
+  for (const id of [...platforms, 'native_downloads']) {
+    const aggregate = id === 'native_downloads', job = workflow.jobs[id];
+    expectExactKeys(job, ['if', 'runs-on', 'timeout-minutes', 'permissions', 'steps', aggregate ? 'needs' : 'outputs'], 'native-download-job');
+    if (job.if !== (aggregate ? 'always() && (' + live + ')' : live) ||
+        job['runs-on'] !== (id === 'native_windows' ? 'windows-2025' : 'ubuntu-24.04') ||
+        job['timeout-minutes'] !== (aggregate ? 5 : 60)) fail('native-download-job');
+    expectDeepEqual(job.permissions, {}, 'code-job-permissions');
+    if (aggregate) expectDeepEqual(job.needs, platforms, 'native-download-platforms');
+    else expectDeepEqual(job.outputs, { passed: '${{ steps.native.outputs.passed }}', revision: '${{ steps.native.outputs.revision }}' }, 'native-download-outputs');
+    const roles = aggregate ? ['require-platforms'] : ['acquire', 'host', 'provision', 'native'];
+    if (!Array.isArray(job.steps) || job.steps.length !== roles.length) fail('native-download-steps');
+    for (const [index, role] of roles.entries()) {
+      const step = job.steps[index];
+      const bounded = ['host', 'provision', 'native'].includes(role);
+      const environment = ['provision', 'native', 'require-platforms'].includes(role);
+      expectExactKeys(step, ['id', 'shell', 'run', ...(Object.hasOwn(step, 'name') ? ['name'] : []),
+        ...(bounded ? ['timeout-minutes'] : []), ...(environment ? ['env'] : [])], 'native-download-step');
+      if (step.id !== role || step.shell !== 'pwsh') fail('native-download-step');
+      if (bounded && step['timeout-minutes'] !== { host: 10, provision: 20, native: 30 }[role]) fail('native-download-step');
+      if (environment) {
+        const env = role === 'require-platforms' ? { PLATFORM_RESULTS: '${{ toJSON(needs) }}' }
+          : { A04_ROOT: '${{ steps.host.outputs.root }}', A04_POWERSHELL: '${{ steps.host.outputs.powershell }}',
+            ...(role === 'native' ? { A04_ARCHIVES: '${{ steps.provision.outputs.archives }}', A04_NODE: '${{ steps.provision.outputs.node }}' } : {}) };
+        expectDeepEqual(step.env, env, 'native-download-environment');
+      }
+      // Finite reviewed bootstrap/provisioning/oracle bodies. This is a byte
+      // identity contract, not an attempted PowerShell security interpreter.
+      visibleLines(step.run);
+      if (sha256(step.run.replaceAll('\r\n', '\n')) !== contract.nativeDownloads.scriptSha256[id][role]) fail('native-download-script');
+    }
+  }
+}
+
 function validateWorkflowObject(fileName, workflow, contract) {
+  if (fileName === NATIVE_DOWNLOAD_WORKFLOW) return validateNativeDownloads(workflow, contract);
   if (!WORKFLOWS.includes(fileName)) fail('workflow-name');
   expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');
   if (typeof workflow.name !== 'string' || !workflow.name.trim()) fail('workflow-name');
@@ -628,7 +677,7 @@ async function main(args = process.argv.slice(2)) {
   if (preflight) return { schema: PREFLIGHT_SCHEMA, ...common };
   await loadYamlBindings(contract);
   const workflowSha256 = {};
-  for (const file of WORKFLOWS) {
+  for (const file of [...WORKFLOWS, NATIVE_DOWNLOAD_WORKFLOW]) {
     const bytes = readInput('.github/workflows/' + file, revision, LIMITS.maximumWorkflowBytes);
     validateWorkflowObject(file, parseStrictYaml(bytes, LIMITS).value, contract);
     workflowSha256[file] = sha256(bytes);

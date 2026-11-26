@@ -10,6 +10,8 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { stripVTControlCharacters } from 'node:util';
 import test from 'node:test';
+import { foundationTar } from './CiToolchainDownloadFixtures.mjs';
+import './Test-CiToolchainDownloads.test.mjs';
 import { readContract } from './Validate-WorkflowPolicy.mjs';
 
 // These tests execute the actual loader/helper bodies with fixed external-tool
@@ -1273,6 +1275,137 @@ $script:hashtableArtifactLanguage = @{
   const blocks = [...source.matchAll(pattern)];
   assert.equal(blocks.length, 1);
   return source.replace(pattern, descriptors[role]);
+}
+
+// The PS and TF artifact roles have different real semantic children.
+const artifactSemanticRoles = [...read('Test-StyleGuideArtifacts.ps1').matchAll(
+  /^\s+SemanticRole = '(PowerShellExamples|TerraformRecovery)'$/gmu)];
+assert.equal(artifactSemanticRoles.length, 1, 'The artifact gate needs one fixed supported semantic role.');
+const powerShellArtifactRole = artifactSemanticRoles[0][1] === 'PowerShellExamples';
+
+function powerShellCapacityGuide(bytes, malformed = false) {
+  let guide = fs.readFileSync(path.join(directory, '../../STYLE_GUIDE.md'), 'utf8');
+  if (malformed) {
+    const warning = /^.*`␠`.*not PowerShell syntax.*$/gmu;
+    assert.equal([...guide.matchAll(warning)].length, 1, 'Mutate the actual unique blank-line warning.');
+    guide = guide.replace(warning, 'The `␠` marker is safe to copy.');
+  }
+  const prefix = '\n<!-- guide capacity fixture: ', suffix = ' -->\n';
+  const padding = bytes - Buffer.byteLength(guide + prefix + suffix, 'utf8');
+  assert.ok(padding >= 0, 'The actual PS guide must fit the independent byte fixture.');
+  const result = Buffer.from(guide + prefix + 'g'.repeat(padding) + suffix, 'utf8');
+  assert.equal(result.length, bytes);
+  return result;
+}
+
+function powerShellCapacityFixture(t) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-capacity-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const env = { ...process.env, GITHUB_WORKSPACE: work, GIT_CONFIG_NOSYSTEM: '1',
+    GIT_CONFIG_GLOBAL: linux ? '/dev/null' : 'NUL', GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1' };
+  for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT',
+    'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES']) delete env[key];
+  for (const key of ['GITHUB_ENV', 'GITHUB_PATH', 'GITHUB_OUTPUT', 'GITHUB_STEP_SUMMARY']) {
+    env[key] = path.join(root, key); fs.writeFileSync(env[key], '');
+  }
+  const run = script => assertReaderCompleted(spawnSync('pwsh',
+    ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', path.join(scripts, script)],
+    { cwd: work, env, encoding: 'utf8', timeout: 30000 }), script);
+  return { root, work, scripts, env, run };
+}
+
+for (const mode of [262144, 262145, 458620, 524288, 524289, 'missing', 'malformed']) {
+  test(`guide capacity: real PS semantic child: ${mode}`, { skip: !powerShellArtifactRole }, t => {
+    const f = powerShellCapacityFixture(t);
+    fs.copyFileSync(path.join(directory, 'Test-BlankLineExamples.ps1'), path.join(f.scripts, 'Test-BlankLineExamples.ps1'));
+    if (mode !== 'missing') fs.writeFileSync(path.join(f.work, 'STYLE_GUIDE.md'),
+      powerShellCapacityGuide(mode === 'malformed' ? 458620 : mode, mode === 'malformed'));
+    const result = f.run('Test-BlankLineExamples.ps1');
+    if (result.status !== 0) t.diagnostic(JSON.stringify({ mode, status: result.status,
+      stdout: result.stdout, stderr: result.stderr }));
+    const admitted = typeof mode === 'number' && mode <= 524288;
+    assert.equal(result.status, admitted ? 0 : 1, result.stdout + result.stderr);
+    if (admitted) {
+      assert.equal(result.stdout.trim(), 'Blank-line example semantics passed, including focused mutation checks.');
+      assert.equal(result.stderr, '');
+    } else {
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
+      assert.match(diagnostic, mode === 'malformed' ? /blank-line warning/ :
+        /STYLE_GUIDE\.md is missing or exceeds the 524288-byte read limit\./u);
+      assert.equal(result.stdout, '');
+    }
+  });
+}
+
+for (const mode of [458620, 524288, 'overflow', 'malformed']) {
+  test(`guide capacity: real Linux artifact chain: ${mode}`, { skip: !linux || !powerShellArtifactRole }, t => {
+    const f = powerShellCapacityFixture(t);
+    const scripts = ['Test-StyleGuideArtifacts.ps1', 'Test-BlankLineExamples.ps1',
+      'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1'];
+    for (const name of scripts) fs.copyFileSync(path.join(directory, name), path.join(f.scripts, name));
+    const outputs = ['copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md'];
+    for (const name of ['STYLE_GUIDE_RATIONALE.md', ...outputs]) {
+      fs.copyFileSync(path.join(directory, '../..', name), path.join(f.work, name));
+    }
+    const bytes = typeof mode === 'number' ? mode : mode === 'overflow' ? 524289 : 458620;
+    fs.writeFileSync(path.join(f.work, 'STYLE_GUIDE.md'), powerShellCapacityGuide(bytes, mode === 'malformed'));
+    const git = args => {
+      const result = assertReaderCompleted(spawnSync('/usr/bin/git', args,
+        { cwd: f.work, env: f.env, encoding: 'utf8', timeout: 30000 }), 'capacity fixture Git');
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+      return result.stdout;
+    };
+    // These commands operate only on the private fixture, never the source checkout.
+    git(['init', '-q']);
+    git(['-c', 'core.autocrlf=false', 'add', '-A']);
+    const generated = f.run('Generate-StyleGuideArtifacts.ps1');
+    assert.equal(generated.status, 0, generated.stdout + generated.stderr);
+    assert.equal(generated.stderr, '');
+    const generation = JSON.parse(generated.stdout);
+    assert.equal(generation.Schema, 'StyleGuide.GeneratorResult.v2');
+    assert.ok(['Success', 'NoChange'].includes(generation.Overall));
+    assert.equal(generation.Phase, 'complete');
+    assert.equal(generation.Category, 'none');
+    assert.equal(generation.NativeOutcome, 'Success');
+    assert.equal(generation.ExitCode, 0);
+    assert.deepEqual(generation.Artifacts.map(row => [row.ArtifactId, row.Path]),
+      [['copilot', outputs[0]], ['powershell-instructions', outputs[1]], ['chat', outputs[2]], ['full', outputs[3]]]);
+    assert.ok(generation.Artifacts.every(row => ['Success', 'NoChange'].includes(row.Status)));
+    git(['-c', 'core.autocrlf=false', 'add', '-A']);
+    git(['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-qm', 'Capacity fixture']);
+    const beforeHead = git(['rev-parse', 'HEAD']);
+    const beforeConfig = fs.readFileSync(path.join(f.work, '.git/config'));
+    const names = ['STYLE_GUIDE.md', 'STYLE_GUIDE_RATIONALE.md', ...outputs,
+      ...scripts.map(name => '.github/workflows/' + name)];
+    const before = new Map(names.map(name => [name, fs.readFileSync(path.join(f.work, name))]));
+    const result = f.run('Test-StyleGuideArtifacts.ps1');
+    if (result.status !== 0) t.diagnostic(JSON.stringify({ mode, status: result.status,
+      stdout: result.stdout, stderr: result.stderr }));
+    assert.equal(result.status, typeof mode === 'number' ? 0 : 1, result.stdout + result.stderr);
+    if (typeof mode === 'number') {
+      assert.match(result.stdout, /generated-artifacts: committed bytes match generator output/u);
+      assert.equal(result.stderr, '');
+      const repeated = f.run('Generate-StyleGuideArtifacts.ps1');
+      assert.equal(repeated.status, 0, repeated.stdout + repeated.stderr);
+      const noChange = JSON.parse(repeated.stdout);
+      assert.equal(noChange.Overall, 'NoChange');
+      assert.ok(noChange.Artifacts.every(row => row.Status === 'NoChange'));
+    } else {
+      const diagnostic = stripVTControlCharacters(result.stderr).replace(/\r?\n[ \t]*\|[ \t]*/gu, ' ');
+      assert.match(diagnostic, mode === 'overflow' ? /exceeds the 524288-byte read limit/u : /blank-line warning/u);
+      assert.doesNotMatch(result.stdout, /committed bytes match generator output/u);
+    }
+    for (const [name, content] of before) assert.deepEqual(fs.readFileSync(path.join(f.work, name)), content, name);
+    assert.equal(git(['rev-parse', 'HEAD']), beforeHead);
+    assert.deepEqual(fs.readFileSync(path.join(f.work, '.git/config')), beforeConfig);
+    assert.equal(git(['status', '--porcelain=v1', '--untracked-files=all']), '');
+    for (const key of ['GITHUB_ENV', 'GITHUB_PATH', 'GITHUB_OUTPUT', 'GITHUB_STEP_SUMMARY']) {
+      assert.equal(fs.readFileSync(f.env[key], 'utf8'), '', key);
+    }
+  });
 }
 
 for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect',
@@ -4323,30 +4456,6 @@ test('F4 compatibility documentation matches actual parameter ownership', () => 
 function foundationOnce(source, anchor, replacement) {
   assert.equal(source.split(anchor).length, 2, `One exact fixture anchor is required: ${anchor}`);
   return source.replace(anchor, replacement);
-}
-
-// A finite USTAR producer avoids creating a device/FIFO in the fixture namespace.
-// GNU tar/xz and the actual initializer remain the archive consumers.
-function foundationTar(entries) {
-  const blocks = [];
-  for (const { name, data = Buffer.alloc(0), type = '0', target = '', mode = 0o755 } of entries) {
-    assert.ok(Buffer.byteLength(name) < 100 && Buffer.byteLength(target) < 100);
-    assert.ok(data.length <= 32768);
-    const header = Buffer.alloc(512);
-    const text = (offset, value, length) => { assert.ok(Buffer.byteLength(value) <= length); header.write(value, offset, length, 'ascii'); };
-    const octal = (offset, value, length) => text(offset, value.toString(8).padStart(length - 1, '0') + '\0', length);
-    text(0, name, 100); octal(100, mode, 8); octal(108, 1000, 8); octal(116, 1000, 8);
-    octal(124, data.length, 12); octal(136, 0, 12); header.fill(32, 148, 156);
-    text(156, type, 1); text(157, target, 100); text(257, 'ustar\0', 6); text(263, '00', 2);
-    octal(329, type === '3' ? 1 : 0, 8); octal(337, type === '3' ? 3 : 0, 8);
-    const checksum = header.reduce((total, value) => total + value, 0);
-    text(148, checksum.toString(8).padStart(6, '0') + '\0 ', 8);
-    blocks.push(header, data, Buffer.alloc((512 - data.length % 512) % 512));
-  }
-  blocks.push(Buffer.alloc(1024));
-  const bytes = Buffer.concat(blocks);
-  assert.ok(bytes.length <= 65536, 'Synthetic archives are finite, not stress data.');
-  return bytes;
 }
 
 function foundationFixture(t, { source = read('Initialize-CiToolchain.ps1'), mode = '', compatibility = false,

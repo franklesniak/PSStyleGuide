@@ -921,6 +921,120 @@
       ],
       "value": "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = 'NUL'\n$env:GIT_TERMINAL_PROMPT = '0'\n$env:GIT_NO_REPLACE_OBJECTS = '1'\n$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\nif ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n    throw 'The current PowerShell executable is unavailable.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = 0\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 1 failed.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 2 failed.'\n}\n$arrHead = @(& 'C:\\Program Files\\Git\\bin\\git.exe' rev-parse --verify 'HEAD^{commit}')\nif ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n    throw 'Generator proof revision mismatch.'\n}\n[IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n",
       "category": "generator-proof"
+    },
+    {
+      "name": "native downloads rejects privileged event",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "on",
+        "pull_request_target"
+      ],
+      "operation": "set",
+      "value": null,
+      "category": "workflow-events"
+    },
+    {
+      "name": "native downloads rejects workflow token",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "permissions"
+      ],
+      "operation": "set",
+      "value": {
+        "contents": "read"
+      },
+      "category": "workflow-permissions"
+    },
+    {
+      "name": "native downloads rejects missing Windows platform",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_windows"
+      ],
+      "operation": "delete",
+      "category": "native-download-jobs"
+    },
+    {
+      "name": "native downloads rejects skipped platform",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_linux",
+        "if"
+      ],
+      "operation": "set",
+      "value": "false",
+      "category": "native-download-job"
+    },
+    {
+      "name": "native downloads rejects wrong host",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_windows",
+        "runs-on"
+      ],
+      "operation": "set",
+      "value": "windows-latest",
+      "category": "native-download-job"
+    },
+    {
+      "name": "native downloads rejects privileged job",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_windows",
+        "permissions"
+      ],
+      "operation": "set",
+      "value": {
+        "contents": "write"
+      },
+      "category": "code-job-permissions"
+    },
+    {
+      "name": "native downloads rejects missing platform dependency",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_downloads",
+        "needs"
+      ],
+      "operation": "set",
+      "value": [
+        "native_linux"
+      ],
+      "category": "native-download-platforms"
+    },
+    {
+      "name": "native downloads rejects changed archive input",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_windows",
+        "steps",
+        3,
+        "env",
+        "A04_ARCHIVES"
+      ],
+      "operation": "set",
+      "value": "C:/private-only",
+      "category": "native-download-environment"
+    },
+    {
+      "name": "native downloads rejects continue on error",
+      "workflow": "ci-toolchain-downloads.yml",
+      "path": [
+        "jobs",
+        "native_linux",
+        "steps",
+        3,
+        "continue-on-error"
+      ],
+      "operation": "set",
+      "value": true,
+      "category": "native-download-step"
     }
   ]
 }
