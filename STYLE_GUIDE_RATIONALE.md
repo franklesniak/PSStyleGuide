@@ -224,6 +224,8 @@ Technical acronyms are useful when their source already uses them for the same c
 
 The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
 
+---
+
 ### Options for Local Variable Prefixes: Analysis
 
 > For the required prefix list, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
