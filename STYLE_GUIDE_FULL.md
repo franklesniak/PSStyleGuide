@@ -2335,9 +2335,10 @@ function Get-ItemStatus {
     # # Returns MissingItem when Get-Item reports ItemNotFoundException.
     #
     # .EXAMPLE
-    # Get-ItemStatus -Path 'protected-config.json'
+    # Get-ItemStatus -Path 'synthetic-private-item'
     #
-    # # Returns ReadFailed when Get-Item reports an access error.
+    # # In the access-error test fixture, Get-Item throws
+    # # UnauthorizedAccessException. The helper returns ReadFailed.
     #
     # .EXAMPLE
     # Get-ItemStatus -Path 'PSStyleGuideMissingDrive:\config.json'
