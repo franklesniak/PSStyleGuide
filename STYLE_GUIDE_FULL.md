@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261126.0
+**Version:** 2.25.20261126.0
 
 ## Metadata
 
@@ -182,6 +182,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Code **MUST NOT** grow PowerShell arrays with `+=` inside accumulation loops; use `System.Collections.Generic.List[T]` when an in-memory collection is required → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** String comparisons for identity, deduplication, or lookup **MUST** use an explicit comparison when the comparison rule affects results; **MUST NOT** rely on PowerShell defaults. Preserve the intended-case-insensitivity exemption and use the exact-comparison examples and target-version conditions in [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity).
 
 ### Testing (Quick Reference)
 
@@ -874,7 +875,7 @@ Get-Content -Path '../config.json'
 Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
 
-**[All] On Windows, code MUST check every original component of a Git repository-relative path before passing it to `GetFullPath`, `Resolve-Path`, `Get-Item`, or another provider operation.** Reject a component that ends with a period or space, contains `<`, `>`, `:`, a double quote, `|`, `?`, `*`, or a control character, or is a reserved device name such as `NUL` or `COM1`, including a device name followed by an extension. These spellings can address an NTFS stream, another drive, a device, or an invalid path. Report the original name as unsafe. Do not normalize a rejected component and then read the resulting alias.
+**[All] On Windows, code MUST check every original component of a Git repository-relative path before passing it to `GetFullPath`, `Resolve-Path`, `Get-Item`, or another provider operation.** Reject a component that ends with a period or space, contains a forward slash (`/`), a backslash (`\`), `<`, `>`, `:`, a double quote, `|`, `?`, `*`, or a control character, or is a reserved device name such as `NUL` or `COM1`, including a device name followed by an extension. These spellings can change the component boundaries or address an NTFS stream, another drive, a device, or an invalid path. Report the original name as unsafe. Do not normalize a rejected component and then read the resulting alias.
 
 #### Resolving Paths for .NET Static Methods
 
@@ -2985,6 +2986,40 @@ foreach ($objItem in $InputObject) {
 
 ---
 
+### String Comparison for Keys and Identity
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
+
+The comparison duty applies to all PowerShell versions in scope. Use syntax and APIs supported by the script's declared target. Constructs named below apply where available; this rule does not require an older target to provide newer constructs. The examples implement an exact comparison contract; they do not select the comparison contract for every consumer.
+
+When code compares strings for identity, deduplication, or lookup, and the comparison rule affects results (for example, persisted keys or security decisions), code **MUST** use an explicit comparison and **MUST NOT** rely on PowerShell defaults:
+
+- A hashtable literal (`@{}`) and `[ordered]@{}` ignore letter case in keys. PowerShell 7 uses an ordinal case-insensitive comparer; Windows PowerShell 5.1 uses a culture-aware comparer.
+- `-eq`, `-contains`, `-in`, and `switch` ignore letter case. Under normal globalization, `-ceq`, `-ccontains`, and `switch -CaseSensitive` are linguistic, not ordinal: a precomposed `é` (U+00E9) `-ceq` `e` + U+0301 returns `$true`. The `-ceq` expectation is an inference from [PowerShell 7.5 comparison semantics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.5) and [.NET linguistic equivalence](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons), not a claim of a new execution.
+- For an exact index, use a generic dictionary with `[System.StringComparer]::Ordinal`. For equality, use `[string]::Equals()` with `[System.StringComparison]::Ordinal`. Normalize or case-fold the values first when the rule requires it.
+
+The `-ceq` example uses invariant-culture linguistic comparison with globalization data enabled. Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
+
+This rule does not apply to configuration hashtables or splatting, where case-insensitive keys are intended.
+
+```powershell
+# Compliant (PowerShell 2 or later)
+$objIndex = New-Object 'System.Collections.Generic.Dictionary[string,object]' -ArgumentList ([System.StringComparer]::Ordinal)
+$boolSame = [string]::Equals($strLeft, $strRight, [System.StringComparison]::Ordinal)
+
+# Non-Compliant (the keys 'ABC' and 'abc' are one key)
+$hashtableIndex = @{}
+$boolSame = ($strLeft -ceq $strRight)
+```
+
+The example uses `object` because it leaves the value schema open. Use the specific value type when it is known.
+
+---
+
 ### Type Conversion Safety Chain
 
 The author implements a **defense-in-depth conversion chain** for numeric strings:
@@ -4294,7 +4329,7 @@ Get-ChildItem -Path 'C:\Logs\*.log'
 Remove-Item -Path 'C:\Temp\*.tmp' -Force
 ```
 
-**[All] On Windows, `GetFullPath` and FileSystem provider path operations can normalize trailing periods or spaces; for example, `dir.` can address `dir`.** Code that walks a directory tree **MUST** build each relative path from the listed entry names, not from a normalized full path, and **MUST** check each listed name for Windows-reserved names before passing the joined path to a provider cmdlet or a .NET file API. Report an unsafe listed name using its original spelling.
+**[All] On Windows, `GetFullPath` and FileSystem provider path operations can normalize trailing periods or spaces; for example, `dir.` can address `dir`.** Code that walks a directory tree **MUST** build each relative path from the original listed entry names. Before passing the joined path to a provider cmdlet or a .NET file API, code **MUST** apply the [Windows component checks](#path-and-scope-handling) to each listed name in its original form, including the check for a trailing period or space. Report an unsafe listed name using its original spelling.
 
 ### Symlink Targets and Repository Containment
 
