@@ -1826,15 +1826,22 @@ function Get-ItemStatus {
     #
     # .EXAMPLE
     # Get-ItemStatus -Path 'config.json'
+    #
     # # Returns Available when the lookup succeeds.
     #
+    # .EXAMPLE
     # Get-ItemStatus -Path 'missing-config.json'
+    #
     # # Returns MissingItem when Get-Item reports ItemNotFoundException.
     #
+    # .EXAMPLE
     # Get-ItemStatus -Path 'protected-config.json'
+    #
     # # Returns ReadFailed when Get-Item reports an access error.
     #
+    # .EXAMPLE
     # Get-ItemStatus -Path 'provider-config.json'
+    #
     # # Returns Failed when Get-Item reports InvalidOperationException.
     #
     # .INPUTS
@@ -1851,7 +1858,7 @@ function Get-ItemStatus {
     #
     #   Position 0: Path
     #
-    # Version: 1.0.20261125.0
+    # Version: 1.0.20261126.0
     [CmdletBinding()]
     [OutputType([string])]
     param (
