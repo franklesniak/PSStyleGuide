@@ -24,6 +24,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
   - [Local Variable Naming: Defensive Design Philosophy](#local-variable-naming-defensive-design-philosophy)
+  - [Established Technical Acronyms in Local Names](#established-technical-acronyms-in-local-names)
   - [Options for Local Variable Prefixes: Analysis](#options-for-local-variable-prefixes-analysis)
   - [Summary: Naming as Defensive Architecture](#summary-naming-as-defensive-architecture)
 - [Documentation Rationale](#documentation-rationale)
@@ -55,8 +56,10 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Interop as Adaptive Resilience](#summary-interop-as-adaptive-resilience)
 - [Output and Streams Rationale](#output-and-streams-rationale)
   - [Executive Summary: Output Discipline](#executive-summary-output-discipline)
+  - [Diagnostic Purpose and Operational Progress](#diagnostic-purpose-and-operational-progress)
   - [Format Files: Future-Proof Design Pattern](#format-files-future-proof-design-pattern)
   - [Modern Stream Capabilities (v2.0+ Context)](#modern-stream-capabilities-v20-context)
+  - [JSON Array Boundaries](#json-array-boundaries)
   - [Summary: Output as Controlled Interface](#summary-output-as-controlled-interface)
 - [Performance, Security, and Holistic Design Rationale](#performance-security-and-holistic-design-rationale)
   - [Executive Summary: Holistic Design Constraints](#executive-summary-holistic-design-constraints)
@@ -65,6 +68,8 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
   - [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+  - [Windows Component and Listed-Name Checks](#windows-component-and-listed-name-checks)
+  - [Symlink Targets and Repository Containment](#symlink-targets-and-repository-containment)
   - [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods)
 - [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
@@ -181,13 +186,13 @@ In the variable-assignment case, there are no cmdlet-parameter semantics in play
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. Their descriptive portions use fully spelled-out words, with established technical acronyms following the documented source and casing rule (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`, `$strJson`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -216,6 +221,16 @@ While some modern styles discourage type prefixes on local variables, in this co
 
 ---
 
+### Established Technical Acronyms in Local Names
+
+> For the naming rule, see [Established Technical Acronyms in Local Names](STYLE_GUIDE.md#established-technical-acronyms-in-local-names) in the main guide.
+
+Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
+
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
+
+---
+
 ### Options for Local Variable Prefixes: Analysis
 
 > For the required prefix list, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
@@ -224,7 +239,7 @@ The broader PowerShell community considers the use of type prefixes on local var
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally descriptive variable names** (team-only shorthand is forbidden) |
 | **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
 **This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
@@ -694,6 +709,18 @@ This creates a **predictable, composable, and debuggable** interface that works 
 
 ---
 
+### Diagnostic Purpose and Operational Progress
+
+> For the normative rule, see the diagnostic-stream requirement in [Modern Advanced Function/Script Requirements](STYLE_GUIDE.md#rule-modern-advanced-functionscript-requirements-v20) in the main guide.
+
+Choosing a stream by purpose preserves a useful diagnostic contract without inventing output to satisfy a per-function quota. Verbose progress helps an operator follow work that reads or changes real resources. Debug output helps investigate internal state or a handled failure. A pure predicate can return its result silently when no message makes the result clearer. Define-only library loading should also stay silent so that importing definitions does not pollute a caller's success stream.
+
+Test setup and helpers follow the same distinction. A test may capture success output and diagnostic streams independently when asserting the output contract. `Write-Verbose` and `Write-Debug` already honor the caller's preference controls. Manually changing those preferences can hide messages the caller requested. Keep messages on their selected streams, preserve error propagation, and apply the sensitive-data restrictions to both diagnostic streams.
+
+Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
+
+---
+
 ### Format Files: Future-Proof Design Pattern
 
 While not implemented in this v1.0 script, the author's design **anticipates** the use of **`.format.ps1xml` files** for custom object display:
@@ -740,6 +767,12 @@ process {
 - **Progress** → long-running operations (not applicable here)
 
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
+
+---
+
+### JSON Array Boundaries
+
+> For the normative exception, see [Consuming Streaming Functions](STYLE_GUIDE.md#consuming-streaming-functions-the-0-1-many-problem) in the main guide.
 
 Top-level JSON arrays need a separate boundary rule from ordinary function output. `ConvertFrom-Json -NoEnumerate` sends an array as one object. Check whether the running command exposes the switch. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
 
@@ -960,9 +993,15 @@ This distinction appeared in the PS #260 macOS run on ARM64, macOS 27.2.1, APFS,
 
 For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
 
+#### Matching Concrete Paths With Wildcard-Enabled Parameters
+
+The general **SHOULD** to escape concrete paths used for wildcard matching remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes selection of an existing target item deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+
 #### `New-Item` Exception
 
 `New-Item` does not expose a `-LiteralPath` parameter in Windows PowerShell 5.1 or PowerShell 7.x. Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. With `-Name`, a wildcard in `-Path` can match multiple existing parent directories and cause creation in multiple locations. Use `New-Item -Path` when the path value is trusted or validated. For untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`), validate or reject the input, or use an appropriate .NET API, such as `[System.IO.File]::Create()` or `[System.IO.Directory]::CreateDirectory()`, when literal path semantics are required.
+
+The item-creation exceptions apply when a command creates a target. In the Windows FileSystem provider probes on Windows PowerShell 5.1.26100.10068 and PowerShell 7.6.9, `New-Item` preserved brackets and literal backticks in a new name supplied as part of `-Path`. With the name in `-Name`, it expanded a wildcard in the parent `-Path` to both test directories. Apply the matching rule to commands that select an existing target.
 
 #### Wildcard-Safe Directory Creation With `[System.IO.Directory]::CreateDirectory()`
 
@@ -974,11 +1013,19 @@ The path must be resolved to an absolute filesystem path via `$ExecutionContext.
 
 For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
 
-The general **SHOULD** to escape concrete paths used for wildcard matching remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes selection of an existing target item deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+---
 
-The item-creation exceptions apply when a command creates a target. In the Windows FileSystem provider probes on Windows PowerShell 5.1.26100.10068 and PowerShell 7.6.9, `New-Item` preserved brackets and literal backticks in a new name supplied as part of `-Path`. With the name in `-Name`, it expanded a wildcard in the parent `-Path` to both test directories. Apply the matching rule to commands that select an existing target.
+### Windows Component and Listed-Name Checks
+
+> For the normative checks, see [Path and Scope Handling](STYLE_GUIDE.md#path-and-scope-handling) in the main guide.
 
 On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
+
+---
+
+### Symlink Targets and Repository Containment
+
+> For the normative checks, see [Symlink Targets and Repository Containment](STYLE_GUIDE.md#symlink-targets-and-repository-containment) in the main guide.
 
 Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). The [.NET 6 source](https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/IO/FileSystemInfo.cs#L109-L157) exposes both members. Check the runtime before relying on them. Refuse a containment decision when the needed original target text is unavailable. In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
 
@@ -1160,7 +1207,7 @@ The prefix list in [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.
 Two specific substitutions are called out because they are the most tempting mistakes:
 
 - **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
-- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+- **`$hash…` → `$hashtable…`.** Use the approved `$hashtable` prefix to distinguish this type from cryptographic hashes and hash codes. The separate rule for the descriptive portion permits established technical acronyms and requires authors to spell out team-only shorthand.
 
 Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
 

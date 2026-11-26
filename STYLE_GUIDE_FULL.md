@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261126.0
+**Version:** 2.27.20261126.0
 
 ## Metadata
 
@@ -65,7 +65,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
-- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., `$strMessage`, `$intCount`, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use type-prefixed camelCase (e.g., `$strMessage`, `$intCount`). Spell out words in the descriptive part. Use technical acronyms only when a relevant specification, language, or official API uses them for that meaning → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -129,7 +129,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions and scripts **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** A function or script does not need both `Write-Verbose` and `Write-Debug`. Choose the stream by purpose. Operational work **MUST** report useful Verbose progress at meaningful stages. Pure helpers **MAY** remain silent. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: Modern functions and scripts **MAY** temporarily suppress `$VerbosePreference` for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** `[Parameter(Mandatory=$true)]` **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
@@ -502,13 +502,13 @@ Public identifiers (functions, parameters, properties) **MUST** use PascalCase. 
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. Their descriptive portions use fully spelled-out words, with established technical acronyms following the documented source and casing rule (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`, `$strJson`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -802,18 +802,18 @@ The prefix list in [Local Variable Naming: Type-Prefixed camelCase](#local-varia
 Two specific substitutions are called out because they are the most tempting mistakes:
 
 - **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
-- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+- **`$hash…` → `$hashtable…`.** Use the approved `$hashtable` prefix to distinguish this type from cryptographic hashes and hash codes. The separate rule for the descriptive portion permits established technical acronyms and requires authors to spell out team-only shorthand.
 
 Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. The descriptive portion of each name—everything after the type prefix—**MUST** use fully spelled-out words, except for technical acronyms established for that meaning by the relevant specification, language, or official API.
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
 - **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
   - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
   - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
-- **Descriptive Name:** The name **MUST** be **fully spelled out**.
+- **Descriptive Name:** The **MUST** for spelled-out words applies to the part after the prefix. The **SHOULD NOT** for ad hoc prefixes applies to the prefix.
 
 **Examples:**
 
@@ -829,6 +829,42 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$objResult`
 - `$refLastKnownError`
 - `$versionPowerShell`
+
+#### Established Technical Acronyms in Local Names
+
+Use an acronym only when a relevant specification, language, or official API uses it for that meaning. Keep the existing type prefix. Apply these casing rules:
+
+- Capitalize both letters of a two-letter acronym, as in `$strIPAddress`. Do not mechanically capitalize every two-letter part of a compound.
+- Treat `Id` and `Ok` as words, as in `$strUserId` and `$boolIsOk`.
+- Use Pascal case for acronyms of three or more letters, as in `$strJson`, `$objFunctionAst`, `$hashtableSdk`, and `$boolEof`.
+- Preserve established spelling when referring to a command. Use `Start-AzureRmVM` and avoid recasing it as `Start-AzureRmVm`.
+- Team-only shorthand and ambiguous terms **MUST** be spelled out.
+
+```powershell
+# Compliant
+$strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
+$objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
+$hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
+$strIPAddress = '192.0.2.10'
+$strUserId = 'user-123'
+$boolIsOk = $true
+$strTransfer = 'complete'
+
+# Non-Compliant
+$strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
+$objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
+$hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
+$strIpAddress = '192.0.2.10'
+$strUserID = 'user-123'
+$boolIsOK = $true
+$strXfr = 'complete'
+```
+
+Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
+
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
 
 ### Local Variable Naming: Defensive Design Philosophy
 
@@ -877,6 +913,8 @@ Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.js
 
 **[All] On Windows, code MUST check every original component of a Git repository-relative path before passing it to `GetFullPath`, `Resolve-Path`, `Get-Item`, or another provider operation.** Reject a component that ends with a period or space, contains a forward slash (`/`), a backslash (`\`), `<`, `>`, `:`, a double quote, `|`, `?`, `*`, or a control character, or is a reserved device name such as `NUL` or `COM1`, including a device name followed by an extension. These spellings can change the component boundaries or address an NTFS stream, another drive, a device, or an invalid path. Report the original name as unsafe. Do not normalize a rejected component and then read the resulting alias.
 
+On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
+
 #### Resolving Paths for .NET Static Methods
 
 **[All]** When a script or function passes a user-provided or otherwise unresolved PowerShell path to a .NET file API (for example, `[System.IO.File]::WriteAllText()`, `[System.IO.File]::WriteAllLines()`, or other `System.IO.*` methods that expect a file-system path), the path **MUST** first be converted to an absolute file-system path via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()`. This method assumes the path resolves through the FileSystem provider; non-FileSystem provider paths (such as `HKLM:\…` or `Cert:\…`) **MUST NOT** be passed to `System.IO.*` methods.
@@ -904,7 +942,7 @@ The broader PowerShell community considers the use of type prefixes on local var
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally descriptive variable names** (team-only shorthand is forbidden) |
 | **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
 **This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
@@ -1847,9 +1885,17 @@ Functions and scripts written in this "Modern Advanced" style **MUST** adhere to
 2. **Must Use `[OutputType()]`:** All modern functions and scripts **MUST** declare their primary output object type using `[OutputType()]`. This is critical for discoverability, integration, and validating the function's or script's contract.
 3. **Must Use Streaming Output:** Functions and scripts that return collections **MUST** write objects directly to the pipeline (stream) from within a loop. They **MUST NOT** collect results in a `List<T>` or array to be returned at the end. (See *Processing Collections in Modern Functions*).
 4. **Must Use `try/catch`:** Error handling **MUST** use `try/catch` blocks. The v1.0 `trap` / preference-toggling pattern is **prohibited** in this style.
-5. **Must Use Proper Streams:** Verbose and debug messages **MUST** be written to their respective streams (`Write-Verbose`, `Write-Debug`). Manual toggling of `$VerbosePreference` is **prohibited**.
+5. **Choose Diagnostic Streams by Purpose:** When a diagnostic message is useful, it **MUST** use the appropriate Verbose or Debug stream. Modern operational work **MUST** report useful progress on the Verbose stream at meaningful stages. A function or script does not need both commands or a message at every entry. Pure validation and data helpers **MAY** remain silent when they have no useful diagnostic. Test scripts, setup, and test helpers follow the same rule. Loading a library that only defines functions **MUST NOT** add progress messages or success-stream output. `Write-Verbose` and `Write-Debug` **MUST** honor caller preferences by default. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern. Follow the [Modern `catch` Block Requirements](#modern-catch-block-requirements) and [sensitive-data rules](#sensitive-data-in-verbose-and-debug-streams) for failure diagnostics.
 
-**Example of a Compliant Modern Function:**
+Choosing a stream by purpose preserves a useful diagnostic contract without inventing output to satisfy a per-function quota. Verbose progress helps an operator follow work that reads or changes real resources. Debug output helps investigate internal state or a handled failure. A pure predicate can return its result silently when no message makes the result clearer. Define-only library loading should also stay silent so that importing definitions does not pollute a caller's success stream.
+
+Test setup and helpers follow the same distinction. A test may capture success output and diagnostic streams independently when asserting the output contract. `Write-Verbose` and `Write-Debug` already honor the caller's preference controls. Manually changing those preferences can hide messages the caller requested. Keep messages on their selected streams, preserve error propagation, and apply the sensitive-data restrictions to both diagnostic streams.
+
+Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
+
+**Operational diagnostics excerpt:**
+
+Apply the [comment-based help requirements](#comment-based-help-structure-and-format) when you implement this pattern.
 
 ```powershell
 function Get-ModernData {
@@ -1861,7 +1907,7 @@ function Get-ModernData {
     )
 
     process {
-        Write-Verbose "Processing file: $InputPath"
+        Write-Verbose 'Processing the input file.'
 
         try {
             $data = Get-Content -LiteralPath $InputPath -ErrorAction Stop
@@ -1873,11 +1919,66 @@ function Get-ModernData {
                 }
             }
         } catch {
-            Write-Error -Message "Failed to process $InputPath: $($_.Exception.Message)"
+            try {
+                Write-Debug ("Input processing failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+            } finally {
+                throw
+            }
         }
     }
 }
 ```
+
+The operational example uses Verbose to report progress. On failure, Debug reports the exception type and a bare `throw` passes the original error to the caller. The Verbose and Debug messages omit the input path and respect the caller's preferences.
+
+**Silent pure validation helper:**
+
+```powershell
+function Test-NonBlankName {
+    # .SYNOPSIS
+    # Tests if a name contains a non-whitespace character.
+    #
+    # .DESCRIPTION
+    # Returns $false for a null, empty, or whitespace-only name.
+    # Otherwise, returns $true.
+    #
+    # .PARAMETER Name
+    # Name to test.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name ' example '
+    #
+    # # Returns $true because the name contains letters.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name '   '
+    #
+    # # Returns $false because the name contains only spaces.
+    #
+    # .INPUTS
+    # None. This function accepts no pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] $true for a name with a non-whitespace character.
+    # $false for a null, empty, or whitespace-only name.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: Name
+    #
+    # Version: 1.0.20261125.0
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param (
+        [string]$Name
+    )
+
+    return (-not [string]::IsNullOrEmpty($Name) -and $Name.Trim().Length -gt 0)
+}
+```
+
+This helper returns one Boolean on the success stream. It has no useful progress or internal diagnostic. Test setup and helper code may likewise stay silent when no diagnostic helps explain their work. A define-only file emits no progress when it loads. The caller can receive diagnostics when it invokes an operation with useful progress or internal detail.
 
 **Benefits**: Pipeline-friendly, discoverable
 
@@ -1885,7 +1986,7 @@ function Get-ModernData {
 
 #### "Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams
 
-Rule 5 states that manual toggling of `$VerbosePreference` is prohibited. This rule's primary intent is to ensure your function or script *respects* the user's desire for verbose output from *your* script (via `Write-Verbose`).
+Rule 5 selects streams by message purpose, not by a per-function quota. Its intent is to preserve the caller's control of diagnostics while reporting useful progress for operational work and useful internal details when they aid troubleshooting. A function or script need not contain both `Write-Verbose` and `Write-Debug`; a suitable catch-path Debug message counts for that failure path, and Debug output on every successful call is unnecessary.
 
 An exception to this rule **MAY** be made when you **MUST** *surgically suppress* the verbose stream from a "chatty" or "noisy" nested command (a command you call within your function or script). This pattern allows your function or script to remain verbose while silencing the underlying tool.
 
@@ -2002,6 +2103,8 @@ foreach ($objJsonElement in $objJsonArray) {
     # For JSON [[1, 2]], this loop receives one inner array.
 }
 ```
+
+Top-level JSON arrays need a separate boundary rule from ordinary function output. `ConvertFrom-Json -NoEnumerate` sends an array as one object. Check whether the running command exposes the switch. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
 
 ---
 
@@ -2186,15 +2289,18 @@ For **modern higher-level functions and scripts** — code that orchestrates the
 
 #### Default Pattern: `Write-Debug` + `throw`
 
-The standard `catch` pattern for modern advanced functions and scripts **SHOULD** log the error to the **Debug** stream and then **re-throw** it so that unexpected failures propagate to the caller. This **SHOULD** be the default unless the function is explicitly designed as a non-throwing wrapper with a documented contract.
+The standard `catch` pattern for modern advanced functions and scripts **SHOULD** report a safe error detail on the **Debug** stream and use a bare `throw` to propagate the original error. Use this pattern unless the function is a non-throwing wrapper with a documented contract. When a diagnostic can interrupt the catch, put it in `try` and place the bare `throw` in `finally` so the original error still reaches the caller.
 
 ```powershell
 # Default: log and re-throw
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: {0}" -f $_)
-    throw
+    try {
+        Write-Debug ("Operation failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -2220,15 +2326,18 @@ try {
 
 #### Adding Context Before Rethrowing
 
-If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. This preserves the original exception while still providing diagnostic context on the Debug stream, reinforcing the [Default Pattern](#default-pattern-write-debug--throw).
+If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. Use safe details such as the operation and exception type. This preserves the original exception and follows the [Default Pattern](#default-pattern-write-debug--throw).
 
 ```powershell
 # Correct — context logged, original exception preserved:
 try {
     Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
-    Write-Debug ("Failed to get item at path '{0}': {1}" -f $strPath, $_)
-    throw
+    try {
+        Write-Debug ("Item lookup failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -2269,15 +2378,18 @@ function Get-ResolvedItem {
 A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
 
 ```powershell
-# Non-throwing wrapper with documented contract
+# Wrapper with a documented conversion failure result
 function Convert-SafelyFromJson {
     # .SYNOPSIS
-    # Converts a JSON string to an object without throwing on invalid input.
+    # Converts a JSON string and handles conversion exceptions.
     #
     # .DESCRIPTION
-    # Attempts to convert a JSON string to an object. This function does
-    # NOT throw on invalid input; instead it returns $null and logs the
-    # error to the Debug stream. Callers MUST check the return value.
+    # Null or empty input returns $null immediately. On successful
+    # conversion, this function writes the output from ConvertFrom-Json.
+    # If conversion throws, the function calls Write-Debug. If execution
+    # continues after that call, the function returns $null. The effective
+    # Debug preference can interrupt execution before that return.
+    # Callers MUST check the returned result before use.
     #
     # .PARAMETER JsonString
     # JSON string to convert.
@@ -2285,20 +2397,28 @@ function Convert-SafelyFromJson {
     # .EXAMPLE
     # $objResult = Convert-SafelyFromJson -JsonString '{"name":"example"}'
     #
-    # # $objResult is a converted object on success, or $null on failure.
+    # # $objResult holds the converted object for this input.
+    #
+    # .EXAMPLE
+    # $objResult = Convert-SafelyFromJson -JsonString '{'
+    #
+    # # With the default Debug preference, $objResult is $null.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [object] on success; $null on failure.
+    # [object] Output from ConvertFrom-Json on success. Concrete types
+    # and output count depend on the input and PowerShell edition.
+    # $null for null or empty input or when execution continues after a
+    # conversion exception and its Debug diagnostic.
     #
     # .NOTES
     # This function supports positional parameters:
     #
     #   Position 0: JsonString
     #
-    # Version: 1.0.20260517.0
+    # Version: 1.1.20261125.0
     [CmdletBinding()]
     [OutputType([object])]
     param (
@@ -2312,7 +2432,7 @@ function Convert-SafelyFromJson {
     try {
         $JsonString | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        Write-Debug ("JSON conversion failed: {0}" -f $_)
+        Write-Debug ("JSON conversion failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
         $null
     }
 }
@@ -3320,8 +3440,6 @@ process {
 
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
 
-Top-level JSON arrays need a separate boundary rule from ordinary function output. `ConvertFrom-Json -NoEnumerate` sends an array as one object. Check whether the running command exposes the switch. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
-
 ### Summary: Output as Controlled Interface
 
 The output formatting and stream usage represent **military-grade interface discipline**:
@@ -4245,9 +4363,15 @@ This distinction appeared in the PS #260 macOS run on ARM64, macOS 27.2.1, APFS,
 
 For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
 
+#### Matching Concrete Paths With Wildcard-Enabled Parameters
+
+The general **SHOULD** to escape concrete paths used for wildcard matching remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes selection of an existing target item deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+
 #### `New-Item` Exception
 
 `New-Item` does not expose a `-LiteralPath` parameter in Windows PowerShell 5.1 or PowerShell 7.x. Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. With `-Name`, a wildcard in `-Path` can match multiple existing parent directories and cause creation in multiple locations. Use `New-Item -Path` when the path value is trusted or validated. For untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`), validate or reject the input, or use an appropriate .NET API, such as `[System.IO.File]::Create()` or `[System.IO.Directory]::CreateDirectory()`, when literal path semantics are required.
+
+The item-creation exceptions apply when a command creates a target. In the Windows FileSystem provider probes on Windows PowerShell 5.1.26100.10068 and PowerShell 7.6.9, `New-Item` preserved brackets and literal backticks in a new name supplied as part of `-Path`. With the name in `-Name`, it expanded a wildcard in the parent `-Path` to both test directories. Apply the matching rule to commands that select an existing target.
 
 #### Wildcard-Safe Directory Creation With `[System.IO.Directory]::CreateDirectory()`
 
@@ -4258,16 +4382,6 @@ The path must be resolved to an absolute filesystem path via `$ExecutionContext.
 `CreateDirectory()` is also safe to call when the directory already exists—it returns the existing `DirectoryInfo` object without error—making a preceding `Test-Path -LiteralPath` check optional but useful for clarity. The compliant example in the main guide includes the `Test-Path` guard for readability.
 
 For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
-
-The general **SHOULD** to escape concrete paths used for wildcard matching remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes selection of an existing target item deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
-
-The item-creation exceptions apply when a command creates a target. In the Windows FileSystem provider probes on Windows PowerShell 5.1.26100.10068 and PowerShell 7.6.9, `New-Item` preserved brackets and literal backticks in a new name supplied as part of `-Path`. With the name in `-Name`, it expanded a wildcard in the parent `-Path` to both test directories. Apply the matching rule to commands that select an existing target.
-
-On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
-
-Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). The [.NET 6 source](https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/IO/FileSystemInfo.cs#L109-L157) exposes both members. Check the runtime before relying on them. Refuse a containment decision when the needed original target text is unavailable. In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
-
-In the same macOS fixture, raw `LinkTarget` kept the literal backslash. The original link alias reached the literal target, while a provider open of the resolved target spelling reached a different, slash-separated file. Checking both spellings before the provider call preserves which entry the containment check is about.
 
 When a cmdlet supports both `-Path` and `-LiteralPath`, and the code is operating on a **single concrete path value**—not an intentionally wildcarded pattern—`-LiteralPath` **SHOULD** be used instead of `-Path`. This especially applies when the path is derived from variables, `Join-Path`, or string construction, because `-Path` interprets wildcard characters (`[`, `]`, `*`, `?`) and can silently match the wrong files or match nothing at all.
 
@@ -4334,6 +4448,10 @@ Remove-Item -Path 'C:\Temp\*.tmp' -Force
 **[All] On Windows, `GetFullPath` and FileSystem provider path operations can normalize trailing periods or spaces; for example, `dir.` can address `dir`.** Code that walks a directory tree **MUST** build each relative path from the original listed entry names. Before passing the joined path to a provider cmdlet or a .NET file API, code **MUST** apply the [Windows component checks](#path-and-scope-handling) to each listed name in its original form, including the check for a trailing period or space. Report an unsafe listed name using its original spelling.
 
 ### Symlink Targets and Repository Containment
+
+Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). The [.NET 6 source](https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/IO/FileSystemInfo.cs#L109-L157) exposes both members. Check the runtime before relying on them. Refuse a containment decision when the needed original target text is unavailable. In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
+
+In the same macOS fixture, raw `LinkTarget` kept the literal backslash. The original link alias reached the literal target, while a provider open of the resolved target spelling reached a different, slash-separated file. Checking both spellings before the provider call preserves which entry the containment check is about.
 
 **[Modern] On Linux and macOS, code that decides whether a path is inside a trusted directory MUST inspect every directory on the lexical path below that root for the `ReparsePoint` attribute before relying on containment, and MUST fail closed if it cannot read a directory. A directory with that attribute is a link for this containment decision and MUST be refused.** When a link target matters to the containment check, code **MUST** verify that the runtime can read its original target text. Use `LinkTarget` where it is available. Fail closed if the needed raw text is unavailable or unreadable. Read it before processing a parent component such as `..`, before normalization, and before provider use. Raw target text and the result of `FileSystemInfo.ResolveLinkTarget($true)`, where available, are noncanonical. .NET can follow a link in the final path component while the returned path still passes through an intermediate directory symlink. A string-prefix comparison or `GetRelativePath()` alone does not prove containment. Do not reject the trusted root or directories above it solely because they are links.
 
