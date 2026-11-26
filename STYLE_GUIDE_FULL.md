@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.27.20261125.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-25
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -460,7 +460,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -4007,7 +4007,9 @@ Pester dot-sources each file using its `PSPath`. Windows PowerShell 5.1 can expa
 
 #### Why discovery must fail closed
 
-An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." Catch only the documented missing-root condition and let other errors fail the step.
+An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." The FileSystem provider can report an invalid Windows name as missing. The example checks all configured Windows components for reserved stems and uses a 255 UTF-16 code-unit bound before lookup. The bound matches a common Windows volume limit. It catches an overlong component even if an earlier directory is missing. Actual volume and total path limits can differ. A direct filesystem attribute query confirms provider-reported absence and surfaces other errors on reachable paths. On POSIX, the example allows a skip only if each unvisited component fits within the [ext4 limit of 255 bytes](https://docs.kernel.org/filesystems/ext4/directory.html) when counted as UTF-8. A missing directory prevents the filesystem from checking those components. Use the target filesystem’s rules when it needs a different check. Existing paths keep their normal filesystem checks. [Windows naming conventions](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions) describe reserved stems, including those with extensions or superscript digits. [Windows path length limits](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) describe volume-dependent limits. [File.GetAttributes](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.getattributes) documents the exceptions for the direct query.
+
+The earlier FileSystem provider filter accepted case variants of the `.Tests.ps1` suffix. The explicit owned list matches the exact suffix, so it excludes `Example.tests.PS1` and `Example.Tests.ps1.txt`. Give an intended owned test the exact suffix, for example `Example.Tests.ps1`. The configured directory segments have their own comparison rule because segment matching defines which trees discovery may enter.
 
 The CI example assumes a trusted checkout and validates the relative root before discovery. It checks each configured component against the names listed by its parent. Windows may accept a short alias for a different listed name, so a successful lookup alone does not establish ownership. The example visits one directory at a time to apply exact segment exclusions before descent. The shared ordinal comparer ignores case on Windows and retains it on Unix. Linguistic matching can ignore a soft hyphen, which would let an excluded name hide tests under a distinct owned directory. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. On Unix, it uses the filesystem provider's non-following `UnixStat.ItemType` to require a regular file. A `FileInfo` object can also describe a named pipe. The example refuses literal POSIX backslashes in eligible names before passing paths to a provider. The original ordinary file objects, including hidden files, control the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
 
@@ -4050,7 +4052,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 
 CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Reject names reserved by the Windows file-naming rules in configured root components, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -4112,6 +4114,18 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     foreach ($strExcludedDirectoryName in @('.', '..', 'node_modules', '.git', '.svn', '.hg')) {
         [void]$objExcludedDirectoryNames.Add($strExcludedDirectoryName)
     }
+    $objWindowsDeviceNames = New-Object -TypeName 'System.Collections.Generic.HashSet[string]' -ArgumentList $objDirectoryNameComparer
+    if ($boolWindowsPath) {
+        foreach ($strDeviceName in @('CON', 'PRN', 'AUX', 'NUL')) {
+            [void]$objWindowsDeviceNames.Add($strDeviceName)
+        }
+        $arrDeviceDigits = @('1', '2', '3', '4', '5', '6', '7', '8', '9', [char]0x00B9, [char]0x00B2, [char]0x00B3)
+        foreach ($objDeviceDigit in $arrDeviceDigits) {
+            [void]$objWindowsDeviceNames.Add(('COM{0}' -f $objDeviceDigit))
+            [void]$objWindowsDeviceNames.Add(('LPT{0}' -f $objDeviceDigit))
+        }
+    }
+
     $arrRootSegments = $strConfiguredRoot -split '[\\/]'
     $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
     foreach ($strRootSegment in $arrRootSegments) {
@@ -4120,6 +4134,15 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
             ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
             throw 'PESTER_TEST_ROOT contains an invalid directory component.'
         }
+        if ($boolWindowsPath) {
+            if ($strRootSegment.Length -gt 255) {
+                throw 'PESTER_TEST_ROOT contains a component that exceeds the example Windows name limit.'
+            }
+            $strRootNameStem = ($strRootSegment -split '\.', 2)[0]
+            if ($objWindowsDeviceNames.Contains($strRootNameStem)) {
+                throw 'PESTER_TEST_ROOT contains a reserved Windows device name.'
+            }
+        }
     }
 
     $objPesterTestRoot = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
@@ -4127,14 +4150,29 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
         throw 'The checkout workspace must be an ordinary filesystem directory.'
     }
-    foreach ($strRootSegment in $arrRootSegments) {
+    for ($intRootIndex = 0; $intRootIndex -lt $arrRootSegments.Count; $intRootIndex++) {
+        $strRootSegment = $arrRootSegments[$intRootIndex]
         $strParentDirectory = $objPesterTestRoot.FullName
         $strNextDirectory = Join-Path -Path $strParentDirectory -ChildPath $strRootSegment
         try {
             $null = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
         } catch [System.Management.Automation.ItemNotFoundException] {
-            Write-Output ("No Pester test root exists at '{0}'." -f $strNextDirectory)
-            exit 0
+            try {
+                [void][System.IO.File]::GetAttributes($strNextDirectory)
+            } catch [System.IO.FileNotFoundException], [System.IO.DirectoryNotFoundException] {
+                if (-not $boolWindowsPath) {
+                    for ($intSuffixIndex = $intRootIndex + 1; $intSuffixIndex -lt $arrRootSegments.Count; $intSuffixIndex++) {
+                        if ([System.Text.Encoding]::UTF8.GetByteCount($arrRootSegments[$intSuffixIndex]) -gt 255) {
+                            throw 'PESTER_TEST_ROOT contains a component that exceeds the example POSIX skip limit.'
+                        }
+                    }
+                }
+                Write-Output ("No Pester test root exists at '{0}'." -f $strNextDirectory)
+                exit 0
+            } catch {
+                throw
+            }
+            throw ("The provider did not find the existing test root component '{0}'." -f $strNextDirectory)
         }
         $arrListedRootEntries = @(
             Get-ChildItem -LiteralPath $strParentDirectory -Force -ErrorAction Stop |
