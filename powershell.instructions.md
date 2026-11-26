@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -337,7 +337,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -1809,44 +1809,57 @@ try {
 }
 ```
 
-**Compliant** (complete example of a documented non-throwing helper with cause-specific results):
+**Compliant** (complete example of a helper that handles lookup failures with documented status values):
 
 ```powershell
 function Get-ItemStatus {
     # .SYNOPSIS
-    # Returns a documented result for an item lookup without throwing.
+    # Returns a status for an item lookup.
     #
     # .DESCRIPTION
-    # Returns Available when Get-Item succeeds, MissingItem when it reports
-    # ItemNotFoundException, ReadFailed for access or I/O failures, and Failed
-    # for other errors. It does not throw lookup failures.
+    # Handles lookup failures and returns one of the documented status values.
+    # If a caller preference stops execution on Verbose or Debug output, the
+    # function can stop before it returns a status.
     #
     # .PARAMETER Path
     # Path passed to Get-Item.
     #
     # .EXAMPLE
     # Get-ItemStatus -Path 'config.json'
+    # # Returns Available when the lookup succeeds.
     #
-    # # Returns Available, MissingItem, ReadFailed, or Failed.
+    # Get-ItemStatus -Path 'missing-config.json'
+    # # Returns MissingItem when Get-Item reports ItemNotFoundException.
+    #
+    # Get-ItemStatus -Path 'protected-config.json'
+    # # Returns ReadFailed when Get-Item reports an access error.
+    #
+    # Get-ItemStatus -Path 'provider-config.json'
+    # # Returns Failed when Get-Item reports InvalidOperationException.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [string] One of Available, MissingItem, ReadFailed, or Failed.
+    # [string] Available when Get-Item succeeds, MissingItem when Get-Item
+    # reports ItemNotFoundException, ReadFailed for access or I/O failures,
+    # or Failed for all other lookup errors. No status is returned if a
+    # diagnostic preference stops the function before the return.
     #
     # .NOTES
     # This function supports positional parameters:
     #
     #   Position 0: Path
     #
-    # Version: 1.0.20261120.0
+    # Version: 1.0.20261125.0
     [CmdletBinding()]
     [OutputType([string])]
     param (
         [Parameter(Mandatory = $true)]
         [string]$Path
     )
+
+    Set-StrictMode -Version Latest
 
     Write-Verbose 'Checking the requested item.'
     try {

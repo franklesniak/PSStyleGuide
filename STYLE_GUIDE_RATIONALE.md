@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -548,6 +548,8 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 | Anomaly reporting | `Write-Warning` | `Write-Warning` (same) |
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
+
+---
 
 ### Cause-Specific Results in Non-Throwing Catches
 
