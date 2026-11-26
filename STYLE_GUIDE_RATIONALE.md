@@ -595,6 +595,8 @@ An ordinal comparer makes the identity rule explicit for a dictionary index, and
 
 PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
 
+---
+
 ### Type Conversion Safety Chain
 
 > For .NET interop patterns, see [.NET Interop Patterns: Safe and Documented](STYLE_GUIDE.md#net-interop-patterns-safe-and-documented) in the main guide.
