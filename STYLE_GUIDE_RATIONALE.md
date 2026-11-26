@@ -967,6 +967,8 @@ On Windows, file and directory names have reserved characters and device names, 
 
 Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
 
+In the same macOS fixture, raw `LinkTarget` kept the literal backslash. The original link alias reached the literal target, while a provider open of the resolved target spelling reached a different, slash-separated file. Checking both spellings before the provider call preserves which entry the containment check is about.
+
 ---
 
 ### Resolving Paths for .NET Static Methods
