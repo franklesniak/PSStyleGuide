@@ -48,6 +48,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
+  - [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity)
   - [Type Conversion Safety Chain](#type-conversion-safety-chain)
   - [Version-Aware Fallback Logic](#version-aware-fallback-logic)
   - [Modernization Path (v2.0+)](#modernization-path-v20)
@@ -581,6 +582,18 @@ The author employs a **sophisticated, version-aware interoperability layer** tha
 5. **Explicit .NET interop** with full documentation of rationale
 
 The strategy transforms potentially version-breaking operations (e.g., handling large numbers) into **resilient, self-adapting code** that works identically whether running on PowerShell 1.0, 3.0, or 7.x. In scripts with dependencies requiring newer PowerShell, version detection is minimized or omitted in favor of assuming the required features.
+
+---
+
+### String Comparison for Keys and Identity
+
+> For the normative rule, see [String Comparison for Keys and Identity](STYLE_GUIDE.md#string-comparison-for-keys-and-identity) in the main guide.
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
 
 ---
 

@@ -7,7 +7,7 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261126.0
+**Version:** 2.25.20261126.0
 
 ## Metadata
 
@@ -167,6 +167,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Code **MUST NOT** grow PowerShell arrays with `+=` inside accumulation loops; use `System.Collections.Generic.List[T]` when an in-memory collection is required → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** String comparisons for identity, deduplication, or lookup **MUST** use an explicit comparison when the comparison rule affects results; **MUST NOT** rely on PowerShell defaults. Preserve the intended-case-insensitivity exemption and use the exact-comparison examples and target-version conditions in [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity).
 
 ### Testing (Quick Reference)
 
@@ -2082,6 +2083,34 @@ foreach ($objItem in $InputObject) {
 
 ---
 
+### String Comparison for Keys and Identity
+
+The comparison duty applies to all PowerShell versions in scope. Use syntax and APIs supported by the script's declared target. Constructs named below apply where available; this rule does not require an older target to provide newer constructs. The examples implement an exact comparison contract; they do not select the comparison contract for every consumer.
+
+When code compares strings for identity, deduplication, or lookup, and the comparison rule affects results (for example, persisted keys or security decisions), code **MUST** use an explicit comparison and **MUST NOT** rely on PowerShell defaults:
+
+- A hashtable literal (`@{}`) and `[ordered]@{}` ignore letter case in keys. PowerShell 7 uses an ordinal case-insensitive comparer; Windows PowerShell 5.1 uses a culture-aware comparer.
+- `-eq`, `-contains`, `-in`, and `switch` ignore letter case. Under normal globalization, `-ceq`, `-ccontains`, and `switch -CaseSensitive` are linguistic, not ordinal: a precomposed `é` (U+00E9) `-ceq` `e` + U+0301 returns `$true`. The `-ceq` expectation is an inference from [PowerShell 7.5 comparison semantics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.5) and [.NET linguistic equivalence](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons), not a claim of a new execution.
+- For an exact index, use a generic dictionary with `[System.StringComparer]::Ordinal`. For equality, use `[string]::Equals()` with `[System.StringComparison]::Ordinal`. Normalize or case-fold the values first when the rule requires it.
+
+The `-ceq` example uses invariant-culture linguistic comparison with globalization data enabled. Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
+
+This rule does not apply to configuration hashtables or splatting, where case-insensitive keys are intended.
+
+```powershell
+# Compliant (PowerShell 2 or later)
+$objIndex = New-Object 'System.Collections.Generic.Dictionary[string,object]' -ArgumentList ([System.StringComparer]::Ordinal)
+$boolSame = [string]::Equals($strLeft, $strRight, [System.StringComparison]::Ordinal)
+
+# Non-Compliant (the keys 'ABC' and 'abc' are one key)
+$hashtableIndex = @{}
+$boolSame = ($strLeft -ceq $strRight)
+```
+
+The example uses `object` because it leaves the value schema open. Use the specific value type when it is known.
+
+---
+
 <!-- rationale-anchor: type-conversion-safety-chain -->
 <!-- rationale-anchor: version-aware-fallback-logic -->
 
@@ -2730,8 +2759,8 @@ Severity = @('Error', 'Warning')
 
 Settings cannot change a built-in rule's fixed severity. Inspect the actual rule metadata and configuration.
 
-- Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files.
-- The repository **SHOULD** have a test that reads the committed settings, gets the severity of each enabled rule with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
+- Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files. An entry in `Rules` configures the named rule even when it sets `Enable = $false`.
+- The repository **SHOULD** have a test that reads the committed settings, gets the severity of each rule the settings file enables or configures with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
 
 **Compliant enabled-rule example:**
 
