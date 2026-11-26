@@ -5,7 +5,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261126.0
+**Version:** 2.27.20261126.0
 
 ## Metadata
 
@@ -54,7 +54,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
-- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., `$strMessage`, `$intCount`, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use type-prefixed camelCase (e.g., `$strMessage`, `$intCount`). Spell out words in the descriptive part. Use technical acronyms only when a relevant specification, language, or official API uses them for that meaning → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -114,7 +114,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions and scripts **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** A function or script does not need both `Write-Verbose` and `Write-Debug`. Choose the stream by purpose. Operational work **MUST** report useful Verbose progress at meaningful stages. Pure helpers **MAY** remain silent. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: Modern functions and scripts **MAY** temporarily suppress `$VerbosePreference` for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** `[Parameter(Mandatory=$true)]` **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
@@ -583,14 +583,14 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. The descriptive portion of each name—everything after the type prefix—**MUST** use fully spelled-out words, except for technical acronyms established for that meaning by the relevant specification, language, or official API.
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
 - **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
   - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
   - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
-- **Descriptive Name:** The name **MUST** be **fully spelled out**.
+- **Descriptive Name:** The **MUST** for spelled-out words applies to the part after the prefix. The **SHOULD NOT** for ad hoc prefixes applies to the prefix.
 
 **Examples:**
 
@@ -606,6 +606,40 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$objResult`
 - `$refLastKnownError`
 - `$versionPowerShell`
+
+#### Established Technical Acronyms in Local Names
+
+Use an acronym only when a relevant specification, language, or official API uses it for that meaning. Keep the existing type prefix. Apply these casing rules:
+
+- Capitalize both letters of a two-letter acronym, as in `$strIPAddress`. Do not mechanically capitalize every two-letter part of a compound.
+- Treat `Id` and `Ok` as words, as in `$strUserId` and `$boolIsOk`.
+- Use Pascal case for acronyms of three or more letters, as in `$strJson`, `$objFunctionAst`, `$hashtableSdk`, and `$boolEof`.
+- Preserve established spelling when referring to a command. Use `Start-AzureRmVM` and avoid recasing it as `Start-AzureRmVm`.
+- Team-only shorthand and ambiguous terms **MUST** be spelled out.
+
+```powershell
+# Compliant
+$strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
+$objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
+$hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
+$strIPAddress = '192.0.2.10'
+$strUserId = 'user-123'
+$boolIsOk = $true
+$strTransfer = 'complete'
+
+# Non-Compliant
+$strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
+$objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
+$hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
+$strIpAddress = '192.0.2.10'
+$strUserID = 'user-123'
+$boolIsOK = $true
+$strXfr = 'complete'
+```
+
+<!-- RATIONALE: established-technical-acronyms-in-local-names -->
 
 <!-- rationale-anchor: local-variable-naming-defensive-design-philosophy -->
 
@@ -1397,9 +1431,13 @@ Functions and scripts written in this "Modern Advanced" style **MUST** adhere to
 2. **Must Use `[OutputType()]`:** All modern functions and scripts **MUST** declare their primary output object type using `[OutputType()]`. This is critical for discoverability, integration, and validating the function's or script's contract.
 3. **Must Use Streaming Output:** Functions and scripts that return collections **MUST** write objects directly to the pipeline (stream) from within a loop. They **MUST NOT** collect results in a `List<T>` or array to be returned at the end. (See *Processing Collections in Modern Functions*).
 4. **Must Use `try/catch`:** Error handling **MUST** use `try/catch` blocks. The v1.0 `trap` / preference-toggling pattern is **prohibited** in this style.
-5. **Must Use Proper Streams:** Verbose and debug messages **MUST** be written to their respective streams (`Write-Verbose`, `Write-Debug`). Manual toggling of `$VerbosePreference` is **prohibited**.
+5. **Choose Diagnostic Streams by Purpose:** When a diagnostic message is useful, it **MUST** use the appropriate Verbose or Debug stream. Modern operational work **MUST** report useful progress on the Verbose stream at meaningful stages. A function or script does not need both commands or a message at every entry. Pure validation and data helpers **MAY** remain silent when they have no useful diagnostic. Test scripts, setup, and test helpers follow the same rule. Loading a library that only defines functions **MUST NOT** add progress messages or success-stream output. `Write-Verbose` and `Write-Debug` **MUST** honor caller preferences by default. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern. Follow the [Modern `catch` Block Requirements](#modern-catch-block-requirements) and [sensitive-data rules](#sensitive-data-in-verbose-and-debug-streams) for failure diagnostics.
 
-**Example of a Compliant Modern Function:**
+<!-- RATIONALE: diagnostic-purpose-and-operational-progress -->
+
+**Operational diagnostics excerpt:**
+
+Apply the [comment-based help requirements](#comment-based-help-structure-and-format) when you implement this pattern.
 
 ```powershell
 function Get-ModernData {
@@ -1411,7 +1449,7 @@ function Get-ModernData {
     )
 
     process {
-        Write-Verbose "Processing file: $InputPath"
+        Write-Verbose 'Processing the input file.'
 
         try {
             $data = Get-Content -LiteralPath $InputPath -ErrorAction Stop
@@ -1423,11 +1461,66 @@ function Get-ModernData {
                 }
             }
         } catch {
-            Write-Error -Message "Failed to process $InputPath: $($_.Exception.Message)"
+            try {
+                Write-Debug ("Input processing failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+            } finally {
+                throw
+            }
         }
     }
 }
 ```
+
+The operational example uses Verbose to report progress. On failure, Debug reports the exception type and a bare `throw` passes the original error to the caller. The Verbose and Debug messages omit the input path and respect the caller's preferences.
+
+**Silent pure validation helper:**
+
+```powershell
+function Test-NonBlankName {
+    # .SYNOPSIS
+    # Tests if a name contains a non-whitespace character.
+    #
+    # .DESCRIPTION
+    # Returns $false for a null, empty, or whitespace-only name.
+    # Otherwise, returns $true.
+    #
+    # .PARAMETER Name
+    # Name to test.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name ' example '
+    #
+    # # Returns $true because the name contains letters.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name '   '
+    #
+    # # Returns $false because the name contains only spaces.
+    #
+    # .INPUTS
+    # None. This function accepts no pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] $true for a name with a non-whitespace character.
+    # $false for a null, empty, or whitespace-only name.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: Name
+    #
+    # Version: 1.0.20261125.0
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param (
+        [string]$Name
+    )
+
+    return (-not [string]::IsNullOrEmpty($Name) -and $Name.Trim().Length -gt 0)
+}
+```
+
+This helper returns one Boolean on the success stream. It has no useful progress or internal diagnostic. Test setup and helper code may likewise stay silent when no diagnostic helps explain their work. A define-only file emits no progress when it loads. The caller can receive diagnostics when it invokes an operation with useful progress or internal detail.
 
 **Benefits**: Pipeline-friendly, discoverable
 
@@ -1435,7 +1528,7 @@ function Get-ModernData {
 
 #### "Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams
 
-Rule 5 states that manual toggling of `$VerbosePreference` is prohibited. This rule's primary intent is to ensure your function or script *respects* the user's desire for verbose output from *your* script (via `Write-Verbose`).
+Rule 5 selects streams by message purpose, not by a per-function quota. Its intent is to preserve the caller's control of diagnostics while reporting useful progress for operational work and useful internal details when they aid troubleshooting. A function or script need not contain both `Write-Verbose` and `Write-Debug`; a suitable catch-path Debug message counts for that failure path, and Debug output on every successful call is unnecessary.
 
 An exception to this rule **MAY** be made when you **MUST** *surgically suppress* the verbose stream from a "chatty" or "noisy" nested command (a command you call within your function or script). This pattern allows your function or script to remain verbose while silencing the underlying tool.
 
@@ -1659,15 +1752,18 @@ For **modern higher-level functions and scripts** — code that orchestrates the
 
 #### Default Pattern: `Write-Debug` + `throw`
 
-The standard `catch` pattern for modern advanced functions and scripts **SHOULD** log the error to the **Debug** stream and then **re-throw** it so that unexpected failures propagate to the caller. This **SHOULD** be the default unless the function is explicitly designed as a non-throwing wrapper with a documented contract.
+The standard `catch` pattern for modern advanced functions and scripts **SHOULD** report a safe error detail on the **Debug** stream and use a bare `throw` to propagate the original error. Use this pattern unless the function is a non-throwing wrapper with a documented contract. When a diagnostic can interrupt the catch, put it in `try` and place the bare `throw` in `finally` so the original error still reaches the caller.
 
 ```powershell
 # Default: log and re-throw
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: {0}" -f $_)
-    throw
+    try {
+        Write-Debug ("Operation failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -1693,15 +1789,18 @@ try {
 
 #### Adding Context Before Rethrowing
 
-If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. This preserves the original exception while still providing diagnostic context on the Debug stream, reinforcing the [Default Pattern](#default-pattern-write-debug--throw).
+If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. Use safe details such as the operation and exception type. This preserves the original exception and follows the [Default Pattern](#default-pattern-write-debug--throw).
 
 ```powershell
 # Correct — context logged, original exception preserved:
 try {
     Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
-    Write-Debug ("Failed to get item at path '{0}': {1}" -f $strPath, $_)
-    throw
+    try {
+        Write-Debug ("Item lookup failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -1742,15 +1841,18 @@ function Get-ResolvedItem {
 A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
 
 ```powershell
-# Non-throwing wrapper with documented contract
+# Wrapper with a documented conversion failure result
 function Convert-SafelyFromJson {
     # .SYNOPSIS
-    # Converts a JSON string to an object without throwing on invalid input.
+    # Converts a JSON string and handles conversion exceptions.
     #
     # .DESCRIPTION
-    # Attempts to convert a JSON string to an object. This function does
-    # NOT throw on invalid input; instead it returns $null and logs the
-    # error to the Debug stream. Callers MUST check the return value.
+    # Null or empty input returns $null immediately. On successful
+    # conversion, this function writes the output from ConvertFrom-Json.
+    # If conversion throws, the function calls Write-Debug. If execution
+    # continues after that call, the function returns $null. The effective
+    # Debug preference can interrupt execution before that return.
+    # Callers MUST check the returned result before use.
     #
     # .PARAMETER JsonString
     # JSON string to convert.
@@ -1758,20 +1860,28 @@ function Convert-SafelyFromJson {
     # .EXAMPLE
     # $objResult = Convert-SafelyFromJson -JsonString '{"name":"example"}'
     #
-    # # $objResult is a converted object on success, or $null on failure.
+    # # $objResult holds the converted object for this input.
+    #
+    # .EXAMPLE
+    # $objResult = Convert-SafelyFromJson -JsonString '{'
+    #
+    # # With the default Debug preference, $objResult is $null.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [object] on success; $null on failure.
+    # [object] Output from ConvertFrom-Json on success. Concrete types
+    # and output count depend on the input and PowerShell edition.
+    # $null for null or empty input or when execution continues after a
+    # conversion exception and its Debug diagnostic.
     #
     # .NOTES
     # This function supports positional parameters:
     #
     #   Position 0: JsonString
     #
-    # Version: 1.0.20260517.0
+    # Version: 1.1.20261125.0
     [CmdletBinding()]
     [OutputType([object])]
     param (
@@ -1785,7 +1895,7 @@ function Convert-SafelyFromJson {
     try {
         $JsonString | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        Write-Debug ("JSON conversion failed: {0}" -f $_)
+        Write-Debug ("JSON conversion failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
         $null
     }
 }

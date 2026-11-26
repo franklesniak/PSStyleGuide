@@ -24,6 +24,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
   - [Local Variable Naming: Defensive Design Philosophy](#local-variable-naming-defensive-design-philosophy)
+  - [Established Technical Acronyms in Local Names](#established-technical-acronyms-in-local-names)
   - [Options for Local Variable Prefixes: Analysis](#options-for-local-variable-prefixes-analysis)
   - [Summary: Naming as Defensive Architecture](#summary-naming-as-defensive-architecture)
 - [Documentation Rationale](#documentation-rationale)
@@ -55,6 +56,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Interop as Adaptive Resilience](#summary-interop-as-adaptive-resilience)
 - [Output and Streams Rationale](#output-and-streams-rationale)
   - [Executive Summary: Output Discipline](#executive-summary-output-discipline)
+  - [Diagnostic Purpose and Operational Progress](#diagnostic-purpose-and-operational-progress)
   - [Format Files: Future-Proof Design Pattern](#format-files-future-proof-design-pattern)
   - [Modern Stream Capabilities (v2.0+ Context)](#modern-stream-capabilities-v20-context)
   - [Summary: Output as Controlled Interface](#summary-output-as-controlled-interface)
@@ -181,13 +183,13 @@ In the variable-assignment case, there are no cmdlet-parameter semantics in play
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. Their descriptive portions use fully spelled-out words, with established technical acronyms following the documented source and casing rule (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`, `$strJson`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -216,6 +218,16 @@ While some modern styles discourage type prefixes on local variables, in this co
 
 ---
 
+### Established Technical Acronyms in Local Names
+
+> For the naming rule, see [Established Technical Acronyms in Local Names](STYLE_GUIDE.md#established-technical-acronyms-in-local-names) in the main guide.
+
+Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
+
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
+
+---
+
 ### Options for Local Variable Prefixes: Analysis
 
 > For the required prefix list, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
@@ -224,7 +236,7 @@ The broader PowerShell community considers the use of type prefixes on local var
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally descriptive variable names** (team-only shorthand is forbidden) |
 | **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
 **This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
@@ -692,6 +704,18 @@ This creates a **predictable, composable, and debuggable** interface that works 
 
 ---
 
+### Diagnostic Purpose and Operational Progress
+
+> For the normative rule, see the diagnostic-stream requirement in [Modern Advanced Function/Script Requirements](STYLE_GUIDE.md#rule-modern-advanced-functionscript-requirements-v20) in the main guide.
+
+Choosing a stream by purpose preserves a useful diagnostic contract without inventing output to satisfy a per-function quota. Verbose progress helps an operator follow work that reads or changes real resources. Debug output helps investigate internal state or a handled failure. A pure predicate can return its result silently when no message makes the result clearer. Define-only library loading should also stay silent so that importing definitions does not pollute a caller's success stream.
+
+Test setup and helpers follow the same distinction. A test may capture success output and diagnostic streams independently when asserting the output contract. `Write-Verbose` and `Write-Debug` already honor the caller's preference controls. Manually changing those preferences can hide messages the caller requested. Keep messages on their selected streams, preserve error propagation, and apply the sensitive-data restrictions to both diagnostic streams.
+
+Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
+
+---
+
 ### Format Files: Future-Proof Design Pattern
 
 While not implemented in this v1.0 script, the author's design **anticipates** the use of **`.format.ps1xml` files** for custom object display:
@@ -1144,7 +1168,7 @@ The prefix list in [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.
 Two specific substitutions are called out because they are the most tempting mistakes:
 
 - **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
-- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+- **`$hash…` → `$hashtable…`.** Use the approved `$hashtable` prefix to distinguish this type from cryptographic hashes and hash codes. The separate rule for the descriptive portion permits established technical acronyms and requires authors to spell out team-only shorthand.
 
 Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
 
