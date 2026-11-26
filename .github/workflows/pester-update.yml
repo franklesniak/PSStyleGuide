@@ -78,7 +78,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Assign one update issue for the newer release
+      - name: Open one update issue for the newer release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -113,7 +113,7 @@ jobs:
           $strIssueBody = @(
               $strMarker
               ''
-              "This guide validates Pester $strBaseline. PowerShell Gallery has a newer stable release."
+              "@franklesniak, this guide validates Pester $strBaseline. PowerShell Gallery has a newer stable release."
               ''
               "[Pester $strCandidate](https://www.powershellgallery.com/packages/Pester/$strCandidate) | [Current guide baseline](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md#testing-with-pester)"
               ''
@@ -127,7 +127,6 @@ jobs:
           $objIssue = @{
               title = "Evaluate Pester $strCandidate for the style guide"
               body = $strIssueBody
-              assignees = @('franklesniak')
           }
 
           $strResult = $objIssue | ConvertTo-Json -Depth 3 -Compress |
@@ -138,8 +137,8 @@ jobs:
 
           $objCreatedIssue = $strResult | ConvertFrom-Json -ErrorAction Stop
           if ($objCreatedIssue.number -lt 1 -or $objCreatedIssue.title -cne $objIssue.title -or
-              $objCreatedIssue.body -cne $strIssueBody -or $objCreatedIssue.assignees.login -cnotcontains 'franklesniak') {
-              throw 'GitHub did not confirm the expected issue and assignee.'
+              $objCreatedIssue.body -cne $strIssueBody) {
+              throw 'GitHub did not confirm the expected issue and its complete body.'
           }
 
-          Write-Output "Created and assigned issue $($objCreatedIssue.html_url)."
+          Write-Output "Created issue $($objCreatedIssue.html_url)."
