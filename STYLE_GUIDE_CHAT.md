@@ -5,13 +5,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261124.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -336,7 +336,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -2702,11 +2702,13 @@ At least one test **SHOULD** assert the emitted string's contract. Tests **SHOUL
 
 Contract assertions **MUST** include at least one positive assertion that a required structural element is present. When a known-invalid construct has caused a defect, tests **SHOULD** also assert that it is absent. Negated checks **MUST NOT** be the only contract assertion; they can pass when required elements are missing.
 
-Patterns **SHOULD** target structural elements and tolerate insignificant whitespace. Use the accepted whitespace-tolerant pattern `summarize\s+arg_min\s*\(\s*TimeGenerated\s*,` in prose and compliant examples. Tests **SHOULD NOT** compare the whole string for equality unless exact text is the contract. Where the target language is case-sensitive, such as KQL, positive checks **SHOULD** be case-sensitive; use `Should -MatchExactly` or `-cmatch` in a filter.
+Patterns **SHOULD** target structural elements and tolerate insignificant whitespace. For example, `summarize\s+arg_min\s*\(\s*TimeGenerated\s*,` checks the KQL structure shown below and allows whitespace at the indicated positions. Tests **SHOULD NOT** compare the whole string for equality unless exact text is the contract. Where the target language is case-sensitive, such as KQL, positive checks **SHOULD** be case-sensitive; use `Should -MatchExactly` or `-cmatch` in a filter.
 
 Tests **SHOULD** use either capture of each emitted string in a `$script:`-scoped `System.Collections.Generic.List[string]` initialized in the same `It` block or `BeforeEach`, or a pair of `Should -Invoke` assertions with the same `-Times <N> -Exactly`: one unfiltered total and one `-ParameterFilter` count that accepts only valid strings. A filtered count alone ignores invalid extra calls. Use capture when several assertions need distinct failure messages. Initialize and use the same script-qualified collection for capture and assertions; an unqualified variable can resolve to a same-named caller-local variable.
 
 Before iterating captured strings, tests **MUST** assert that the capture list is not empty. Tests **SHOULD** also assert the exact count before examining values when the call count is part of the contract. This applies to a mock's capture list; [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing) continues to govern returned collections.
+
+The compliant examples use two example-only commands. `Get-AuditSummary` accepts a `-ReferenceToResult` argument of type `[ref]` and returns an integer status. `Invoke-LogQuery` accepts a `-Query` argument of type `[string]` and returns an object with a `Results` property.
 
 **Compliant: capture each emitted string:**
 
