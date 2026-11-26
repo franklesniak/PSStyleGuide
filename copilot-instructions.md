@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261124.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -332,7 +332,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -616,7 +616,7 @@ Use an acronym only when a relevant specification, language, or official API use
 $strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
 $objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
 $hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
-$boolEof = $objReader.EndOfStream # EOF names the end-of-file condition.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
 $strIPAddress = '192.0.2.10'
 $strUserId = 'user-123'
 $boolIsOk = $true
@@ -626,7 +626,7 @@ $strTransfer = 'complete'
 $strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
 $objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
 $hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
-$boolEOF = $objReader.EndOfStream # The end-of-file acronym takes the casing Eof.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
 $strIpAddress = '192.0.2.10'
 $strUserID = 'user-123'
 $boolIsOK = $true

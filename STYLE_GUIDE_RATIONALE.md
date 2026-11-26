@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -181,7 +181,7 @@ In the variable-assignment case, there are no cmdlet-parameter semantics in play
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
@@ -222,7 +222,7 @@ While some modern styles discourage type prefixes on local variables, in this co
 
 Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
 
-The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [EOF in .NET's `StreamReader`](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/IO/StreamReader.cs)
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
 
 ### Options for Local Variable Prefixes: Analysis
 

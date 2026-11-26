@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261124.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -458,7 +458,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -495,7 +495,7 @@ Public identifiers (functions, parameters, properties) **MUST** use PascalCase. 
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
@@ -838,7 +838,7 @@ Use an acronym only when a relevant specification, language, or official API use
 $strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
 $objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
 $hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
-$boolEof = $objReader.EndOfStream # EOF names the end-of-file condition.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
 $strIPAddress = '192.0.2.10'
 $strUserId = 'user-123'
 $boolIsOk = $true
@@ -848,7 +848,7 @@ $strTransfer = 'complete'
 $strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
 $objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
 $hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
-$boolEOF = $objReader.EndOfStream # The end-of-file acronym takes the casing Eof.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
 $strIpAddress = '192.0.2.10'
 $strUserID = 'user-123'
 $boolIsOK = $true
@@ -857,7 +857,7 @@ $strXfr = 'complete'
 
 Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
 
-The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [EOF in .NET's `StreamReader`](https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Private.CoreLib/src/System/IO/StreamReader.cs)
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
 
 ### Local Variable Naming: Defensive Design Philosophy
 
