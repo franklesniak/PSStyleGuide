@@ -690,6 +690,8 @@ Test setup and helpers follow the same distinction. A test may capture success o
 
 Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
 
+---
+
 ### Format Files: Future-Proof Design Pattern
 
 While not implemented in this v1.0 script, the author's design **anticipates** the use of **`.format.ps1xml` files** for custom object display:
