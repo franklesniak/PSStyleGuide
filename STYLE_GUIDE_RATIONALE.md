@@ -49,12 +49,14 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
+  - [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity)
   - [Type Conversion Safety Chain](#type-conversion-safety-chain)
   - [Version-Aware Fallback Logic](#version-aware-fallback-logic)
   - [Modernization Path (v2.0+)](#modernization-path-v20)
   - [Summary: Interop as Adaptive Resilience](#summary-interop-as-adaptive-resilience)
 - [Output and Streams Rationale](#output-and-streams-rationale)
   - [Executive Summary: Output Discipline](#executive-summary-output-discipline)
+  - [Diagnostic Purpose and Operational Progress](#diagnostic-purpose-and-operational-progress)
   - [Format Files: Future-Proof Design Pattern](#format-files-future-proof-design-pattern)
   - [Modern Stream Capabilities (v2.0+ Context)](#modern-stream-capabilities-v20-context)
   - [Summary: Output as Controlled Interface](#summary-output-as-controlled-interface)
@@ -595,6 +597,18 @@ The strategy transforms potentially version-breaking operations (e.g., handling 
 
 ---
 
+### String Comparison for Keys and Identity
+
+> For the normative rule, see [String Comparison for Keys and Identity](STYLE_GUIDE.md#string-comparison-for-keys-and-identity) in the main guide.
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
+
+---
+
 ### Type Conversion Safety Chain
 
 > For .NET interop patterns, see [.NET Interop Patterns: Safe and Documented](STYLE_GUIDE.md#net-interop-patterns-safe-and-documented) in the main guide.
@@ -687,6 +701,18 @@ All output follows **three key principles**:
 3. **No host pollution** — no output appears unless explicitly requested
 
 This creates a **predictable, composable, and debuggable** interface that works identically whether the function is called interactively, from a script, or within a larger pipeline. In modern-dependent scripts, additional streams like Verbose or Debug are used as needed.
+
+---
+
+### Diagnostic Purpose and Operational Progress
+
+> For the normative rule, see the diagnostic-stream requirement in [Modern Advanced Function/Script Requirements](STYLE_GUIDE.md#rule-modern-advanced-functionscript-requirements-v20) in the main guide.
+
+Choosing a stream by purpose preserves a useful diagnostic contract without inventing output to satisfy a per-function quota. Verbose progress helps an operator follow work that reads or changes real resources. Debug output helps investigate internal state or a handled failure. A pure predicate can return its result silently when no message makes the result clearer. Define-only library loading should also stay silent so that importing definitions does not pollute a caller's success stream.
+
+Test setup and helpers follow the same distinction. A test may capture success output and diagnostic streams independently when asserting the output contract. `Write-Verbose` and `Write-Debug` already honor the caller's preference controls. Manually changing those preferences can hide messages the caller requested. Keep messages on their selected streams, preserve error propagation, and apply the sensitive-data restrictions to both diagnostic streams.
+
+Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
 
 ---
 
