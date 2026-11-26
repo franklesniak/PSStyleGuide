@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.25.20261126.0
+**Version:** 2.26.20261126.0
 
 ## Metadata
 
@@ -65,7 +65,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
-- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., `$strMessage`, `$intCount`, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use type-prefixed camelCase (e.g., `$strMessage`, `$intCount`). Spell out words in the descriptive part. Use technical acronyms only when a relevant specification, language, or official API uses them for that meaning → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -496,13 +496,13 @@ Public identifiers (functions, parameters, properties) **MUST** use PascalCase. 
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. Their descriptive portions use fully spelled-out words, with established technical acronyms following the documented source and casing rule (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`, `$strJson`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -796,18 +796,18 @@ The prefix list in [Local Variable Naming: Type-Prefixed camelCase](#local-varia
 Two specific substitutions are called out because they are the most tempting mistakes:
 
 - **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
-- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+- **`$hash…` → `$hashtable…`.** Use the approved `$hashtable` prefix to distinguish this type from cryptographic hashes and hash codes. The separate rule for the descriptive portion permits established technical acronyms and requires authors to spell out team-only shorthand.
 
 Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. The descriptive portion of each name—everything after the type prefix—**MUST** use fully spelled-out words, except for technical acronyms established for that meaning by the relevant specification, language, or official API.
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
 - **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
   - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
   - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
-- **Descriptive Name:** The name **MUST** be **fully spelled out**.
+- **Descriptive Name:** The **MUST** for spelled-out words applies to the part after the prefix. The **SHOULD NOT** for ad hoc prefixes applies to the prefix.
 
 **Examples:**
 
@@ -823,6 +823,42 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$objResult`
 - `$refLastKnownError`
 - `$versionPowerShell`
+
+#### Established Technical Acronyms in Local Names
+
+Use an acronym only when a relevant specification, language, or official API uses it for that meaning. Keep the existing type prefix. Apply these casing rules:
+
+- Capitalize both letters of a two-letter acronym, as in `$strIPAddress`. Do not mechanically capitalize every two-letter part of a compound.
+- Treat `Id` and `Ok` as words, as in `$strUserId` and `$boolIsOk`.
+- Use Pascal case for acronyms of three or more letters, as in `$strJson`, `$objFunctionAst`, `$hashtableSdk`, and `$boolEof`.
+- Preserve established spelling when referring to a command. Use `Start-AzureRmVM` and avoid recasing it as `Start-AzureRmVm`.
+- Team-only shorthand and ambiguous terms **MUST** be spelled out.
+
+```powershell
+# Compliant
+$strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
+$objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
+$hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
+$strIPAddress = '192.0.2.10'
+$strUserId = 'user-123'
+$boolIsOk = $true
+$strTransfer = 'complete'
+
+# Non-Compliant
+$strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
+$objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
+$hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
+$strIpAddress = '192.0.2.10'
+$strUserID = 'user-123'
+$boolIsOK = $true
+$strXfr = 'complete'
+```
+
+Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
+
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
 
 ### Local Variable Naming: Defensive Design Philosophy
 
@@ -896,7 +932,7 @@ The broader PowerShell community considers the use of type prefixes on local var
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally descriptive variable names** (team-only shorthand is forbidden) |
 | **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
 **This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
