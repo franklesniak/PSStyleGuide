@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261125.0
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-25
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -458,7 +458,7 @@ When writing or generating text files programmatically (for example, build scrip
 The preferred cross-version pattern for UTF-8 without BOM **SHOULD** use a `.NET` encoding object:
 
 ```powershell
-$objUtf8NoBomEncoding = New-Object System.Text.UTF8Encoding($false)
+$objUtf8NoBomEncoding = New-Object -TypeName System.Text.UTF8Encoding -ArgumentList $false
 [System.IO.File]::WriteAllText($strOutputFilePath, $strFileContent, $objUtf8NoBomEncoding)
 ```
 
@@ -1916,7 +1916,9 @@ function Test-NonBlankName {
     # $false for a null, empty, or whitespace-only name.
     #
     # .NOTES
-    # Position 0 accepts Name.
+    # This function supports positional parameters:
+    #
+    #   Position 0: Name
     #
     # Version: 1.0.20261125.0
     [CmdletBinding()]
