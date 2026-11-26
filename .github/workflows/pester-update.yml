@@ -1,0 +1,145 @@
+name: Check for Pester updates
+
+'on':
+  schedule:
+    - cron: '23 14 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pester-update-check
+  cancel-in-progress: false
+
+jobs:
+  compare:
+    if: github.repository == 'franklesniak/PSStyleGuide' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions: {}
+    outputs:
+      baseline: ${{ steps.versions.outputs.baseline }}
+      candidate: ${{ steps.versions.outputs.candidate }}
+    steps:
+      - name: Compare the guide baseline with PowerShell Gallery
+        id: versions
+        shell: pwsh
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $strRevision = $env:GITHUB_SHA
+          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'The workflow needs an exact commit ID to read the canonical guide.'
+          }
+
+          $strGuideUrl = "https://raw.githubusercontent.com/franklesniak/PSStyleGuide/$strRevision/STYLE_GUIDE.md"
+          $objGuide = Invoke-WebRequest -Uri $strGuideUrl -MaximumRedirection 0 -TimeoutSec 30 -ErrorAction Stop
+          $strBaselinePattern = '(?m)^Tests \*\*MUST\*\* use Pester \*\*([0-9]+\.[0-9]+\.[0-9]+)\*\* as the documented and validated baseline\.'
+          $arrBaselineMatches = @([regex]::Matches($objGuide.Content, $strBaselinePattern))
+          if ($arrBaselineMatches.Count -ne 1) {
+              throw 'The canonical guide must identify exactly one Pester baseline.'
+          }
+
+          $objBaseline = [version]$arrBaselineMatches[0].Groups[1].Value
+          $objRepository = Get-PSResourceRepository -Name PSGallery -ErrorAction Stop
+          if ($objRepository.Uri.AbsoluteUri.TrimEnd('/') -cne 'https://www.powershellgallery.com/api/v2') {
+              throw 'PSGallery does not point to the official PowerShell Gallery feed.'
+          }
+          $arrPackages = @(Find-PSResource -Name Pester -Repository PSGallery -ErrorAction Stop)
+          if ($arrPackages.Count -ne 1 -or $arrPackages[0].Name -cne 'Pester' -or
+              $arrPackages[0].Repository -cne 'PSGallery' -or $arrPackages[0].Prerelease) {
+              throw 'Expected one stable Pester package from PowerShell Gallery.'
+          }
+
+          $strReleaseVersion = [string]$arrPackages[0].Version
+          if ($strReleaseVersion -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+              throw 'The Pester package version must have three numeric components.'
+          }
+
+          $objReleaseVersion = [version]$strReleaseVersion
+          Write-Output "Guide baseline: $objBaseline. Latest stable Pester in PowerShell Gallery: $objReleaseVersion."
+          if ($objReleaseVersion -gt $objBaseline) {
+              Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8 -Value @(
+                  "baseline=$objBaseline"
+                  "candidate=$objReleaseVersion"
+              )
+          }
+
+  open-issue:
+    if: >-
+      github.repository == 'franklesniak/PSStyleGuide'
+      && github.ref == 'refs/heads/main'
+      && github.event_name == 'schedule'
+      && needs.compare.outputs.candidate != ''
+    needs: compare
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    steps:
+      - name: Assign one update issue for the newer release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PESTER_BASELINE: ${{ needs.compare.outputs.baseline }}
+          PESTER_CANDIDATE: ${{ needs.compare.outputs.candidate }}
+        run: |
+          Set-StrictMode -Version Latest
+          $ErrorActionPreference = 'Stop'
+
+          $strBaseline = $env:PESTER_BASELINE
+          $strCandidate = $env:PESTER_CANDIDATE
+          $strVersionPattern = '^[0-9]+\.[0-9]+\.[0-9]+$'
+          if ($strBaseline -cnotmatch $strVersionPattern -or $strCandidate -cnotmatch $strVersionPattern -or
+              [version]$strCandidate -le [version]$strBaseline) {
+              throw 'Refusing to create an issue without a valid newer version.'
+          }
+
+          $strIssueRoute = 'repos/franklesniak/PSStyleGuide/issues'
+          $strIssueList = $strIssueRoute + '?state=all&per_page=100'
+          $strMarker = "<!-- pester-update:$strCandidate -->"
+          $strIssuesQuery = '.[] | select(has("pull_request") | not) | select(.user.login == "github-actions[bot]") | (.body // "") | split("\n")[] | sub("\r$"; "")'
+          $arrPriorLines = @(& gh api --hostname github.com --paginate $strIssueList --jq $strIssuesQuery)
+          if ($LASTEXITCODE -ne 0) {
+              throw 'Unable to verify the complete existing issue list.'
+          }
+
+          if ($arrPriorLines -ccontains $strMarker) {
+              Write-Output "An update issue already exists for Pester $strCandidate."
+              exit 0
+          }
+
+          $strIssueBody = @(
+              $strMarker
+              ''
+              "This guide validates Pester $strBaseline. PowerShell Gallery has a newer stable release."
+              ''
+              "[Pester $strCandidate](https://www.powershellgallery.com/packages/Pester/$strCandidate) | [Current guide baseline](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md#testing-with-pester)"
+              ''
+              '### Update checklist'
+              ''
+              '- [ ] Review the release notes and confirm support for the test hosts in the guide.'
+              '- [ ] In a dedicated PR, update the canonical rule, pinned examples, and applicable rationale.'
+              '- [ ] Run the guide examples on the supported Windows PowerShell and PowerShell test hosts. Check hidden owned files, wrong-version rejection, and nonzero failure exits.'
+              '- [ ] Regenerate the four guide artifacts and request review.'
+          ) -join [string][char]10
+          $objIssue = @{
+              title = "Evaluate Pester $strCandidate for the style guide"
+              body = $strIssueBody
+              assignees = @('franklesniak')
+          }
+
+          $strResult = $objIssue | ConvertTo-Json -Depth 3 -Compress |
+              & gh api --hostname github.com --method POST $strIssueRoute --input -
+          if ($LASTEXITCODE -ne 0) {
+              throw 'GitHub did not confirm issue creation. Check the issue list before retrying.'
+          }
+
+          $objCreatedIssue = $strResult | ConvertFrom-Json -ErrorAction Stop
+          if ($objCreatedIssue.number -lt 1 -or $objCreatedIssue.title -cne $objIssue.title -or
+              $objCreatedIssue.body -cne $strIssueBody -or $objCreatedIssue.assignees.login -cnotcontains 'franklesniak') {
+              throw 'GitHub did not confirm the expected issue and assignee.'
+          }
+
+          Write-Output "Created and assigned issue $($objCreatedIssue.html_url)."
