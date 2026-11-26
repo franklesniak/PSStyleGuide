@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20261124.1
+**Version:** 2.24.20261126.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-24
+- **Last Updated:** 2026-11-26
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -77,6 +77,10 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Code **SHOULD** avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Code **SHOULD** use explicit scoping (`$global:`, `$script:`) → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** `-LiteralPath` **SHOULD** be used instead of `-Path` when operating on concrete (non-wildcard) paths derived from variables or `Join-Path` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** A concrete variable-derived path passed to a wildcard-enabled `-Path` parameter without a `-LiteralPath` alternative **MUST** be escaped to match only the intended item; related concrete command paths **SHOULD** be escaped → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** Windows repository path components and listed names **MUST** be checked in their original form before path normalization or provider/.NET path operations → [Path and Scope Handling](#path-and-scope-handling)
+- **[Modern]** Linux/macOS containment checks **MUST** inspect each lexical directory below the trusted root and raw link targets before parent traversal; unreadable or unclassifiable entries in a validation walk **MUST** fail the walk → [Symlink Targets and Repository Containment](#symlink-targets-and-repository-containment)
+- **[All]** Check original external names before provider resolution; report POSIX names containing a literal backslash and validate Windows path components before normalization → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For destructive cmdlets (`Remove-Item`, `Move-Item`), `-LiteralPath` **MUST** be used for variable-derived paths → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** `New-Item` does **not** support `-LiteralPath`; use `-Path` with `New-Item` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For directory creation from variable-derived paths that may contain wildcard characters, prefer `[System.IO.Directory]::CreateDirectory()` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
@@ -142,6 +146,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** A cmdlet failure handled by `try/catch` **MUST** use `-ErrorAction Stop` inside `try`; a failed read in a validation or security gate **MUST** fail closed → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** `throw "message"` and `throw ("fmt" -f $args)` **MUST NOT** be used in catch blocks intended to rethrow → [Rethrow Anti-Pattern](#rethrow-anti-pattern)
 - **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
 - **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
@@ -165,6 +170,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[Modern]** Modern functions **MUST NOT** collect results in `List<T>` and return; **MUST** stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
 - **[Modern]** Streaming function calls **SHOULD** be wrapped in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
+- **[All]** Code supporting Windows PowerShell 5.1 that parses a JSON array **MUST** preserve the array as one object and enumerate once; use `-NoEnumerate` when the command exposes it → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
 - **[All]** Code **MUST** use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
 - **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
 - **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
@@ -867,6 +873,8 @@ Get-Content -Path '../config.json'
 # Good — always resolves relative to the script's own directory:
 Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
+
+**[All] On Windows, code MUST check every original component of a Git repository-relative path before passing it to `GetFullPath`, `Resolve-Path`, `Get-Item`, or another provider operation.** Reject a component that ends with a period or space, contains `<`, `>`, `:`, a double quote, `|`, `?`, `*`, or a control character, or is a reserved device name such as `NUL` or `COM1`, including a device name followed by an extension. These spellings can address an NTFS stream, another drive, a device, or an invalid path. Report the original name as unsafe. Do not normalize a rejected component and then read the resulting alias.
 
 #### Resolving Paths for .NET Static Methods
 
@@ -1979,6 +1987,21 @@ To ensure the result is **always** an array (even if empty or with a single item
 # # result is an array, even if only one principal is returned.
 ```
 
+**JSON array exception:** Code that supports Windows PowerShell 5.1 and parses a top-level JSON array **MUST** preserve that array as one object and enumerate it once. Check whether `ConvertFrom-Json` exposes the `NoEnumerate` parameter and use `-NoEnumerate` when available. Do not use a PowerShell version comparison for this capability check. Keep the parsed array in one variable and enumerate that variable once; do not add another array wrapper or flatten nested arrays.
+
+```powershell
+$objConvertFromJsonCommand = Get-Command -Name ConvertFrom-Json -ErrorAction Stop
+if ($objConvertFromJsonCommand.Parameters.ContainsKey('NoEnumerate')) {
+    $objJsonArray = ConvertFrom-Json -InputObject $strJson -NoEnumerate -ErrorAction Stop
+} else {
+    $objJsonArray = ConvertFrom-Json -InputObject $strJson -ErrorAction Stop
+}
+
+foreach ($objJsonElement in $objJsonArray) {
+    # For JSON [[1, 2]], this loop receives one inner array.
+}
+```
+
 ---
 
 ### Summary: Function Design as Reliability Engineering
@@ -2146,9 +2169,13 @@ Despite suppression, **full error context is preserved** in the global `$Error` 
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
 
+Modern `try/catch` handles terminating errors. A cmdlet's non-terminating error does not enter `catch` unless the command's effective error action escalates it; `-ErrorAction Stop` makes that behavior explicit at the operation that the catch handles. This avoids relying on a caller's `$ErrorActionPreference`. The [PowerShell error-handling documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_error_handling?view=powershell-7.6) describes the escalation. Issue probes on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6 showed explicit `-ErrorAction Stop` entering `catch` under all tested preference values; without it, the cmdlet failure reached `catch` only when the preference was `Stop`. The separate macOS PowerShell Core 7.6.9 run also observed plain `Write-Error` continue inside `try` under `Continue` and `SilentlyContinue`, while `Write-Error -ErrorAction Stop` reached `catch` under both. These results are bounded to the tested commands and runtimes; they do not change the documented non-throwing contract for catches that intentionally handle a failure without rethrowing.
+
 ### Modern `catch` Block Requirements
 
 In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **MUST NOT** be empty. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value.
+
+A `try` block catches only terminating errors. A cmdlet call whose failure the code handles **MUST** pass `-ErrorAction Stop` inside the `try` block, so the result does not depend on the caller's `$ErrorActionPreference`. When a failed read can hide input from a validation or security gate, the `catch` block **MUST** fail closed by rethrowing the error or reporting the failure in the documented output. This requirement does not remove a documented non-throwing contract.
 
 #### Architectural Context: Library/Helper Functions vs. Higher-Level Code
 
@@ -3256,6 +3283,8 @@ process {
 - **Debug** → internal state
 - **Progress** → long-running operations (not applicable here)
 
+Top-level JSON arrays need a separate boundary rule from ordinary function output. The `ConvertFrom-Json` documentation says `-NoEnumerate` sends an array as one object, and records the parameter as introduced in PowerShell 6.2. A capability check handles commands that expose the switch without relying on a guessed version threshold. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
+
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
 
 ### Summary: Output as Controlled Interface
@@ -4173,7 +4202,9 @@ Paths built from variables, `Join-Path` output, user input, environment variable
 
 #### Why `-LiteralPath` Is the Safe Default
 
-`-LiteralPath` treats the entire string as a literal file-system path with no wildcard interpretation. It is semantically equivalent to "this exact path" and eliminates the entire class of wildcard-injection bugs. There is no performance cost to using `-LiteralPath`; it simply bypasses the wildcard-resolution step.
+`-LiteralPath` disables wildcard interpretation. It does not guarantee that the provider and native filesystem identify a name in the same way: provider syntax, separator rules, path normalization, and links still affect resolution. Treating it as a promise of exact filesystem identity would hide those separate path-resolution steps. It removes wildcard matching from the decision, but it does not remove the need to validate an externally supplied name before provider resolution.
+
+This distinction appeared in the PS #260 macOS run on ARM64, macOS 27.2.1, APFS, and PowerShell Core 7.6.9. The native .NET API read a file whose name contained a literal backslash, while `Get-Item -LiteralPath` and `Get-Content -LiteralPath` selected a distinct slash-separated decoy. The result is specific to that tested provider and runtime. It supports checking the original repository-relative name before handing it to a provider and reporting a POSIX name containing a literal backslash rather than rewriting it.
 
 #### Destructive Operations Require Stronger Protection
 
@@ -4193,13 +4224,35 @@ The path must be resolved to an absolute filesystem path via `$ExecutionContext.
 
 For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
 
+The general **SHOULD** to escape concrete paths passed to wildcard-enabled `-Path` parameters remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes the result deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+
+On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
+
+Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
+
 When a cmdlet supports both `-Path` and `-LiteralPath`, and the code is operating on a **single concrete path value**—not an intentionally wildcarded pattern—`-LiteralPath` **SHOULD** be used instead of `-Path`. This especially applies when the path is derived from variables, `Join-Path`, or string construction, because `-Path` interprets wildcard characters (`[`, `]`, `*`, `?`) and can silently match the wrong files or match nothing at all.
 
 For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **MUST** be used when the path value comes from a variable or expression. Wildcard interpretation of a variable-derived path in a destructive cmdlet can silently delete or move unintended files.
 
-Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
+Reserve unescaped `-Path` patterns for cases where wildcard expansion is **explicitly intended**.
+
+**[All]** `-LiteralPath` stops wildcard expansion, but it does not override FileSystem path syntax. On Linux and macOS, the PowerShell FileSystem provider treats a backslash as a directory separator, even though the native filesystem can store a literal backslash in a file name. Before code passes a repository-relative name from Git, directory enumeration, or another external source to a provider cmdlet or provider-backed tool, it **MUST** check the original name. If a Linux or macOS name contains a literal backslash, code **MUST** report that name instead of reading it through the provider. Preserve the original spelling; do not replace a literal backslash with `/` to make the check pass. Use `/` for repository-relative component boundaries. When converting a native filesystem path to that form, replace only `[System.IO.Path]::DirectorySeparatorChar` with `/`.
 
 **Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation. Because `-Path` still interprets wildcard characters, code **SHOULD** validate or reject untrusted input containing `[`, `]`, `*`, or `?` as literal characters, or use a .NET file API (e.g., `[System.IO.File]::Create()`) when literal path semantics are required.
+
+**Concrete paths in code and documented commands:** When a cmdlet without `-LiteralPath` receives one concrete path from a variable, the pipeline, or command output through a parameter that interprets wildcards, code and documented commands **SHOULD** escape each backtick character and each of `*`, `?`, `[`, and `]` with a backtick. Do not rely on `[System.Management.Automation.WildcardPattern]::Escape()` alone. PowerShell's 7.6 changelog records a fix so that method escapes lone backticks; code that supports earlier versions must escape backticks explicitly. For code that passes one concrete, variable-derived path to a wildcard-enabled `-Path` parameter, the following rule applies; this general **SHOULD** does not weaken it.
+
+**Cmdlets without `-LiteralPath`:** When a cmdlet has only a wildcard-enabled `-Path` parameter and code passes one concrete, variable-derived path, code **MUST** escape the path so that it matches only the intended item. The escape **MUST** put a backtick before each backtick character and each of `*`, `?`, `[`, and `]`. Code **MUST NOT** rely on `WildcardPattern.Escape()` alone. A pattern that matches nothing can let the command succeed without output. When a skipped item could hide a failure, such as in a lint or security gate, code **SHOULD** also resolve the escaped path with `Resolve-Path -Path` and fail closed unless it resolves to exactly the intended item.
+
+For example, an input name with brackets needs a pattern that treats them as literal characters:
+
+```text
+Input name: report[final].ps1
+Escaped pattern: report`[final`].ps1
+Expected match: only report[final].ps1
+```
+
+The escaped pattern preserves the original name and prevents the brackets from matching a different item.
 
 **Directory creation:** When creating a directory from a variable-derived path that may contain wildcard characters (`[`, `]`, `*`, or `?`), code **SHOULD** prefer `[System.IO.Directory]::CreateDirectory()` over `New-Item -Path ... -ItemType Directory`. The path **MUST** first be resolved to an absolute filesystem path per [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
 
@@ -4238,3 +4291,11 @@ Remove-Item -Path $strTempFile -Force   # Dangerous: destructive + wildcard
 Get-ChildItem -Path 'C:\Logs\*.log'
 Remove-Item -Path 'C:\Temp\*.tmp' -Force
 ```
+
+**[All] On Windows, `GetFullPath` and FileSystem provider path operations can normalize trailing periods or spaces; for example, `dir.` can address `dir`.** Code that walks a directory tree **MUST** build each relative path from the listed entry names, not from a normalized full path, and **MUST** check each listed name for Windows-reserved names before passing the joined path to a provider cmdlet or a .NET file API. Report an unsafe listed name using its original spelling.
+
+### Symlink Targets and Repository Containment
+
+**[Modern] On Linux and macOS, code that decides whether a path is inside a trusted directory MUST inspect every directory on the lexical path below that root for the `ReparsePoint` attribute before relying on containment, and MUST fail closed if it cannot read a directory. A directory with that attribute is a link for this containment decision and MUST be refused.** Read the raw `LinkTarget` before processing a parent component such as `..`; do not first normalize the path or pass the target to a provider. Do not treat `FileSystemInfo.ResolveLinkTarget($true)` or `LinkTarget` as a canonical path. .NET can follow a link in the final path component while the returned path still passes through an intermediate directory symlink. A string-prefix comparison or `GetRelativePath()` alone does not prove containment. Do not reject the trusted root or directories above it solely because they are links.
+
+When a directory walk supplies input to a validation or security gate, an enumeration or entry-classification failure **MUST** be reported or propagated as a failure. Code **MUST NOT** silently skip an unreadable or unclassifiable entry and report the walk as complete.

@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-11-26
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -548,6 +548,8 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
 
+Modern `try/catch` handles terminating errors. A cmdlet's non-terminating error does not enter `catch` unless the command's effective error action escalates it; `-ErrorAction Stop` makes that behavior explicit at the operation that the catch handles. This avoids relying on a caller's `$ErrorActionPreference`. The [PowerShell error-handling documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_error_handling?view=powershell-7.6) describes the escalation. Issue probes on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6 showed explicit `-ErrorAction Stop` entering `catch` under all tested preference values; without it, the cmdlet failure reached `catch` only when the preference was `Stop`. The separate macOS PowerShell Core 7.6.9 run also observed plain `Write-Error` continue inside `try` under `Continue` and `SilentlyContinue`, while `Write-Error -ErrorAction Stop` reached `catch` under both. These results are bounded to the tested commands and runtimes; they do not change the documented non-throwing contract for catches that intentionally handle a failure without rethrowing.
+
 ---
 
 ### Summary: Error Handling as Diagnostic Instrumentation
@@ -723,6 +725,8 @@ process {
 - **Verbose** → operational details
 - **Debug** → internal state
 - **Progress** → long-running operations (not applicable here)
+
+Top-level JSON arrays need a separate boundary rule from ordinary function output. The `ConvertFrom-Json` documentation says `-NoEnumerate` sends an array as one object, and records the parameter as introduced in PowerShell 6.2. A capability check handles commands that expose the switch without relying on a guessed version threshold. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
 
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
 
@@ -935,7 +939,9 @@ Paths built from variables, `Join-Path` output, user input, environment variable
 
 #### Why `-LiteralPath` Is the Safe Default
 
-`-LiteralPath` treats the entire string as a literal file-system path with no wildcard interpretation. It is semantically equivalent to "this exact path" and eliminates the entire class of wildcard-injection bugs. There is no performance cost to using `-LiteralPath`; it simply bypasses the wildcard-resolution step.
+`-LiteralPath` disables wildcard interpretation. It does not guarantee that the provider and native filesystem identify a name in the same way: provider syntax, separator rules, path normalization, and links still affect resolution. Treating it as a promise of exact filesystem identity would hide those separate path-resolution steps. It removes wildcard matching from the decision, but it does not remove the need to validate an externally supplied name before provider resolution.
+
+This distinction appeared in the PS #260 macOS run on ARM64, macOS 27.2.1, APFS, and PowerShell Core 7.6.9. The native .NET API read a file whose name contained a literal backslash, while `Get-Item -LiteralPath` and `Get-Content -LiteralPath` selected a distinct slash-separated decoy. The result is specific to that tested provider and runtime. It supports checking the original repository-relative name before handing it to a provider and reporting a POSIX name containing a literal backslash rather than rewriting it.
 
 #### Destructive Operations Require Stronger Protection
 
@@ -954,6 +960,12 @@ The path must be resolved to an absolute filesystem path via `$ExecutionContext.
 `CreateDirectory()` is also safe to call when the directory already exists—it returns the existing `DirectoryInfo` object without error—making a preceding `Test-Path -LiteralPath` check optional but useful for clarity. The compliant example in the main guide includes the `Test-Path` guard for readability.
 
 For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
+
+The general **SHOULD** to escape concrete paths passed to wildcard-enabled `-Path` parameters remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes the result deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+
+On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
+
+Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
 
 ---
 
