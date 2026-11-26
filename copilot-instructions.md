@@ -1835,9 +1835,9 @@ function Get-ItemStatus {
     # # Returns ReadFailed when Get-Item reports an access error.
     #
     # .EXAMPLE
-    # Get-ItemStatus -Path 'provider-config.json'
+    # Get-ItemStatus -Path 'PSStyleGuideMissingDrive:\config.json'
     #
-    # # Returns Failed when Get-Item reports InvalidOperationException.
+    # # Returns Failed when the named PowerShell drive does not exist.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
