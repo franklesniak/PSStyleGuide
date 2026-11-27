@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.27.20261126.0
+**Version:** 2.28.20261127.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-26
+- **Last Updated:** 2026-11-27
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -196,6 +196,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** For mock invocation counts, `-Times <N>` without `-Exactly` checks for at least N calls when N is positive. `-Times 0` checks for exactly zero. Use `-Exactly` when the contract requires an exact count → [Mocking External Dependencies](#mocking-external-dependencies)
 - **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
+- **[All]** A PSScriptAnalyzer severity filter that feeds a CI gate **MUST** include `ParseError`, unless the gate separately parses every input and fails on parse errors → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
+- **[All]** A PSScriptAnalyzer settings file **MUST NOT** enable or configure a rule whose severity its `Severity` filter leaves out → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
 - **[All]** CI Pester discovery **MUST** use one explicit list of owned `*.Tests.ps1` files, including hidden files, for the no-tests decision and file-backed `Run.Container` entries. Only an absent test root or an empty owned list **MAY** skip → [Running Pester Tests](#running-pester-tests)
 
@@ -4111,6 +4113,74 @@ When a PSScriptAnalyzer CI integration emits host-native diagnostics in addition
 When a command string includes dynamic values such as file paths, line numbers, rule names, messages, or titles, those values **MUST** be formatted, escaped, or encoded according to the active host's command syntax before they are written to the log. File paths **SHOULD** be emitted in the form the active host expects so that diagnostics resolve to the correct file.
 
 Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer output unless the active CI host is explicitly known. If host detection is ambiguous, missing, or contradictory, the integration **MUST** use plain PSScriptAnalyzer output and **MUST NOT** emit host-native diagnostic commands.
+
+---
+
+### PSScriptAnalyzer Severity Filters and Parse Errors
+
+Apply these guide rules whenever their conditions are met, regardless of the PSScriptAnalyzer version in use. The explanations beside the examples describe analyzer behavior in versions 1.24.0 and 1.25.0.
+
+- A settings file or command that feeds a CI gate and filters by severity **MUST** name `ParseError`, unless the gate parses each input separately and fails on parse errors.
+- The repository **SHOULD** have a test that reads the committed settings and fails when the `Severity` filter leaves out `ParseError`.
+
+Verify which diagnostics or independent failure signals make the actual gate fail. The example explanations assume the displayed effective severity selection.
+
+**Compliant:**
+
+```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+```
+
+**Non-Compliant** (if this is the effective severity selection, relevant `ParseError` diagnostics are omitted; a gate can miss the parse failure when no other counted diagnostic or independent failure signal remains):
+
+```powershell
+Severity = @('Error', 'Warning')
+```
+
+Settings cannot change a built-in rule's fixed severity. Inspect the actual rule metadata and configuration.
+
+- Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files. An entry in `Rules` configures the named rule even when it sets `Enable = $false`.
+- The repository **SHOULD** have a test that reads the committed settings, gets the severity of each rule the settings file enables or configures with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
+
+**Compliant enabled-rule example:**
+
+```powershell
+Severity = @('Error', 'Warning', 'Information', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+**Non-compliant enabled-rule example** (`PSProvideCommentHelp` has `Information` severity; with no other severity input adding `Information`, the effective filter excludes it from built-in script-rule execution):
+
+```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+Keep each settings file consistent even when a command-line severity value makes the rule eligible.
+
+### Rationale for PSScriptAnalyzer Severity Filters
+
+#### Parser diagnostics in the tagged source
+
+In the source at PSScriptAnalyzer 1.24.0 and 1.25.0, `AnalyzeScriptDefinition` and `AnalyzeFile` add relevant parser errors as `ParseError` diagnostics only when the effective severity selection is absent or includes `ParseError`. Before that branch, `TypeNotFound` parser errors are converted to `Information` diagnostics, and analysis continues with `AnalyzeSyntaxTree`. Omitting `ParseError` can therefore hide relevant parse diagnostics; it does not imply that every parser error is suppressed or that no other diagnostics are produced. A CI gate that relies only on the resulting analyzer records can miss a parse failure when no other counted diagnostic or independent failure signal makes it fail. This is an inference from tagged source, not an executed gate test. See [1.24.0 parse path](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1491-L1533), [1.25.0 parse path](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1453-L1495), [1.24.0 TypeNotFound handling](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1706-L1726), and [1.25.0 TypeNotFound handling](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1668-L1688).
+
+#### Built-in script-rule eligibility
+
+In the PSScriptAnalyzer 1.24.0 and 1.25.0 built-in script-rule path, the effective severity selection participates in rule eligibility before `AnalyzeScript` runs: `IsSeverityAllowed` compares the selected severities with `rule.GetSeverity()`, together with include/exclude, enabled-state, and help-file conditions. Enabling or configuring a rule does not guarantee its execution, and a settings-list omission alone does not establish effective omission when command-line severity values add to that selection. Settings cannot change a built-in rule's fixed severity. The examined `PSProvideCommentHelp` implementation returns `Information` for both rule metadata and its diagnostics; its documented configuration options do not provide a severity override. This finite source inspection does not establish that every built-in rule in every version has immutable severity. Inspect the actual rule metadata and configuration instead of assuming an override. See [1.24.0 eligibility](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1987-L2017), [1.25.0 eligibility](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1947-L1977), [ProvideCommentHelp metadata 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Rules/ProvideCommentHelp.cs#L156-L159), [ProvideCommentHelp metadata 1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Rules/ProvideCommentHelp.cs#L156-L159), [ProvideCommentHelp diagnostics 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Rules/ProvideCommentHelp.cs#L175-L178), and [ProvideCommentHelp diagnostics 1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Rules/ProvideCommentHelp.cs#L175-L178).
+
+#### Settings and command-line severity
+
+Do not assume command-line `-Severity` replaces the settings-file selection. In the source at PSScriptAnalyzer 1.24.0 and 1.25.0, `BeginProcessing` applies the settings and then initializes analysis with the command arguments; `UpdateSettings` and `Initialize` combine the settings and command severity selections by union. Command values can therefore make a severity effective even when it is absent from the displayed settings. The same-tag help instead describes profile precedence and filtering only after all rules run; those descriptions conflict with the examined initialization and built-in script-rule selection paths and are not positive evidence for them. This is a source comparison, not a runtime adjudication. Fix the actual settings to satisfy the file-consistency rule in the main guide and verify the records and failure signals that reach the actual gate. See [1.24.0 command initialization](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/Commands/InvokeScriptAnalyzerCommand.cs#L274-L372), [1.25.0 command initialization](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/Commands/InvokeScriptAnalyzerCommand.cs#L272-L370), [1.24.0 severity union](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L678-L836), [1.25.0 severity union](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L643-L798), [contrary precedence help 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L181-L199), [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L181-L199), [contrary filtering help 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L530-L547), and [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L530-L547).
+
+#### Limits of the metadata check
+
+The tagged `Get-ScriptAnalyzerRule` implementation returns rule metadata from `GetSeverity`; that metadata check does not prove the actual settings were discovered, a rule executed, or a gate failed. The main guide recommends this metadata check for repository settings. The upstream sources describe the metadata API. The behavior claims here come from the tagged source. See [Get-ScriptAnalyzerRule metadata 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/Commands/GetScriptAnalyzerRuleCommand.cs#L98-L121), and [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/Commands/GetScriptAnalyzerRuleCommand.cs#L98-L121).
+
+This rule is document guidance, not evidence that an actual CI gate parses every input or fails closed. The repository should test the committed settings and separately validate the analyzer records and failure signals that reach its gate. The source inspection is finite and version-specific; it is not a runtime test or a universal claim about every analyzer version.
 
 ---
 

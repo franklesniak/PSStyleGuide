@@ -5,13 +5,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.27.20261126.0
+**Version:** 2.28.20261127.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-26
+- **Last Updated:** 2026-11-27
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -185,6 +185,8 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** For mock invocation counts, `-Times <N>` without `-Exactly` checks for at least N calls when N is positive. `-Times 0` checks for exactly zero. Use `-Exactly` when the contract requires an exact count → [Mocking External Dependencies](#mocking-external-dependencies)
 - **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
+- **[All]** A PSScriptAnalyzer severity filter that feeds a CI gate **MUST** include `ParseError`, unless the gate separately parses every input and fails on parse errors → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
+- **[All]** A PSScriptAnalyzer settings file **MUST NOT** enable or configure a rule whose severity its `Severity` filter leaves out → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
 - **[All]** CI Pester discovery **MUST** use one explicit list of owned `*.Tests.ps1` files, including hidden files, for the no-tests decision and file-backed `Run.Container` entries. Only an absent test root or an empty owned list **MAY** skip → [Running Pester Tests](#running-pester-tests)
 
@@ -2905,6 +2907,56 @@ When a PSScriptAnalyzer CI integration emits host-native diagnostics in addition
 When a command string includes dynamic values such as file paths, line numbers, rule names, messages, or titles, those values **MUST** be formatted, escaped, or encoded according to the active host's command syntax before they are written to the log. File paths **SHOULD** be emitted in the form the active host expects so that diagnostics resolve to the correct file.
 
 Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer output unless the active CI host is explicitly known. If host detection is ambiguous, missing, or contradictory, the integration **MUST** use plain PSScriptAnalyzer output and **MUST NOT** emit host-native diagnostic commands.
+
+---
+
+### PSScriptAnalyzer Severity Filters and Parse Errors
+
+Apply these guide rules whenever their conditions are met, regardless of the PSScriptAnalyzer version in use. The explanations beside the examples describe analyzer behavior in versions 1.24.0 and 1.25.0.
+
+- A settings file or command that feeds a CI gate and filters by severity **MUST** name `ParseError`, unless the gate parses each input separately and fails on parse errors.
+- The repository **SHOULD** have a test that reads the committed settings and fails when the `Severity` filter leaves out `ParseError`.
+
+Verify which diagnostics or independent failure signals make the actual gate fail. The example explanations assume the displayed effective severity selection.
+
+**Compliant:**
+
+```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+```
+
+**Non-Compliant** (if this is the effective severity selection, relevant `ParseError` diagnostics are omitted; a gate can miss the parse failure when no other counted diagnostic or independent failure signal remains):
+
+```powershell
+Severity = @('Error', 'Warning')
+```
+
+Settings cannot change a built-in rule's fixed severity. Inspect the actual rule metadata and configuration.
+
+- Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files. An entry in `Rules` configures the named rule even when it sets `Enable = $false`.
+- The repository **SHOULD** have a test that reads the committed settings, gets the severity of each rule the settings file enables or configures with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
+
+**Compliant enabled-rule example:**
+
+```powershell
+Severity = @('Error', 'Warning', 'Information', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+**Non-compliant enabled-rule example** (`PSProvideCommentHelp` has `Information` severity; with no other severity input adding `Information`, the effective filter excludes it from built-in script-rule execution):
+
+```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+Keep each settings file consistent even when a command-line severity value makes the rule eligible.
+
+<!-- rationale-anchor: rationale-for-psscriptanalyzer-severity-filters -->
 
 ---
 
