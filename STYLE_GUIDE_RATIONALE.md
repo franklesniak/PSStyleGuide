@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-11-26
+- **Last Updated:** 2026-11-27
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -24,6 +24,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Overview of Observed Naming Discipline](#overview-of-observed-naming-discipline)
   - [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
   - [Local Variable Naming: Defensive Design Philosophy](#local-variable-naming-defensive-design-philosophy)
+  - [Established Technical Acronyms in Local Names](#established-technical-acronyms-in-local-names)
   - [Options for Local Variable Prefixes: Analysis](#options-for-local-variable-prefixes-analysis)
   - [Summary: Naming as Defensive Architecture](#summary-naming-as-defensive-architecture)
 - [Documentation Rationale](#documentation-rationale)
@@ -49,12 +50,14 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
+  - [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity)
   - [Type Conversion Safety Chain](#type-conversion-safety-chain)
   - [Version-Aware Fallback Logic](#version-aware-fallback-logic)
   - [Modernization Path (v2.0+)](#modernization-path-v20)
   - [Summary: Interop as Adaptive Resilience](#summary-interop-as-adaptive-resilience)
 - [Output and Streams Rationale](#output-and-streams-rationale)
   - [Executive Summary: Output Discipline](#executive-summary-output-discipline)
+  - [Diagnostic Purpose and Operational Progress](#diagnostic-purpose-and-operational-progress)
   - [Format Files: Future-Proof Design Pattern](#format-files-future-proof-design-pattern)
   - [Modern Stream Capabilities (v2.0+ Context)](#modern-stream-capabilities-v20-context)
   - [Summary: Output as Controlled Interface](#summary-output-as-controlled-interface)
@@ -181,13 +184,13 @@ In the variable-assignment case, there are no cmdlet-parameter semantics in play
 
 ### Overview of Observed Naming Discipline
 
-The author exhibits an uncompromising commitment to **explicit, self-documenting identifiers** across all code elements. This manifests as a complete rejection of aliases, abbreviations, or any form of shorthand in function names, parameter names, or command invocations. Every identifier is fully spelled out using clear, descriptive language that communicates intent without requiring external context or documentation lookup. This practice eliminates ambiguity and future-proofs the code against changes in command behavior or parameter sets—common sources of subtle bugs in PowerShell scripting.
+The author favors **explicit, self-documenting identifiers**. Descriptive names and full command names make call sites easier to read. Spell out team-only shorthand and ambiguous terms. Local names can use established technical acronyms when the naming rule permits them. References to published commands retain the published spelling.
 
 The naming strategy is rooted in **.NET Framework capitalization conventions**, treating PowerShell as a .NET scripting language. This results in:
 
 - **PascalCase** for all public-facing identifiers (function names, parameters, properties).
 - **lowercase** for PowerShell language keywords (`function`, `param`, `if`, `else`, `return`, `trap`).
-- **camelCase with type-hinting prefixes** for local variables. **These MUST be fully descriptive and non-abbreviated** (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`).
+- **camelCase with type-hinting prefixes** for local variables. Their descriptive portions use fully spelled-out words, with established technical acronyms following the documented source and casing rule (e.g., `$strMessage`, `$intReturnValue`, `$objMemoryStream`, `$strJson`).
 - **Noun-based naming for Modules**, treating them as containers/namespaces (e.g., `ObjectFlattener`) distinct from the executable actions they contain.
 
 This consistent application creates a visual hierarchy that allows rapid comprehension of code structure and data flow, even in large or complex functions.
@@ -216,6 +219,16 @@ While some modern styles discourage type prefixes on local variables, in this co
 
 ---
 
+### Established Technical Acronyms in Local Names
+
+> For the naming rule, see [Established Technical Acronyms in Local Names](STYLE_GUIDE.md#established-technical-acronyms-in-local-names) in the main guide.
+
+Technical acronyms are useful when their source already uses them for the same concept. A maintainer can verify the term in a specification, language reference, or official API instead of guessing what a team abbreviation means. Casing follows established ecosystem usage. Two-letter acronyms stay uppercase, while longer acronyms use Pascal case in descriptive names, consistent with [.NET capitalization conventions](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions). `Id` and `Ok` read as words. This keeps familiar names such as JSON and AST recognizable and avoids maintaining a separate list of approved acronyms.
+
+The example terms come from documented formats, APIs, and tools. [JSON in RFC 8259](https://www.rfc-editor.org/rfc/rfc8259) · [PowerShell `Ast` class](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.language.ast) · [.NET project SDK](https://learn.microsoft.com/en-us/dotnet/core/project-sdk/overview) · [.NET `XmlReader.EOF` property](https://learn.microsoft.com/en-us/dotnet/api/system.xml.xmlreader.eof)
+
+---
+
 ### Options for Local Variable Prefixes: Analysis
 
 > For the required prefix list, see [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.md#local-variable-naming-type-prefixed-camelcase) in the main guide.
@@ -224,7 +237,7 @@ The broader PowerShell community considers the use of type prefixes on local var
 
 | Option | Description | Pros | Cons |
 | --- | --- | --- | --- |
-| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally longer variable names** (as abbreviations are forbidden) |
+| **1. Type Prefixes** (e.g., `$strMessage`, `$intCount`) | Hungarian-style notation **(required by this style guide)** | • Immediate type visibility in plain text • Critical in v1.0 without IDE support • Reduces runtime type errors • Self-documenting in large functions | • Increases visual noise • Feels dated in modern editors • **Intentionally descriptive variable names** (team-only shorthand is forbidden) |
 | **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | • Cleaner, more modern aesthetic • Aligns with .NET naming simplicity • Shorter, easier to type | • Requires IDE/IntelliSense for type clarity • Risk of confusion in complex logic • Less resilient in plain-text review |
 
 **This style guide requires type prefixes (Option 1) in all code.** Plain camelCase is a valid community alternative, but it is **not permitted** in this codebase. The clarity benefit of type prefixes outweighs verbosity regardless of target PowerShell version, as IDE support cannot always be assumed and the prefixes provide immediate type context in any environment.
@@ -595,6 +608,18 @@ The strategy transforms potentially version-breaking operations (e.g., handling 
 
 ---
 
+### String Comparison for Keys and Identity
+
+> For the normative rule, see [String Comparison for Keys and Identity](STYLE_GUIDE.md#string-comparison-for-keys-and-identity) in the main guide.
+
+PowerShell's default string operations are convenient for ordinary scripting, but convenience defaults do not define every identity contract. Hashtable keys and common comparison operators ignore letter case; case-sensitive operators still use linguistic comparison under normal globalization. Linguistic equivalence can treat different Unicode sequences as equal. That behavior is useful for language-aware text and unsafe when exact identity, deduplication, or lookup determines persisted keys or security decisions.
+
+An ordinal comparer makes the identity rule explicit for a dictionary index, and `StringComparison.Ordinal` does the same for equality. Normalize or case-fold only when the consumer's own contract requires it. A configuration hashtable or splatting map remains case-insensitive when that is the intended contract; configuration-derived exact identities still need explicit comparison.
+
+PowerShell 7 and Windows PowerShell 5.1 use different default hashtable comparer behavior, and runtime globalization mode or ICU/NLS backend can also affect linguistic results. These differences support documenting explicit comparisons and recording the actual validation environment. The PowerShell 2+ example is not an all-version syntax mandate; older targets still need a supported construction form.
+
+---
+
 ### Type Conversion Safety Chain
 
 > For .NET interop patterns, see [.NET Interop Patterns: Safe and Documented](STYLE_GUIDE.md#net-interop-patterns-safe-and-documented) in the main guide.
@@ -687,6 +712,18 @@ All output follows **three key principles**:
 3. **No host pollution** — no output appears unless explicitly requested
 
 This creates a **predictable, composable, and debuggable** interface that works identically whether the function is called interactively, from a script, or within a larger pipeline. In modern-dependent scripts, additional streams like Verbose or Debug are used as needed.
+
+---
+
+### Diagnostic Purpose and Operational Progress
+
+> For the normative rule, see the diagnostic-stream requirement in [Modern Advanced Function/Script Requirements](STYLE_GUIDE.md#rule-modern-advanced-functionscript-requirements-v20) in the main guide.
+
+Choosing a stream by purpose preserves a useful diagnostic contract without inventing output to satisfy a per-function quota. Verbose progress helps an operator follow work that reads or changes real resources. Debug output helps investigate internal state or a handled failure. A pure predicate can return its result silently when no message makes the result clearer. Define-only library loading should also stay silent so that importing definitions does not pollute a caller's success stream.
+
+Test setup and helpers follow the same distinction. A test may capture success output and diagnostic streams independently when asserting the output contract. `Write-Verbose` and `Write-Debug` already honor the caller's preference controls. Manually changing those preferences can hide messages the caller requested. Keep messages on their selected streams, preserve error propagation, and apply the sensitive-data restrictions to both diagnostic streams.
+
+Caller settings that stop or prompt can interrupt `Write-Debug`. A bare `throw` in `finally` preserves the original operation error even if the diagnostic is interrupted. Callers can set `$DebugPreference` to `Continue` for unattended runs that need Debug output and continued execution. This is useful on Windows PowerShell hosts where `-Debug` can select a prompting preference.
 
 ---
 
@@ -1142,7 +1179,7 @@ The prefix list in [Local Variable Naming: Type-Prefixed camelCase](STYLE_GUIDE.
 Two specific substitutions are called out because they are the most tempting mistakes:
 
 - **`$enum…` → `$obj…`.** An enum is a .NET type without a dedicated approved prefix, so it falls under the default `$obj` bucket exactly like any other such type. Introducing a separate `$enum` prefix would imply that enums are a first-class category in the prefix list, when in fact the guide's design is for `$obj` to absorb all such types uniformly.
-- **`$hash…` → `$hashtable…`.** `$hash` is a natural-looking shortening, but the approved prefix is the fully spelled `$hashtable`. The descriptive-portion rule already forbids abbreviations in the body of a variable name; applying the same discipline to the prefix keeps the type-hinting convention internally consistent and avoids ambiguity with unrelated uses of the word "hash" (e.g., cryptographic hashes, hash codes).
+- **`$hash…` → `$hashtable…`.** Use the approved `$hashtable` prefix to distinguish this type from cryptographic hashes and hash codes. The separate rule for the descriptive portion permits established technical acronyms and requires authors to spell out team-only shorthand.
 
 Consistency with the documented prefix list is what keeps the type-hinting convention useful and predictable. Every deviation that is individually "obvious" erodes the guarantee that a reader can identify a variable's type from its prefix alone.
 
@@ -1765,7 +1802,7 @@ repository/
 
 **Pester** is the standard testing framework for PowerShell, providing a domain-specific language for writing and executing tests. This section documents testing conventions that integrate with the coding standards in this guide. For comprehensive Pester documentation, see [pester.dev](https://pester.dev/).
 
-> **Note:** Pester 5.x requires PowerShell 3.0+ to execute tests. However, v1.0-compatible scripts can still be tested with Pester—simply run the tests on a modern PowerShell version (e.g., pwsh 7.x on a CI platform like `ubuntu-latest`). The test files themselves will use modern Pester syntax, but the scripts under test can target any PowerShell version.
+> **Note:** The selected test host floor is Windows PowerShell 5.1 with .NET Framework 4.6.2 or later, or PowerShell 7.4 or later. This host requirement does not change the declared runtime targets of the scripts under test.
 
 ### PSScriptAnalyzer CI Diagnostic Output
 
@@ -1785,9 +1822,37 @@ Severity mapping should be explicit. GitHub Actions can represent warnings and e
 
 GitHub documents multiple annotation surfaces with different limits. Problem matchers document GitHub Actions display limits of 10 warning, 10 error, and 10 notice annotations per step, 50 annotations per job, and 50 annotations per run. The Checks API accepts a maximum of 50 annotations per API request and separately notes GitHub Actions warning/error per-step limits. Because analyzer output can exceed these display surfaces, annotations should complement plain output, summaries, or artifacts rather than replace them.
 
+### Rationale for PSScriptAnalyzer Severity Filters
+
+> For the normative rules, see [PSScriptAnalyzer Severity Filters and Parse Errors](STYLE_GUIDE.md#psscriptanalyzer-severity-filters-and-parse-errors) in the main guide.
+
+#### Parser diagnostics in the tagged source
+
+In the source at PSScriptAnalyzer 1.24.0 and 1.25.0, `AnalyzeScriptDefinition` and `AnalyzeFile` add relevant parser errors as `ParseError` diagnostics only when the effective severity selection is absent or includes `ParseError`. Before that branch, `TypeNotFound` parser errors are converted to `Information` diagnostics, and analysis continues with `AnalyzeSyntaxTree`. Omitting `ParseError` can therefore hide relevant parse diagnostics; it does not imply that every parser error is suppressed or that no other diagnostics are produced. A CI gate that relies only on the resulting analyzer records can miss a parse failure when no other counted diagnostic or independent failure signal makes it fail. This is an inference from tagged source, not an executed gate test. See [1.24.0 parse path](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1491-L1533), [1.25.0 parse path](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1453-L1495), [1.24.0 TypeNotFound handling](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1706-L1726), and [1.25.0 TypeNotFound handling](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1668-L1688).
+
+#### Built-in script-rule eligibility
+
+In the PSScriptAnalyzer 1.24.0 and 1.25.0 built-in script-rule path, the effective severity selection participates in rule eligibility before `AnalyzeScript` runs: `IsSeverityAllowed` compares the selected severities with `rule.GetSeverity()`, together with include/exclude, enabled-state, and help-file conditions. Enabling or configuring a rule does not guarantee its execution, and a settings-list omission alone does not establish effective omission when command-line severity values add to that selection. Settings cannot change a built-in rule's fixed severity. The examined `PSProvideCommentHelp` implementation returns `Information` for both rule metadata and its diagnostics; its documented configuration options do not provide a severity override. This finite source inspection does not establish that every built-in rule in every version has immutable severity. Inspect the actual rule metadata and configuration instead of assuming an override. See [1.24.0 eligibility](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L1987-L2017), [1.25.0 eligibility](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L1947-L1977), [ProvideCommentHelp metadata 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Rules/ProvideCommentHelp.cs#L156-L159), [ProvideCommentHelp metadata 1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Rules/ProvideCommentHelp.cs#L156-L159), [ProvideCommentHelp diagnostics 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Rules/ProvideCommentHelp.cs#L175-L178), and [ProvideCommentHelp diagnostics 1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Rules/ProvideCommentHelp.cs#L175-L178).
+
+#### Settings and command-line severity
+
+Do not assume command-line `-Severity` replaces the settings-file selection. In the source at PSScriptAnalyzer 1.24.0 and 1.25.0, `BeginProcessing` applies the settings and then initializes analysis with the command arguments; `UpdateSettings` and `Initialize` combine the settings and command severity selections by union. Command values can therefore make a severity effective even when it is absent from the displayed settings. The same-tag help instead describes profile precedence and filtering only after all rules run; those descriptions conflict with the examined initialization and built-in script-rule selection paths and are not positive evidence for them. This is a source comparison, not a runtime adjudication. Fix the actual settings to satisfy the file-consistency rule in the main guide and verify the records and failure signals that reach the actual gate. See [1.24.0 command initialization](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/Commands/InvokeScriptAnalyzerCommand.cs#L274-L372), [1.25.0 command initialization](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/Commands/InvokeScriptAnalyzerCommand.cs#L272-L370), [1.24.0 severity union](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/ScriptAnalyzer.cs#L678-L836), [1.25.0 severity union](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/ScriptAnalyzer.cs#L643-L798), [contrary precedence help 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L181-L199), [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L181-L199), [contrary filtering help 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L530-L547), and [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/docs/Cmdlets/Invoke-ScriptAnalyzer.md#L530-L547).
+
+#### Limits of the metadata check
+
+The tagged `Get-ScriptAnalyzerRule` implementation returns rule metadata from `GetSeverity`; that metadata check does not prove the actual settings were discovered, a rule executed, or a gate failed. The main guide recommends this metadata check for repository settings. The upstream sources describe the metadata API. The behavior claims here come from the tagged source. See [Get-ScriptAnalyzerRule metadata 1.24.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/4b4a136d3b669a1fc127f182e7360160e4919acb/Engine/Commands/GetScriptAnalyzerRuleCommand.cs#L98-L121), and [1.25.0](https://github.com/PowerShell/PSScriptAnalyzer/blob/f05704df81b2aca17dc027ee39b3fce106d418fc/Engine/Commands/GetScriptAnalyzerRuleCommand.cs#L98-L121).
+
+This rule is document guidance, not evidence that an actual CI gate parses every input or fails closed. The repository should test the committed settings and separately validate the analyzer records and failure signals that reach its gate. The source inspection is finite and version-specific; it is not a runtime test or a universal claim about every analyzer version.
+
 ### Running Pester Tests
 
 > For the actionable rule, see [Running Pester Tests](STYLE_GUIDE.md#running-pester-tests) in the main guide.
+
+The framework version is part of the test contract. A repository can have several Pester versions installed or load a built-in version before its tests start, so installation alone does not prove which code ran. Import the required version and check the loaded module. A mismatched loaded version or failed import should stop the run with a clear error.
+
+On Windows PowerShell 5.1 and PowerShell 7.6.9 with Pester 6.2.0, installed-module enumeration reported the manifest path (`Pester.psd1`) and the loaded module reported the script-module path (`Pester.psm1`). Comparing those paths rejects a valid import. Verify that one loaded module has the required version and that its GUID and module directory match the same installed candidate.
+
+Pester 6.2.0's per-file discovery/run lifecycle makes discovery data local to each test file. `BeforeDiscovery` is the supported place for data required while Pester discovers parameterized tests. Runtime setup belongs in the appropriate setup block. When multiple setup or teardown blocks remain, written order and reverse teardown order are observable behavior and need a focused ordering check. These rules do not require parallel execution.
 
 **Basic invocation:**
 
@@ -1807,16 +1872,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 Invoke-Pester -Path tests/Get-UserInfo.Tests.ps1
 ```
 
-**With configuration object (for CI/CD scenarios):**
-
-```powershell
-$objPesterConfig = New-PesterConfiguration
-$objPesterConfig.Run.Path = 'tests/'
-$objPesterConfig.Output.Verbosity = 'Detailed'
-$objPesterConfig.TestResult.Enabled = $true
-$objPesterConfig.TestResult.OutputPath = 'test-results.xml'
-Invoke-Pester -Configuration $objPesterConfig
-```
+For CI, the guide's configuration example combines exact file selection with detailed output, NUnit results, and a nonzero exit on failure.
 
 #### Why CI Pester discovery must be scoped to the project test root
 
@@ -1826,15 +1882,29 @@ Scoping discovery to `tests/` or to the project's documented test root converts 
 
 #### Why discovery and execution need a single test-root source of truth
 
-Pester discovery and Pester execution are two halves of one contract. If discovery scans `tests/` but the Pester configuration `Run.Path` later points at `.`, the workflow's preflight output no longer describes what Pester actually runs. The inverse is also risky: discovery can say test files exist in one directory while execution runs a narrower or entirely different directory and silently skips the files that justified the step.
+The preflight decision and Pester execution both depend on the exact owned file list. Scanning a different directory during execution can pick up unrelated tests or omit files from the list.
 
-A single source of truth, such as `PESTER_TEST_ROOT`, keeps the workflow honest. The same value defines what "this project's tests" means for both the preflight check and the Pester configuration, so a later path change is made once instead of being duplicated across separate script fragments.
+In Pester 6.2.0, explicit `Run.Path` inputs and `New-PesterContainer -Path` pass through a finder that can omit hidden files. Creating a file container from each original `FileInfo` preserves its provider path and file-based setup, including relative paths. The parallel worker reconstructs path inputs, so this example runs the file containers sequentially and clears the other input lists. [Pinned file finder](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/Pester.RSpec.ps1#L15-L93) · [Container factory](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/csharp/Pester/ContainerInfo.cs#L7-L22) · [Parallel worker](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/functions/Pester.Parallel.ps1#L313-L322)
 
-#### Why missing test roots should skip cleanly
+Pester dot-sources each file using its `PSPath`. Windows PowerShell 5.1 can expand brackets in that path and invoke a different file. The example escapes the invocation string on that host, including literal backticks. The original `FileInfo`, its `FullName`, and the file's attributes remain intact. PowerShell 7.6.9 used the original provider path for the tested names. [Pinned file invocation](https://github.com/pester/Pester/blob/98e56d65da1642a7158992b50ded240c42a3ac18/src/Pester.Runtime.ps1#L2571-L2600) · [Wildcard escaping fix](https://github.com/PowerShell/PowerShell/pull/25211)
 
-Downstream consumers often adopt a style guide or reusable workflow before they have created PowerShell tests. Some projects intentionally remove a `tests/` directory during early scaffolding, documentation-only work, or staged migrations. In those cases, a hard workflow failure from `Get-ChildItem` is mostly noise: it says the directory is absent, not that the code failed a test.
+#### Why discovery must fail closed
 
-A `Test-Path -LiteralPath ... -PathType Container` guard lets the workflow produce a clear "no test files" skip when the directory is absent. Restricting the guard to `Container` keeps the skip scoped to "the test root is a missing directory" — a bare `Test-Path` would also succeed when the configured path happens to resolve to a file (for example a mis-set `PESTER_TEST_ROOT` env var), silently converting a real misconfiguration into a clean skip. That keeps CI output actionable while still making the absence of owned Pester tests visible to maintainers. `Get-ChildItem` with `-ErrorAction SilentlyContinue` is an alternative shape, but it is not equivalent: `SilentlyContinue` will also suppress non-existence-related errors such as permission or IO failures, converting genuine CI problems into a silent "no tests" skip. Preferring `Test-Path` followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` keeps the skip narrowly scoped to "directory is missing," while still surfacing real enumeration failures as workflow errors.
+An absent test root or an existing root with no owned test files can be an intentional state. Other discovery failures are defects: a file at the root path, denied access, I/O failure, or invalid configuration must not be mistaken for "no tests." The FileSystem provider can report an invalid Windows name as missing. The example checks all configured Windows components for reserved stems and uses a 255 UTF-16 code-unit bound before lookup. The bound matches a common Windows volume limit. It catches an overlong component even if an earlier directory is missing. Actual volume and total path limits can differ. A direct filesystem attribute query confirms provider-reported absence and surfaces other errors on reachable paths. On POSIX, the example allows a skip only if each unvisited component fits within the [ext4 limit of 255 bytes](https://docs.kernel.org/filesystems/ext4/directory.html) when counted as UTF-8. A missing directory prevents the filesystem from checking those components. Use the target filesystem’s rules when it needs a different check. Existing paths keep their normal filesystem checks. [Windows naming conventions](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#naming-conventions) describe reserved stems, including those with extensions or superscript digits. [Windows path length limits](https://learn.microsoft.com/en-us/windows/win32/fileio/maximum-file-path-limitation) describe volume-dependent limits. [File.GetAttributes](https://learn.microsoft.com/en-us/dotnet/api/system.io.file.getattributes) documents the exceptions for the direct query.
+
+The earlier FileSystem provider filter accepted case variants of the `.Tests.ps1` suffix. The explicit owned list matches the exact suffix, so it excludes `Example.tests.PS1` and `Example.Tests.ps1.txt`. Give an intended owned test the exact suffix, for example `Example.Tests.ps1`. The configured directory segments have their own comparison rule because segment matching defines which trees discovery may enter.
+
+The CI example assumes a trusted checkout and validates the relative root before discovery. It checks each configured component against the names listed by its parent. Windows may accept a short alias for a different listed name, so a successful lookup alone does not establish ownership. The example visits one directory at a time to apply exact segment exclusions before descent. The shared ordinal comparer ignores case on Windows and retains it on Unix. Linguistic matching can ignore a soft hyphen, which would let an excluded name hide tests under a distinct owned directory. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. On Unix, it uses the filesystem provider's non-following `UnixStat.ItemType` to require a regular file. A `FileInfo` object can also describe a named pipe. The example refuses literal POSIX backslashes in eligible names before passing paths to a provider. The original ordinary file objects, including hidden files, control the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
+
+### Mocking External Dependencies
+
+> For the normative rules, see [Mocking External Dependencies](STYLE_GUIDE.md#mocking-external-dependencies) in the main guide.
+
+Pester deprecated `Assert-MockCalled` and `Assert-VerifiableMock` in the 5.0.0 release and removed them in 6.0.0. The supported 6.2.0 interfaces are `Should -Invoke` and `Should -InvokeVerifiable`; invocation checks remain optional when they do not add value. See the [Pester 5.0.0 release](https://github.com/pester/Pester/releases/tag/5.0.0) and [Pester 6.0.0 release](https://github.com/pester/Pester/releases/tag/6.0.0).
+
+For `Should -Invoke`, positive `-Times N` without `-Exactly` means at least N calls. Zero is intentionally different: `-Times 0` asserts that no calls occurred. When the exact count is part of the contract, use `-Exactly`. A `-ParameterFilter` can narrow which invocations count; it does not include invalid extra calls in that result. Pair a filtered count with an unfiltered total when both cardinality and valid arguments matter.
+
+A filtered mock miss does not imply that Pester will run the original command. A test that needs the original behavior must resolve and cache the real command before installing a mock, then add a deliberate default mock that invokes the cached command. This keeps fallback behavior explicit and avoids confusing it with a matching filtered mock.
 
 ### Testing Strongly-Typed Array Properties
 
@@ -1892,7 +1962,7 @@ Tests that verify a *specific expected failure* are the inverse problem: their p
 
 #### How to capture the thrown exception for follow-up assertions
 
-`Should -Throw` on its own does not implicitly expose the thrown exception to subsequent statements, so any follow-up assertion against the exception needs an explicit capture mechanism. Pester 5 supports two idioms. The first is `Should -Throw -PassThru`, which evaluates the script block, asserts that it throws, and returns the thrown `ErrorRecord` as its output so it can be assigned to a variable and inspected—for example, `$errorRecord = { ... } | Should -Throw -PassThru; $errorRecord.Exception.Message | Should -Match '<pattern>'`. The second is the classic `try { ... } catch { $e = $_ }` pattern, in which the caught `$_` is an `ErrorRecord` whose `Exception` property exposes the same detail; a presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` followed by `$e.Exception.Message | Should -Match '<pattern>'` is safe because both assertions fail when `$e` is `$null`. Both idioms are acceptable; the critical constraint is that the follow-up assertions on the captured exception fail when the expected exception is absent or different. Assertions that satisfy this constraint include both positive predicates on exception detail (`Should -Match`, `Should -Be`, `Should -BeOfType`, etc.) and the presence guard `Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself — despite using `-Not`, the presence guard fails precisely in the absent-exception case and is therefore consistent with (and complementary to) the rule. What **MUST NOT** be used as the sole follow-up check is a negated predicate against exception **text** (e.g., `$e.Exception.Message | Should -Not -Match '<pattern>'`), because that assertion is silently satisfied by any exception whose message does not match — including unrelated exceptions and the absence of an exception altogether.
+`Should -Throw` on its own does not implicitly expose the thrown exception to subsequent statements, so any follow-up assertion against the exception needs an explicit capture mechanism. Pester 6.2.0 supports both capture patterns. The first is `Should -Throw -PassThru`, which evaluates the script block, asserts that it throws, and returns the thrown `ErrorRecord` as its output so it can be assigned to a variable and inspected—for example, `$errorRecord = { ... } | Should -Throw -PassThru; $errorRecord.Exception.Message | Should -Match '<pattern>'`. The second is the classic `try { ... } catch { $e = $_ }` pattern, in which the caught `$_` is an `ErrorRecord` whose `Exception` property exposes the same detail; a presence-guard assertion such as `$e | Should -Not -BeNullOrEmpty` followed by `$e.Exception.Message | Should -Match '<pattern>'` is safe because both assertions fail when `$e` is `$null`. Both idioms are acceptable; the critical constraint is that the follow-up assertions on the captured exception fail when the expected exception is absent or different. Assertions that satisfy this constraint include both positive predicates on exception detail (`Should -Match`, `Should -Be`, `Should -BeOfType`, etc.) and the presence guard `Should -Not -BeNullOrEmpty` against the captured `ErrorRecord` itself — despite using `-Not`, the presence guard fails precisely in the absent-exception case and is therefore consistent with (and complementary to) the rule. What **MUST NOT** be used as the sole follow-up check is a negated predicate against exception **text** (e.g., `$e.Exception.Message | Should -Not -Match '<pattern>'`), because that assertion is silently satisfied by any exception whose message does not match — including unrelated exceptions and the absence of an exception altogether.
 
 #### Motivating case
 

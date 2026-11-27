@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.24.20261126.0
+**Version:** 2.29.20261127.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-26
+- **Last Updated:** 2026-11-27
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -56,7 +56,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[All]** Public identifiers (functions, parameters, properties) **MUST** use PascalCase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
 - **[All]** PowerShell keywords (function, param, if, else, return, trap) **MUST** be lowercase → [Capitalization and Naming Conventions](#capitalization-and-naming-conventions)
-- **[All]** Local variables **MUST** use camelCase with type-hinting prefixes, fully descriptive (e.g., `$strMessage`, `$intCount`, no abbreviations) → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
+- **[All]** Local variables **MUST** use type-prefixed camelCase (e.g., `$strMessage`, `$intCount`). Spell out words in the descriptive part. Use technical acronyms only when a relevant specification, language, or official API uses them for that meaning → [Local Variable Naming: Type-Prefixed camelCase](#local-variable-naming-type-prefixed-camelcase)
 - **[All]** Functions **MUST** follow Verb-Noun pattern with approved verbs → [Script and Function Naming: Full Explicit Form](#script-and-function-naming-full-explicit-form)
 - **[All]** Functions **MUST** use singular nouns in function names → [Script and Function Naming: Nouns](#script-and-function-naming-nouns)
 - **[All]** Modules **MUST** use PascalCase nouns (containers, not actions) → [Module Naming: Noun-Based Containers](#module-naming-noun-based-containers)
@@ -116,7 +116,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[Modern]** Modern functions and scripts **MUST** use [OutputType()] declaring singular primary type → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use streaming output (write objects directly to pipeline in loop) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Modern functions and scripts **MUST** use try/catch for error handling → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
-- **[Modern]** Modern functions and scripts **MUST** use Write-Verbose and Write-Debug (not manual preference toggling) → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
+- **[Modern]** A function or script does not need both `Write-Verbose` and `Write-Debug`. Choose the stream by purpose. Operational work **MUST** report useful Verbose progress at meaningful stages. Pure helpers **MAY** remain silent. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern → [Rule: "Modern Advanced" Function/Script Requirements (v2.0+)](#rule-modern-advanced-functionscript-requirements-v20)
 - **[Modern]** Exception: Modern functions and scripts **MAY** temporarily suppress `$VerbosePreference` for noisy nested commands using try/finally → ["Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams](#modern-advanced-functionsscripts-exception-for-suppressing-nested-verbose-streams)
 - **[Modern]** `[Parameter(Mandatory=$true)]` **SHOULD** be used only when function cannot work without value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
 - **[Modern]** [ValidateNotNullOrEmpty()] **SHOULD** be used for optional-but-not-empty parameters and for mandatory [string] parameters whose logic depends on a non-empty value → ["Modern Advanced" Functions/Scripts: Parameter Validation and Attributes (`[Parameter()]`)](#modern-advanced-functionsscripts-parameter-validation-and-attributes-parameter)
@@ -167,12 +167,13 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** `System.Collections.ArrayList` is deprecated and **MUST NOT** be used in new code; use `System.Collections.Generic.List[T]` instead → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Generic collections **MUST** provide specific type T (List[PSCustomObject], not List[object]) → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
 - **[All]** Code **MUST NOT** grow PowerShell arrays with `+=` inside accumulation loops; use `System.Collections.Generic.List[T]` when an in-memory collection is required → [.NET Interop Patterns: Safe and Documented](#net-interop-patterns-safe-and-documented)
+- **[All]** String comparisons for identity, deduplication, or lookup **MUST** use an explicit comparison when the comparison rule affects results; **MUST NOT** rely on PowerShell defaults. Preserve the intended-case-insensitivity exemption and use the exact-comparison examples and target-version conditions in [String Comparison for Keys and Identity](#string-comparison-for-keys-and-identity).
 
 ### Testing (Quick Reference)
 
 - **[All]** New functions **SHOULD** have corresponding Pester tests when testability is a project requirement → [Testing with Pester](#testing-with-pester)
 - **[All]** Test files **MUST** use `*.Tests.ps1` naming convention → [Test File Naming and Location](#test-file-naming-and-location)
-- **[All]** Tests **MUST** use Pester 5.x syntax (BeforeAll, Describe, Context, It) → [Pester 5.x Syntax Requirements](#pester-5x-syntax-requirements)
+- **[All]** Tests **MUST** use Pester 6.2.0 syntax (BeforeAll, Describe, Context, It) on Windows PowerShell 5.1 with .NET Framework 4.6.2+ or PowerShell 7.4+ → [Testing with Pester](#testing-with-pester)
 - **[All]** Tests **SHOULD** use Arrange-Act-Assert pattern in test cases → [Test Structure: Arrange-Act-Assert](#test-structure-arrange-act-assert)
 - **[All]** Tests **MUST** verify all documented return codes for functions → [Testing Return Code Conventions](#testing-return-code-conventions)
 - **[All]** `Test-*` functions **MUST** have tests for both `$true` and `$false` cases → [Testing Return Code Conventions](#testing-return-code-conventions)
@@ -182,10 +183,14 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests iterating a returned collection with `foreach` **MUST** assert non-emptiness before the loop → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests accessing specific indices of a returned collection **MUST** assert count before any indexed access → [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing)
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
+- **[All]** Tests verifying mock invocations **MUST** use `Should -Invoke` or `Should -InvokeVerifiable`; `Assert-MockCalled` and `Assert-VerifiableMock` **MUST NOT** be used → [Mocking External Dependencies](#mocking-external-dependencies)
+- **[All]** For mock invocation counts, `-Times <N>` without `-Exactly` checks for at least N calls when N is positive. `-Times 0` checks for exactly zero. Use `-Exactly` when the contract requires an exact count → [Mocking External Dependencies](#mocking-external-dependencies)
 - **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
+- **[All]** A PSScriptAnalyzer severity filter that feeds a CI gate **MUST** include `ParseError`, unless the gate separately parses every input and fails on parse errors → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
+- **[All]** A PSScriptAnalyzer settings file **MUST NOT** enable or configure a rule whose severity its `Severity` filter leaves out → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
 - **[All]** CI Pester discovery and execution **MUST** be scoped to the project-owned `tests/` tree or documented test root, not the repository root → [Running Pester Tests](#running-pester-tests)
-- **[All]** CI Pester discovery and the Pester configuration `Run.Path` **MUST** share one test-root source of truth and **SHOULD** guard missing test roots cleanly → [Running Pester Tests](#running-pester-tests)
+- **[All]** CI Pester discovery **MUST** use one explicit list of owned `*.Tests.ps1` files, including hidden files, for the no-tests decision and file-backed `Run.Container` entries. Only an absent test root or an empty owned list **MAY** skip → [Running Pester Tests](#running-pester-tests)
 
 <!-- rationale-anchor: executive-summary-author-profile -->
 
@@ -582,14 +587,14 @@ Aliases **MAY** only be exported in a Module Manifest if they provide genuine sh
 
 ### Local Variable Naming: Type-Prefixed camelCase
 
-Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. **The descriptive portion of each name—everything after the type prefix—MUST be fully spelled out; abbreviations and shorthand are not permitted.**
+Local variables follow a **Hungarian-style notation** combining a **type-hinting prefix** with **descriptive `camelCase`**. The descriptive portion of each name—everything after the type prefix—**MUST** use fully spelled-out words, except for technical acronyms established for that meaning by the relevant specification, language, or official API.
 
 - **Prefixes:** `$str` (string), `$int` (integer), `$dbl` (double), `$bool` (boolean), `$arr` (array), `$obj` (object/default), `$hashtable` (hashtable), `$list` (generic list), etc.
 - **Default prefix — `obj`:** Use `$obj` for any .NET type that does not have a dedicated approved prefix above. This includes enum values (e.g., `$objActionPreference`), complex .NET reference types (e.g., `$objMemoryStream`), and `[pscustomobject]` instances (e.g., `$objResult`).
 - **Open-ended list:** The "etc." above means additional descriptive prefixes such as `$ref` and `$version` are permitted when they provide immediate type clarity (e.g., `$refLastKnownError`, `$versionPowerShell`). However, authors **SHOULD NOT** invent ad hoc abbreviated type-name prefixes when a canonical documented prefix already exists. Specifically:
   - Do **not** use `$enumActionPreference`; use `$objActionPreference` instead (enum values fall under the default `$obj` prefix).
   - Do **not** use `$hashSeen`, `$hashResult`, etc.; use `$hashtableSeen`, `$hashtableResult`, etc. instead (the canonical prefix for hashtables is `$hashtable`, not the abbreviated `$hash`).
-- **Descriptive Name:** The name **MUST** be **fully spelled out**.
+- **Descriptive Name:** The **MUST** for spelled-out words applies to the part after the prefix. The **SHOULD NOT** for ad hoc prefixes applies to the prefix.
 
 **Examples:**
 
@@ -605,6 +610,40 @@ Local variables follow a **Hungarian-style notation** combining a **type-hinting
 - `$objResult`
 - `$refLastKnownError`
 - `$versionPowerShell`
+
+#### Established Technical Acronyms in Local Names
+
+Use an acronym only when a relevant specification, language, or official API uses it for that meaning. Keep the existing type prefix. Apply these casing rules:
+
+- Capitalize both letters of a two-letter acronym, as in `$strIPAddress`. Do not mechanically capitalize every two-letter part of a compound.
+- Treat `Id` and `Ok` as words, as in `$strUserId` and `$boolIsOk`.
+- Use Pascal case for acronyms of three or more letters, as in `$strJson`, `$objFunctionAst`, `$hashtableSdk`, and `$boolEof`.
+- Preserve established spelling when referring to a command. Use `Start-AzureRmVM` and avoid recasing it as `Start-AzureRmVm`.
+- Team-only shorthand and ambiguous terms **MUST** be spelled out.
+
+```powershell
+# Compliant
+$strJson = ConvertTo-Json -InputObject $objValue # JSON names the serialized format.
+$objFunctionAst = $objParsedFunction # AST names a PowerShell syntax-tree node.
+$hashtableSdk = @{ TargetFramework = 'net10.0' } # SDK names a software development kit.
+$boolEof = $objXmlReader.EOF # EOF names the end-of-stream state in XmlReader.
+$strIPAddress = '192.0.2.10'
+$strUserId = 'user-123'
+$boolIsOk = $true
+$strTransfer = 'complete'
+
+# Non-Compliant
+$strJSON = ConvertTo-Json -InputObject $objValue # The format acronym takes the casing Json.
+$objFunctionAST = $objParsedFunction # The syntax tree acronym takes the casing Ast.
+$hashtableSDK = @{ TargetFramework = 'net10.0' } # The development kit acronym takes the casing Sdk.
+$boolEOF = $objXmlReader.EOF # The EOF acronym takes the casing Eof.
+$strIpAddress = '192.0.2.10'
+$strUserID = 'user-123'
+$boolIsOK = $true
+$strXfr = 'complete'
+```
+
+<!-- RATIONALE: established-technical-acronyms-in-local-names -->
 
 <!-- rationale-anchor: local-variable-naming-defensive-design-philosophy -->
 
@@ -1396,9 +1435,13 @@ Functions and scripts written in this "Modern Advanced" style **MUST** adhere to
 2. **Must Use `[OutputType()]`:** All modern functions and scripts **MUST** declare their primary output object type using `[OutputType()]`. This is critical for discoverability, integration, and validating the function's or script's contract.
 3. **Must Use Streaming Output:** Functions and scripts that return collections **MUST** write objects directly to the pipeline (stream) from within a loop. They **MUST NOT** collect results in a `List<T>` or array to be returned at the end. (See *Processing Collections in Modern Functions*).
 4. **Must Use `try/catch`:** Error handling **MUST** use `try/catch` blocks. The v1.0 `trap` / preference-toggling pattern is **prohibited** in this style.
-5. **Must Use Proper Streams:** Verbose and debug messages **MUST** be written to their respective streams (`Write-Verbose`, `Write-Debug`). Manual toggling of `$VerbosePreference` is **prohibited**.
+5. **Choose Diagnostic Streams by Purpose:** When a diagnostic message is useful, it **MUST** use the appropriate Verbose or Debug stream. Modern operational work **MUST** report useful progress on the Verbose stream at meaningful stages. A function or script does not need both commands or a message at every entry. Pure validation and data helpers **MAY** remain silent when they have no useful diagnostic. Test scripts, setup, and test helpers follow the same rule. Loading a library that only defines functions **MUST NOT** add progress messages or success-stream output. `Write-Verbose` and `Write-Debug` **MUST** honor caller preferences by default. Manual preference toggling is **prohibited** except for the documented nested-command suppression pattern. Follow the [Modern `catch` Block Requirements](#modern-catch-block-requirements) and [sensitive-data rules](#sensitive-data-in-verbose-and-debug-streams) for failure diagnostics.
 
-**Example of a Compliant Modern Function:**
+<!-- RATIONALE: diagnostic-purpose-and-operational-progress -->
+
+**Operational diagnostics excerpt:**
+
+Apply the [comment-based help requirements](#comment-based-help-structure-and-format) when you implement this pattern.
 
 ```powershell
 function Get-ModernData {
@@ -1410,7 +1453,7 @@ function Get-ModernData {
     )
 
     process {
-        Write-Verbose "Processing file: $InputPath"
+        Write-Verbose 'Processing the input file.'
 
         try {
             $data = Get-Content -LiteralPath $InputPath -ErrorAction Stop
@@ -1422,11 +1465,66 @@ function Get-ModernData {
                 }
             }
         } catch {
-            Write-Error -Message "Failed to process $InputPath: $($_.Exception.Message)"
+            try {
+                Write-Debug ("Input processing failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+            } finally {
+                throw
+            }
         }
     }
 }
 ```
+
+The operational example uses Verbose to report progress. On failure, Debug reports the exception type and a bare `throw` passes the original error to the caller. The Verbose and Debug messages omit the input path and respect the caller's preferences.
+
+**Silent pure validation helper:**
+
+```powershell
+function Test-NonBlankName {
+    # .SYNOPSIS
+    # Tests if a name contains a non-whitespace character.
+    #
+    # .DESCRIPTION
+    # Returns $false for a null, empty, or whitespace-only name.
+    # Otherwise, returns $true.
+    #
+    # .PARAMETER Name
+    # Name to test.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name ' example '
+    #
+    # # Returns $true because the name contains letters.
+    #
+    # .EXAMPLE
+    # Test-NonBlankName -Name '   '
+    #
+    # # Returns $false because the name contains only spaces.
+    #
+    # .INPUTS
+    # None. This function accepts no pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] $true for a name with a non-whitespace character.
+    # $false for a null, empty, or whitespace-only name.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: Name
+    #
+    # Version: 1.0.20261125.0
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param (
+        [string]$Name
+    )
+
+    return (-not [string]::IsNullOrEmpty($Name) -and $Name.Trim().Length -gt 0)
+}
+```
+
+This helper returns one Boolean on the success stream. It has no useful progress or internal diagnostic. Test setup and helper code may likewise stay silent when no diagnostic helps explain their work. A define-only file emits no progress when it loads. The caller can receive diagnostics when it invokes an operation with useful progress or internal detail.
 
 **Benefits**: Pipeline-friendly, discoverable
 
@@ -1434,7 +1532,7 @@ function Get-ModernData {
 
 #### "Modern Advanced" Functions/Scripts: Exception for Suppressing Nested Verbose Streams
 
-Rule 5 states that manual toggling of `$VerbosePreference` is prohibited. This rule's primary intent is to ensure your function or script *respects* the user's desire for verbose output from *your* script (via `Write-Verbose`).
+Rule 5 selects streams by message purpose, not by a per-function quota. Its intent is to preserve the caller's control of diagnostics while reporting useful progress for operational work and useful internal details when they aid troubleshooting. A function or script need not contain both `Write-Verbose` and `Write-Debug`; a suitable catch-path Debug message counts for that failure path, and Debug output on every successful call is unnecessary.
 
 An exception to this rule **MAY** be made when you **MUST** *surgically suppress* the verbose stream from a "chatty" or "noisy" nested command (a command you call within your function or script). This pattern allows your function or script to remain verbose while silencing the underlying tool.
 
@@ -1658,15 +1756,18 @@ For **modern higher-level functions and scripts** — code that orchestrates the
 
 #### Default Pattern: `Write-Debug` + `throw`
 
-The standard `catch` pattern for modern advanced functions and scripts **SHOULD** log the error to the **Debug** stream and then **re-throw** it so that unexpected failures propagate to the caller. This **SHOULD** be the default unless the function is explicitly designed as a non-throwing wrapper with a documented contract.
+The standard `catch` pattern for modern advanced functions and scripts **SHOULD** report a safe error detail on the **Debug** stream and use a bare `throw` to propagate the original error. Use this pattern unless the function is a non-throwing wrapper with a documented contract. When a diagnostic can interrupt the catch, put it in `try` and place the bare `throw` in `finally` so the original error still reaches the caller.
 
 ```powershell
 # Default: log and re-throw
 try {
     ...
 } catch {
-    Write-Debug ("Failed to do X: {0}" -f $_)
-    throw
+    try {
+        Write-Debug ("Operation failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -1692,15 +1793,18 @@ try {
 
 #### Adding Context Before Rethrowing
 
-If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. This preserves the original exception while still providing diagnostic context on the Debug stream, reinforcing the [Default Pattern](#default-pattern-write-debug--throw).
+If contextual information is needed before rethrowing, it **SHOULD** be logged via `Write-Debug` before the bare `throw`. Use safe details such as the operation and exception type. This preserves the original exception and follows the [Default Pattern](#default-pattern-write-debug--throw).
 
 ```powershell
 # Correct — context logged, original exception preserved:
 try {
     Get-Item -LiteralPath $strPath -ErrorAction Stop
 } catch {
-    Write-Debug ("Failed to get item at path '{0}': {1}" -f $strPath, $_)
-    throw
+    try {
+        Write-Debug ("Item lookup failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+    } finally {
+        throw
+    }
 }
 ```
 
@@ -1741,15 +1845,18 @@ function Get-ResolvedItem {
 A modern function **MAY** intentionally handle an exception without re-throwing **only** when its contract explicitly specifies non-throwing behavior. In that case, the function's comment-based help (`.DESCRIPTION` and `.OUTPUTS`) **MUST** clearly document that failures are communicated through return values, output state, warnings, or another defined mechanism rather than by throwing.
 
 ```powershell
-# Non-throwing wrapper with documented contract
+# Wrapper with a documented conversion failure result
 function Convert-SafelyFromJson {
     # .SYNOPSIS
-    # Converts a JSON string to an object without throwing on invalid input.
+    # Converts a JSON string and handles conversion exceptions.
     #
     # .DESCRIPTION
-    # Attempts to convert a JSON string to an object. This function does
-    # NOT throw on invalid input; instead it returns $null and logs the
-    # error to the Debug stream. Callers MUST check the return value.
+    # Null or empty input returns $null immediately. On successful
+    # conversion, this function writes the output from ConvertFrom-Json.
+    # If conversion throws, the function calls Write-Debug. If execution
+    # continues after that call, the function returns $null. The effective
+    # Debug preference can interrupt execution before that return.
+    # Callers MUST check the returned result before use.
     #
     # .PARAMETER JsonString
     # JSON string to convert.
@@ -1757,20 +1864,28 @@ function Convert-SafelyFromJson {
     # .EXAMPLE
     # $objResult = Convert-SafelyFromJson -JsonString '{"name":"example"}'
     #
-    # # $objResult is a converted object on success, or $null on failure.
+    # # $objResult holds the converted object for this input.
+    #
+    # .EXAMPLE
+    # $objResult = Convert-SafelyFromJson -JsonString '{'
+    #
+    # # With the default Debug preference, $objResult is $null.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [object] on success; $null on failure.
+    # [object] Output from ConvertFrom-Json on success. Concrete types
+    # and output count depend on the input and PowerShell edition.
+    # $null for null or empty input or when execution continues after a
+    # conversion exception and its Debug diagnostic.
     #
     # .NOTES
     # This function supports positional parameters:
     #
     #   Position 0: JsonString
     #
-    # Version: 1.0.20260517.0
+    # Version: 1.1.20261125.0
     [CmdletBinding()]
     [OutputType([object])]
     param (
@@ -1784,7 +1899,7 @@ function Convert-SafelyFromJson {
     try {
         $JsonString | ConvertFrom-Json -ErrorAction Stop
     } catch {
-        Write-Debug ("JSON conversion failed: {0}" -f $_)
+        Write-Debug ("JSON conversion failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
         $null
     }
 }
@@ -2234,6 +2349,34 @@ foreach ($objItem in $InputObject) {
 
 ---
 
+### String Comparison for Keys and Identity
+
+The comparison duty applies to all PowerShell versions in scope. Use syntax and APIs supported by the script's declared target. Constructs named below apply where available; this rule does not require an older target to provide newer constructs. The examples implement an exact comparison contract; they do not select the comparison contract for every consumer.
+
+When code compares strings for identity, deduplication, or lookup, and the comparison rule affects results (for example, persisted keys or security decisions), code **MUST** use an explicit comparison and **MUST NOT** rely on PowerShell defaults:
+
+- A hashtable literal (`@{}`) and `[ordered]@{}` ignore letter case in keys. PowerShell 7 uses an ordinal case-insensitive comparer; Windows PowerShell 5.1 uses a culture-aware comparer.
+- `-eq`, `-contains`, `-in`, and `switch` ignore letter case. Under normal globalization, `-ceq`, `-ccontains`, and `switch -CaseSensitive` are linguistic, not ordinal: a precomposed `é` (U+00E9) `-ceq` `e` + U+0301 returns `$true`. The `-ceq` expectation is an inference from [PowerShell 7.5 comparison semantics](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_comparison_operators?view=powershell-7.5) and [.NET linguistic equivalence](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons), not a claim of a new execution.
+- For an exact index, use a generic dictionary with `[System.StringComparer]::Ordinal`. For equality, use `[string]::Equals()` with `[System.StringComparison]::Ordinal`. Normalize or case-fold the values first when the rule requires it.
+
+The `-ceq` example uses invariant-culture linguistic comparison with globalization data enabled. Invariant-culture comparison and optional invariant-globalization mode are different. The latter disables linguistic comparison and uses ordinal behavior; do not extend the ordinary-mode example to that mode. [.NET documents this distinction](https://learn.microsoft.com/en-us/dotnet/standard/base-types/best-practices-strings#linguistic-string-comparisons). Record the actual mode and [ICU/NLS backend](https://learn.microsoft.com/en-us/dotnet/core/extensions/globalization-icu) when known, and verify each supported target. This qualification does not weaken the explicit-comparison duty.
+
+This rule does not apply to configuration hashtables or splatting, where case-insensitive keys are intended.
+
+```powershell
+# Compliant (PowerShell 2 or later)
+$objIndex = New-Object 'System.Collections.Generic.Dictionary[string,object]' -ArgumentList ([System.StringComparer]::Ordinal)
+$boolSame = [string]::Equals($strLeft, $strRight, [System.StringComparison]::Ordinal)
+
+# Non-Compliant (the keys 'ABC' and 'abc' are one key)
+$hashtableIndex = @{}
+$boolSame = ($strLeft -ceq $strRight)
+```
+
+The example uses `object` because it leaves the value schema open. Use the specific value type when it is known.
+
+---
+
 <!-- rationale-anchor: type-conversion-safety-chain -->
 <!-- rationale-anchor: version-aware-fallback-logic -->
 
@@ -2392,7 +2535,7 @@ if ($DebugPreference -ne 'SilentlyContinue') {
 
 ## Testing with Pester
 
-**Pester 5.x** is required. Legacy 3.x/4.x patterns **MUST NOT** be used. Pester requires PowerShell 3.0+ to run, but scripts under test can target any version. See [pester.dev](https://pester.dev/).
+Tests **MUST** use Pester **6.2.0** as the documented and validated baseline. The test host **MUST** be Windows PowerShell **5.1 with .NET Framework 4.6.2 or later**, or PowerShell **7.4 or later**. Install and import Pester 6.2.0 explicitly before running tests. A different loaded Pester version **MUST** cause a clear failure. Scripts under test retain their own declared runtime targets. Later baseline changes require a reviewed guide and example update. See [pester.dev](https://pester.dev/).
 
 ---
 
@@ -2404,9 +2547,9 @@ if ($DebugPreference -ne 'SilentlyContinue') {
 
 ---
 
-### Pester 5.x Syntax Requirements
+### Pester 6.2.0 Syntax and Host Requirements
 
-Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT** be used.
+Tests **MUST** use Pester 6.2.0 syntax. Legacy Pester 3.x/4.x patterns **MUST NOT** be used.
 
 | Block | Purpose |
 | --- | --- |
@@ -2418,11 +2561,21 @@ Tests **MUST** use Pester 5.x syntax. Legacy Pester 3.x/4.x patterns **MUST NOT*
 | `It` | Defines an individual test case |
 | `Should` | Assertion cmdlet for validating expected outcomes |
 
-**Key Pester 5.x Changes:**
+The test host **MUST** be Windows PowerShell 5.1 with .NET Framework 4.6.2 or later, or PowerShell 7.4 or later. This compatibility floor applies to the test host; it does not change the declared runtime target of the scripts under test.
+
+Install Pester 6.2.0 with `Install-Module Pester -RequiredVersion 6.2.0 -Scope CurrentUser`. On Windows hosts affected by the documented Microsoft-to-community Pester publisher-certificate transition, use the Gallery's documented side-by-side installation with `-Force -SkipPublisherCheck -RequiredVersion 6.2.0 -Scope CurrentUser`. Limit this exception to that known transition. Do not suppress arbitrary certificate failures, remove the built-in module, or change machine-wide execution policy. Unaffected hosts need no publisher-check exception.
+
+Before running tests, import Pester with `Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop` and verify the loaded module identity and version. If a different Pester version is already loaded or the exact version cannot be imported, fail clearly; do not silently run another version. Verify installed and loaded module identities. A clean host, a preloaded Pester 5 module, a wrong version, and a fresh-process import are distinct compatibility cases.
+
+For Pester 6.2.0, each test file has its own runtime state. Put data needed during discovery in `BeforeDiscovery`; do not depend on another file's top-level discovery side effects. Null or empty `-ForEach`/`-TestCases` data fails by default. Use `AllowNullOrEmptyForEach` only for a justified test of an intentional empty case. Replace removed `Set-ItResult -Pending` uses with the intended Skip or Inconclusive result. Where relevant, `<...>` test names can contain expressions; escape literal delimiters according to the selected test-name form.
+
+Pester 6.2.0 permits multiple `BeforeAll`, `AfterAll`, `BeforeEach`, and `AfterEach` blocks. Setup follows written registration order; teardown reverses the corresponding within-scope order. Inspect each scope with duplicate blocks and merge them unless their ordering is deliberate; deliberately retained multiple blocks require ordering checks. Pester 6.2.0 inherits `BeforeContainer` configuration; explain `#pester:no-inherit` only when an example uses that inheritance. Parallel execution remains optional and is outside this baseline.
+
+**Pester 6.2.0 syntax:**
 
 - Use `BeforeAll` for dot-sourcing scripts (not at the file level outside blocks)
-- Discovery and Run phases are separate—code at the top level runs during discovery
-- Code **MUST** use `Should -Be`, `Should -BeExactly`, `Should -BeNullOrEmpty`, etc. (not legacy `Assert-*` patterns)
+- Discovery and Run phases are separate; code at the top level runs during discovery
+- Use supported `Should` assertions such as `Should -Be`, `Should -BeExactly`, and `Should -BeNullOrEmpty`; do not use legacy Pester 3.x/4.x `Assert-*` patterns
 
 ---
 
@@ -2845,7 +2998,61 @@ Context "When external service is unavailable" {
 
 - Mock cmdlets and external commands that introduce dependencies (network, file system, cloud services)
 - Mock at the narrowest scope possible (prefer `Context`-level mocks over `Describe`-level)
-- Use `Assert-MockCalled` to verify expected interactions when appropriate
+- Invocation verification is optional when appropriate. When tests verify a mock invocation, they **MUST** use `Should -Invoke` (with `-ParameterFilter`, `-Times`, `-Exactly`, or `-Scope` as needed) or `Should -InvokeVerifiable`. `Assert-MockCalled` and `Assert-VerifiableMock` **MUST NOT** be used.
+- `Should -Invoke -Times <N>` without `-Exactly` checks for at least N calls when N is greater than zero. `-Times 0` means exactly zero calls. Use `-Exactly` when the exact count is part of the contract.
+- A parameter-filtered mock that does not match a call does not automatically invoke the original command. Add a default mock only when fallback is intended; cache the real command before mocking if that fallback invokes it.
+
+**Matching filtered mock and verification:**
+
+```powershell
+Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+    $LiteralPath -eq 'synthetic'
+}
+Get-Item -LiteralPath 'synthetic' | Should -Not -BeNullOrEmpty
+Should -Invoke Get-Item -Times 1 -Exactly -ParameterFilter {
+    $LiteralPath -eq 'synthetic'
+}
+```
+
+**Unmatched call and intentional default fallback:**
+
+```powershell
+Describe 'Get-Item mock fallback' {
+    BeforeAll {
+        $strFixturePath = Join-Path -Path $TestDrive -ChildPath 'fixture.txt'
+        Set-Content -LiteralPath $strFixturePath -Value 'fixture' -ErrorAction Stop
+    }
+
+    It 'Fails an unmatched call even when the target file exists' {
+        Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+            $LiteralPath -eq 'synthetic'
+        }
+
+        { Get-Item -LiteralPath $strFixturePath } | Should -Throw -ExpectedMessage '*[Nn]o mock*'
+        Should -Invoke Get-Item -Times 0 -ParameterFilter { $LiteralPath -eq 'synthetic' }
+    }
+
+    It 'Uses the default mock only when the filter does not match' {
+        $objGetItemCommand = Get-Command -Name Microsoft.PowerShell.Management\Get-Item -ErrorAction Stop
+        Mock Get-Item { & $objGetItemCommand -LiteralPath $LiteralPath }
+        Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -ParameterFilter {
+            $LiteralPath -eq 'synthetic'
+        }
+
+        (Get-Item -LiteralPath $strFixturePath).Name | Should -BeExactly 'fixture.txt'
+        (Get-Item -LiteralPath 'synthetic').Name | Should -BeExactly 'synthetic'
+        Should -Invoke Get-Item -Times 2 -Exactly
+    }
+}
+```
+
+**Verifiable mock alternative:**
+
+```powershell
+Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -Verifiable
+Get-Item -LiteralPath 'synthetic' | Should -Not -BeNullOrEmpty
+Should -InvokeVerifiable
+```
 
 ---
 
@@ -2859,19 +3066,102 @@ Host-neutral, local, and interactive runs **SHOULD** use plain PSScriptAnalyzer 
 
 ---
 
-### Running Pester Tests
+### PSScriptAnalyzer Severity Filters and Parse Errors
 
-For local developer runs, use the documented project test root directly:
+Apply these guide rules whenever their conditions are met, regardless of the PSScriptAnalyzer version in use. The explanations beside the examples describe analyzer behavior in versions 1.24.0 and 1.25.0.
+
+- A settings file or command that feeds a CI gate and filters by severity **MUST** name `ParseError`, unless the gate parses each input separately and fails on parse errors.
+- The repository **SHOULD** have a test that reads the committed settings and fails when the `Severity` filter leaves out `ParseError`.
+
+Verify which diagnostics or independent failure signals make the actual gate fail. The example explanations assume the displayed effective severity selection.
+
+**Compliant:**
 
 ```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+```
+
+**Non-Compliant** (if this is the effective severity selection, relevant `ParseError` diagnostics are omitted; a gate can miss the parse failure when no other counted diagnostic or independent failure signal remains):
+
+```powershell
+Severity = @('Error', 'Warning')
+```
+
+Settings cannot change a built-in rule's fixed severity. Inspect the actual rule metadata and configuration.
+
+- Every rule that a settings file enables or configures **MUST** have a severity that the `Severity` filter names, unless the settings file has no `Severity` filter. This requirement applies to every actual analyzer settings file, including generated and uncommitted files. An entry in `Rules` configures the named rule even when it sets `Enable = $false`.
+- The repository **SHOULD** have a test that reads the committed settings, gets the severity of each rule the settings file enables or configures with `Get-ScriptAnalyzerRule`, and fails when the filter leaves out that severity. Check the actual gate separately.
+
+**Compliant enabled-rule example:**
+
+```powershell
+Severity = @('Error', 'Warning', 'Information', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+**Non-compliant enabled-rule example** (`PSProvideCommentHelp` has `Information` severity; with no other severity input adding `Information`, the effective filter excludes it from built-in script-rule execution):
+
+```powershell
+Severity = @('Error', 'Warning', 'ParseError')
+Rules = @{
+    PSProvideCommentHelp = @{ Enable = $true }
+}
+```
+
+Keep each settings file consistent even when a command-line severity value makes the rule eligible.
+
+<!-- rationale-anchor: rationale-for-psscriptanalyzer-severity-filters -->
+
+---
+
+### Running Pester Tests
+
+Before running tests, ensure a different Pester version is not already loaded, then import and verify Pester 6.2.0 explicitly:
+
+```powershell
+$objConflictingPester = Get-Module -Name Pester |
+    Where-Object { $_.Version -ne [version]'6.2.0' } |
+    Select-Object -First 1
+if ($null -ne $objConflictingPester) {
+    throw ("Pester 6.2.0 is required; version {0} is already loaded." -f $objConflictingPester.Version)
+}
+
+$arrInstalledPesterModules = @(
+    Get-Module -Name Pester -ListAvailable |
+        Where-Object { $_.Version -eq [version]'6.2.0' }
+)
+if ($arrInstalledPesterModules.Count -eq 0) {
+    throw 'Pester 6.2.0 is not installed.'
+}
+
+Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop
+$arrLoadedPesterModules = @(Get-Module -Name Pester)
+if ($arrLoadedPesterModules.Count -ne 1 -or $arrLoadedPesterModules[0].Version -ne [version]'6.2.0') {
+    throw 'Pester 6.2.0 did not load.'
+}
+$objLoadedPester = $arrLoadedPesterModules[0]
+$objInstalledPester = $arrInstalledPesterModules |
+    Where-Object {
+        $_.Guid -eq $objLoadedPester.Guid -and
+        [string]::Equals($_.ModuleBase, $objLoadedPester.ModuleBase, [System.StringComparison]::Ordinal)
+    } |
+    Select-Object -First 1
+if ($null -eq $objInstalledPester) {
+    throw 'The loaded Pester 6.2.0 did not match an installed Pester 6.2.0 module.'
+}
+
 Invoke-Pester -Path tests/ -Output Detailed
 ```
 
-CI workflow runs often need a PowerShell `run:` step that performs both test discovery and Pester execution. In those steps, CI Pester discovery (`Get-ChildItem ... -Filter '*.Tests.ps1' -Recurse`) and execution (the Pester configuration `Run.Path`) **MUST** be scoped to the project-owned `tests/` tree or to the project's documented test root. They **MUST NOT** scan from the repository root, because root-level scanning can sweep up unrelated tests, including starter, sample, template, vendored, or dependency `*.Tests.ps1` files, and produce a misleading green test signal.
+CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-The Pester configuration `Run.Path` value and the discovery step's path **MUST** be derived from a single source of truth, such as a workflow-level `env:` value like `PESTER_TEST_ROOT`, so the discovery scope and execution scope cannot drift apart.
+Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Reject names reserved by the Windows file-naming rules in configured root components, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
-The discovery step **SHOULD** guard against a missing test root using `Test-Path -LiteralPath ... -PathType Container` so projects that have not yet created or have intentionally removed the `tests/` directory still see a clean "no test files" skip rather than a workflow error. Using `-PathType Container` keeps the skip scoped to "the test root is a missing directory"; a bare `Test-Path` would also succeed when the path resolves to a file (for example a mis-set `PESTER_TEST_ROOT`), masking a real misconfiguration as a clean skip. `Get-ChildItem ... -ErrorAction SilentlyContinue` **MAY** be used as an alternative, but it is **NOT** equivalent: `SilentlyContinue` also suppresses non-existence-related errors such as permission or IO failures, which can mask genuine CI problems as a clean skip. A `Test-Path` guard followed by `Get-ChildItem` without `-ErrorAction SilentlyContinue` is preferred.
+For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
+
+Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve supported `NUnitXml` test-result output and the supported coverage formats used by coverage examples. Do not add a coverage requirement to unrelated examples.
 
 **Compliant** (single env-var-driven test root for discovery and execution):
 
@@ -2881,23 +3171,189 @@ The discovery step **SHOULD** guard against a missing test root using `Test-Path
   env:
     PESTER_TEST_ROOT: tests
   run: |
-    $strPesterTestRoot = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath $env:PESTER_TEST_ROOT
-    $arrPesterTestFiles = @()
-
-    if (Test-Path -LiteralPath $strPesterTestRoot -PathType Container) {
-        $arrPesterTestFiles = @(
-            Get-ChildItem -LiteralPath $strPesterTestRoot -Filter '*.Tests.ps1' -Recurse -File
-        )
+    $objConflictingPester = Get-Module -Name Pester |
+        Where-Object { $_.Version -ne [version]'6.2.0' } |
+        Select-Object -First 1
+    if ($null -ne $objConflictingPester) {
+        throw ("Pester 6.2.0 is required; version {0} is already loaded." -f $objConflictingPester.Version)
     }
 
+    $arrInstalledPesterModules = @(
+        Get-Module -Name Pester -ListAvailable |
+            Where-Object { $_.Version -eq [version]'6.2.0' }
+    )
+    if ($arrInstalledPesterModules.Count -eq 0) {
+        throw 'Pester 6.2.0 is not installed.'
+    }
+
+    Import-Module Pester -RequiredVersion 6.2.0 -ErrorAction Stop
+    $arrLoadedPesterModules = @(Get-Module -Name Pester)
+    if ($arrLoadedPesterModules.Count -ne 1 -or $arrLoadedPesterModules[0].Version -ne [version]'6.2.0') {
+        throw 'Pester 6.2.0 did not load.'
+    }
+    $objLoadedPester = $arrLoadedPesterModules[0]
+    $objInstalledPester = $arrInstalledPesterModules |
+        Where-Object {
+            $_.Guid -eq $objLoadedPester.Guid -and
+            [string]::Equals($_.ModuleBase, $objLoadedPester.ModuleBase, [System.StringComparison]::Ordinal)
+        } |
+        Select-Object -First 1
+    if ($null -eq $objInstalledPester) {
+        throw 'The loaded Pester 6.2.0 did not match an installed Pester 6.2.0 module.'
+    }
+
+    $strConfiguredRoot = $env:PESTER_TEST_ROOT
+    $boolWindowsPath = [System.IO.Path]::DirectorySeparatorChar -eq '\'
+    if ([string]::IsNullOrWhiteSpace($strConfiguredRoot) -or
+        [System.IO.Path]::IsPathRooted($strConfiguredRoot) -or
+        (-not $boolWindowsPath -and $strConfiguredRoot.Contains('\'))) {
+        throw 'PESTER_TEST_ROOT must name a relative checkout subdirectory.'
+    }
+
+    $objDirectoryNameComparer = if ($boolWindowsPath) {
+        [System.StringComparer]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparer]::Ordinal
+    }
+    $objExcludedDirectoryNames = New-Object -TypeName 'System.Collections.Generic.HashSet[string]' -ArgumentList $objDirectoryNameComparer
+    foreach ($strExcludedDirectoryName in @('.', '..', 'node_modules', '.git', '.svn', '.hg')) {
+        [void]$objExcludedDirectoryNames.Add($strExcludedDirectoryName)
+    }
+    $objWindowsDeviceNames = New-Object -TypeName 'System.Collections.Generic.HashSet[string]' -ArgumentList $objDirectoryNameComparer
+    if ($boolWindowsPath) {
+        foreach ($strDeviceName in @('CON', 'PRN', 'AUX', 'NUL')) {
+            [void]$objWindowsDeviceNames.Add($strDeviceName)
+        }
+        $arrDeviceDigits = @('1', '2', '3', '4', '5', '6', '7', '8', '9', [char]0x00B9, [char]0x00B2, [char]0x00B3)
+        foreach ($objDeviceDigit in $arrDeviceDigits) {
+            [void]$objWindowsDeviceNames.Add(('COM{0}' -f $objDeviceDigit))
+            [void]$objWindowsDeviceNames.Add(('LPT{0}' -f $objDeviceDigit))
+        }
+    }
+
+    $arrRootSegments = $strConfiguredRoot -split '[\\/]'
+    $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
+    foreach ($strRootSegment in $arrRootSegments) {
+        if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $objExcludedDirectoryNames.Contains($strRootSegment) -or
+            $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
+            ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
+            throw 'PESTER_TEST_ROOT contains an invalid directory component.'
+        }
+        if ($boolWindowsPath) {
+            if ($strRootSegment.Length -gt 255) {
+                throw 'PESTER_TEST_ROOT contains a component that exceeds the example Windows name limit.'
+            }
+            $strRootNameStem = ($strRootSegment -split '\.', 2)[0]
+            if ($objWindowsDeviceNames.Contains($strRootNameStem)) {
+                throw 'PESTER_TEST_ROOT contains a reserved Windows device name.'
+            }
+        }
+    }
+
+    $objPesterTestRoot = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
+    $objLinkAttribute = [System.IO.FileAttributes]::ReparsePoint
+    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+        throw 'The checkout workspace must be an ordinary filesystem directory.'
+    }
+    for ($intRootIndex = 0; $intRootIndex -lt $arrRootSegments.Count; $intRootIndex++) {
+        $strRootSegment = $arrRootSegments[$intRootIndex]
+        $strParentDirectory = $objPesterTestRoot.FullName
+        $strNextDirectory = Join-Path -Path $strParentDirectory -ChildPath $strRootSegment
+        try {
+            $null = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
+        } catch [System.Management.Automation.ItemNotFoundException] {
+            try {
+                [void][System.IO.File]::GetAttributes($strNextDirectory)
+            } catch [System.IO.FileNotFoundException], [System.IO.DirectoryNotFoundException] {
+                if (-not $boolWindowsPath) {
+                    for ($intSuffixIndex = $intRootIndex + 1; $intSuffixIndex -lt $arrRootSegments.Count; $intSuffixIndex++) {
+                        if ([System.Text.Encoding]::UTF8.GetByteCount($arrRootSegments[$intSuffixIndex]) -gt 255) {
+                            throw 'PESTER_TEST_ROOT contains a component that exceeds the example POSIX skip limit.'
+                        }
+                    }
+                }
+                Write-Output ("No Pester test root exists at '{0}'." -f $strNextDirectory)
+                exit 0
+            } catch {
+                throw
+            }
+            throw ("The provider did not find the existing test root component '{0}'." -f $strNextDirectory)
+        }
+        $arrListedRootEntries = @(
+            Get-ChildItem -LiteralPath $strParentDirectory -Force -ErrorAction Stop |
+                Where-Object { $objDirectoryNameComparer.Equals($_.Name, $strRootSegment) }
+        )
+        if ($arrListedRootEntries.Count -ne 1 -or $objExcludedDirectoryNames.Contains($arrListedRootEntries[0].Name)) {
+            throw ("The test root component must match one allowed listed name: '{0}'." -f $strNextDirectory)
+        }
+        $objPesterTestRoot = $arrListedRootEntries[0]
+        if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+            throw ("The test root component is not an ordinary directory: '{0}'." -f $strNextDirectory)
+        }
+    }
+
+    $objDirectories = New-Object -TypeName 'System.Collections.Generic.Stack[System.IO.DirectoryInfo]'
+    $objDirectories.Push($objPesterTestRoot)
+    $arrPesterTestFiles = @(
+        while ($objDirectories.Count -gt 0) {
+            $objDirectory = $objDirectories.Pop()
+            foreach ($objEntry in (Get-ChildItem -LiteralPath $objDirectory.FullName -Force -ErrorAction Stop)) {
+                $boolIsDirectory = $objEntry -is [System.IO.DirectoryInfo]
+                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($objEntry.Name)) {
+                    continue
+                }
+
+                $boolIsTestFile = $objEntry.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+                if (-not $boolIsDirectory -and -not $boolIsTestFile) {
+                    continue
+                }
+
+                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $objEntry.Name.Contains('\'))) {
+                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $objEntry.Name)
+                }
+                if ($boolIsDirectory) {
+                    $objDirectories.Push($objEntry)
+                } elseif ($objEntry -is [System.IO.FileInfo]) {
+                    if (-not $boolWindowsPath -and [string]($objEntry.UnixStat.ItemType) -cne 'File') {
+                        throw ("Cannot verify a regular owned Pester test file: '{0}'." -f $objEntry.Name)
+                    }
+                    $objEntry
+                } else {
+                    throw ("Cannot classify owned Pester test entry '{0}'." -f $objEntry.Name)
+                }
+            }
+        }
+    )
+
     if ($arrPesterTestFiles.Count -eq 0) {
-        Write-Output ("No Pester test files found under '{0}'." -f $strPesterTestRoot)
+        Write-Output ("No owned Pester test files found under '{0}'." -f $objPesterTestRoot.FullName)
         exit 0
     }
 
+    $arrPesterTestContainers = @(
+        foreach ($objPesterTestFile in $arrPesterTestFiles) {
+            if ($PSVersionTable.PSEdition -eq 'Desktop') {
+                # Windows PowerShell 5.1 can expand wildcards when Pester invokes the file.
+                $objPesterTestFile.PSPath = $objPesterTestFile.PSPath -replace '([`*?\[\]])', '`$1'
+            }
+            $objPesterTestContainer = [Pester.ContainerInfo]::Create()
+            $objPesterTestContainer.Type = 'File'
+            $objPesterTestContainer.Item = $objPesterTestFile
+            $objPesterTestContainer
+        }
+    )
+
     $objPesterConfiguration = New-PesterConfiguration
-    $objPesterConfiguration.Run.Path = $strPesterTestRoot
+    $objPesterConfiguration.Run.Container = $arrPesterTestContainers
+    $objPesterConfiguration.Run.Path = @()
+    $objPesterConfiguration.Run.ScriptBlock = @()
+    $objPesterConfiguration.Run.Parallel = $false
+    $objPesterConfiguration.Run.RepoRoot = $env:GITHUB_WORKSPACE
+    $objPesterConfiguration.Run.Exit = $true
     $objPesterConfiguration.Output.Verbosity = 'Detailed'
+    $objPesterConfiguration.TestResult.Enabled = $true
+    $objPesterConfiguration.TestResult.OutputFormat = 'NUnitXml'
+    $objPesterConfiguration.TestResult.OutputPath = 'test-results.xml'
     Invoke-Pester -Configuration $objPesterConfiguration
 ```
 
