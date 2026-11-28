@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.29.20261128.0
+**Version:** 2.30.20261128.0
 
 ## Metadata
 
@@ -145,7 +145,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
-- **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract; any cause it reports **MUST** match the caught error → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** A cmdlet failure handled by `try/catch` **MUST** use `-ErrorAction Stop` inside `try`; a failed read in a validation or security gate **MUST** fail closed → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** `throw "message"` and `throw ("fmt" -f $args)` **MUST NOT** be used in catch blocks intended to rethrow → [Rethrow Anti-Pattern](#rethrow-anti-pattern)
 - **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
@@ -2441,6 +2441,162 @@ function Convert-SafelyFromJson {
     }
 }
 ```
+
+#### Cause-Specific Results in Non-Throwing Catches
+
+When a documented non-throwing catch returns a record, code, or message that names a particular cause, that cause **MUST** be supported by the caught error. Check the exception type or a documented `FullyQualifiedErrorId` from the operation that failed. The operation and item named by the result **MUST** match that failure. Use a narrow `try` block when other calls can raise the same exception type for a different cause. Use the command's applicable error classification. Avoid localized message text and a second query to guess the cause of the first failure.
+
+Other errors **MUST** produce a truthful result under the documented contract. They **MAY** share a generic failure result when the caller does not need a finer distinction. An unreadable result can describe an applicable read failure. Keep the default rethrow policy for code without a documented non-throwing contract.
+
+Write useful information about a caught failure to the Debug stream under the existing diagnostic rules. A safe exception type can be enough. Keep raw personal data, credentials, tokens, and sensitive identifiers out of diagnostics. The returned cause must remain accurate when Debug output is disabled.
+
+**Non-Compliant** (fragment from a helper whose `.DESCRIPTION` and `.OUTPUTS` document its results):
+
+```powershell
+try {
+    [void](Get-Item -LiteralPath $Path -ErrorAction Stop)
+    return 'Available'
+} catch {
+    return 'MissingItem' # An access or I/O failure can reach this catch.
+}
+```
+
+**Compliant** (complete example of a helper that handles lookup failures with documented status values):
+
+```powershell
+function Get-ItemStatus {
+    # .SYNOPSIS
+    # Returns a status for an item lookup.
+    #
+    # .DESCRIPTION
+    # Handles lookup failures and returns one of the documented status values.
+    # If a caller preference stops execution on Verbose or Debug output, the
+    # function can stop before it returns a status.
+    #
+    # .PARAMETER Path
+    # Path passed to Get-Item.
+    #
+    # .EXAMPLE
+    # Get-ItemStatus -Path 'config.json'
+    #
+    # # Returns Available when the lookup succeeds.
+    #
+    # .EXAMPLE
+    # Get-ItemStatus -Path 'missing-config.json'
+    #
+    # # Returns MissingItem when Get-Item reports ItemNotFoundException.
+    #
+    # .EXAMPLE
+    # Get-ItemStatus -Path 'synthetic-private-item'
+    #
+    # # In the access-error test fixture, Get-Item throws
+    # # UnauthorizedAccessException. The helper returns ReadFailed.
+    #
+    # .EXAMPLE
+    # Get-ItemStatus -Path 'PSStyleGuideMissingDrive:\config.json'
+    #
+    # # Returns Failed when the named PowerShell drive does not exist.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] Available when Get-Item succeeds, MissingItem when Get-Item
+    # reports ItemNotFoundException, ReadFailed for access or I/O failures,
+    # or Failed for all other lookup errors. No status is returned if a
+    # diagnostic preference stops the function before the return.
+    #
+    # .NOTES
+    # This function supports positional parameters:
+    #
+    #   Position 0: Path
+    #
+    # Version: 1.0.20261126.0
+    [CmdletBinding()]
+    [OutputType([string])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Path
+    )
+
+    Set-StrictMode -Version Latest
+
+    Write-Verbose 'Checking the requested item.'
+    try {
+        [void](Get-Item -LiteralPath $Path -ErrorAction Stop)
+        return 'Available'
+    } catch [System.Management.Automation.ItemNotFoundException] {
+        Write-Debug 'Get-Item reported ItemNotFoundException.'
+        return 'MissingItem'
+    } catch [System.UnauthorizedAccessException] {
+        Write-Debug 'Get-Item failed with UnauthorizedAccessException.'
+        return 'ReadFailed'
+    } catch [System.IO.IOException] {
+        Write-Debug 'Get-Item failed with IOException.'
+        return 'ReadFailed'
+    } catch {
+        Write-Debug ("Get-Item failed with exception type '{0}'." -f $_.Exception.GetType().FullName)
+        return 'Failed'
+    }
+}
+```
+
+The not-found result describes the command's reported category. It is not independent proof that a physical entry cannot exist on every platform.
+
+**Test pattern** (invoke the same helper body and use deterministic mocked failures):
+
+```powershell
+Describe 'Get-ItemStatus' {
+    BeforeAll {
+        $strSrcPath = Join-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -ChildPath 'src'
+        . (Join-Path -Path $strSrcPath -ChildPath 'Get-ItemStatus.ps1')
+    }
+
+    It 'Returns MissingItem for a reported not-found error' {
+        Mock Get-Item { throw [System.Management.Automation.ItemNotFoundException]::new('missing') }
+        Get-ItemStatus -Path 'item' | Should -BeExactly 'MissingItem'
+    }
+
+    It 'Returns ReadFailed for an access error' {
+        # Arrange
+        $strSensitiveFixture = 'synthetic-private-item'
+        Mock Get-Item { throw [System.UnauthorizedAccessException]::new("Denied: $LiteralPath") }
+        $DebugPreference = 'Continue'
+        $VerbosePreference = 'Continue'
+
+        # Act
+        $arrRecords = @(Get-ItemStatus -Path $strSensitiveFixture 4>&1 5>&1)
+
+        # Assert
+        $arrResults = @($arrRecords | Where-Object { $_ -is [string] })
+        $arrResults.Count | Should -Be 1
+        $arrResults[0] | Should -BeExactly 'ReadFailed'
+        $arrDebugRecords = @($arrRecords | Where-Object { $_ -is [System.Management.Automation.DebugRecord] })
+        $arrDebugRecords.Count | Should -Be 1
+        $arrDebugRecords[0].Message | Should -BeExactly 'Get-Item failed with UnauthorizedAccessException.'
+        ($arrRecords -join [Environment]::NewLine) | Should -Not -Match ([regex]::Escape($strSensitiveFixture))
+    }
+
+    It 'Returns ReadFailed for an I/O error' {
+        Mock Get-Item { throw [System.IO.IOException]::new('read failed') }
+        Get-ItemStatus -Path 'item' | Should -BeExactly 'ReadFailed'
+    }
+
+    It 'Returns Failed for an unexpected error' {
+        Mock Get-Item { throw [System.InvalidOperationException]::new('unexpected') }
+        Get-ItemStatus -Path 'item' | Should -BeExactly 'Failed'
+    }
+
+    It 'Returns Available after a successful lookup' {
+        Mock Get-Item { [pscustomobject]@{ Name = 'item' } }
+        Get-ItemStatus -Path 'item' | Should -BeExactly 'Available'
+    }
+}
+```
+
+A non-throwing helper's result is part of its public contract. A cause-specific value such as `MissingItem` is truthful only when the caught error from the operation supports that cause. A broad catch that maps access denial or an I/O failure to `MissingItem` can send the caller toward the wrong repair. Match a typed exception or a command-specific documented identifier; keep the protected operation narrow when other calls could raise the same type. Do not parse localized message text or perform a second query to guess what the first failure meant.
+
+A generic failure result remains useful when callers do not need a finer distinction. It preserves the non-throwing contract without pretending that every exception has the same cause. Debug diagnostics can include a safe exception type, but they do not repair an inaccurate result. Avoid raw paths and other sensitive values in diagnostic output. PowerShell documents [typed catch behavior](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_try_catch_finally?view=powershell-7.5), and the [ItemNotFoundException API](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.itemnotfoundexception?view=powershellsdk-7.4.0) identifies the command-level not-found category used in the example.
 
 ---
 

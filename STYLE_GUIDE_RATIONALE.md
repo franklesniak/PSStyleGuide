@@ -46,6 +46,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
   - [Comparison with Modern Alternatives](#comparison-with-modern-alternatives)
+  - [Cause-Specific Results in Non-Throwing Catches](#cause-specific-results-in-non-throwing-catches)
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
@@ -565,6 +566,16 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
 
 Modern `try/catch` handles terminating errors. A cmdlet's non-terminating error does not enter `catch` unless the command's effective error action escalates it; `-ErrorAction Stop` makes that behavior explicit at the operation that the catch handles. This avoids relying on a caller's `$ErrorActionPreference`. The [PowerShell error-handling documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_error_handling?view=powershell-7.6) describes the escalation. Issue probes on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6 showed explicit `-ErrorAction Stop` entering `catch` under all tested preference values; without it, the cmdlet failure reached `catch` only when the preference was `Stop`. The separate macOS PowerShell Core 7.6.9 run also observed plain `Write-Error` continue inside `try` under `Continue` and `SilentlyContinue`, while `Write-Error -ErrorAction Stop` reached `catch` under both. These results are bounded to the tested commands and runtimes; they do not change the documented non-throwing contract for catches that intentionally handle a failure without rethrowing.
+
+---
+
+### Cause-Specific Results in Non-Throwing Catches
+
+> For the normative rule, see [Cause-Specific Results in Non-Throwing Catches](STYLE_GUIDE.md#cause-specific-results-in-non-throwing-catches) in the main guide.
+
+A non-throwing helper's result is part of its public contract. A cause-specific value such as `MissingItem` is truthful only when the caught error from the operation supports that cause. A broad catch that maps access denial or an I/O failure to `MissingItem` can send the caller toward the wrong repair. Match a typed exception or a command-specific documented identifier; keep the protected operation narrow when other calls could raise the same type. Do not parse localized message text or perform a second query to guess what the first failure meant.
+
+A generic failure result remains useful when callers do not need a finer distinction. It preserves the non-throwing contract without pretending that every exception has the same cause. Debug diagnostics can include a safe exception type, but they do not repair an inaccurate result. Avoid raw paths and other sensitive values in diagnostic output. PowerShell documents [typed catch behavior](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_try_catch_finally?view=powershell-7.5), and the [ItemNotFoundException API](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.itemnotfoundexception?view=powershellsdk-7.4.0) identifies the command-level not-found category used in the example.
 
 ---
 
