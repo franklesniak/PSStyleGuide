@@ -7,13 +7,13 @@ description: "PowerShell coding standards"
 
 # PowerShell Writing Style
 
-**Version:** 2.28.20261127.0
+**Version:** 2.29.20261128.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-27
+- **Last Updated:** 2026-11-28
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -68,6 +68,10 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Code **SHOULD** avoid relative paths and tilde (~) shortcut → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** Code **SHOULD** use explicit scoping (`$global:`, `$script:`) → [Path and Scope Handling](#path-and-scope-handling)
 - **[All]** `-LiteralPath` **SHOULD** be used instead of `-Path` when operating on concrete (non-wildcard) paths derived from variables or `Join-Path` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** When only wildcard-enabled `-Path` is available to match an existing target, escape a concrete variable-derived path (**MUST**). Code and documented commands **SHOULD** escape other concrete paths from variables, pipeline input, or command output when used for wildcard matching when `-LiteralPath` is unavailable → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+- **[All]** Windows repository path components and listed names **MUST** be checked in their original form before path normalization or provider/.NET path operations → [Path and Scope Handling](#path-and-scope-handling)
+- **[Modern]** Linux/macOS containment checks **MUST** inspect each lexical directory below the trusted root. Check any needed raw link target before parent traversal and fail closed if it cannot be read. Unreadable or unclassifiable entries in a validation walk **MUST** fail the walk → [Symlink Targets and Repository Containment](#symlink-targets-and-repository-containment)
+- **[All]** Check original external names before provider resolution; report POSIX names containing a literal backslash and validate Windows path components before normalization → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For destructive cmdlets (`Remove-Item`, `Move-Item`), `-LiteralPath` **MUST** be used for variable-derived paths → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** `New-Item` does **not** support `-LiteralPath`; use `-Path` with `New-Item` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
 - **[All]** For directory creation from variable-derived paths that may contain wildcard characters, prefer `[System.IO.Directory]::CreateDirectory()` → [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
@@ -133,6 +137,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[v1.0]** v1.0-targeted functions **MUST** use trap {} for error suppression → [Core Error Suppression Mechanism](#core-error-suppression-mechanism)
 - **[Modern]** catch blocks **MUST NOT** be empty; default pattern is `Write-Debug` + `throw` → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** Non-throwing catch (no `throw`) **MUST** have a documented non-throwing contract → [Modern catch Block Requirements](#modern-catch-block-requirements)
+- **[Modern]** A cmdlet failure handled by `try/catch` **MUST** use `-ErrorAction Stop` inside `try`; a failed read in a validation or security gate **MUST** fail closed → [Modern catch Block Requirements](#modern-catch-block-requirements)
 - **[Modern]** `throw "message"` and `throw ("fmt" -f $args)` **MUST NOT** be used in catch blocks intended to rethrow → [Rethrow Anti-Pattern](#rethrow-anti-pattern)
 - **[Modern]** Exception wrapping **SHOULD** use `$PSCmdlet.ThrowTerminatingError()` with the original as `InnerException` → [Wrapping Exceptions with `$PSCmdlet.ThrowTerminatingError()`](#wrapping-exceptions-with-pscmdletthrowterminatingerror)
 - **[Modern]** Variables referenced in `finally` that are assigned in `try` **MUST** be initialized before the `try` block → [Set-StrictMode Considerations for finally Blocks](#set-strictmode-considerations-for-finally-blocks)
@@ -156,6 +161,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 
 - **[Modern]** Modern functions **MUST NOT** collect results in `List<T>` and return; **MUST** stream objects to pipeline → [Processing Collections in Modern Functions (Streaming Output)](#processing-collections-in-modern-functions-streaming-output)
 - **[Modern]** Streaming function calls **SHOULD** be wrapped in @(...) to handle 0-1-Many problem → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
+- **[All]** Code supporting Windows PowerShell 5.1 that parses a JSON array **MUST** preserve the array as one object and enumerate once; use `-NoEnumerate` when the command exposes it → [Consuming Streaming Functions (The `0-1-Many` Problem)](#consuming-streaming-functions-the-0-1-many-problem)
 - **[All]** Code **MUST** use Write-Warning for user-facing anomalies; Write-Debug for internal details → [Choosing Between Warning and Debug Streams](#choosing-between-warning-and-debug-streams)
 - **[All]** .NET method output **MUST** be suppressed with [void](...), not | Out-Null → [Suppression of Method Output](#suppression-of-method-output)
 - **[All]** `Write-Verbose` / `Write-Debug` **MUST NOT** emit raw PII, credentials, tokens, or other sensitive identifiers → [Sensitive Data in Verbose and Debug Streams](#sensitive-data-in-verbose-and-debug-streams)
@@ -687,6 +693,10 @@ Get-Content -Path '../config.json'
 # Good — always resolves relative to the script's own directory:
 Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath '../config.json')
 ```
+
+**[All] On Windows, code MUST check every original component of a Git repository-relative path before passing it to `GetFullPath`, `Resolve-Path`, `Get-Item`, or another provider operation.** Reject a component that ends with a period or space, contains a forward slash (`/`), a backslash (`\`), `<`, `>`, `:`, a double quote, `|`, `?`, `*`, or a control character, or is a reserved device name such as `NUL` or `COM1`, including a device name followed by an extension. These spellings can change the component boundaries or address an NTFS stream, another drive, a device, or an invalid path. Report the original name as unsafe. Do not normalize a rejected component and then read the resulting alias.
+
+<!-- RATIONALE: windows-component-and-listed-name-checks -->
 
 #### Resolving Paths for .NET Static Methods
 
@@ -1635,6 +1645,23 @@ To ensure the result is **always** an array (even if empty or with a single item
 # # result is an array, even if only one principal is returned.
 ```
 
+**JSON array exception:** Code that supports Windows PowerShell 5.1 and parses a top-level JSON array **MUST** preserve that array as one object and enumerate it once. Check whether `ConvertFrom-Json` exposes the `NoEnumerate` parameter and use `-NoEnumerate` when available. Do not use a PowerShell version comparison for this capability check. Keep the parsed array in one variable and enumerate that variable once; do not add another array wrapper or flatten nested arrays.
+
+```powershell
+$objConvertFromJsonCommand = Get-Command -Name ConvertFrom-Json -ErrorAction Stop
+if ($objConvertFromJsonCommand.Parameters.ContainsKey('NoEnumerate')) {
+    $objJsonArray = ConvertFrom-Json -InputObject $strJson -NoEnumerate -ErrorAction Stop
+} else {
+    $objJsonArray = ConvertFrom-Json -InputObject $strJson -ErrorAction Stop
+}
+
+foreach ($objJsonElement in $objJsonArray) {
+    # For JSON [[1, 2]], this loop receives one inner array.
+}
+```
+
+<!-- RATIONALE: json-array-boundaries -->
+
 ---
 
 <!-- rationale-anchor: summary-function-design-as-reliability-engineering -->
@@ -1747,6 +1774,8 @@ Despite suppression, **full error context is preserved** in the global `$Error` 
 ### Modern `catch` Block Requirements
 
 In modern functions using `try/catch` (i.e., those not targeting v1.0), `catch` blocks **MUST NOT** be empty. An empty `catch` block is flagged by PSScriptAnalyzer and provides no diagnostic value.
+
+A `try` block catches only terminating errors. A cmdlet call whose failure the code handles **MUST** pass `-ErrorAction Stop` inside the `try` block, so the result does not depend on the caller's `$ErrorActionPreference`. When a failed read can hide input from a validation or security gate, the `catch` block **MUST** fail closed by rethrowing the error or reporting the failure in the documented output. This requirement does not remove a documented non-throwing contract.
 
 #### Architectural Context: Library/Helper Functions vs. Higher-Level Code
 
@@ -3003,7 +3032,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 
 CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Reject names reserved by the Windows file-naming rules in configured root components, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Build the walk paths from the original listed directory names. On Windows, apply the [component checks](#path-and-scope-handling) to configured components and eligible listed names before reusing them, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -3079,31 +3108,50 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
 
     $arrRootSegments = $strConfiguredRoot -split '[\\/]'
     $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
+    $objGetWindowsNameProblem = {
+        param([string]$strName)
+
+        if ($strName.IndexOfAny($arrInvalidNameChars) -ge 0 -or $strName -cmatch '\p{Cc}|[ .]\z') {
+            return 'InvalidComponent'
+        }
+        $strDeviceStem = ($strName -split '\.', 2)[0]
+        if ($objWindowsDeviceNames.Contains($strDeviceStem)) {
+            return 'ReservedDevice'
+        }
+        return $null
+    }
+
     foreach ($strRootSegment in $arrRootSegments) {
+        $strWindowsNameProblem = if ($boolWindowsPath) {
+            & $objGetWindowsNameProblem -strName $strRootSegment
+        } else {
+            $null
+        }
         if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $objExcludedDirectoryNames.Contains($strRootSegment) -or
-            $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
-            ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
+            $strWindowsNameProblem -ceq 'InvalidComponent' -or
+            (-not $boolWindowsPath -and $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0)) {
             throw 'PESTER_TEST_ROOT contains an invalid directory component.'
         }
         if ($boolWindowsPath) {
             if ($strRootSegment.Length -gt 255) {
                 throw 'PESTER_TEST_ROOT contains a component that exceeds the example Windows name limit.'
             }
-            $strRootNameStem = ($strRootSegment -split '\.', 2)[0]
-            if ($objWindowsDeviceNames.Contains($strRootNameStem)) {
+            if ($strWindowsNameProblem -ceq 'ReservedDevice') {
                 throw 'PESTER_TEST_ROOT contains a reserved Windows device name.'
             }
         }
     }
 
-    $objPesterTestRoot = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
+    $objCheckoutDirectory = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
     $objLinkAttribute = [System.IO.FileAttributes]::ReparsePoint
-    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+    if ($objCheckoutDirectory -isnot [System.IO.DirectoryInfo] -or ($objCheckoutDirectory.Attributes -band $objLinkAttribute)) {
         throw 'The checkout workspace must be an ordinary filesystem directory.'
     }
+    $strCheckoutPath = $objCheckoutDirectory.FullName
+    $strRelativeTestRoot = ''
     for ($intRootIndex = 0; $intRootIndex -lt $arrRootSegments.Count; $intRootIndex++) {
         $strRootSegment = $arrRootSegments[$intRootIndex]
-        $strParentDirectory = $objPesterTestRoot.FullName
+        $strParentDirectory = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeTestRoot)
         $strNextDirectory = Join-Path -Path $strParentDirectory -ChildPath $strRootSegment
         try {
             $null = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
@@ -3132,33 +3180,42 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
         if ($arrListedRootEntries.Count -ne 1 -or $objExcludedDirectoryNames.Contains($arrListedRootEntries[0].Name)) {
             throw ("The test root component must match one allowed listed name: '{0}'." -f $strNextDirectory)
         }
-        $objPesterTestRoot = $arrListedRootEntries[0]
-        if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+        $objListedDirectory = $arrListedRootEntries[0]
+        if ($boolWindowsPath -and $null -ne (& $objGetWindowsNameProblem -strName $objListedDirectory.Name)) {
+            throw ("Unsafe Windows name in the listed Pester test root: '{0}'." -f $objListedDirectory.Name)
+        }
+        if ($objListedDirectory -isnot [System.IO.DirectoryInfo] -or ($objListedDirectory.Attributes -band $objLinkAttribute)) {
             throw ("The test root component is not an ordinary directory: '{0}'." -f $strNextDirectory)
         }
+        $strRelativeTestRoot = [System.IO.Path]::Combine($strRelativeTestRoot, $objListedDirectory.Name)
     }
 
-    $objDirectories = New-Object -TypeName 'System.Collections.Generic.Stack[System.IO.DirectoryInfo]'
-    $objDirectories.Push($objPesterTestRoot)
+    $objDirectoryPaths = New-Object -TypeName 'System.Collections.Generic.Stack[string]'
+    $objDirectoryPaths.Push($strRelativeTestRoot)
     $arrPesterTestFiles = @(
-        while ($objDirectories.Count -gt 0) {
-            $objDirectory = $objDirectories.Pop()
-            foreach ($objEntry in (Get-ChildItem -LiteralPath $objDirectory.FullName -Force -ErrorAction Stop)) {
+        while ($objDirectoryPaths.Count -gt 0) {
+            $strRelativeDirectory = $objDirectoryPaths.Pop()
+            $strDirectory = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeDirectory)
+            foreach ($objEntry in (Get-ChildItem -LiteralPath $strDirectory -Force -ErrorAction Stop)) {
+                $strListedName = $objEntry.Name
                 $boolIsDirectory = $objEntry -is [System.IO.DirectoryInfo]
-                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($objEntry.Name)) {
+                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($strListedName)) {
                     continue
                 }
 
-                $boolIsTestFile = $objEntry.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+                $boolIsTestFile = $strListedName.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
                 if (-not $boolIsDirectory -and -not $boolIsTestFile) {
                     continue
                 }
 
-                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $objEntry.Name.Contains('\'))) {
-                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $objEntry.Name)
+                if ($boolWindowsPath -and $null -ne (& $objGetWindowsNameProblem -strName $strListedName)) {
+                    throw ("Unsafe Windows name in the owned Pester test tree: '{0}'." -f $strListedName)
+                }
+                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $strListedName.Contains('\'))) {
+                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $strListedName)
                 }
                 if ($boolIsDirectory) {
-                    $objDirectories.Push($objEntry)
+                    $objDirectoryPaths.Push([System.IO.Path]::Combine($strRelativeDirectory, $strListedName))
                 } elseif ($objEntry -is [System.IO.FileInfo]) {
                     if (-not $boolWindowsPath -and [string]($objEntry.UnixStat.ItemType) -cne 'File') {
                         throw ("Cannot verify a regular owned Pester test file: '{0}'." -f $objEntry.Name)
@@ -3172,7 +3229,8 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     )
 
     if ($arrPesterTestFiles.Count -eq 0) {
-        Write-Output ("No owned Pester test files found under '{0}'." -f $objPesterTestRoot.FullName)
+        $strTestRootPath = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeTestRoot)
+        Write-Output ("No owned Pester test files found under '{0}'." -f $strTestRootPath)
         exit 0
     }
 
@@ -3238,9 +3296,25 @@ When a cmdlet supports both `-Path` and `-LiteralPath`, and the code is operatin
 
 For **destructive** operations—`Remove-Item`, `Move-Item`—`-LiteralPath` **MUST** be used when the path value comes from a variable or expression. Wildcard interpretation of a variable-derived path in a destructive cmdlet can silently delete or move unintended files.
 
-Reserve `-Path` for cases where wildcard expansion is **explicitly intended**.
+Reserve unescaped `-Path` patterns for cases where wildcard expansion is **explicitly intended**.
 
-**Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation. Because `-Path` still interprets wildcard characters, code **SHOULD** validate or reject untrusted input containing `[`, `]`, `*`, or `?` as literal characters, or use a .NET file API (e.g., `[System.IO.File]::Create()`) when literal path semantics are required.
+**[All]** `-LiteralPath` stops wildcard expansion, but it does not override FileSystem path syntax. On Linux and macOS, the PowerShell FileSystem provider treats a backslash as a directory separator, even though the native filesystem can store a literal backslash in a file name. Before code passes a repository-relative name from Git, directory enumeration, or another external source to a provider cmdlet or provider-backed tool, it **MUST** check the original name. If a Linux or macOS name contains a literal backslash, code **MUST** report that name instead of reading it through the provider. Preserve the original spelling; do not replace a literal backslash with `/` to make the check pass. Use `/` for repository-relative component boundaries. When converting a native filesystem path to that form, replace only `[System.IO.Path]::DirectorySeparatorChar` with `/`.
+
+**Exception — `New-Item`:** `New-Item` does **not** have a `-LiteralPath` parameter (across Windows PowerShell 5.1 and PowerShell 7.x). Use `New-Item -Path` for item creation. With `-Name`, `-Path` can match parent directories by wildcard. On the tested Windows FileSystem hosts, a new leaf supplied directly in `-Path` retains its spelling. Code **SHOULD** validate or reject untrusted input containing `[`, `]`, `*`, or `?` as literal characters, or use a .NET file API (e.g., `[System.IO.File]::Create()`) when literal path semantics are required.
+
+**Concrete paths in code and documented commands:** When a cmdlet without `-LiteralPath` receives one concrete path from a variable, the pipeline, or command output and uses that path as a wildcard pattern to match an existing target, code and documented commands **SHOULD** escape each backtick character and each of `*`, `?`, `[`, and `]` with a backtick. Do not rely on `[System.Management.Automation.WildcardPattern]::Escape()` alone. PowerShell's 7.6 changelog records a fix so that method escapes lone backticks; code that supports earlier versions must escape backticks explicitly. Apply the following narrower rule when code passes a concrete, variable-derived `-Path` value to select an existing target item.
+
+**Cmdlets without `-LiteralPath`:** When a cmdlet that lacks `-LiteralPath` uses its wildcard-enabled `-Path` parameter to match an existing target item and code passes one concrete, variable-derived path, code **MUST** escape the path so that it matches only the intended item. The escape **MUST** put a backtick before each backtick character and each of `*`, `?`, `[`, and `]`. Code **MUST NOT** rely on `WildcardPattern.Escape()` alone. A pattern that matches nothing can let the command succeed without output. When a skipped item could hide a failure, such as in a lint or security gate, code **SHOULD** also resolve the escaped path with `Resolve-Path -Path` and fail closed unless it resolves to exactly the intended item. For item creation, use the separate `New-Item` and directory-creation exceptions.
+
+For example, an input name with brackets needs a pattern that treats them as literal characters:
+
+```text
+Input name: report[final].ps1
+Escaped pattern: report`[final`].ps1
+Expected match: only report[final].ps1
+```
+
+The escaped pattern preserves the original name and prevents the brackets from matching a different item.
 
 **Directory creation:** When creating a directory from a variable-derived path that may contain wildcard characters (`[`, `]`, `*`, or `?`), code **SHOULD** prefer `[System.IO.Directory]::CreateDirectory()` over `New-Item -Path ... -ItemType Directory`. The path **MUST** first be resolved to an absolute filesystem path per [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods).
 
@@ -3279,3 +3353,13 @@ Remove-Item -Path $strTempFile -Force   # Dangerous: destructive + wildcard
 Get-ChildItem -Path 'C:\Logs\*.log'
 Remove-Item -Path 'C:\Temp\*.tmp' -Force
 ```
+
+**[All] On Windows, `GetFullPath` and FileSystem provider path operations can normalize trailing periods or spaces; for example, `dir.` can address `dir`.** Code that walks a directory tree **MUST** build each relative path from the original listed entry names. Before passing the joined path to a provider cmdlet or a .NET file API, code **MUST** apply the [Windows component checks](#path-and-scope-handling) to each listed name in its original form, including the check for a trailing period or space. Report an unsafe listed name using its original spelling.
+
+### Symlink Targets and Repository Containment
+
+**[Modern] On Linux and macOS, code that decides whether a path is inside a trusted directory MUST inspect every directory on the lexical path below that root for the `ReparsePoint` attribute before relying on containment, and MUST fail closed if it cannot read a directory. A directory with that attribute is a link for this containment decision and MUST be refused.** When a link target matters to the containment check, code **MUST** verify that the runtime can read its original target text. Use `LinkTarget` where it is available. Fail closed if the needed raw text is unavailable or unreadable. Read it before processing a parent component such as `..`, before normalization, and before provider use. Raw target text and the result of `FileSystemInfo.ResolveLinkTarget($true)`, where available, are noncanonical. .NET can follow a link in the final path component while the returned path still passes through an intermediate directory symlink. A string-prefix comparison or `GetRelativePath()` alone does not prove containment. Do not reject the trusted root or directories above it solely because they are links.
+
+When a directory walk supplies input to a validation or security gate, an enumeration or entry-classification failure **MUST** be reported or propagated as a failure. Code **MUST NOT** silently skip an unreadable or unclassifiable entry and report the walk as complete.
+
+**[Modern]** On Linux and macOS, the PowerShell FileSystem provider interprets a backslash as a directory separator even with `-LiteralPath`. The kernel and, where available, .NET `ResolveLinkTarget` can preserve a literal backslash as part of a name. Before code passes a path built from a link target to a provider cmdlet such as `Get-Item`, code **MUST** check the resolved target path and the raw target text of every link in the chain. Code **MUST** fail closed if it cannot obtain a required spelling or if any of those strings contains a literal backslash. The provider can otherwise address a different entry from the one checked for containment.
