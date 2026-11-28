@@ -2,13 +2,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.29.20261127.0
+**Version:** 2.29.20261128.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-11-27
+- **Last Updated:** 2026-11-28
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -3027,7 +3027,7 @@ Invoke-Pester -Path tests/ -Output Detailed
 
 CI discovery **MUST** stay within the project-owned `tests/` tree or documented test root. It **MUST NOT** scan from the repository root or collect starter, sample, template, vendored, dependency, or version-control tests. Keep one editable root that names a relative subdirectory of the trusted checkout. Validate its directory components before discovery. Discover the explicit owned file list once. Use that same list to decide whether to skip and to create one file-backed `Run.Container` entry per file. Give each container the original FileSystem `FileInfo` so Pester uses the file's original location and identity.
 
-Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Use listed directory names for the configured test root. Reject names reserved by the Windows file-naming rules in configured root components, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
+Include hidden owned test files in the discovery list. Match the complete `.Tests.ps1` suffix with case-sensitive ordinal comparison on each supported host. Exclude dependency and version-control directories by exact segment names such as `node_modules`, `.git`, `.svn`, and `.hg` before entering them. Match directory names with ordinal case-insensitive comparison on Windows and ordinal comparison on Unix. If the selected root contains other unowned trees, configure exact directory exclusions for those trees too. Build the walk paths from the original listed directory names. On Windows, apply the [component checks](#path-and-scope-handling) to configured components and eligible listed names before reusing them, including when a reserved stem has an extension. This example limits a Windows root component to 255 UTF-16 code units. Confirm provider-reported root absence with a filesystem attribute query. In this example, a POSIX root may skip only if every component after the missing directory fits within 255 UTF-8 bytes. Require ordinary directories and regular test files in the owned tree. Treat reparse-point directories and matching test entries with unsupported or unavailable file types as configuration failures. A valid root that is absent or an owned file list that is empty **MAY** skip. An existing non-directory root, read or enumeration error, invalid configuration, discovery failure, or test failure **MUST** fail. Use terminating errors and a supported result-to-exit path so CI receives a nonzero failure. `Run.Exit = $true` is one supported design. A checked result-to-exit path is also acceptable. Interactive examples **SHOULD NOT** end the user's shell to report a test failure.
 
 For Pester 6.2.0, clear `Run.Path` and `Run.ScriptBlock` and keep `Run.Parallel` false in this configuration. This lets Pester run the exact file containers, including hidden files, without another path discovery pass.
 
@@ -3103,31 +3103,50 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
 
     $arrRootSegments = $strConfiguredRoot -split '[\\/]'
     $arrInvalidNameChars = [System.IO.Path]::GetInvalidFileNameChars()
+    $objGetWindowsNameProblem = {
+        param([string]$strName)
+
+        if ($strName.IndexOfAny($arrInvalidNameChars) -ge 0 -or $strName -cmatch '\p{Cc}|[ .]\z') {
+            return 'InvalidComponent'
+        }
+        $strDeviceStem = ($strName -split '\.', 2)[0]
+        if ($objWindowsDeviceNames.Contains($strDeviceStem)) {
+            return 'ReservedDevice'
+        }
+        return $null
+    }
+
     foreach ($strRootSegment in $arrRootSegments) {
+        $strWindowsNameProblem = if ($boolWindowsPath) {
+            & $objGetWindowsNameProblem -strName $strRootSegment
+        } else {
+            $null
+        }
         if ([string]::IsNullOrWhiteSpace($strRootSegment) -or $objExcludedDirectoryNames.Contains($strRootSegment) -or
-            $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0 -or
-            ($boolWindowsPath -and $strRootSegment.TrimEnd([char[]]@(' ', '.')) -cne $strRootSegment)) {
+            $strWindowsNameProblem -ceq 'InvalidComponent' -or
+            (-not $boolWindowsPath -and $strRootSegment.IndexOfAny($arrInvalidNameChars) -ge 0)) {
             throw 'PESTER_TEST_ROOT contains an invalid directory component.'
         }
         if ($boolWindowsPath) {
             if ($strRootSegment.Length -gt 255) {
                 throw 'PESTER_TEST_ROOT contains a component that exceeds the example Windows name limit.'
             }
-            $strRootNameStem = ($strRootSegment -split '\.', 2)[0]
-            if ($objWindowsDeviceNames.Contains($strRootNameStem)) {
+            if ($strWindowsNameProblem -ceq 'ReservedDevice') {
                 throw 'PESTER_TEST_ROOT contains a reserved Windows device name.'
             }
         }
     }
 
-    $objPesterTestRoot = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
+    $objCheckoutDirectory = Get-Item -LiteralPath $env:GITHUB_WORKSPACE -Force -ErrorAction Stop
     $objLinkAttribute = [System.IO.FileAttributes]::ReparsePoint
-    if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+    if ($objCheckoutDirectory -isnot [System.IO.DirectoryInfo] -or ($objCheckoutDirectory.Attributes -band $objLinkAttribute)) {
         throw 'The checkout workspace must be an ordinary filesystem directory.'
     }
+    $strCheckoutPath = $objCheckoutDirectory.FullName
+    $strRelativeTestRoot = ''
     for ($intRootIndex = 0; $intRootIndex -lt $arrRootSegments.Count; $intRootIndex++) {
         $strRootSegment = $arrRootSegments[$intRootIndex]
-        $strParentDirectory = $objPesterTestRoot.FullName
+        $strParentDirectory = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeTestRoot)
         $strNextDirectory = Join-Path -Path $strParentDirectory -ChildPath $strRootSegment
         try {
             $null = Get-Item -LiteralPath $strNextDirectory -Force -ErrorAction Stop
@@ -3156,33 +3175,42 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
         if ($arrListedRootEntries.Count -ne 1 -or $objExcludedDirectoryNames.Contains($arrListedRootEntries[0].Name)) {
             throw ("The test root component must match one allowed listed name: '{0}'." -f $strNextDirectory)
         }
-        $objPesterTestRoot = $arrListedRootEntries[0]
-        if ($objPesterTestRoot -isnot [System.IO.DirectoryInfo] -or ($objPesterTestRoot.Attributes -band $objLinkAttribute)) {
+        $objListedDirectory = $arrListedRootEntries[0]
+        if ($boolWindowsPath -and $null -ne (& $objGetWindowsNameProblem -strName $objListedDirectory.Name)) {
+            throw ("Unsafe Windows name in the listed Pester test root: '{0}'." -f $objListedDirectory.Name)
+        }
+        if ($objListedDirectory -isnot [System.IO.DirectoryInfo] -or ($objListedDirectory.Attributes -band $objLinkAttribute)) {
             throw ("The test root component is not an ordinary directory: '{0}'." -f $strNextDirectory)
         }
+        $strRelativeTestRoot = [System.IO.Path]::Combine($strRelativeTestRoot, $objListedDirectory.Name)
     }
 
-    $objDirectories = New-Object -TypeName 'System.Collections.Generic.Stack[System.IO.DirectoryInfo]'
-    $objDirectories.Push($objPesterTestRoot)
+    $objDirectoryPaths = New-Object -TypeName 'System.Collections.Generic.Stack[string]'
+    $objDirectoryPaths.Push($strRelativeTestRoot)
     $arrPesterTestFiles = @(
-        while ($objDirectories.Count -gt 0) {
-            $objDirectory = $objDirectories.Pop()
-            foreach ($objEntry in (Get-ChildItem -LiteralPath $objDirectory.FullName -Force -ErrorAction Stop)) {
+        while ($objDirectoryPaths.Count -gt 0) {
+            $strRelativeDirectory = $objDirectoryPaths.Pop()
+            $strDirectory = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeDirectory)
+            foreach ($objEntry in (Get-ChildItem -LiteralPath $strDirectory -Force -ErrorAction Stop)) {
+                $strListedName = $objEntry.Name
                 $boolIsDirectory = $objEntry -is [System.IO.DirectoryInfo]
-                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($objEntry.Name)) {
+                if ($boolIsDirectory -and $objExcludedDirectoryNames.Contains($strListedName)) {
                     continue
                 }
 
-                $boolIsTestFile = $objEntry.Name.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
+                $boolIsTestFile = $strListedName.EndsWith('.Tests.ps1', [System.StringComparison]::Ordinal)
                 if (-not $boolIsDirectory -and -not $boolIsTestFile) {
                     continue
                 }
 
-                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $objEntry.Name.Contains('\'))) {
-                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $objEntry.Name)
+                if ($boolWindowsPath -and $null -ne (& $objGetWindowsNameProblem -strName $strListedName)) {
+                    throw ("Unsafe Windows name in the owned Pester test tree: '{0}'." -f $strListedName)
+                }
+                if (($objEntry.Attributes -band $objLinkAttribute) -or (-not $boolWindowsPath -and $strListedName.Contains('\'))) {
+                    throw ("Unsupported path in the owned Pester test tree: '{0}'." -f $strListedName)
                 }
                 if ($boolIsDirectory) {
-                    $objDirectories.Push($objEntry)
+                    $objDirectoryPaths.Push([System.IO.Path]::Combine($strRelativeDirectory, $strListedName))
                 } elseif ($objEntry -is [System.IO.FileInfo]) {
                     if (-not $boolWindowsPath -and [string]($objEntry.UnixStat.ItemType) -cne 'File') {
                         throw ("Cannot verify a regular owned Pester test file: '{0}'." -f $objEntry.Name)
@@ -3196,7 +3224,8 @@ Set `Run.RepoRoot` deliberately when coverage paths depend on it. Preserve suppo
     )
 
     if ($arrPesterTestFiles.Count -eq 0) {
-        Write-Output ("No owned Pester test files found under '{0}'." -f $objPesterTestRoot.FullName)
+        $strTestRootPath = [System.IO.Path]::Combine($strCheckoutPath, $strRelativeTestRoot)
+        Write-Output ("No owned Pester test files found under '{0}'." -f $strTestRootPath)
         exit 0
     }
 
