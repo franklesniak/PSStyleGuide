@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-11-27
+- **Last Updated:** 2026-11-28
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -46,6 +46,7 @@ This companion document preserves the extended rationale, design philosophy, and
 - [Error Handling Rationale](#error-handling-rationale)
   - [Executive Summary: Error Handling Philosophy](#executive-summary-error-handling-philosophy)
   - [Comparison with Modern Alternatives](#comparison-with-modern-alternatives)
+  - [Cause-Specific Results in Non-Throwing Catches](#cause-specific-results-in-non-throwing-catches)
   - [Summary: Error Handling as Diagnostic Instrumentation](#summary-error-handling-as-diagnostic-instrumentation)
 - [Language Interop Rationale](#language-interop-rationale)
   - [Executive Summary: Interop and Versioning Strategy](#executive-summary-interop-and-versioning-strategy)
@@ -59,6 +60,7 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Diagnostic Purpose and Operational Progress](#diagnostic-purpose-and-operational-progress)
   - [Format Files: Future-Proof Design Pattern](#format-files-future-proof-design-pattern)
   - [Modern Stream Capabilities (v2.0+ Context)](#modern-stream-capabilities-v20-context)
+  - [JSON Array Boundaries](#json-array-boundaries)
   - [Summary: Output as Controlled Interface](#summary-output-as-controlled-interface)
 - [Performance, Security, and Holistic Design Rationale](#performance-security-and-holistic-design-rationale)
   - [Executive Summary: Holistic Design Constraints](#executive-summary-holistic-design-constraints)
@@ -67,6 +69,8 @@ This companion document preserves the extended rationale, design philosophy, and
   - [Other: Maintainability, Extensibility, and Modernization](#other-maintainability-extensibility-and-modernization)
   - [Summary: Performance, Security, and Holistic Design](#summary-performance-security-and-holistic-design)
   - [Prefer `-LiteralPath` Over `-Path` for Concrete Paths](#prefer--literalpath-over--path-for-concrete-paths)
+  - [Windows Component and Listed-Name Checks](#windows-component-and-listed-name-checks)
+  - [Symlink Targets and Repository Containment](#symlink-targets-and-repository-containment)
   - [Resolving Paths for .NET Static Methods](#resolving-paths-for-net-static-methods)
 - [Content Relocated from STYLE_GUIDE.md](#content-relocated-from-style_guidemd)
 
@@ -561,6 +565,18 @@ The system is **atomic**—each error-prone operation is isolated, measured, and
 
 The v1.0 pattern is **functionally equivalent** but **more verbose** and **duplicate-prone**.
 
+Modern `try/catch` handles terminating errors. A cmdlet's non-terminating error does not enter `catch` unless the command's effective error action escalates it; `-ErrorAction Stop` makes that behavior explicit at the operation that the catch handles. This avoids relying on a caller's `$ErrorActionPreference`. The [PowerShell error-handling documentation](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_error_handling?view=powershell-7.6) describes the escalation. Issue probes on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6 showed explicit `-ErrorAction Stop` entering `catch` under all tested preference values; without it, the cmdlet failure reached `catch` only when the preference was `Stop`. The separate macOS PowerShell Core 7.6.9 run also observed plain `Write-Error` continue inside `try` under `Continue` and `SilentlyContinue`, while `Write-Error -ErrorAction Stop` reached `catch` under both. These results are bounded to the tested commands and runtimes; they do not change the documented non-throwing contract for catches that intentionally handle a failure without rethrowing.
+
+---
+
+### Cause-Specific Results in Non-Throwing Catches
+
+> For the normative rule, see [Cause-Specific Results in Non-Throwing Catches](STYLE_GUIDE.md#cause-specific-results-in-non-throwing-catches) in the main guide.
+
+A non-throwing helper's result is part of its public contract. A cause-specific value such as `MissingItem` is truthful only when the caught error from the operation supports that cause. A broad catch that maps access denial or an I/O failure to `MissingItem` can send the caller toward the wrong repair. Match a typed exception or a command-specific documented identifier; keep the protected operation narrow when other calls could raise the same type. Do not parse localized message text or perform a second query to guess what the first failure meant.
+
+A generic failure result remains useful when callers do not need a finer distinction. It preserves the non-throwing contract without pretending that every exception has the same cause. Debug diagnostics can include a safe exception type, but they do not repair an inaccurate result. Avoid raw paths and other sensitive values in diagnostic output. PowerShell documents [typed catch behavior](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_try_catch_finally?view=powershell-7.5), and the [ItemNotFoundException API](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.itemnotfoundexception?view=powershellsdk-7.4.0) identifies the command-level not-found category used in the example.
+
 ---
 
 ### Summary: Error Handling as Diagnostic Instrumentation
@@ -762,6 +778,14 @@ process {
 - **Progress** → long-running operations (not applicable here)
 
 But in **v1.0**, these are **deliberately omitted** — not due to ignorance, but **design constraint**.
+
+---
+
+### JSON Array Boundaries
+
+> For the normative exception, see [Consuming Streaming Functions](STYLE_GUIDE.md#consuming-streaming-functions-the-0-1-many-problem) in the main guide.
+
+Top-level JSON arrays need a separate boundary rule from ordinary function output. `ConvertFrom-Json -NoEnumerate` sends an array as one object. Check whether the running command exposes the switch. Store the parsed array, then enumerate it once; another wrapper or a second flattening step can change the distinction between an empty array, a one-element array, and a nested array. In the PS #260 probes, capability-gated parsing retained top-level and nested array boundaries on Windows PowerShell 5.1.26100.9818, Windows PowerShell 7.6.9, and Linux PowerShell 7.4.6. The separate macOS PowerShell Core 7.6.9 run observed `-NoEnumerate` produce one `System.Object[]` record for each of `[]`, `[1]`, `[1,2]`, and `[[1,2]]`; one loop over the nested result received one inner array of length two. The [official cmdlet reference](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/convertfrom-json?view=powershell-7.6) documents the switch.
 
 ---
 
@@ -972,25 +996,51 @@ Paths built from variables, `Join-Path` output, user input, environment variable
 
 #### Why `-LiteralPath` Is the Safe Default
 
-`-LiteralPath` treats the entire string as a literal file-system path with no wildcard interpretation. It is semantically equivalent to "this exact path" and eliminates the entire class of wildcard-injection bugs. There is no performance cost to using `-LiteralPath`; it simply bypasses the wildcard-resolution step.
+`-LiteralPath` disables wildcard interpretation. It does not guarantee that the provider and native filesystem identify a name in the same way: provider syntax, separator rules, path normalization, and links still affect resolution. Treating it as a promise of exact filesystem identity would hide those separate path-resolution steps. It removes wildcard matching from the decision, but it does not remove the need to validate an externally supplied name before provider resolution.
+
+This distinction appeared in the PS #260 macOS run on ARM64, macOS 27.2.1, APFS, and PowerShell Core 7.6.9. The native .NET API read a file whose name contained a literal backslash, while `Get-Item -LiteralPath` and `Get-Content -LiteralPath` selected a distinct slash-separated decoy. The result is specific to that tested provider and runtime. It supports checking the original repository-relative name before handing it to a provider and reporting a POSIX name containing a literal backslash rather than rewriting it.
 
 #### Destructive Operations Require Stronger Protection
 
 For `Remove-Item` and `Move-Item`, the consequences of accidental wildcard expansion are **irreversible**—deleted files cannot be recovered (without backups), and moved files may overwrite existing targets. This is why the main guide elevates the rule from **SHOULD** to **MUST** for destructive cmdlets with variable-derived paths.
 
+#### Matching Concrete Paths With Wildcard-Enabled Parameters
+
+The general **SHOULD** to escape concrete paths used for wildcard matching remains useful even when `-LiteralPath` is unavailable. The narrower **MUST** for a concrete, variable-derived path to a `-Path`-only cmdlet makes selection of an existing target item deterministic. The PowerShell [7.6 changelog](https://github.com/PowerShell/PowerShell/blob/master/CHANGELOG/7.6.md) records a fix to `WildcardPattern.Escape()` for lone backticks; code that supports releases before that fix must escape backticks explicitly instead of relying on that method alone. The reported PS #260 run used PowerShell 7.6.9; a pre-7.6 runtime was not run.
+
 #### `New-Item` Exception
 
-`New-Item` does not expose a `-LiteralPath` parameter in any released version of PowerShell (Windows PowerShell 5.1, PowerShell 7.x). Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. Because `New-Item` creates a new item rather than deleting, moving, or modifying existing file-system entries, the wildcard-injection risk is lower than for read or destructive cmdlets, but it is not eliminated: wildcard characters supplied to `-Path` can still match existing parent directories or items and cause creation in unintended or multiple locations. Use `New-Item -Path` when the path value is trusted or validated; for untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`) as literal characters, validate or reject the input, or use an appropriate .NET API (e.g., `[System.IO.File]::Create()`, `[System.IO.Directory]::CreateDirectory()`) when literal path semantics are required.
+`New-Item` does not expose a `-LiteralPath` parameter in Windows PowerShell 5.1 or PowerShell 7.x. Attempting `New-Item -LiteralPath` produces a `ParameterBindingException`. With `-Name`, a wildcard in `-Path` can match multiple existing parent directories and cause creation in multiple locations. Use `New-Item -Path` when the path value is trusted or validated. For untrusted input that may contain wildcard characters (`[`, `]`, `*`, `?`), validate or reject the input, or use an appropriate .NET API, such as `[System.IO.File]::Create()` or `[System.IO.Directory]::CreateDirectory()`, when literal path semantics are required.
+
+The item-creation exceptions apply when a command creates a target. In the Windows FileSystem provider probes on Windows PowerShell 5.1.26100.10068 and PowerShell 7.6.9, `New-Item` preserved brackets and literal backticks in a new name supplied as part of `-Path`. With the name in `-Name`, it expanded a wildcard in the parent `-Path` to both test directories. Apply the matching rule to commands that select an existing target.
 
 #### Wildcard-Safe Directory Creation With `[System.IO.Directory]::CreateDirectory()`
 
-For directory creation specifically, `[System.IO.Directory]::CreateDirectory()` is the preferred .NET alternative when the path is variable-derived and may contain wildcard characters. Unlike `New-Item -Path ... -ItemType Directory`, `CreateDirectory()` does not interpret PowerShell wildcard characters (`[`, `]`, `*`, `?`) and therefore provides deterministic behavior regardless of what characters appear in the path.
+For directory creation specifically, `[System.IO.Directory]::CreateDirectory()` is the preferred .NET alternative when the path is variable-derived and may contain wildcard characters. `CreateDirectory()` accepts a literal filesystem path and leaves character validity to the target filesystem. It does not expand PowerShell wildcard patterns.
 
 The path must be resolved to an absolute filesystem path via `$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath()` before being passed to `CreateDirectory()`, as documented in the "Resolving Paths for .NET Static Methods" rule. `GetUnresolvedProviderPathFromPSPath()` is particularly appropriate here because the target directory may not yet exist.
 
 `CreateDirectory()` is also safe to call when the directory already exists—it returns the existing `DirectoryInfo` object without error—making a preceding `Test-Path -LiteralPath` check optional but useful for clarity. The compliant example in the main guide includes the `Test-Path` guard for readability.
 
 For *file* creation with wildcard-safe semantics, the corresponding .NET API is `[System.IO.File]::Create()` or `[System.IO.StreamWriter]`, but that case is not covered by this rule. The directory-creation guidance is separated because it is the most common scenario where `New-Item -ItemType Directory` would otherwise be the idiomatic choice.
+
+---
+
+### Windows Component and Listed-Name Checks
+
+> For the normative checks, see [Path and Scope Handling](STYLE_GUIDE.md#path-and-scope-handling) in the main guide.
+
+On Windows, file and directory names have reserved characters and device names, and Windows path handling can remove trailing periods or spaces. The [Windows naming guidance](https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file) lists the reserved names and characters; Microsoft's [whitespace behavior note](https://learn.microsoft.com/en-us/troubleshoot/windows-client/shell-experience/file-folder-name-whitespace-characters) describes the handling of trailing ASCII periods and spaces. Checking each original component and each enumerated name before normalization prevents a later path operation from silently changing which name the code addresses.
+
+---
+
+### Symlink Targets and Repository Containment
+
+> For the normative checks, see [Symlink Targets and Repository Containment](STYLE_GUIDE.md#symlink-targets-and-repository-containment) in the main guide.
+
+Link target strings and resolved path strings are also not interchangeable. .NET documents `LinkTarget` as the link's target path and `ResolveLinkTarget(true)` as following links to a final target ([`LinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.linktarget), [`ResolveLinkTarget`](https://learn.microsoft.com/en-us/dotnet/api/system.io.filesysteminfo.resolvelinktarget)). The [.NET 6 source](https://github.com/dotnet/runtime/blob/v6.0.0/src/libraries/System.Private.CoreLib/src/System/IO/FileSystemInfo.cs#L109-L157) exposes both members. Check the runtime before relying on them. Refuse a containment decision when the needed original target text is unavailable. In the PS #260 macOS run, a `sub/../x` path reached an outside fixture through native and provider opens, while `GetFullPath()` and `ResolveLinkTarget(true).FullName` returned the trusted decoy spelling `trusted/x`; a separate resolved path also retained an intermediate directory link. These observations are bounded to the tested runtime and filesystem. They explain why containment checks inspect lexical directories below the trusted root and examine a raw link target before processing parent traversal. When enumeration feeds a validation gate, an unreadable or unclassifiable entry also prevents the walk from proving that it covered the whole tree; the same run observed native enumeration and `Get-ChildItem -ErrorAction Stop` fail after the test directory's mode was changed to `000`.
+
+In the same macOS fixture, raw `LinkTarget` kept the literal backslash. The original link alias reached the literal target, while a provider open of the resolved target spelling reached a different, slash-separated file. Checking both spellings before the provider call preserves which entry the containment check is about.
 
 ---
 
@@ -1350,7 +1400,7 @@ For scripts targeting PowerShell v2.0 or later, **either approach is acceptable*
 
 #### try/catch Approach Rationale
 
-The `try/catch` code example uses `.NET` static methods for both path construction (`[System.IO.Path]::Combine()`) and file operations (`[System.IO.File]::Open()` and `[System.IO.File]::Delete()`) instead of cmdlets. `New-Item` does not support `-LiteralPath`, and `Join-Path`'s `-Path` parameter accepts wildcard characters. Since the guide requires `-LiteralPath` for variable-derived concrete paths, the cmdlet-based approach cannot be made consistent with that rule. `.NET` path and file APIs operate on literal path strings and do not interpret PowerShell wildcard characters, avoiding the inconsistency.
+The `try/catch` code example uses .NET static methods for path construction (`[System.IO.Path]::Combine()`) and file operations (`[System.IO.File]::Open()` and `[System.IO.File]::Delete()`). These APIs use literal filesystem paths without PowerShell wildcard expansion.
 
 The probe writes to a GUID-based temporary filename (`.write_test_{GUID}.tmp`) in the target file's parent directory instead of probing at the actual output path. This avoids two problems:
 
@@ -1883,7 +1933,7 @@ An absent test root or an existing root with no owned test files can be an inten
 
 The earlier FileSystem provider filter accepted case variants of the `.Tests.ps1` suffix. The explicit owned list matches the exact suffix, so it excludes `Example.tests.PS1` and `Example.Tests.ps1.txt`. Give an intended owned test the exact suffix, for example `Example.Tests.ps1`. The configured directory segments have their own comparison rule because segment matching defines which trees discovery may enter.
 
-The CI example assumes a trusted checkout and validates the relative root before discovery. It checks each configured component against the names listed by its parent. Windows may accept a short alias for a different listed name, so a successful lookup alone does not establish ownership. The example visits one directory at a time to apply exact segment exclusions before descent. The shared ordinal comparer ignores case on Windows and retains it on Unix. Linguistic matching can ignore a soft hyphen, which would let an excluded name hide tests under a distinct owned directory. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. On Unix, it uses the filesystem provider's non-following `UnixStat.ItemType` to require a regular file. A `FileInfo` object can also describe a named pipe. The example refuses literal POSIX backslashes in eligible names before passing paths to a provider. The original ordinary file objects, including hidden files, control the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
+The CI example requires an ordinary filesystem workspace before it selects the trusted walk root. It validates the relative root before discovery and checks each configured component against the original names listed by its parent. Windows may accept a short alias for a different listed name, so a successful lookup alone does not establish ownership. The example visits one directory at a time to apply exact segment exclusions before descent. On Windows, it checks each eligible original name before it reads attributes, enqueues a directory, or accepts a test file. A provider lookup can trim a trailing period or space and select a different directory. The example builds each relative walk path from checked listed components. The shared ordinal comparer ignores case on Windows and retains it on Unix. Linguistic matching can ignore a soft hyphen, which would let an excluded name hide tests under a distinct owned directory. It rejects eligible entries with the reparse-point attribute, which includes symbolic links and Windows junctions. On Unix, it uses the filesystem provider's non-following `UnixStat.ItemType` to require a regular file. A `FileInfo` object can also describe a named pipe. The example refuses literal POSIX backslashes in eligible names before passing paths to a provider. The original ordinary file objects, including hidden files, control the skip decision and `Run.Container`. `-ErrorAction Stop` makes enumeration failures reach CI. A supported result-to-exit path makes failing tests return a nonzero process status.
 
 ### Mocking External Dependencies
 
@@ -1901,7 +1951,7 @@ A filtered mock miss does not imply that Pester will run the original command. A
 
 A mock supplies a controlled return value without sending the composed string through the real service's parser or semantic validation. A return-code or call-count assertion can therefore pass while the string itself is malformed. Positive structural assertions detect missing required clauses. A complementary negative assertion detects a known invalid construct that can coexist with the required clause; neither check replaces the other.
 
-Whitespace-tolerant structural patterns avoid coupling a test to formatting when formatting is not part of the contract. Case-sensitive checks matter for languages such as KQL. Whole-string equality is appropriate only when exact text is required. When using a filtered invocation count, an unfiltered total is also needed so an invalid extra call cannot disappear from the filtered result. Script-scoped capture makes the mock and assertion address the same per-test collection even when a caller-local variable has the same name. Each test initializes its own capture state to preserve isolation.
+Whitespace-tolerant structural patterns avoid coupling a test to formatting when formatting is not part of the contract. The KQL example anchors its check to the declared source and first pipeline stage. A match anywhere in the query can accept the expected words inside a comment or a quoted value. Case-sensitive checks matter for languages such as KQL. Whole-string equality is appropriate only when exact text is required. When using a filtered invocation count, an unfiltered total is also needed so an invalid extra call cannot disappear from the filtered result. Script-scoped capture makes the mock and assertion address the same per-test collection even when a caller-local variable has the same name. Each test initializes its own capture state to preserve isolation.
 
 These assertions establish what the code sent to the mock; they do not prove that the service accepts the string. Where practical, validate it through an integration test or an offline parser. This is a recommendation for additional evidence, not a requirement to use both validation methods for every test.
 
