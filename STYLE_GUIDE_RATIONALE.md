@@ -1945,6 +1945,20 @@ For `Should -Invoke`, positive `-Times N` without `-Exactly` means at least N ca
 
 A filtered mock miss does not imply that Pester will run the original command. A test that needs the original behavior must resolve and cache the real command before installing a mock, then add a deliberate default mock that invokes the cached command. This keeps fallback behavior explicit and avoids confusing it with a matching filtered mock.
 
+### Asserting Query and Command Strings Sent to Mocks
+
+> For the normative rules, see [Asserting Query and Command Strings Sent to Mocks](STYLE_GUIDE.md#asserting-query-and-command-strings-sent-to-mocks) in the main guide.
+
+A mock supplies a controlled return value without sending the composed string through the real service's parser or semantic validation. A return-code or call-count assertion can therefore pass while the string itself is malformed. Positive structural assertions detect missing required clauses. A complementary negative assertion detects a known invalid construct that can coexist with the required clause; neither check replaces the other.
+
+Whitespace-tolerant structural patterns avoid coupling a test to formatting when formatting is not part of the contract. The KQL example anchors its check to the declared source and first pipeline stage. A match anywhere in the query can accept the expected words inside a comment or a quoted value. Case-sensitive checks matter for languages such as KQL. Whole-string equality is appropriate only when exact text is required. When using a filtered invocation count, an unfiltered total is also needed so an invalid extra call cannot disappear from the filtered result. Script-scoped capture makes the mock and assertion address the same per-test collection even when a caller-local variable has the same name. Each test initializes its own capture state to preserve isolation.
+
+These assertions establish what the code sent to the mock; they do not prove that the service accepts the string. Where practical, validate it through an integration test or an offline parser. This is a recommendation for additional evidence, not a requirement to use both validation methods for every test.
+
+#### Motivating case
+
+At [GloryRole issue #52](https://github.com/franklesniak/GloryRole/issues/52), the code at commit [`8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68`](https://github.com/franklesniak/GloryRole/commit/8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68) used `project-rename TimeGenerated = min_TimeGenerated` after `summarize arg_min(TimeGenerated, ...)`. The reported service response was `BadRequest` / `SEM0001` for an unresolved `min_TimeGenerated` column. Passing mocked Pester jobs did not show that the service accepted the query. The [Kusto `arg_min` reference](https://learn.microsoft.com/en-us/kusto/query/arg-min-aggregation-function) distinguishes the output column name from the source column expression; checking only for `arg_min` would still allow the invalid rename.
+
 ### Testing Strongly-Typed Array Properties
 
 > For the normative rules, see [Testing Strongly-Typed Array Properties](STYLE_GUIDE.md#testing-strongly-typed-array-properties) in the main guide.

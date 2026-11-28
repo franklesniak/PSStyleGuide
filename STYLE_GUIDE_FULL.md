@@ -2,7 +2,7 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.30.20261128.0
+**Version:** 2.31.20261128.0
 
 ## Metadata
 
@@ -200,6 +200,7 @@ Scope tags: **[All]** = all PowerShell versions, **[Modern]** = PowerShell v2.0+
 - **[All]** Tests asserting that a call does not throw **MUST** use `{ ... } | Should -Not -Throw` and **MUST NOT** rely on `try/catch` plus negated assertions on exception text → [Asserting Successful Execution With Should -Not -Throw](#asserting-successful-execution-with-should--not--throw)
 - **[All]** Tests verifying mock invocations **MUST** use `Should -Invoke` or `Should -InvokeVerifiable`; `Assert-MockCalled` and `Assert-VerifiableMock` **MUST NOT** be used → [Mocking External Dependencies](#mocking-external-dependencies)
 - **[All]** For mock invocation counts, `-Times <N>` without `-Exactly` checks for at least N calls when N is positive. `-Times 0` checks for exactly zero. Use `-Exactly` when the contract requires an exact count → [Mocking External Dependencies](#mocking-external-dependencies)
+- **[All]** When code under test passes a composed query, command, or request string to a mock, at least one test **SHOULD** assert the string's required structure; negated checks **MUST NOT** be the only contract assertion → [Asserting Query and Command Strings Sent to Mocks](#asserting-query-and-command-strings-sent-to-mocks)
 - **[All]** PSScriptAnalyzer CI integrations that emit host-native diagnostics **MUST** use the active CI host's command format → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** Host-neutral, local, and interactive PSScriptAnalyzer runs **SHOULD** use plain output; ambiguous, missing, or contradictory host detection **MUST** fall back to plain output → [PSScriptAnalyzer CI Diagnostic Output](#psscriptanalyzer-ci-diagnostic-output)
 - **[All]** A PSScriptAnalyzer severity filter that feeds a CI gate **MUST** include `ParseError`, unless the gate separately parses every input and fails on parse errors → [PSScriptAnalyzer Severity Filters and Parse Errors](#psscriptanalyzer-severity-filters-and-parse-errors)
@@ -4275,6 +4276,89 @@ Describe 'Get-Item mock fallback' {
 Mock Get-Item { [pscustomobject]@{ Name = 'synthetic' } } -Verifiable
 Get-Item -LiteralPath 'synthetic' | Should -Not -BeNullOrEmpty
 Should -InvokeVerifiable
+```
+
+---
+
+### Asserting Query and Command Strings Sent to Mocks
+
+A mock supplies a controlled return value without sending the composed string through the real service's parser or semantic validation. A return-code or call-count assertion can therefore pass while the string itself is malformed. Positive structural assertions detect missing required clauses. A complementary negative assertion detects a known invalid construct that can coexist with the required clause; neither check replaces the other.
+
+Whitespace-tolerant structural patterns avoid coupling a test to formatting when formatting is not part of the contract. The KQL example anchors its check to the declared source and first pipeline stage. A match anywhere in the query can accept the expected words inside a comment or a quoted value. Case-sensitive checks matter for languages such as KQL. Whole-string equality is appropriate only when exact text is required. When using a filtered invocation count, an unfiltered total is also needed so an invalid extra call cannot disappear from the filtered result. Script-scoped capture makes the mock and assertion address the same per-test collection even when a caller-local variable has the same name. Each test initializes its own capture state to preserve isolation.
+
+These assertions establish what the code sent to the mock; they do not prove that the service accepts the string. Where practical, validate it through an integration test or an offline parser. This is a recommendation for additional evidence, not a requirement to use both validation methods for every test.
+
+#### Motivating case
+
+At [GloryRole issue #52](https://github.com/franklesniak/GloryRole/issues/52), the code at commit [`8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68`](https://github.com/franklesniak/GloryRole/commit/8a4d6fe33d076c1c1c29da8abbc4d51885a3ba68) used `project-rename TimeGenerated = min_TimeGenerated` after `summarize arg_min(TimeGenerated, ...)`. The reported service response was `BadRequest` / `SEM0001` for an unresolved `min_TimeGenerated` column. Passing mocked Pester jobs did not show that the service accepted the query. The [Kusto `arg_min` reference](https://learn.microsoft.com/en-us/kusto/query/arg-min-aggregation-function) distinguishes the output column name from the source column expression; checking only for `arg_min` would still allow the invalid rename.
+
+Apply this guidance when code under test composes a string that an external system parses or validates, then sends that string to a mocked command. Examples include KQL, SQL, an OData `$filter`, an HTTP or JSON request body, and a native command line.
+
+At least one test **SHOULD** assert the emitted string's contract. Tests **SHOULD** cover each code path that changes the emitted structure, such as terminal and non-terminal pages or chunks. A shared assertion about one common clause does not establish branch-specific structure.
+
+Contract assertions **MUST** include at least one positive assertion that a required structural element is present. When a known-invalid construct has caused a defect, tests **SHOULD** also assert that it is absent. Negated checks **MUST NOT** be the only contract assertion; they can pass when required elements are missing.
+
+Patterns **SHOULD** target structural elements and tolerate insignificant whitespace. Tests **SHOULD NOT** compare the whole string for equality unless exact text is the contract. Where the target language is case-sensitive, such as KQL, positive checks **SHOULD** be case-sensitive; use `Should -MatchExactly` or `-cmatch` in a filter.
+
+Tests **SHOULD** use either capture of each emitted string in a `$script:`-scoped `System.Collections.Generic.List[string]` initialized in the same `It` block or `BeforeEach`, or a pair of `Should -Invoke` assertions with the same `-Times <N> -Exactly`: one unfiltered total and one `-ParameterFilter` count that accepts only valid strings. A filtered count alone ignores invalid extra calls. Use capture when several assertions need distinct failure messages. Initialize and use the same script-qualified collection for capture and assertions; an unqualified variable can resolve to a same-named caller-local variable.
+
+Before iterating captured strings, tests **MUST** assert that the capture list is not empty. Tests **SHOULD** also assert the exact count before examining values when the call count is part of the contract. This applies to a mock's capture list; [Defensive Assertions Before Iteration and Indexing](#defensive-assertions-before-iteration-and-indexing) continues to govern returned collections.
+
+The compliant examples use two example-only commands. `Get-AuditSummary` accepts a `-ReferenceToResult` argument of type `[ref]` and returns an integer status. `Invoke-LogQuery` accepts a `-Query` argument of type `[string]` and returns an object with a `Results` property.
+
+For both examples, `Get-AuditSummary` emits a query that starts with this source and pipeline stage.
+
+```kusto
+AuditEvents
+| summarize arg_min(TimeGenerated, *) by AccountId
+```
+
+The pattern `\A\s*AuditEvents\s*\|\s*summarize\s+arg_min\s*\(\s*TimeGenerated\s*,\s*\*\s*\)\s+by\s+AccountId(?=\s*(?:\||\z))` anchors the check at the start of the query. It checks the complete first stage, allows whitespace in the positions shown, and permits later pipeline stages. The examples also disallow the text `min_TimeGenerated` in this fixture.
+
+**Compliant: capture each emitted string:**
+
+```powershell
+It 'Emits the required summarize stage and omits the disallowed text' {
+    # Arrange
+    $refResult = $null
+    $script:listCapturedQuery = New-Object System.Collections.Generic.List[string]
+    Mock Invoke-LogQuery {
+        [void]($script:listCapturedQuery.Add([string]$Query))
+        [pscustomobject]@{ Results = @() }
+    }
+
+    # Act
+    $intReturnCode = Get-AuditSummary -ReferenceToResult ([ref]$refResult)
+
+    # Assert
+    $intReturnCode | Should -Be 0
+    $script:listCapturedQuery | Should -Not -BeNullOrEmpty
+    $script:listCapturedQuery.Count | Should -Be 1
+    foreach ($strCapturedQuery in $script:listCapturedQuery) {
+        $strCapturedQuery | Should -MatchExactly '\A\s*AuditEvents\s*\|\s*summarize\s+arg_min\s*\(\s*TimeGenerated\s*,\s*\*\s*\)\s+by\s+AccountId(?=\s*(?:\||\z))'
+        $strCapturedQuery | Should -Not -Match 'min_TimeGenerated'
+    }
+}
+```
+
+**Compliant: assert total and filtered valid-call counts:**
+
+```powershell
+Should -Invoke Invoke-LogQuery -Times 1 -Exactly
+Should -Invoke Invoke-LogQuery -Times 1 -Exactly -ParameterFilter {
+    $Query -cmatch '\A\s*AuditEvents\s*\|\s*summarize\s+arg_min\s*\(\s*TimeGenerated\s*,\s*\*\s*\)\s+by\s+AccountId(?=\s*(?:\||\z))' -and $Query -notmatch 'min_TimeGenerated'
+}
+```
+
+**Non-Compliant: only a negated contract check:**
+
+```powershell
+# Non-Compliant: the only contract check is negated. It passes when the
+# query is truncated or is missing the required summarize step.
+$script:listCapturedQuery | Should -Not -BeNullOrEmpty
+foreach ($strCapturedQuery in $script:listCapturedQuery) {
+    $strCapturedQuery | Should -Not -Match 'min_TimeGenerated'
+}
 ```
 
 ---
